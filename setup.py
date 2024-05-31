@@ -10,6 +10,6 @@ setup(
     author_email='',
     description='An example of a basic Python repository',
     install_requires=[
-        'requests==2.20.0'
+        ''
     ]
 )
