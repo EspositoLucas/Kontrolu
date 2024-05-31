@@ -1,4 +1,6 @@
-# Proyecto Final UTN FRBA 2024
+# Kontrolu | Final-Thesis | 2024
+
+## Authors
 
 | Integrantes   | Correo Institucional      |
 | ------------- | ------------- |  
