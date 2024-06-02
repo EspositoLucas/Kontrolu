@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtTest import QTest
 from PyQt5.QtCore import Qt, QPoint
 
-# Agregar la ruta del módulo src a sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 from src.ui.drawing_area import DrawingArea

@@ -1,4 +1,3 @@
-# src/ui/main_window.py
 from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QVBoxLayout, QWidget, QPushButton
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
@@ -10,8 +9,8 @@ class MainWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('Diagramador')
-        self.setGeometry(100, 100, 800, 600)
+        self.setWindowTitle('Kontrolu')
+        self.showMaximized()
         
         # Menú de archivo
         new_action = QAction(QIcon('new.png'), 'Nuevo', self)
@@ -44,22 +43,11 @@ class MainWindow(QMainWindow):
     def initToolBar(self):
         toolbar = QToolBar("Herramientas", self)
         self.addToolBar(Qt.LeftToolBarArea, toolbar)
-        
-        square_btn = QPushButton("Cuadrado", self)
-        square_btn.clicked.connect(lambda: self.drawing_area.set_shape('square'))
-        toolbar.addWidget(square_btn)
-        
-        rect_btn = QPushButton("Rectángulo", self)
-        rect_btn.clicked.connect(lambda: self.drawing_area.set_shape('rectangle'))
-        toolbar.addWidget(rect_btn)
-        
-        circle_btn = QPushButton("Círculo", self)
-        circle_btn.clicked.connect(lambda: self.drawing_area.set_shape('circle'))
-        toolbar.addWidget(circle_btn)
-        
-        arrow_btn = QPushButton("Flecha", self)
-        arrow_btn.clicked.connect(lambda: self.drawing_area.set_shape('arrow'))
-        toolbar.addWidget(arrow_btn)
+
+        delete_button = QPushButton('Borrar', self)
+        delete_button.clicked.connect(lambda: self.drawing_area.clear())
+        toolbar.addWidget(delete_button)
+        pass
 
     def new_project(self):
         self.statusBar().showMessage('Nuevo proyecto creado')
