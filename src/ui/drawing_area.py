@@ -39,7 +39,8 @@ class DrawingArea(QWidget):
 
     def mouseReleaseEvent(self, event):
         if self.drawing_shape:
-            self.shapes.append(self.current_shape)
+            if self.current_shape:
+                self.shapes.append(self.current_shape)
             self.current_shape = None
             self.drawing_shape = False
             self.update()
@@ -129,10 +130,10 @@ class DrawingArea(QWidget):
         angle = math.atan2(end.y() - start.y(), end.x() - start.x())
         arrow_size = 10
 
-        arrow_p1 = end + QPointF(math.cos(angle - math.pi / 6) * arrow_size,
-                                 math.sin(angle - math.pi / 6) * arrow_size)
-        arrow_p2 = end + QPointF(math.cos(angle + math.pi / 6) * arrow_size,
+        arrow_p1 = end + QPointF(math.cos(angle + math.pi / 6) * arrow_size,
                                  math.sin(angle + math.pi / 6) * arrow_size)
+        arrow_p2 = end + QPointF(math.cos(angle - math.pi / 6) * arrow_size,
+                                 math.sin(angle - math.pi / 6) * arrow_size)
 
         arrow_head = QPolygonF([end, arrow_p1, arrow_p2])
         painter.setBrush(Qt.black)
@@ -144,15 +145,15 @@ class DrawingArea(QWidget):
         painter.setPen(pen)
 
         for shape in self.shapes:
-            if shape['type'] == 'square':
+            if shape and shape['type'] == 'square':
                 painter.drawRect(QRectF(shape['start'], shape['end']))
-            elif shape['type'] == 'rectangle':
+            elif shape and shape['type'] == 'rectangle':
                 painter.drawRect(QRectF(shape['start'], shape['end']))
-            elif shape['type'] == 'circle':
+            elif shape and shape['type'] == 'circle':
                 center = (shape['start'] + shape['end']) / 2
                 radius = (shape['start'] - shape['end']).manhattanLength() / 2
                 painter.drawEllipse(center, radius, radius)
-            elif shape['type'] == 'arrow':
+            elif shape and shape['type'] == 'arrow':
                 self.draw_arrow(painter, shape['start'], shape['end'])
 
         if self.current_shape:
