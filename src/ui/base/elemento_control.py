@@ -1,6 +1,18 @@
+from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtGui import QPen, QBrush
 from PyQt5.QtCore import QRectF
-from .elemento_base import ElementoBase
+from PyQt5.QtCore import Qt
+class ElementoControl(QGraphicsRectItem):
+    def __init__(self, start, end):
+        super().__init__()
+        self.start = start
+        self.end = end
+        self.draw()
 
-class ElementoControl(ElementoBase):
-    def draw(self, painter):
-        painter.drawRect(QRectF(self.start, self.end))
+    def draw(self):
+        rect = QRectF(self.start, self.end)
+        self.setRect(rect)
+        pen = QPen(Qt.black, 2)
+        brush = QBrush(Qt.white)
+        self.setPen(pen)
+        self.setBrush(brush)

@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToo
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from .drawing_area import DrawingArea
+from .infinite_canvas import InfiniteCanvas
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -35,7 +36,10 @@ class MainWindow(QMainWindow):
         
         # Área de dibujo
         self.drawing_area = DrawingArea()
-        self.setCentralWidget(self.drawing_area)
+        self.infinite_canvas = InfiniteCanvas()
+        self.infinite_canvas.setScene(self.drawing_area)
+        self.infinite_canvas.fitInView(self.drawing_area.sceneRect(), Qt.KeepAspectRatio)
+        self.setCentralWidget(self.infinite_canvas)
         
         # Panel de herramientas
         self.initToolBar()
