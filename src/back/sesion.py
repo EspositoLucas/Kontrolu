@@ -5,7 +5,7 @@ from .macros.macro_proceso import MacroProceso
 
 class Sesion():
     def __init__(self):
-        self.controlador = MacroActuador()
+        self.controlador = MacroControlador()
         self.actuador = MacroActuador()
         self.proceso = MacroProceso()
         self.mediciones = MacroMedidor()
