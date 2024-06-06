@@ -1,18 +1,4 @@
-from PyQt5.QtWidgets import QGraphicsRectItem
-from PyQt5.QtGui import QPen, QBrush
-from PyQt5.QtCore import QRectF
-from PyQt5.QtCore import Qt
-class ElementoControl(QGraphicsRectItem):
-    def __init__(self, start, end):
-        super().__init__()
-        self.start = start
-        self.end = end
-        self.draw()
-
-    def draw(self):
-        rect = QRectF(self.start, self.end)
-        self.setRect(rect)
-        pen = QPen(Qt.black, 2)
-        brush = QBrush(Qt.white)
-        self.setPen(pen)
-        self.setBrush(brush)
+from .macro_vista import MacroVista
+class ElementoControl(MacroVista):
+    def __init__(self, controlador):
+        MacroVista.__init__(self,(50, 50),(150, 100),controlador)

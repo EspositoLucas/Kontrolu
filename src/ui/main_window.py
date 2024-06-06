@@ -1,13 +1,15 @@
-from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QVBoxLayout, QWidget, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QGridLayout, QWidget, QPushButton
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
-from .drawing_area import DrawingArea
-from .infinite_canvas import InfiniteCanvas
+
+from .macro_diagrama import MacroDiagrama
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self,sesion):
         super().__init__()
+        self.sesion = sesion
         self.initUI()
+        
 
     def initUI(self):
         self.setWindowTitle('Kontrolu')
@@ -34,28 +36,26 @@ class MainWindow(QMainWindow):
         
         self.statusBar().showMessage('Listo')
         
-        # Área de dibujo
-        self.drawing_area = DrawingArea()
-        self.infinite_canvas = InfiniteCanvas()
-        self.infinite_canvas.setScene(self.drawing_area)
-        self.infinite_canvas.fitInView(self.drawing_area.sceneRect(), Qt.KeepAspectRatio)
-        self.setCentralWidget(self.infinite_canvas)
-        
         # Panel de herramientas
-        self.initToolBar()
+        self.init_tool_bar()
+
+
+        diagrama = MacroDiagrama(self.sesion)
+        diagrama.show()
+        self.setCentralWidget(diagrama)
     
-    def initToolBar(self):
+
+    def init_tool_bar(self):
         toolbar = QToolBar("Herramientas", self)
         self.addToolBar(Qt.LeftToolBarArea, toolbar)
 
         delete_button = QPushButton('Borrar', self)
-        delete_button.clicked.connect(lambda: self.drawing_area.clear())
+        # delete_button.clicked.connect(lambda: self.drawing_area.clear())
         toolbar.addWidget(delete_button)
         pass
 
     def new_project(self):
         self.statusBar().showMessage('Nuevo proyecto creado')
-        self.drawing_area.clear()
 
     def open_project(self):
         options = QFileDialog.Options()
