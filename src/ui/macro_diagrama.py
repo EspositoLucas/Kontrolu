@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QVBoxLayout, QWidget, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QHBoxLayout, QWidget, QPushButton
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
@@ -12,22 +12,22 @@ class MacroDiagrama(QWidget):
     def __init__(self,sesion):
         super().__init__()
         self.sesion = sesion
+        self.initUI()
         self.generar_diagrama()
 
+    def initUI(self):
+        self.setFixedSize(800, 600)
+        self.show()
 
-    def generar_diagrama(self):
-
-        layout = QVBoxLayout(self) 
-        
+    def generar_diagrama(self):  
         control = ElementoControl(self.sesion.controlador)
-        # self.addShape(control)
         correccion = ElementoCorreccion(self.sesion.actuador)
-        # self.addShape(correccion)
         proceso = Proceso(self.sesion.proceso)
-        # self.addShape(proceso)
         medicion = ElementoMedicion(self.sesion.mediciones)
+
+        control.setParent(self)
+        correccion.setParent(self)
+        proceso.setParent(self)
+        medicion.setParent(self)
         
-        layout.addWidget(control)
-        layout.addWidget(correccion)
-        layout.addWidget(proceso)
-        layout.addWidget(medicion)
+        

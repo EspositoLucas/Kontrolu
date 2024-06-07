@@ -12,11 +12,8 @@ class MacroVista(QPushButton):
         self.end = QPoint(*end)
         self.move(self.start)  # Mueve el botón a la posición especificada por start
         self.setStyleSheet("background-color: #f0f0f0; border: 1px solid #000000; border-radius: 5px;")
-        self.draw()
         self.clicked.connect(self.accion)
+        self.show()
 
     def accion(self):
         print("boton apretado")
-
-    def draw(self):
-        self.show()

@@ -1,8 +1,10 @@
-from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QGridLayout, QWidget, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QGridLayout, QWidget, QPushButton,QMenuBar
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
 from .macro_diagrama import MacroDiagrama
+from .menu.archivo import Archivo
+from .menu.menu_bar import Menu
 
 class MainWindow(QMainWindow):
     def __init__(self,sesion):
@@ -14,26 +16,13 @@ class MainWindow(QMainWindow):
     def initUI(self):
         self.setWindowTitle('Kontrolu')
         self.showMaximized()
-        
-        # Menú de archivo
-        new_action = QAction(QIcon('new.png'), 'Nuevo', self)
-        new_action.setShortcut('Ctrl+N')
-        new_action.triggered.connect(self.new_project)
-        
-        open_action = QAction(QIcon('open.png'), 'Abrir', self)
-        open_action.setShortcut('Ctrl+O')
-        open_action.triggered.connect(self.open_project)
-        
-        save_action = QAction(QIcon('save.png'), 'Guardar', self)
-        save_action.setShortcut('Ctrl+S')
-        save_action.triggered.connect(self.save_project)
-        
-        menubar = self.menuBar()
-        file_menu = menubar.addMenu('Archivo')
-        file_menu.addAction(new_action)
-        file_menu.addAction(open_action)
-        file_menu.addAction(save_action)
-        
+
+
+        menuBar = Menu(self)
+        self.setMenuBar(menuBar)
+
+
+
         self.statusBar().showMessage('Listo')
         
         # Panel de herramientas

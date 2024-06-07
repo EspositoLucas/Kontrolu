@@ -1,0 +1,46 @@
+from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QHBoxLayout, QWidget, QPushButton, QMenu, QAction
+from PyQt5.QtGui import QIcon
+
+class Archivo(QMenu):
+    def __init__(self,main_window):
+        super().__init__('Archivo',main_window)
+        self.setup(main_window)
+    
+    def setup(self,main_window):
+        # Menú de archivo
+        new_action = QAction(QIcon('new.png'), 'Nuevo', main_window)
+        new_action.setShortcut('Ctrl+N')
+        new_action.triggered.connect(self.new_project)
+        
+        open_action = QAction(QIcon('open.png'), 'Abrir', main_window)
+        open_action.setShortcut('Ctrl+O')
+        open_action.triggered.connect(self.open_project)
+        
+        save_action = QAction(QIcon('save.png'), 'Guardar', main_window)
+        save_action.setShortcut('Ctrl+S')
+        save_action.triggered.connect(self.save_project)
+
+        self.addAction(new_action)
+        self.addAction(open_action)
+        self.addAction(save_action)
+    
+
+    def new_project(self):
+        print('Nuevo proyecto creado')
+        # self.statusBar().showMessage('Nuevo proyecto creado')
+
+    def open_project(self):
+        print('Proyecto abierto')
+        # options = QFileDialog.Options()
+        # file_name, _ = QFileDialog.getOpenFileName(self, 'Abrir Proyecto', '', 'Todos los archivos (*);;Archivos de Proyecto (*.prj)', options=options)
+        # if file_name:
+        #     self.statusBar().showMessage(f'Proyecto {file_name} abierto')
+        #     # Lógica para abrir un proyecto
+    
+    def save_project(self):
+        print('Proyecto guardado')
+        # options = QFileDialog.Options()
+        # file_name, _ = QFileDialog.getSaveFileName(self, 'Guardar Proyecto', '', 'Archivos de Proyecto (*.prj)', options=options)
+        # if file_name:
+        #     self.statusBar().showMessage(f'Proyecto guardado en {file_name}')
+        #     # Lógica para guardar un proyecto
