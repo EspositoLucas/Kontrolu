@@ -8,5 +8,5 @@ class Sesion():
         self.controlador = MacroControlador()
         self.actuador = MacroActuador()
         self.proceso = MacroProceso()
-        self.mediciones = MacroMedidor()
+        self.medidor = MacroMedidor()
     

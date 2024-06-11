@@ -1,11 +1,9 @@
-from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QGridLayout, QWidget, QPushButton,QMenuBar
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QToolBar, QPushButton
 from PyQt5.QtCore import Qt
 
-from .macro_diagrama import MacroDiagrama
 from .menu.archivo import Archivo
 from .menu.menu_bar import Menu
-from .diagramtest import Ui_Form
+from .macro_diagrama import MacroDiagrama
 
 class MainWindow(QMainWindow):
     def __init__(self,sesion):
@@ -18,35 +16,16 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Kontrolu')
         self.showMaximized()
 
-
         menuBar = Menu(self)
         self.setMenuBar(menuBar)
 
-
-
         self.statusBar().showMessage('Listo')
         
-        # Panel de herramientas
+        # Panel de herramientas lateral
         self.init_tool_bar()
-
-        a = Ui_Form()
-        a.setupUi(self)
-        a.pushButton.show()
-        a.pushButton_2.show()
-        a.pushButton_3.show()
-        a.pushButton_4.show()
-        a.line.show()
-        a.line_2.show()
-        a.line_3.show()
-        a.line_4.show()
-        a.line_5.show()
-        a.line_6.show()
-
         
-
-        # diagrama = MacroDiagrama(self.sesion)
-        # diagrama.show()
-        # self.setCentralWidget(diagrama)
+        # Diagrama inicial de lazo cerrado
+        self.init_macrobloques()
     
 
     def init_tool_bar(self):
@@ -57,6 +36,11 @@ class MainWindow(QMainWindow):
         # delete_button.clicked.connect(lambda: self.drawing_area.clear())
         toolbar.addWidget(delete_button)
         pass
+
+    def init_macrobloques(self):
+        a = MacroDiagrama()
+        a.setupUi(self)
+        a.mostrarElementos()
 
     def new_project(self):
         self.statusBar().showMessage('Nuevo proyecto creado')

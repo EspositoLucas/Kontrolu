@@ -1,5 +1,6 @@
 from .macro_vista import MacroVista
+from PyQt5 import QtCore
 
-class Proceso(MacroVista):
-    def __init__(self,medidor):
-        MacroVista.__init__(self,(350, 50), (450, 100),medidor)
+class ElementoProceso(MacroVista):
+    def __init__(self, medidor):
+        MacroVista.__init__(self, medidor, QtCore.QRect(420, 210, 121, 41))
