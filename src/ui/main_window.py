@@ -5,7 +5,6 @@ from PyQt5.QtCore import Qt
 from .macro_diagrama import MacroDiagrama
 from .menu.archivo import Archivo
 from .menu.menu_bar import Menu
-from .diagramtest import Ui_Form
 
 class MainWindow(QMainWindow):
     def __init__(self,sesion):
@@ -29,24 +28,17 @@ class MainWindow(QMainWindow):
         # Panel de herramientas
         self.init_tool_bar()
 
-        a = Ui_Form()
-        a.setupUi(self)
-        a.pushButton.show()
-        a.pushButton_2.show()
-        a.pushButton_3.show()
-        a.pushButton_4.show()
-        a.line.show()
-        a.line_2.show()
-        a.line_3.show()
-        a.line_4.show()
-        a.line_5.show()
-        a.line_6.show()
+        # a = Ui_Form()
+        # a.setupUi(self)
+        # a.line.show()
+        # a.line_2.show()
+        # a.line_3.show()
+        # a.line_4.show()
+        # a.line_5.show()
+        # a.line_6.show()
 
-        
-
-        # diagrama = MacroDiagrama(self.sesion)
-        # diagrama.show()
-        # self.setCentralWidget(diagrama)
+        diagrama = MacroDiagrama(self.sesion,self)
+        diagrama.show()
     
 
     def init_tool_bar(self):

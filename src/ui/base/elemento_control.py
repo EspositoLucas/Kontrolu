@@ -1,4 +1,4 @@
 from .macro_vista import MacroVista
 class ElementoControl(MacroVista):
-    def __init__(self, controlador):
-        MacroVista.__init__(self,(50, 50),(150, 100),controlador)
+    def __init__(self, controlador, main_window):
+        super().__init__(120, 210,controlador,main_window)
