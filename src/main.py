@@ -4,7 +4,7 @@ from ui.main_window import MainWindow
 from back.sesion import Sesion
 
 def main():
-    app = QApplication(sys.argv)
+    app = QApplication(sys.argv) 
     sesion = Sesion()
     main_window = MainWindow(sesion)
     main_window.show()
