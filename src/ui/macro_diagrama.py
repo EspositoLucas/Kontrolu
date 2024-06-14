@@ -4,6 +4,7 @@ from .base.elemento_actuador import ElementoActuador
 from .base.elemento_proceso import ElementoProceso
 from .base.elemento_medicion import ElementoMedicion
 from .base.punto_suma import PuntoSuma
+from .base.flecha import Flecha
 
 class MacroDiagrama(QtWidgets.QWidget):
     def setupUi(self, mainWindow):
@@ -33,62 +34,31 @@ class MacroDiagrama(QtWidgets.QWidget):
         puntoSuma.setParent(mainWindow)
         self.puntoSuma = puntoSuma
 
-        # LINEAS
-        self.line = QtWidgets.QFrame(mainWindow)
-        self.line.setGeometry(QtCore.QRect(340, 210, 31, 41))
-        self.line.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line.setObjectName("line")
-        self.line_2 = QtWidgets.QFrame(mainWindow)
-        self.line_2.setGeometry(QtCore.QRect(490, 210, 31, 41))
-        self.line_2.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_2.setObjectName("line_2")
-        self.line_3 = QtWidgets.QFrame(mainWindow)
-        self.line_3.setGeometry(QtCore.QRect(490, 280, 171, 41))
-        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_3.setObjectName("line_3")
-        self.line_4 = QtWidgets.QFrame(mainWindow)
-        self.line_4.setGeometry(QtCore.QRect(170, 280, 201, 41))
-        self.line_4.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_4.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_4.setObjectName("line_4")
-        self.line_5 = QtWidgets.QFrame(mainWindow)
-        self.line_5.setGeometry(QtCore.QRect(600, 230, 121, 71))
-        self.line_5.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_5.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_5.setObjectName("line_5")
-        self.line_6 = QtWidgets.QFrame(mainWindow)
-        self.line_6.setGeometry(QtCore.QRect(110, 260, 121, 41))
-        self.line_6.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_6.setObjectName("line_6")
-        self.line_7 = QtWidgets.QFrame(mainWindow)
-        self.line_7.setGeometry(QtCore.QRect(170, 280, 201, 41))
-        self.line_7.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_7.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_8 = QtWidgets.QFrame(mainWindow)
-        self.line_8.setGeometry(QtCore.QRect(600, 230, 121, 71))
-        self.line_8.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_8.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_9 = QtWidgets.QFrame(mainWindow)
-        self.line_9.setGeometry(QtCore.QRect(110, 260, 121, 41))
-        self.line_9.setFrameShape(QtWidgets.QFrame.VLine)
-        self.line_9.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_10 = QtWidgets.QFrame(mainWindow)
-        self.line_10.setGeometry(QtCore.QRect(190, 210, 31, 41))
-        self.line_10.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_10.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_11 = QtWidgets.QFrame(mainWindow)
-        self.line_11.setGeometry(QtCore.QRect(640, 210, 31, 41))
-        self.line_11.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_11.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_12 = QtWidgets.QFrame(mainWindow)
-        self.line_12.setGeometry(QtCore.QRect(110, 220, 31, 41))
-        self.line_12.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_12.setFrameShadow(QtWidgets.QFrame.Sunken)
+        # LINEAS: 
+        self.line = Flecha(QtCore.QPointF(341, 230), QtCore.QPointF(371, 230), 2, 2, 4) # controlador a actuador
+        self.line.setParent(mainWindow)
         
+        self.line_1 = Flecha(QtCore.QPointF(491, 230), QtCore.QPointF(521, 230), 2, 2, 4) # actuador a proceso
+        self.line_1.setParent(mainWindow)
+
+        self.line_2 = Flecha(QtCore.QPointF(661, 300), QtCore.QPointF(490, 300), 2, 2, 4) # proceso a medidor (lazo realimentado)
+        self.line_2.setParent(mainWindow)
+
+        self.line_3 = Flecha(QtCore.QPointF(600, 230), QtCore.QPointF(600, 230), 2, 2, 4) # proceso a salida
+        self.line_3.setParent(mainWindow)
+
+        self.line_4 = Flecha(QtCore.QPointF(370, 300), QtCore.QPointF(170, 300), 2, 2, 4) # medidor a punto suma (horizontal)
+        self.line_4.setParent(mainWindow)
+
+        self.line_5 = Flecha(QtCore.QPointF(165, 305), QtCore.QPointF(165, 257), 2, 2, 4) # medidor a punto suma (vertical)
+        self.line_5.setParent(mainWindow)
+
+        self.line_6 = Flecha(QtCore.QPointF(190, 230), QtCore.QPointF(221, 230),2, 2, 4) # punto suma a controlador
+        self.line_6.setParent(mainWindow)
+
+        self.line_7 = Flecha(QtCore.QPointF(110, 230), QtCore.QPointF(141, 230),2, 2, 4) # entrada a punto suma
+        self.line_7.setParent(mainWindow)
+
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
     
@@ -99,15 +69,11 @@ class MacroDiagrama(QtWidgets.QWidget):
         self.medidor.show()
         self.puntoSuma.show()
         self.line.show()
+        self.line_1.show()
         self.line_2.show()
         self.line_3.show()
         self.line_4.show()
         self.line_5.show()
         self.line_6.show()
         self.line_7.show()
-        self.line_8.show()
-        self.line_9.show()
-        self.line_10.show()
-        self.line_11.show()
-        self.line_12.show()
         

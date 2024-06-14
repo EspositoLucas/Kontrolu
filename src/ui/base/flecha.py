@@ -10,14 +10,13 @@ import math
 #                           |/    __|__
 #
 #                           |<->|
-#                        arrow_height    
-class Flecha(QtWidgets.QGraphicsPathItem):
+#                        arrow_height 
+
+class Flecha(QtWidgets.QWidget):
     def __init__(self, source: QtCore.QPointF, destination: QtCore.QPointF, arrow_height, arrow_width, length_width, *args, **kwargs):
         super(Flecha, self).__init__(*args, **kwargs)
-
         self._sourcePoint = source
         self._destinationPoint = destination
-
         self._arrow_height = arrow_height
         self._arrow_width = arrow_width
         self._length_width = length_width
@@ -25,13 +24,8 @@ class Flecha(QtWidgets.QGraphicsPathItem):
     def arrowCalc(self, start_point=None, end_point=None):  # calculates the point where the arrow should be drawn
 
         try:
-            startPoint, endPoint = start_point, end_point
-
-            if start_point is None:
-                startPoint = self._sourcePoint
-
-            if endPoint is None:
-                endPoint = self._destinationPoint
+            startPoint = start_point if start_point else self._sourcePoint
+            endPoint = end_point if end_point else self._destinationPoint
 
             dx, dy = startPoint.x() - endPoint.x(), startPoint.y() - endPoint.y()
 
@@ -42,7 +36,6 @@ class Flecha(QtWidgets.QGraphicsPathItem):
             # perpendicular vector (perpX, perpY)
             perpX = -normY
             perpY = normX
-            
             
             #           p2
             #           |\
@@ -65,7 +58,8 @@ class Flecha(QtWidgets.QGraphicsPathItem):
         except (ZeroDivisionError, Exception):
             return None
 
-    def paint(self, painter: QtGui.QPainter, option, widget=None) -> None:
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
         painter.setRenderHint(painter.Antialiasing)
 
         my_pen = QtGui.QPen()
@@ -76,26 +70,4 @@ class Flecha(QtWidgets.QGraphicsPathItem):
 
         arrow_polygon = self.arrowCalc()
         if arrow_polygon is not None:
-            # painter.drawPolyline(arrow_polygon)
             painter.drawPolygon(arrow_polygon)
-
-
-def main():
-    app = QtWidgets.QApplication([])
-
-
-
-    scene = QtWidgets.QGraphicsScene()
-
-    view = QtWidgets.QGraphicsView(scene)
-
-    view.show()
-
-    arrow = Flecha(QtCore.QPointF(0, 0), QtCore.QPointF(0, 100), 10, 30, 10)
-    scene.addItem(arrow)
-    arrow = Flecha(QtCore.QPointF(100, 0), QtCore.QPointF(100, 100), 10, 30, 10)
-    scene.addItem(arrow)
-
-    app.exec_()
-if __name__ == "__main__":
-    main()

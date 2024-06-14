@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtGui
 
 class PuntoSuma(MacroVista):
     def __init__(self, puntoSuma):
-        MacroVista.__init__(self, puntoSuma, QtCore.QRect(140, 210, 51, 51))
+        MacroVista.__init__(self, puntoSuma, QtCore.QRect(140, 205, 51, 51))
         self.setText("") # el punto suma no tiene texto
         self.setDisabled(True) # el punto suma no se puede apretar
         
