@@ -14,7 +14,6 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle('Kontrolu')
-        self.showMaximized()
 
         menuBar = Menu(self)
         self.setMenuBar(menuBar)
@@ -26,6 +25,8 @@ class MainWindow(QMainWindow):
         
         # Diagrama inicial de lazo cerrado
         self.init_macrobloques()
+        
+        self.showMaximized() # se maximiza al final de todo, luego de cargar todos los elementos
     
 
     def init_tool_bar(self):
@@ -38,9 +39,10 @@ class MainWindow(QMainWindow):
         pass
 
     def init_macrobloques(self):
-        a = MacroDiagrama()
-        a.setupUi(self)
-        a.mostrarElementos()
+        self.diagrama = MacroDiagrama()
+        self.diagrama.setupUi(self)
+        self.setCentralWidget(self.diagrama)
+        self.diagrama.mostrarElementos()
 
     def new_project(self):
         self.statusBar().showMessage('Nuevo proyecto creado')

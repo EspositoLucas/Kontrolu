@@ -12,7 +12,7 @@ import math
 #                           |<->|
 #                        arrow_height 
 
-class Flecha(QtWidgets.QWidget):
+class Flecha(QtWidgets.QGraphicsItem):
     def __init__(self, source: QtCore.QPointF, destination: QtCore.QPointF, arrow_height, arrow_width, length_width, *args, **kwargs):
         super(Flecha, self).__init__(*args, **kwargs)
         self._sourcePoint = source
@@ -21,8 +21,25 @@ class Flecha(QtWidgets.QWidget):
         self._arrow_width = arrow_width
         self._length_width = length_width
 
-    def arrowCalc(self, start_point=None, end_point=None):  # calculates the point where the arrow should be drawn
+    def boundingRect(self):
+        extra = 10
+        return QtCore.QRectF(self._sourcePoint, QtCore.QSizeF(self._destinationPoint.x() - self._sourcePoint.x(),
+                                                              self._destinationPoint.y() - self._sourcePoint.y())).normalized().adjusted(-extra, -extra, extra, extra)
 
+    def paint(self, painter, option, widget):
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+
+        my_pen = QtGui.QPen()
+        my_pen.setWidth(1)
+        my_pen.setCosmetic(False)
+        my_pen.setColor(QtGui.QColor(255, 0, 0, 100))
+        painter.setPen(my_pen)
+
+        arrow_polygon = self.arrowCalc()
+        if arrow_polygon is not None:
+            painter.drawPolygon(arrow_polygon)
+
+    def arrowCalc(self, start_point=None, end_point=None):
         try:
             startPoint = start_point if start_point else self._sourcePoint
             endPoint = end_point if end_point else self._destinationPoint
@@ -32,19 +49,9 @@ class Flecha(QtWidgets.QWidget):
             leng = math.sqrt(dx ** 2 + dy ** 2)
             normX, normY = dx / leng, dy / leng  # normalize
             
-            # parallel vector (normX, normY)
-            # perpendicular vector (perpX, perpY)
             perpX = -normY
             perpY = normX
             
-            #           p2
-            #           |\
-            #    p4____p5 \
-            #     |        \ endpoint
-            #    p7____p6  /
-            #           | /
-            #           |/
-            #          p3
             point2 = endPoint + QtCore.QPointF(normX, normY) * self._arrow_height + QtCore.QPointF(perpX, perpY) * self._arrow_width
             point3 = endPoint + QtCore.QPointF(normX, normY) * self._arrow_height - QtCore.QPointF(perpX, perpY) * self._arrow_width
 
@@ -57,17 +64,3 @@ class Flecha(QtWidgets.QWidget):
 
         except (ZeroDivisionError, Exception):
             return None
-
-    def paintEvent(self, event):
-        painter = QtGui.QPainter(self)
-        painter.setRenderHint(painter.Antialiasing)
-
-        my_pen = QtGui.QPen()
-        my_pen.setWidth(1)
-        my_pen.setCosmetic(False)
-        my_pen.setColor(QtGui.QColor(255, 0, 0, 100))
-        painter.setPen(my_pen)
-
-        arrow_polygon = self.arrowCalc()
-        if arrow_polygon is not None:
-            painter.drawPolygon(arrow_polygon)
