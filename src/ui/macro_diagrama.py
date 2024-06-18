@@ -41,20 +41,29 @@ class MacroDiagrama(QtWidgets.QWidget):
         self.line_1 = Flecha(QtCore.QPointF(491, 230), QtCore.QPointF(521, 230), 2, 2, 4) # actuador a proceso
         self.scene.addItem(self.line_1)
 
-        self.line_2 = Flecha(QtCore.QPointF(681, 300), QtCore.QPointF(490, 300), 2, 2, 4) # proceso a medidor (lazo realimentado - horizontal)
-        self.scene.addItem(self.line_2)
+        # self.line_2 = Flecha(QtCore.QPointF(681, 300), QtCore.QPointF(490, 300), 2, 2, 4) # proceso a medidor (lazo realimentado - horizontal)
+        # self.scene.addItem(self.line_2)
 
-        self.line_8 = Flecha(QtCore.QPointF(677, 235), QtCore.QPointF(677, 296), 2, 2, 4) # proceso a medidor (lazo realimentado - vertical)
-        self.scene.addItem(self.line_8)
+        # self.line_8 = Flecha(QtCore.QPointF(677, 235), QtCore.QPointF(677, 296), 2, 2, 4) # proceso a medidor (lazo realimentado - vertical)
+        # self.scene.addItem(self.line_8)
 
-        self.line_3 = Flecha(QtCore.QPointF(641, 230), QtCore.QPointF(720, 230), 2, 2, 4) # proceso a salida
+        bend_points_8 = [QtCore.QPointF(677, 300)]
+        self.line_8_2 = Flecha(QtCore.QPointF(677, 235), QtCore.QPointF(490, 300),2 ,2 , 4, bend_points_8)
+        self.scene.addItem(self.line_8_2)
+
+
+        self.line_3 = Flecha(QtCore.QPointF(641,230), QtCore.QPointF(720, 230), 2, 2, 4) # proceso a salida
         self.scene.addItem(self.line_3)
 
-        self.line_4 = Flecha(QtCore.QPointF(370, 300), QtCore.QPointF(170, 300), 2, 2, 4) # medidor a punto suma (horizontal)
-        self.scene.addItem(self.line_4)
+        # self.line_4 = Flecha(QtCore.QPointF(370, 300), QtCore.QPointF(170, 300), 2, 2, 4) # medidor a punto suma (horizontal)
+        # self.scene.addItem(self.line_4)
 
-        self.line_5 = Flecha(QtCore.QPointF(165, 305), QtCore.QPointF(165, 257), 2, 2, 4) # medidor a punto suma (vertical)
-        self.scene.addItem(self.line_5)
+        # self.line_5 = Flecha(QtCore.QPointF(165, 305), QtCore.QPointF(165, 257), 2, 2, 4) # medidor a punto suma (vertical)
+        # self.scene.addItem(self.line_5)
+
+        bend_points = [QtCore.QPointF(170, 300)]
+        self.line_4_5 = Flecha(QtCore.QPointF(370, 300), QtCore.QPointF(170, 257),2 ,2 , 4, bend_points)
+        self.scene.addItem(self.line_4_5)
 
         self.line_6 = Flecha(QtCore.QPointF(190, 230), QtCore.QPointF(221, 230),2, 2, 4) # punto suma a controlador
         self.scene.addItem(self.line_6)

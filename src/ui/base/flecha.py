@@ -35,9 +35,9 @@ class Flecha(QtWidgets.QGraphicsItem):
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
         my_pen = QtGui.QPen()
-        my_pen.setWidth(2)
+        my_pen.setWidth(1)
         my_pen.setCosmetic(False)
-        my_pen.setColor(QtGui.QColor(255, 0, 0))
+        my_pen.setColor(QtGui.QColor(0, 0, 0))
         painter.setPen(my_pen)
 
         points = [self._sourcePoint]
@@ -49,7 +49,7 @@ class Flecha(QtWidgets.QGraphicsItem):
         if arrow_polygon is not None:
             painter.drawPolyline(QtGui.QPolygonF(points))
             painter.drawPolygon(arrow_polygon)
-            painter.setBrush(QtGui.QColor(255, 0, 0))  # Pintar el interior de la flecha
+            painter.setBrush(QtGui.QColor(0, 0, 0))  # Pintar el interior de la flecha
             painter.drawPolygon(arrow_polygon)
 
     def arrowCalc(self, start_point, end_point):
