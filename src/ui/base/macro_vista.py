@@ -9,7 +9,7 @@ class MacroVista(QPushButton):
         self.setText(self.modelo.nombre)
         self.setGeometry(geometria)
         self.setCheckable(True)
-        self.clicked.connect(self.click) # Conecta el evento click con el método click
+        self.clicked.connect(self.click)
     
     def click(self):
         self.ventana = QMainWindow()
@@ -34,7 +34,7 @@ class MacroVista(QPushButton):
         toolbar.addWidget(microbloque_button)
 
         delete_microbloque_button = QPushButton('Borrar Microbloque', self)
-        delete_microbloque_button.clicked.connect(self.delete_microbloque)
+        delete_microbloque_button.clicked.connect(self.toggle_delete_microbloque)
         toolbar.addWidget(delete_microbloque_button)
 
         flecha_button = QPushButton('Flecha', self)
@@ -49,11 +49,10 @@ class MacroVista(QPushButton):
         nombre = f"Microbloque {len(self.drawing_area.microbloques) + 1}"
         self.drawing_area.add_microbloque(nombre)
 
-    def delete_microbloque(self):
-        self.drawing_area.delete_microbloque()
+    def toggle_delete_microbloque(self):
+        self.drawing_area.set_deleting_microbloque(not self.drawing_area.deleting_microbloque)
 
     def add_flecha(self):
-        # This is a placeholder. You would implement logic to add arrows between microbloques.
         if len(self.drawing_area.microbloques) >= 2:
             start = self.drawing_area.microbloques[0].pos() + QPoint(50, 25)
             end = self.drawing_area.microbloques[1].pos() + QPoint(50, 25)
@@ -63,6 +62,4 @@ class MacroVista(QPushButton):
         self.drawing_area.delete_arrow()
 
     def clear_all(self):
-        self.drawing_area.microbloques.clear()
-        self.drawing_area.arrows.clear()
-        self.drawing_area.update()
+        self.drawing_area.clear_all()

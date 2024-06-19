@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QInputDialog, QFrame
 from PyQt5.QtGui import QPainter
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, QEvent
 from back.micros.micro_bloque_back import MicroBloqueBack
 
 class ResizeHandle(QFrame):
@@ -41,7 +41,9 @@ class Microbloque(QWidget):
             self.update()
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if self.parent().deleting_microbloque:
+            self.parent().delete_microbloque(self)
+        elif event.button() == Qt.LeftButton:
             self.last_mouse_pos = event.pos()
             self.is_moving = True
 
@@ -69,4 +71,3 @@ class Microbloque(QWidget):
     def update_handles(self):
         # Actualizar la posición de los handles para redimensionar
         self.handles['bottom_right'].move(self.width() - 10, self.height() - 10)
-
