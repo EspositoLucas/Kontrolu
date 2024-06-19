@@ -13,21 +13,20 @@ import math
 #                        arrow_height 
 
 class Flecha(QtWidgets.QGraphicsItem):
-    def __init__(self, source: QtCore.QPointF, destination: QtCore.QPointF, arrow_height=15, arrow_width=10, length_width=5, bend_points=None, *args, **kwargs):
+    def __init__(self, source: QtCore.QPointF, destination: QtCore.QPointF, arrow_height=15, arrow_width=10, length_width=5, arrow=True, *args, **kwargs):
         super(Flecha, self).__init__(*args, **kwargs)
         self._sourcePoint = source
         self._destinationPoint = destination
-        self._bendPoints = bend_points if bend_points is not None else []
         self._arrow_height = arrow_height
         self._arrow_width = arrow_width
         self._length_width = length_width
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, False)  # Flechas no movibles
-        # self.setFlag(QtWidgets.QGraphicsItem.ItemIsFocusable, False)
-        self.setAcceptHoverEvents(True)  # Aceptar eventos de hover para cambiar el cursor
+        self.arrow = arrow
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, False)
+        self.setAcceptHoverEvents(True)
 
     def boundingRect(self):
         extra = 10
-        points = [self._sourcePoint, self._destinationPoint] + self._bendPoints
+        points = [self._sourcePoint, self._destinationPoint]
         return QtCore.QRectF(QtCore.QPointF(min(p.x() for p in points), min(p.y() for p in points)),
                              QtCore.QPointF(max(p.x() for p in points), max(p.y() for p in points))).normalized().adjusted(-extra, -extra, extra, extra)
 
@@ -35,22 +34,25 @@ class Flecha(QtWidgets.QGraphicsItem):
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
         my_pen = QtGui.QPen()
-        my_pen.setWidth(1)
+        my_pen.setWidth(2)
         my_pen.setCosmetic(False)
         my_pen.setColor(QtGui.QColor(0, 0, 0))
         painter.setPen(my_pen)
 
-        points = [self._sourcePoint]
-        if self._bendPoints:
-            points.extend(self._bendPoints)
-        points.append(self._destinationPoint)
+        points = [self._sourcePoint, self._destinationPoint]
 
-        arrow_polygon = self.arrowCalc(points[-2], points[-1])
-        if arrow_polygon is not None:
-            painter.drawPolyline(QtGui.QPolygonF(points))
-            painter.drawPolygon(arrow_polygon)
-            painter.setBrush(QtGui.QColor(0, 0, 0))  # Pintar el interior de la flecha
-            painter.drawPolygon(arrow_polygon)
+        if self.arrow:
+            arrow_polygon = self.arrowCalc(points[0], points[1])
+            if arrow_polygon is not None:
+                painter.drawPolyline(QtGui.QPolygonF(points))
+                painter.setBrush(QtGui.QColor(0, 0, 0))
+                painter.drawPolygon(arrow_polygon)
+        else:
+            rectangle_polygon = self.rectangleCalc(points[0], points[1])
+            if rectangle_polygon is not None:
+                painter.drawPolyline(QtGui.QPolygonF(points))
+                painter.setBrush(QtGui.QColor(0, 0, 0))
+                painter.drawPolygon(rectangle_polygon)
 
     def arrowCalc(self, start_point, end_point):
         try:
@@ -60,13 +62,14 @@ class Flecha(QtWidgets.QGraphicsItem):
             dx, dy = startPoint.x() - endPoint.x(), startPoint.y() - endPoint.y()
 
             leng = math.sqrt(dx ** 2 + dy ** 2)
-            normX, normY = dx / leng, dy / leng  # normalize
+            normX, normY = dx / leng, dy / leng
 
             perpX = -normY
             perpY = normX
 
-            point2 = endPoint + QtCore.QPointF(normX, normY) * self._arrow_height * 5 + QtCore.QPointF(perpX, perpY) * self._arrow_width * 5  # Intensificar la punta
-            point3 = endPoint + QtCore.QPointF(normX, normY) * self._arrow_height * 5 - QtCore.QPointF(perpX, perpY) * self._arrow_width * 5  # Intensificar la punta
+
+            point2 = endPoint + QtCore.QPointF(normX, normY) * self._arrow_height * 5 + QtCore.QPointF(perpX, perpY) * self._arrow_width * 5
+            point3 = endPoint + QtCore.QPointF(normX, normY) * self._arrow_height * 5 - QtCore.QPointF(perpX, perpY) * self._arrow_width * 5
 
             point4 = startPoint + QtCore.QPointF(perpX, perpY) * self._length_width
             point5 = endPoint + QtCore.QPointF(normX, normY) * self._arrow_height + QtCore.QPointF(perpX, perpY) * self._length_width
@@ -78,8 +81,31 @@ class Flecha(QtWidgets.QGraphicsItem):
         except (ZeroDivisionError, Exception):
             return None
 
+    def rectangleCalc(self, start_point, end_point):
+        try:
+            startPoint = start_point
+            endPoint = end_point
+
+            dx, dy = startPoint.x() - endPoint.x(), startPoint.y() - endPoint.y()
+
+            leng = math.sqrt(dx ** 2 + dy ** 2)
+            normX, normY = dx / leng, dy / leng
+
+            perpX = -normY
+            perpY = normX
+
+            point1 = startPoint + QtCore.QPointF(perpX, perpY) * self._length_width
+            point2 = startPoint - QtCore.QPointF(perpX, perpY) * self._length_width
+            point3 = endPoint - QtCore.QPointF(perpX, perpY) * self._length_width
+            point4 = endPoint + QtCore.QPointF(perpX, perpY) * self._length_width
+
+            return QtGui.QPolygonF([point1, point2, point3, point4])
+
+        except (ZeroDivisionError, Exception):
+            return None
+
     def hoverEnterEvent(self, event):
-        self.setCursor(QtCore.Qt.CrossCursor)  # Cambiar el cursor cuando el mouse esté sobre la flecha
+        self.setCursor(QtCore.Qt.CrossCursor)
 
     def hoverLeaveEvent(self, event):
-        self.setCursor(QtCore.Qt.ArrowCursor)  # Restablecer el cursor cuando el mouse salga de la flecha
+        self.setCursor(QtCore.Qt.ArrowCursor)
