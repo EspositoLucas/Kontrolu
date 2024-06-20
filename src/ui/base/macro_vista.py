@@ -35,6 +35,7 @@ class MacroVista(QPushButton):
 
         delete_microbloque_button = QPushButton('Borrar Microbloque', self)
         delete_microbloque_button.clicked.connect(self.toggle_delete_microbloque)
+        delete_microbloque_button.setCheckable(True)
         toolbar.addWidget(delete_microbloque_button)
 
         flecha_button = QPushButton('Flecha', self)
@@ -54,9 +55,9 @@ class MacroVista(QPushButton):
 
     def add_flecha(self):
         if len(self.drawing_area.microbloques) >= 2:
-            start = self.drawing_area.microbloques[0].pos() + QPoint(50, 25)
-            end = self.drawing_area.microbloques[1].pos() + QPoint(50, 25)
-            self.drawing_area.add_arrow(start, end)
+            start_microbloque = self.drawing_area.microbloques[-2]
+            end_microbloque = self.drawing_area.microbloques[-1]
+            self.drawing_area.add_arrow(start_microbloque, end_microbloque)
 
     def delete_flecha(self):
         self.drawing_area.delete_arrow()

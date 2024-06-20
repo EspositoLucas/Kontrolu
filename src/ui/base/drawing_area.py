@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QPen, QCursor, QPalette, QColor
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPoint, QSize
 from .micro_bloque import Microbloque
 
 class DrawingArea(QWidget):
@@ -54,8 +54,10 @@ class DrawingArea(QWidget):
                     self.selected_microbloque = microbloque
                     break
 
-    def add_arrow(self, start, end):
-        self.arrows.append({'start': start, 'end': end})
+    def add_arrow(self,start_microbloque, end_microbloque):
+        start = start_microbloque.pos() + QPoint(50, 25)
+        end = end_microbloque.pos() + QPoint(50, 25)
+        self.arrows.append({'start': start, 'end': end, 'start_microbloque': start_microbloque, 'end_microbloque': end_microbloque})
         self.update()
 
     def delete_arrow(self):
@@ -77,3 +79,11 @@ class DrawingArea(QWidget):
             self.setCursor(QCursor(Qt.CrossCursor))
         else:
             self.setCursor(QCursor(Qt.ArrowCursor))
+    
+    def update_arrows(self, microbloque):
+        for arrow in self.arrows:
+            if arrow['start_microbloque'] == microbloque:
+                arrow['start'] = microbloque.pos() + QPoint(50, 25)
+            if arrow['end_microbloque'] == microbloque:
+                arrow['end'] = microbloque.pos() + QPoint(50, 25)
+        self.update()

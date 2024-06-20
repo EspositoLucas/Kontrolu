@@ -62,6 +62,7 @@ class Microbloque(QWidget):
             new_size = self.size() + QSize(delta.x(), delta.y())
             self.resize(new_size)
             self.update_handles()
+        self.parent().update_arrows(self)
         self.update()
 
     def mouseReleaseEvent(self, event):
