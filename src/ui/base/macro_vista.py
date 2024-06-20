@@ -1,5 +1,7 @@
 from PyQt5.QtCore import Qt, QPoint
-from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar
+from PyQt5.QtWidgets import (QPushButton, QMainWindow, QToolBar, QInputDialog, QColorDialog, 
+                             QVBoxLayout, QWidget, QLabel, QLineEdit, QHBoxLayout, QDialog)
+from PyQt5.QtGui import QColor
 from .drawing_area import DrawingArea
 
 class MacroVista(QPushButton):
@@ -30,11 +32,11 @@ class MacroVista(QPushButton):
         toolbar.addWidget(delete_button)
 
         microbloque_button = QPushButton('Microbloque', self)
-        microbloque_button.clicked.connect(self.add_microbloque)
+        microbloque_button.clicked.connect(self.configure_microbloque)
         toolbar.addWidget(microbloque_button)
 
         delete_microbloque_button = QPushButton('Borrar Microbloque', self)
-        delete_microbloque_button.clicked.connect(self.toggle_delete_microbloque)
+        delete_microbloque_button.clicked.connect(self.delete_microbloque)
         toolbar.addWidget(delete_microbloque_button)
 
         flecha_button = QPushButton('Flecha', self)
@@ -45,12 +47,44 @@ class MacroVista(QPushButton):
         delete_flecha_button.clicked.connect(self.delete_flecha)
         toolbar.addWidget(delete_flecha_button)
 
-    def add_microbloque(self):
-        nombre = f"Microbloque {len(self.drawing_area.microbloques) + 1}"
-        self.drawing_area.add_microbloque(nombre)
+    def configure_microbloque(self):
+        dialog = QDialog(self.ventana)
+        dialog.setWindowTitle("Configurar Microbloque")
+        
+        layout = QVBoxLayout()
+        
+        name_layout = QHBoxLayout()
+        name_label = QLabel("Nombre (opcional):")
+        name_input = QLineEdit()
+        name_input.setPlaceholderText(f"Microbloque {len(self.drawing_area.microbloques) + 1}")
+        name_layout.addWidget(name_label)
+        name_layout.addWidget(name_input)
+        
+        color_button = QPushButton("Seleccionar Color (opcional)")
+        color_button.clicked.connect(lambda: self.select_color(color_button))
+        
+        save_button = QPushButton("Guardar")
+        save_button.clicked.connect(dialog.accept)
+        
+        layout.addLayout(name_layout)
+        layout.addWidget(color_button)
+        layout.addWidget(save_button)
+        
+        dialog.setLayout(layout)
+        
+        if dialog.exec_():
+            nombre = name_input.text() if name_input.text() else None
+            color = color_button.property("selected_color") if color_button.property("selected_color") else None
+            self.drawing_area.start_creating_microbloque({"nombre": nombre, "color": color})
 
-    def toggle_delete_microbloque(self):
-        self.drawing_area.set_deleting_microbloque(not self.drawing_area.deleting_microbloque)
+    def select_color(self, button):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            button.setStyleSheet(f"background-color: {color.name()};")
+            button.setProperty("selected_color", color)
+
+    def delete_microbloque(self):
+        self.drawing_area.delete_microbloque()
 
     def add_flecha(self):
         if len(self.drawing_area.microbloques) >= 2:
@@ -62,4 +96,6 @@ class MacroVista(QPushButton):
         self.drawing_area.delete_arrow()
 
     def clear_all(self):
-        self.drawing_area.clear_all()
+        self.drawing_area.microbloques.clear()
+        self.drawing_area.arrows.clear()
+        self.drawing_area.update()
