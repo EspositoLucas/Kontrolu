@@ -221,12 +221,9 @@
 #         self.drawing_area.update()
 
 
-from PyQt5.QtCore import Qt, QPoint
-from PyQt5.QtWidgets import (QPushButton, QMainWindow, QToolBar, QInputDialog, QColorDialog, 
-                             QVBoxLayout, QWidget, QLabel, QLineEdit, QHBoxLayout, QDialog)
-from PyQt5.QtGui import QColor
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar
 from .drawing_area import DrawingArea
-from .latex_editor import LatexEditor
 
 class MacroVista(QPushButton):
     def __init__(self, elementoBack, geometria):
@@ -256,77 +253,9 @@ class MacroVista(QPushButton):
         delete_button.clicked.connect(self.drawing_area.clear_all)
         toolbar.addWidget(delete_button)
 
-        microbloque_button = QPushButton('Microbloque', self)
-        microbloque_button.clicked.connect(self.configure_microbloque)
-        toolbar.addWidget(microbloque_button)
-
         delete_microbloque_button = QPushButton('Borrar Microbloque', self)
         delete_microbloque_button.clicked.connect(self.drawing_area.delete_microbloque)
         toolbar.addWidget(delete_microbloque_button)
 
-        flecha_button = QPushButton('Flecha', self)
-        flecha_button.clicked.connect(self.drawing_area.start_creating_arrow)
-        toolbar.addWidget(flecha_button)
-
-        delete_flecha_button = QPushButton('Borrar Flecha', self)
-        delete_flecha_button.clicked.connect(self.drawing_area.delete_arrow)
-        toolbar.addWidget(delete_flecha_button)
-
-
     def configure_microbloque(self):
-        dialog = QDialog(self.ventana)
-        dialog.setWindowTitle("Configurar Microbloque")
-        
-        layout = QVBoxLayout()
-        
-        name_layout = QHBoxLayout()
-        name_label = QLabel("Nombre:")
-        name_input = QLineEdit()
-        name_input.setPlaceholderText(f"Microbloque {len(self.drawing_area.microbloques) + 1}")
-        name_layout.addWidget(name_label)
-        name_layout.addWidget(name_input)
-        
-        color_button = QPushButton("Seleccionar Color")
-        color_button.clicked.connect(lambda: self.select_color(color_button))
-        
-        latex_editor = LatexEditor()
-        
-        save_button = QPushButton("Guardar")
-        save_button.clicked.connect(dialog.accept)
-        
-        layout.addLayout(name_layout)
-        layout.addWidget(color_button)
-        layout.addWidget(latex_editor)
-        layout.addWidget(save_button)
-        
-        dialog.setLayout(layout)
-        
-        if dialog.exec_():
-            nombre = name_input.text() if name_input.text() else None
-            color = color_button.property("selected_color") if color_button.property("selected_color") else None
-            funcion_transferencia = latex_editor.get_latex()
-            opciones_adicionales = {}
-            self.drawing_area.start_creating_microbloque({
-                "nombre": nombre,
-                "color": color,
-                "funcion_transferencia": funcion_transferencia,
-                "opciones_adicionales": opciones_adicionales
-            })
-
-    def select_color(self, button):
-        color = QColorDialog.getColor()
-        if color.isValid():
-            button.setStyleSheet(f"background-color: {color.name()};")
-            button.setProperty("selected_color", color)
-
-    def delete_microbloque(self):
-        self.drawing_area.delete_microbloque()
-
-    def start_creating_arrow(self):
-        self.drawing_area.start_creating_arrow()
-
-    def delete_flecha(self):
-        self.drawing_area.delete_arrow()
-
-    def clear_all(self):
-        self.drawing_area.clear_all()
+        self.drawing_area.create_new_microbloque()
