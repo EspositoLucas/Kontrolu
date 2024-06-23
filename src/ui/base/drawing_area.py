@@ -1,302 +1,11 @@
-# from PyQt5.QtWidgets import QWidget
-# from PyQt5.QtGui import QPainter, QPen, QColor
-# from PyQt5.QtCore import Qt, pyqtSignal
-# from .micro_bloque import Microbloque
-
-# class DrawingArea(QWidget):
-#     microbloque_created = pyqtSignal(Microbloque)
-
-#     def __init__(self, parent=None, modelo=None):
-#         super().__init__(parent)
-#         self.microbloques = []
-#         self.arrows = []
-#         self.selected_microbloque = None
-#         self.modelo = modelo
-#         self.creating_microbloque = False
-#         self.new_microbloque_config = {}
-#         self.init_ui()
-
-#     def init_ui(self):
-#         self.setStyleSheet("background-color: white; border: 1px solid black;")
-
-#     def start_creating_microbloque(self, config):
-#         self.creating_microbloque = True
-#         self.new_microbloque_config = config
-#         self.setCursor(Qt.CrossCursor)
-
-#     def add_microbloque(self, pos):
-#         nombre = self.new_microbloque_config.get('nombre') or f"Microbloque {len(self.microbloques) + 1}"
-#         color = self.new_microbloque_config.get('color') or QColor(255, 255, 0)  # Amarillo por defecto
-#         microbloque = Microbloque(nombre, self, color)
-#         microbloque.setGeometry(pos.x() - 50, pos.y() - 25, 100, 50)
-#         self.microbloques.append(microbloque)
-#         microbloque.show()
-#         self.microbloque_created.emit(microbloque)
-        
-#     def delete_microbloque(self):
-#         if self.selected_microbloque:
-#             self.microbloques.remove(self.selected_microbloque)
-#             self.selected_microbloque.deleteLater()
-#             self.selected_microbloque = None
-#             self.update()
-
-#     def paintEvent(self, event):
-#         painter = QPainter(self)
-#         for arrow in self.arrows:
-#             painter.setPen(QPen(Qt.black, 2))
-#             painter.drawLine(arrow['start'], arrow['end'])
-
-
-#     def mousePressEvent(self, event):
-#         if self.creating_microbloque:
-#             self.add_microbloque(event.pos())
-#             self.creating_microbloque = False
-#             self.setCursor(Qt.ArrowCursor)
-#         else:
-#             for microbloque in self.microbloques:
-#                 if microbloque.geometry().contains(event.pos()):
-#                     self.selected_microbloque = microbloque
-#                     break
-                
-#     def add_arrow(self, start, end):
-#         self.arrows.append({'start': start, 'end': end})
-#         self.update()
-
-#     def delete_arrow(self):
-#         if self.arrows:
-#             self.arrows.pop()
-#             self.update()
-
-
-
-
-
-
-# from PyQt5.QtWidgets import QWidget
-# from PyQt5.QtGui import QPainter, QPen, QColor,QPolygonF
-# from PyQt5.QtCore import Qt, pyqtSignal, QPointF
-# from .micro_bloque import Microbloque
-# import math
-
-# class Arrow:
-#     def __init__(self, start_microbloque, end_microbloque):
-#         self.start_microbloque = start_microbloque
-#         self.end_microbloque = end_microbloque
-
-#     def draw(self, painter):
-#         start = self.start_microbloque.pos() + QPointF(self.start_microbloque.width()/2, self.start_microbloque.height()/2)
-#         end = self.end_microbloque.pos() + QPointF(self.end_microbloque.width()/2, self.end_microbloque.height()/2)
-#         painter.drawLine(start, end)
-#         # Dibujar punta de flecha
-#         angle = math.atan2(end.y() - start.y(), end.x() - start.x())
-#         arrowSize = 10
-#         painter.drawPolygon(QPolygonF([
-#             end,
-#             end - QPointF(math.cos(angle + math.pi/6) * arrowSize, math.sin(angle + math.pi/6) * arrowSize),
-#             end - QPointF(math.cos(angle - math.pi/6) * arrowSize, math.sin(angle - math.pi/6) * arrowSize),
-#         ]))
-
-        
-# class DrawingArea(QWidget):
-#     microbloque_created = pyqtSignal(Microbloque)
-
-#     def __init__(self, parent=None, modelo=None):
-#         super().__init__(parent)
-#         self.microbloques = []
-#         self.arrows = []
-#         self.selected_microbloque = None
-#         self.modelo = modelo
-#         self.creating_microbloque = False
-#         self.new_microbloque_config = {}
-#         self.creating_arrow = False
-#         self.arrow_start = None
-#         self.init_ui()
-        
-#     def init_ui(self):
-#         self.setStyleSheet("background-color: white; border: 1px solid black;")
-        
-#     def start_creating_microbloque(self, config):
-#         self.creating_microbloque = True
-#         self.new_microbloque_config = config
-#         self.setCursor(Qt.CrossCursor)
-
-#     def add_microbloque(self, pos):
-#         nombre = self.new_microbloque_config.get('nombre') or f"Microbloque {len(self.microbloques) + 1}"
-#         color = self.new_microbloque_config.get('color') or QColor(255, 255, 0)
-#         funcion_transferencia = self.new_microbloque_config.get('funcion_transferencia') or ""
-#         microbloque = Microbloque(nombre, self, color, funcion_transferencia)
-#         microbloque.setGeometry(pos.x() - 75, pos.y() - 40, 150, 80)
-#         self.microbloques.append(microbloque)
-#         microbloque.show()
-#         self.microbloque_created.emit(microbloque)
-
-#     def delete_microbloque(self):
-#         if self.selected_microbloque:
-#             self.microbloques.remove(self.selected_microbloque)
-#             # Eliminar flechas conectadas a este microbloque
-#             self.arrows = [arrow for arrow in self.arrows if arrow.start_microbloque != self.selected_microbloque and arrow.end_microbloque != self.selected_microbloque]
-#             self.selected_microbloque.deleteLater()
-#             self.selected_microbloque = None
-#             self.update()
-
-#     def paintEvent(self, event):
-#         painter = QPainter(self)
-#         for arrow in self.arrows:
-#             painter.setPen(QPen(Qt.black, 2))
-#             arrow.draw(painter)
-
-#     def mousePressEvent(self, event):
-#         if self.creating_microbloque:
-#             self.add_microbloque(event.pos())
-#             self.creating_microbloque = False
-#             self.setCursor(Qt.ArrowCursor)
-#         elif self.creating_arrow:
-#             clicked_microbloque = self.microbloque_at_pos(event.pos())
-#             if clicked_microbloque:
-#                 if not self.arrow_start:
-#                     self.arrow_start = clicked_microbloque
-#                 else:
-#                     self.add_arrow(self.arrow_start, clicked_microbloque)
-#                     self.arrow_start = None
-#                     self.creating_arrow = False
-#                     self.setCursor(Qt.ArrowCursor)
-#         else:
-#             for microbloque in self.microbloques:
-#                 if microbloque.geometry().contains(event.pos()):
-#                     self.selected_microbloque = microbloque
-#                     break
-
-#     def microbloque_at_pos(self, pos):
-#         for microbloque in self.microbloques:
-#             if microbloque.geometry().contains(pos):
-#                 return microbloque
-#         return None
-
-#     def add_arrow(self, start_microbloque, end_microbloque):
-#         self.arrows.append(Arrow(start_microbloque, end_microbloque))
-#         self.update()
-
-#     def delete_arrow(self):
-#         if self.arrows:
-#             self.arrows.pop()
-#             self.update()
-
-#     def start_creating_arrow(self):
-#         self.creating_arrow = True
-#         self.setCursor(Qt.CrossCursor)
-
-
-# from PyQt5.QtWidgets import QWidget, QMenu
-# from PyQt5.QtGui import QPainter, QPen, QColor, QPolygonF
-# from PyQt5.QtCore import Qt, pyqtSignal, QPointF, QRectF
-# from .micro_bloque import Microbloque
-# import math
-# class DrawingArea(QWidget):
-#     microbloque_created = pyqtSignal(Microbloque)
-
-#     def __init__(self, parent=None, modelo=None):
-#         super().__init__(parent)
-#         self.microbloques = []
-#         self.selected_microbloque = None
-#         self.modelo = modelo
-#         self.creating_microbloque = False
-#         self.new_microbloque_config = {}
-#         self.init_ui()
-        
-#     def init_ui(self):
-#         self.setStyleSheet("background-color: white; border: 1px solid black;")
-#         self.setContextMenuPolicy(Qt.CustomContextMenu)
-#         self.customContextMenuRequested.connect(self.show_context_menu)
-        
-#     def start_creating_microbloque(self, config):
-#         self.creating_microbloque = True
-#         self.new_microbloque_config = config
-#         self.setCursor(Qt.CrossCursor)
-
-#     def add_microbloque(self, pos):
-#         nombre = self.new_microbloque_config.get('nombre') or f"Microbloque {len(self.microbloques) + 1}"
-#         color = self.new_microbloque_config.get('color') or QColor(255, 255, 0)
-#         funcion_transferencia = self.new_microbloque_config.get('funcion_transferencia') or ""
-#         opciones_adicionales = self.new_microbloque_config.get('opciones_adicionales') or {}
-#         microbloque = Microbloque(nombre, self, color, funcion_transferencia, opciones_adicionales)
-#         microbloque.setGeometry(pos.x() - 75, pos.y() - 40, 150, 80)
-#         self.microbloques.append(microbloque)
-#         microbloque.show()
-#         self.microbloque_created.emit(microbloque)
-
-#     def delete_microbloque(self):
-#         if self.selected_microbloque:
-#             self.microbloques.remove(self.selected_microbloque)
-#             self.selected_microbloque.deleteLater()
-#             self.selected_microbloque = None
-#             self.update()
-
-#     def paintEvent(self, event):
-#         painter = QPainter(self)
-#         painter.setPen(QPen(Qt.black, 2))
-        
-#         # Dibujar bloques de entrada y salida
-#         entrada = QPointF(50, self.height() / 2)
-#         salida = QPointF(self.width() - 50, self.height() / 2)
-        
-#         # Usar QRectF para dibujar los rectángulos
-#         painter.drawRect(QRectF(entrada.x() - 40, entrada.y() - 30, 80, 60))
-#         painter.drawText(int(entrada.x() - 30), int(entrada.y() + 5), "Entrada")
-        
-#         painter.drawRect(QRectF(salida.x() - 40, salida.y() - 30, 80, 60))
-#         painter.drawText(int(salida.x() - 30), int(salida.y() + 5), "Salida")
-        
-#         # Dibujar flecha
-#         painter.drawLine(int(entrada.x() + 40), int(entrada.y()), int(salida.x() - 40), int(salida.y()))
-        
-#         # Dibujar botón '+'
-#         mid_point = QPointF((entrada.x() + salida.x()) / 2, entrada.y())
-#         painter.drawEllipse(mid_point, 15, 15)
-#         painter.drawText(int(mid_point.x() - 5), int(mid_point.y() + 5), "+")
-        
-#     def mousePressEvent(self, event):
-#         if self.creating_microbloque:
-#             self.add_microbloque(event.pos())
-#             self.creating_microbloque = False
-#             self.setCursor(Qt.ArrowCursor)
-#         else:
-#             clicked_microbloque = self.microbloque_at_pos(event.pos())
-#             if clicked_microbloque:
-#                 self.selected_microbloque = clicked_microbloque
-#             else:
-#                 self.selected_microbloque = None
-
-#     def microbloque_at_pos(self, pos):
-#         for microbloque in self.microbloques:
-#             if microbloque.geometry().contains(pos):
-#                 return microbloque
-#         return None
-
-#     def clear_all(self):
-#         for microbloque in self.microbloques:
-#             microbloque.deleteLater()
-#         self.microbloques.clear()
-#         self.update()
-
-#     def show_context_menu(self, pos):
-#         menu = QMenu(self)
-#         delete_action = menu.addAction("Delete")
-        
-#         action = menu.exec_(self.mapToGlobal(pos))
-        
-#         if action == delete_action:
-#             self.delete_microbloque()
-
-
-from PyQt5.QtWidgets import QWidget, QMenu, QInputDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QColorDialog, QLabel
+from PyQt5.QtWidgets import QWidget, QMenu, QDialog, QVBoxLayout, QLineEdit, QPushButton, QColorDialog, QLabel
 from PyQt5.QtGui import QPainter, QPen, QColor, QPolygonF
 from PyQt5.QtCore import Qt, pyqtSignal, QPointF, QRectF
-from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
-import math
+from .micro_bloque import Microbloque
 
 class DrawingArea(QWidget):
-    microbloque_created = pyqtSignal(Microbloque)
+    microbloque_created = pyqtSignal(object)
 
     def __init__(self, parent=None, modelo=None):
         super().__init__(parent)
@@ -308,42 +17,52 @@ class DrawingArea(QWidget):
         self.init_ui()
         
     def init_ui(self):
-        self.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.setStyleSheet("background-color: #2b2b2b; border: 1px solid black;")
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
         
-    def add_microbloque(self, pos):
+    def add_microbloque(self, pos, relation='serie', reference_microbloque=None):
         nombre = self.new_microbloque_config.get('nombre') or f"Microbloque {len(self.microbloques) + 1}"
         color = self.new_microbloque_config.get('color') or QColor(255, 255, 0)
         funcion_transferencia = self.new_microbloque_config.get('funcion_transferencia') or ""
         opciones_adicionales = self.new_microbloque_config.get('opciones_adicionales') or {}
+        
         microbloque = Microbloque(nombre, self, color, funcion_transferencia, opciones_adicionales)
+        microbloque.moved.connect(self.update)
         
-        # Calcular la posición para el nuevo microbloque
-        if self.microbloques:
-            last_microbloque = self.microbloques[-1]
-            new_x = last_microbloque.x() + last_microbloque.width() + 50  # 50 píxeles de separación
-            new_y = last_microbloque.y()
+        if reference_microbloque:
+            index = self.microbloques.index(reference_microbloque)
+            if relation == 'izquierda':
+                self.microbloques.insert(index, microbloque)
+            elif relation == 'derecha':
+                self.microbloques.insert(index + 1, microbloque)
+            elif relation in ['arriba', 'abajo']:
+                self.microbloques.append(microbloque)
+                microbloque.paralelo_con = reference_microbloque
         else:
-            new_x = int(pos.x() - 75)
-            new_y = int(pos.y() - 40)
+            self.microbloques.append(microbloque)
         
-        microbloque.setGeometry(new_x, new_y, 150, 80)
-        self.microbloques.append(microbloque)
+        microbloque.move(int(pos.x() - microbloque.width() / 2), int(pos.y() - microbloque.height() / 2))
         microbloque.show()
         self.microbloque_created.emit(microbloque)
         self.update()
+        self.reorganize_microbloques()
 
     def delete_microbloque(self):
         if self.selected_microbloque:
             self.microbloques.remove(self.selected_microbloque)
+            for mb in self.microbloques:
+                if mb.paralelo_con == self.selected_microbloque:
+                    mb.paralelo_con = None
             self.selected_microbloque.deleteLater()
             self.selected_microbloque = None
             self.update()
+            self.reorganize_microbloques()
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setPen(QPen(Qt.black, 2))
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(QPen(Qt.white, 2))
         
         entrada = QPointF(50, self.height() / 2)
         salida = QPointF(self.width() - 50, self.height() / 2)
@@ -354,47 +73,49 @@ class DrawingArea(QWidget):
         painter.drawRect(QRectF(salida.x() - 40, salida.y() - 30, 80, 60))
         painter.drawText(int(salida.x() - 30), int(salida.y() + 5), "Salida")
         
-        # Dibujar línea entre bloques
-        last_point = entrada
-        for microbloque in self.microbloques:
-            current_point = microbloque.pos() + QPointF(microbloque.width()/2, microbloque.height()/2)
-            painter.drawLine(int(last_point.x()), int(last_point.y()), int(current_point.x()), int(current_point.y()))
-            last_point = current_point
-        painter.drawLine(int(last_point.x()), int(last_point.y()), int(salida.x() - 40), int(salida.y()))
-        
-        # Dibujar botones '+'
+        self.draw_connections(painter)
         self.draw_add_buttons(painter)
+
+    def draw_connections(self, painter):
+        last_point = QPointF(90, self.height() / 2)
+        for microbloque in self.microbloques:
+            if not microbloque.paralelo_con:
+                current_point = microbloque.get_center()
+                painter.drawLine(int(last_point.x()), int(last_point.y()), int(current_point.x()), int(current_point.y()))
+                last_point = QPointF(microbloque.x() + microbloque.width(), microbloque.y() + microbloque.height() / 2)
+            
+            if microbloque.paralelo_con:
+                start = microbloque.paralelo_con.get_center()
+                end = microbloque.get_center()
+                mid_x = (start.x() + end.x()) / 2
+                painter.drawLine(int(start.x()), int(start.y()), int(mid_x), int(start.y()))
+                painter.drawLine(int(mid_x), int(start.y()), int(mid_x), int(end.y()))
+                painter.drawLine(int(mid_x), int(end.y()), int(end.x()), int(end.y()))
+        
+        painter.drawLine(int(last_point.x()), int(last_point.y()), int(self.width() - 90), int(self.height() / 2))
 
     def draw_add_buttons(self, painter):
         if not self.microbloques:
             mid_point = QPointF(self.width() / 2, self.height() / 2)
             self.draw_add_button(painter, mid_point)
         else:
+            last_x = 90
             for i, microbloque in enumerate(self.microbloques):
-                if i == 0:
-                    start = QPointF(50, self.height() / 2)
-                    end = microbloque.pos() + QPointF(microbloque.width()/2, microbloque.height()/2)
-                    mid = (start + end) / 2
-                    self.draw_add_button(painter, mid)
-                
-                # Dibujar botones '+' arriba y abajo del microbloque
-                top_mid = microbloque.pos() + QPointF(microbloque.width()/2, -20)
-                bottom_mid = microbloque.pos() + QPointF(microbloque.width()/2, microbloque.height() + 20)
-                self.draw_add_button(painter, top_mid)
-                self.draw_add_button(painter, bottom_mid)
-                
-                if i < len(self.microbloques) - 1:
-                    next_microbloque = self.microbloques[i+1]
-                    start = microbloque.pos() + QPointF(microbloque.width()/2, microbloque.height()/2)
-                    end = next_microbloque.pos() + QPointF(next_microbloque.width()/2, next_microbloque.height()/2)
-                    mid = (start + end) / 2
-                    self.draw_add_button(painter, mid)
-                
-                if i == len(self.microbloques) - 1:
-                    start = microbloque.pos() + QPointF(microbloque.width()/2, microbloque.height()/2)
-                    end = QPointF(self.width() - 50, self.height() / 2)
-                    mid = (start + end) / 2
-                    self.draw_add_button(painter, mid)
+                if not microbloque.paralelo_con:
+                    # Botón izquierdo
+                    self.draw_add_button(painter, QPointF(last_x + (microbloque.x() - last_x) / 2, self.height() / 2))
+                    
+                    # Botón derecho
+                    next_x = microbloque.x() + microbloque.width() + 100 if i < len(self.microbloques) - 1 else self.width() - 90
+                    self.draw_add_button(painter, QPointF((microbloque.x() + microbloque.width() + next_x) / 2, self.height() / 2))
+                    
+                    # Botón arriba
+                    self.draw_add_button(painter, QPointF(microbloque.x() + microbloque.width() / 2, microbloque.y() - 50))
+                    
+                    # Botón abajo
+                    self.draw_add_button(painter, QPointF(microbloque.x() + microbloque.width() / 2, microbloque.y() + microbloque.height() + 50))
+                    
+                    last_x = microbloque.x() + microbloque.width()
 
     def draw_add_button(self, painter, point):
         painter.drawEllipse(point, 15, 15)
@@ -402,125 +123,96 @@ class DrawingArea(QWidget):
 
     def mousePressEvent(self, event):
         if self.creating_microbloque:
-            self.add_microbloque(event.pos())
+            add_button = self.add_button_at_pos(event.pos())
+            if add_button:
+                relation, pos, reference_microbloque = add_button
+                self.add_microbloque(pos, relation, reference_microbloque)
             self.creating_microbloque = False
             self.setCursor(Qt.ArrowCursor)
         else:
             clicked_microbloque = self.microbloque_at_pos(event.pos())
             if clicked_microbloque:
                 self.selected_microbloque = clicked_microbloque
-                self.edit_microbloque(clicked_microbloque)
             else:
                 add_button = self.add_button_at_pos(event.pos())
                 if add_button:
                     self.create_new_microbloque(add_button)
                 else:
                     self.selected_microbloque = None
+        super().mousePressEvent(event)
 
     def add_button_at_pos(self, pos):
         if not self.microbloques:
-            start = QPointF(50, self.height() / 2)
-            end = QPointF(self.width() - 50, self.height() / 2)
-            mid = (start + end) / 2
-            if (pos - mid).manhattanLength() < 15:
-                return mid
-        else:
-            for microbloque in self.microbloques:
-                # Verificar botones arriba y abajo
-                top_mid = microbloque.pos() + QPointF(microbloque.width()/2, -20)
-                bottom_mid = microbloque.pos() + QPointF(microbloque.width()/2, microbloque.height() + 20)
-                if (pos - top_mid).manhattanLength() < 15:
-                    return top_mid
-                if (pos - bottom_mid).manhattanLength() < 15:
-                    return bottom_mid
-
-            for i, microbloque in enumerate(self.microbloques + [None]):
-                if i == 0:
-                    start = QPointF(50, self.height() / 2)
-                    end = self.microbloques[0].pos() + QPointF(self.microbloques[0].width()/2, self.microbloques[0].height()/2)
-                elif i == len(self.microbloques):
-                    start = self.microbloques[-1].pos() + QPointF(self.microbloques[-1].width()/2, self.microbloques[-1].height()/2)
-                    end = QPointF(self.width() - 50, self.height() / 2)
-                else:
-                    start = self.microbloques[i-1].pos() + QPointF(self.microbloques[i-1].width()/2, self.microbloques[i-1].height()/2)
-                    end = microbloque.pos() + QPointF(microbloque.width()/2, microbloque.height()/2)
+            mid_point = QPointF(self.width() / 2, self.height() / 2)
+            if (pos - mid_point).manhattanLength() < 15:
+                return ('serie', mid_point, None)
+        
+        last_x = 90
+        for i, microbloque in enumerate(self.microbloques):
+            if not microbloque.paralelo_con:
+                # Botón izquierdo
+                left_mid = QPointF(last_x + (microbloque.x() - last_x) / 2, self.height() / 2)
+                if (pos - left_mid).manhattanLength() < 15:
+                    return ('izquierda', left_mid, microbloque)
                 
-                mid = (start + end) / 2
-                if (pos - mid).manhattanLength() < 15:
-                    return mid
+                # Botón derecho
+                next_x = microbloque.x() + microbloque.width() + 100 if i < len(self.microbloques) - 1 else self.width() - 90
+                right_mid = QPointF((microbloque.x() + microbloque.width() + next_x) / 2, self.height() / 2)
+                if (pos - right_mid).manhattanLength() < 15:
+                    return ('derecha', right_mid, microbloque)
+                
+                # Botón arriba
+                top_mid = QPointF(microbloque.x() + microbloque.width() / 2, microbloque.y() - 50)
+                if (pos - top_mid).manhattanLength() < 15:
+                    return ('arriba', top_mid, microbloque)
+                
+                # Botón abajo
+                bottom_mid = QPointF(microbloque.x() + microbloque.width() / 2, microbloque.y() + microbloque.height() + 50)
+                if (pos - bottom_mid).manhattanLength() < 15:
+                    return ('abajo', bottom_mid, microbloque)
+                
+                last_x = microbloque.x() + microbloque.width()
+        
         return None
-    
-    def create_new_microbloque(self, pos=None):
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Nuevo Microbloque")
-        layout = QVBoxLayout()
 
-        name_input = QLineEdit()
-        name_input.setPlaceholderText("Nombre del microbloque")
-        layout.addWidget(name_input)
+    def create_new_microbloque(self, add_button_info):
+        if add_button_info:
+            relation, pos, reference_microbloque = add_button_info
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Nuevo Microbloque")
+            layout = QVBoxLayout()
 
-        color_button = QPushButton("Seleccionar Color")
-        color_button.clicked.connect(lambda: self.select_color(color_button))
-        layout.addWidget(color_button)
+            name_input = QLineEdit()
+            name_input.setPlaceholderText("Nombre del microbloque")
+            layout.addWidget(name_input)
 
-        transfer_label = QLabel("Función de Transferencia:")
-        latex_editor = LatexEditor()
-        layout.addWidget(transfer_label)
-        layout.addWidget(latex_editor)
+            color_button = QPushButton("Seleccionar Color")
+            color_button.clicked.connect(lambda: self.select_color(color_button))
+            layout.addWidget(color_button)
 
-        save_button = QPushButton("Guardar")
-        save_button.clicked.connect(dialog.accept)
-        layout.addWidget(save_button)
+            transfer_label = QLabel("Función de Transferencia:")
+            latex_editor = LatexEditor()
+            layout.addWidget(transfer_label)
+            layout.addWidget(latex_editor)
 
-        dialog.setLayout(layout)
+            save_button = QPushButton("Guardar")
+            save_button.clicked.connect(dialog.accept)
+            layout.addWidget(save_button)
 
-        if dialog.exec_():
-            nombre = name_input.text() or f"Microbloque {len(self.microbloques) + 1}"
-            color = color_button.property("selected_color") or QColor(255, 255, 0)
-            funcion_transferencia = latex_editor.get_latex()
-            config = {
-                'nombre': nombre,
-                'color': color,
-                'funcion_transferencia': funcion_transferencia,
-                'opciones_adicionales': {}
-            }
-            self.new_microbloque_config = config
-            if pos:
-                self.add_microbloque(pos)
-            else:
-                self.creating_microbloque = True
-                self.setCursor(Qt.CrossCursor)
+            dialog.setLayout(layout)
 
-    def edit_microbloque(self, microbloque):
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Editar Microbloque")
-        layout = QVBoxLayout()
-
-        name_input = QLineEdit(microbloque.nombre)
-        layout.addWidget(name_input)
-
-        color_button = QPushButton("Cambiar Color")
-        color_button.setStyleSheet(f"background-color: {microbloque.color.name()};")
-        color_button.clicked.connect(lambda: self.select_color(color_button))
-        layout.addWidget(color_button)
-
-        transfer_label = QLabel("Función de Transferencia:")
-        latex_editor = LatexEditor(initial_latex=microbloque.funcion_transferencia)
-        layout.addWidget(transfer_label)
-        layout.addWidget(latex_editor)
-
-        save_button = QPushButton("Guardar")
-        save_button.clicked.connect(dialog.accept)
-        layout.addWidget(save_button)
-
-        dialog.setLayout(layout)
-
-        if dialog.exec_():
-            microbloque.nombre = name_input.text()
-            microbloque.color = color_button.property("selected_color") or microbloque.color
-            microbloque.funcion_transferencia = latex_editor.get_latex()
-            microbloque.update()
-            self.update()
+            if dialog.exec_():
+                nombre = name_input.text() or f"Microbloque {len(self.microbloques) + 1}"
+                color = color_button.property("selected_color") or QColor(255, 255, 0)
+                funcion_transferencia = latex_editor.get_latex()
+                config = {
+                    'nombre': nombre,
+                    'color': color,
+                    'funcion_transferencia': funcion_transferencia,
+                    'opciones_adicionales': {}
+                }
+                self.new_microbloque_config = config
+                self.add_microbloque(pos, relation, reference_microbloque)
 
     def select_color(self, button):
         color = QColorDialog.getColor()
@@ -548,3 +240,27 @@ class DrawingArea(QWidget):
         
         if action == delete_action:
             self.delete_microbloque()
+
+    def reorganize_microbloques(self):
+        if not self.microbloques:
+            return
+
+        start_x = 150
+        start_y = self.height() / 2
+        horizontal_spacing = 100
+        vertical_spacing = 100
+
+        x = start_x
+        for microbloque in self.microbloques:
+            if not microbloque.paralelo_con:
+                microbloque.move(int(x), int(start_y - microbloque.height() / 2))
+                x += microbloque.width() + horizontal_spacing
+            else:
+                ref_x = microbloque.paralelo_con.x()
+                ref_y = microbloque.paralelo_con.y()
+                if microbloque.y() < ref_y:  # Arriba
+                    microbloque.move(int(ref_x), int(ref_y - microbloque.height() - vertical_spacing))
+                else:  # Abajo
+                    microbloque.move(int(ref_x), int(ref_y + microbloque.paralelo_con.height() + vertical_spacing))
+
+        self.update()
