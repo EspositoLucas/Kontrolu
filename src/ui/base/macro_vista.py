@@ -253,9 +253,9 @@ class MacroVista(QPushButton):
         delete_button.clicked.connect(self.drawing_area.clear_all)
         toolbar.addWidget(delete_button)
 
-        delete_microbloque_button = QPushButton('Borrar Microbloque', self)
-        delete_microbloque_button.clicked.connect(self.drawing_area.delete_microbloque)
-        toolbar.addWidget(delete_microbloque_button)
+        # delete_microbloque_button = QPushButton('Borrar Microbloque', self)
+        # delete_microbloque_button.clicked.connect(self.drawing_area.delete_microbloque)
+        # toolbar.addWidget(delete_microbloque_button)
 
     def configure_microbloque(self):
         self.drawing_area.create_new_microbloque()
