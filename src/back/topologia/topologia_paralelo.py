@@ -5,8 +5,8 @@ class TopologiaParalelo(InterfazTopologia):
     
     def __init__(self,microbloque,microbloque2,padre:TopologiaSerie=None):
         self.padre = padre
-        serie = TopologiaSerie(micro=microbloque)
-        serie2 = TopologiaSerie(micro=microbloque2)
+        serie = TopologiaSerie(micro=microbloque,padre=self)
+        serie2 = TopologiaSerie(micro=microbloque2,padre=self)
         self.hijos = [serie,serie2]
     
     def agregar_paralela(self,microbloque,indice):

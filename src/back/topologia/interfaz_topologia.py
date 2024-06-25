@@ -1,3 +1,4 @@
+from __future__ import annotations
 class InterfazTopologia():
     def __init__(self) -> None:
         self.hijos = []
@@ -23,3 +24,6 @@ class InterfazTopologia():
 
     def reemplazar_elemento(self,elemento,nuevo):
         self.hijos[self.hijos.index(elemento)] = nuevo
+
+    def cambiar_padre(self,padre: InterfazTopologia):
+        self.padre = padre
