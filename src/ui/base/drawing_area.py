@@ -17,7 +17,7 @@
 #         self.init_ui()
         
 #     def init_ui(self):
-#         self.setStyleSheet("background-color: #2b2b2b; border: 1px solid black;")
+#         self.setStyleSheet("background-color: white; border: 1px solid black;")
 #         self.setContextMenuPolicy(Qt.CustomContextMenu)
 #         self.customContextMenuRequested.connect(self.show_context_menu)
         
@@ -62,7 +62,7 @@
 #     def paintEvent(self, event):
 #         painter = QPainter(self)
 #         painter.setRenderHint(QPainter.Antialiasing)
-#         painter.setPen(QPen(Qt.white, 2))
+#         painter.setPen(QPen(Qt.black, 2))
         
 #         entrada = QPointF(50, self.height() / 2)
 #         salida = QPointF(self.width() - 50, self.height() / 2)
@@ -265,6 +265,9 @@
 
 #         self.update()
 
+
+
+
 from PyQt5.QtWidgets import QWidget, QMenu, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
 from PyQt5.QtCore import Qt, pyqtSignal, QPointF, QRectF
@@ -288,14 +291,9 @@ class DrawingArea(QWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
         
-    def init_ui(self):
-        self.setStyleSheet("background-color: white; border: 1px solid black;")
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_context_menu)
-        
     def add_microbloque(self, pos, relation='serie', reference_microbloque=None):
         nombre = self.new_microbloque_config.get('nombre') or f"Microbloque {len(self.microbloques) + 1}"
-        color = self.new_microbloque_config.get('color') or QColor(255, 255, 0)
+        color = self.new_microbloque_config.get('color') or QColor(255, 255, 255)
         funcion_transferencia = self.new_microbloque_config.get('funcion_transferencia') or ""
         opciones_adicionales = self.new_microbloque_config.get('opciones_adicionales') or {}
         
@@ -303,14 +301,16 @@ class DrawingArea(QWidget):
         
         if reference_microbloque:
             if relation in ['arriba', 'abajo']:
+                if not hasattr(reference_microbloque, 'paralelo_con'):
+                    reference_microbloque.paralelo_con = []
                 reference_microbloque.paralelo_con.append(microbloque)
             elif relation == 'derecha':
-                if reference_microbloque.serie_con:
+                if hasattr(reference_microbloque, 'serie_con'):
                     microbloque.serie_con = reference_microbloque.serie_con
                 reference_microbloque.serie_con = microbloque
             elif relation == 'izquierda':
                 for mb in self.microbloques:
-                    if mb.serie_con == reference_microbloque:
+                    if hasattr(mb, 'serie_con') and mb.serie_con == reference_microbloque:
                         mb.serie_con = microbloque
                         break
                 microbloque.serie_con = reference_microbloque
@@ -324,8 +324,8 @@ class DrawingArea(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         
-        self.draw_io_blocks(painter)
         self.draw_connections(painter)
+        self.draw_io_blocks(painter)
         
         for microbloque in self.microbloques:
             painter.translate(microbloque.pos())
@@ -353,11 +353,11 @@ class DrawingArea(QWidget):
         
         last_point = QPointF(130, self.height() / 2)
         for microbloque in self.microbloques:
-            if not any(mb for mb in self.microbloques if mb.serie_con == microbloque):
+            if not any(mb for mb in self.microbloques if hasattr(mb, 'serie_con') and mb.serie_con == microbloque):
                 current_point = microbloque.pos() + QPointF(microbloque.width() / 2, microbloque.height() / 2)
                 draw_line(last_point, QPointF(current_point.x() - microbloque.width() / 2, current_point.y()))
                 
-                if microbloque.paralelo_con:
+                if hasattr(microbloque, 'paralelo_con') and microbloque.paralelo_con:
                     top = min(mb.y() for mb in [microbloque] + microbloque.paralelo_con)
                     bottom = max(mb.y() + mb.height() for mb in [microbloque] + microbloque.paralelo_con)
                     mid_y = (top + bottom) / 2
@@ -374,7 +374,7 @@ class DrawingArea(QWidget):
                 
                 last_point = current_point + QPointF(microbloque.width() / 2, 0)
             
-            if microbloque.serie_con:
+            if hasattr(microbloque, 'serie_con') and microbloque.serie_con:
                 start = microbloque.pos() + QPointF(microbloque.width(), microbloque.height() / 2)
                 end = microbloque.serie_con.pos() + QPointF(0, microbloque.serie_con.height() / 2)
                 draw_line(start, end)
@@ -394,6 +394,7 @@ class DrawingArea(QWidget):
         else:
             for microbloque in self.microbloques:
                 draw_button(microbloque.pos() + QPointF(microbloque.width() + 20, microbloque.height() / 2))
+                draw_button(microbloque.pos() + QPointF(-20, microbloque.height() / 2))
                 draw_button(microbloque.pos() + QPointF(microbloque.width() / 2, -20))
                 draw_button(microbloque.pos() + QPointF(microbloque.width() / 2, microbloque.height() + 20))
 
@@ -407,24 +408,24 @@ class DrawingArea(QWidget):
             max_height = 0
             
             while start_microbloque:
-                parallel_count = len(start_microbloque.paralelo_con)
-                total_height = start_microbloque.height() * (parallel_count + 1) + 40 * parallel_count
+                parallel_count = len(getattr(start_microbloque, 'paralelo_con', []))
+                total_height = start_microbloque.height() * (parallel_count + 1) + 60 * parallel_count
                 start_y = current_y - total_height / 2 + start_microbloque.height() / 2
                 
                 start_microbloque.move(int(current_x), int(start_y))
                 max_height = max(max_height, total_height)
                 
-                if start_microbloque.paralelo_con:
+                if hasattr(start_microbloque, 'paralelo_con') and start_microbloque.paralelo_con:
                     for i, parallel_mb in enumerate(start_microbloque.paralelo_con):
-                        parallel_y = start_y + (i + 1) * (start_microbloque.height() + 40)
+                        parallel_y = start_y + (i + 1) * (start_microbloque.height() + 60)
                         parallel_mb.move(int(current_x), int(parallel_y))
                 
                 current_x += start_microbloque.width() + 100
-                start_microbloque = start_microbloque.serie_con
+                start_microbloque = getattr(start_microbloque, 'serie_con', None)
             
             return max_height
         
-        start_microbloque = next((mb for mb in self.microbloques if not any(other.serie_con == mb for other in self.microbloques)), None)
+        start_microbloque = next((mb for mb in self.microbloques if not any(hasattr(other, 'serie_con') and other.serie_con == mb for other in self.microbloques)), None)
         
         if start_microbloque:
             organize_branch(start_microbloque, 150, self.height() / 2)
@@ -453,6 +454,10 @@ class DrawingArea(QWidget):
             right_mid = microbloque.pos() + QPointF(microbloque.width() + 20, microbloque.height() / 2)
             if (pos - right_mid).manhattanLength() < 15:
                 return ('derecha', right_mid, microbloque)
+            
+            left_mid = microbloque.pos() + QPointF(-20, microbloque.height() / 2)
+            if (pos - left_mid).manhattanLength() < 15:
+                return ('izquierda', left_mid, microbloque)
             
             top_mid = microbloque.pos() + QPointF(microbloque.width() / 2, -20)
             if (pos - top_mid).manhattanLength() < 15:
@@ -492,7 +497,7 @@ class DrawingArea(QWidget):
 
             if dialog.exec_():
                 nombre = name_input.text() or f"Microbloque {len(self.microbloques) + 1}"
-                color = color_button.property("selected_color") or QColor(255, 255, 0)
+                color = color_button.property("selected_color") or QColor(255, 255, 255)
                 funcion_transferencia = latex_editor.get_latex()
                 config = {
                     'nombre': nombre,
@@ -538,10 +543,10 @@ class DrawingArea(QWidget):
         if microbloque:
             self.microbloques.remove(microbloque)
             for mb in self.microbloques:
-                if microbloque in mb.paralelo_con:
+                if hasattr(mb, 'paralelo_con') and microbloque in mb.paralelo_con:
                     mb.paralelo_con.remove(microbloque)
-                if mb.serie_con == microbloque:
-                    mb.serie_con = microbloque.serie_con
+                if hasattr(mb, 'serie_con') and mb.serie_con == microbloque:
+                    mb.serie_con = getattr(microbloque, 'serie_con', None)
             microbloque.deleteLater()
             self.selected_microbloque = None
             self.update()
