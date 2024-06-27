@@ -4,7 +4,7 @@ from src.back.topologia.interfaz_topologia import InterfazTopologia
 class MacroBloque(InterfazTopologia):
     
     def __init__(self):
-        self.topologia = TopologiaSerie(self)
+        self.topologia = TopologiaSerie(padre=self)
         self.nombre = "MacroBloque"
         self.representacion = None # ESTA SERÍA LA REPRESENTACIÓN VISUAL DEL ELEMENTO (TODO: VINCULARLO CON LAS CLASES DEFINIDAS EN LA CARPETA "ui")
 

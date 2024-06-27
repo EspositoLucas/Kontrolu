@@ -5,10 +5,13 @@ class TopologiaSerie(InterfazTopologia):
     def __init__(self,micro: TopologiaParalelo | MicroBloque = None,lista_micros: list=None,padre = None):
         self.padre = padre
         self.hijos: list[InterfazTopologia] = []
+        print("creo serie")
         if micro:
+            print("Entra micro")
             micro.cambiar_padre(self)
             self.hijos.append(micro)
         if lista_micros:
+            print("Entra lista")
             for micro in lista_micros:
                 micro.cambiar_padre(self)
             self.hijos.extend(lista_micros)
