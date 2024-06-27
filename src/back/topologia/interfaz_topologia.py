@@ -11,7 +11,7 @@ class InterfazTopologia():
         pass
 
     def tamanio(self) -> tuple(int,int):
-        pass
+        return(self.ancho(),self.alto())
 
     def obtenerHijo(self):
         pass
