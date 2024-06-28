@@ -6,9 +6,9 @@ from .macros.macro_punto_suma import MacroPuntoSuma
 
 class Sesion():
     def __init__(self):
-        self.controlador = MacroControlador()
-        self.actuador = MacroActuador()
-        self.proceso = MacroProceso()
-        self.medidor = MacroMedidor()
-        self.punto_suma = MacroPuntoSuma()
+        self.controlador = MacroControlador(self)
+        self.actuador = MacroActuador(self)
+        self.proceso = MacroProceso(self)
+        self.medidor = MacroMedidor(self)
+        self.punto_suma = MacroPuntoSuma(self)
     
