@@ -1,5 +1,6 @@
 from __future__ import annotations
 from back.topologia.interfaz_topologia import InterfazTopologia
+from PyQt5.QtGui import QColor
 class TopologiaSerie(InterfazTopologia):
     
     def __init__(self,micro: TopologiaParalelo | MicroBloque = None,lista_micros: list=None,padre = None):
@@ -73,12 +74,13 @@ class TopologiaSerie(InterfazTopologia):
     def __str__(self):
         return "SERIE: " + str(list(map(lambda hijo: str(hijo),self.hijos)))
 
-
-
 class MicroBloque(InterfazTopologia):
-    def __init__(self,nombre: str,padre: TopologiaSerie=None) -> None:
+    def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, opciones_adicionales: dict=None, padre: TopologiaSerie=None) -> None:
         self.padre = padre
         self.nombre = nombre
+        self.color = color
+        self.funcion_transferencia = funcion_transferencia
+        self.opciones_adicionales = opciones_adicionales
 
     def borrar_elemento(self):
         self.padre.borrar_elemento(self)
@@ -107,6 +109,15 @@ class MicroBloque(InterfazTopologia):
     
     def obtener_micros(self):
         return [self]
+    
+    def set_funcion_transferencia(self, funcion):
+        self.funcion_transferencia = funcion
+
+    def set_opcion_adicional(self, clave, valor):
+        self.opciones_adicionales[clave] = valor
+
+    def get_opcion_adicional(self, clave):
+        return self.opciones_adicionales.get(clave)
 
 
 
