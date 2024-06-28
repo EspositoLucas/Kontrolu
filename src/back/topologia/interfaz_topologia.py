@@ -1,4 +1,5 @@
 from __future__ import annotations
+import itertools
 class InterfazTopologia():
     def __init__(self) -> None:
         self.hijos = []
@@ -27,3 +28,6 @@ class InterfazTopologia():
 
     def cambiar_padre(self,padre: InterfazTopologia):
         self.padre = padre
+
+    def obtener_micros(self):
+        return list(itertools.chain.from_iterable(map(lambda x: x.obtener_micros(),self.hijos)))

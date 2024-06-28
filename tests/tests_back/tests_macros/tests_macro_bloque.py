@@ -18,7 +18,7 @@ class TestMacroBloque(unittest.TestCase):
         micro = MicroBloque("microSerie1")
         macro = MacroBloque()
         macro.topologia.agregar_elemento(micro)
-        print(str(macro))
+        #print(str(macro))
 
     def test_agregar_serie_despues_y_antes(self):
         micro0 = MicroBloque("microSerie0")
@@ -27,24 +27,82 @@ class TestMacroBloque(unittest.TestCase):
         macro = MacroBloque()
         macro.topologia.agregar_elemento(micro1,5)
 
-        macro.topologia.agregar_elemento(micro0,0)
+        
+        micro1.agregar_antes(micro0)
+        micro1.agregar_despues(micro2)
 
-        macro.topologia.agregar_elemento(micro2,2)
+        self.assertEqual(str(macro), "MacroBloque: SERIE: ['microSerie0', 'microSerie1', 'microSerie2']")
 
-        print(str(macro))
     
-    def test_agregar_paralelo(self):
-        micro0 = MicroBloque("microSerie0")
+    def test_crear_paralelo(self):
+        micro0 = MicroBloque("microParalelo0")
+        micro1 = MicroBloque("microParalelo1")
+        macro = MacroBloque()
+        macro.topologia.agregar_elemento(micro1,5)
+        micro1.agregar_arriba(micro0)
+
+
+        #print(str(macro))
+
+    def test_crear_paralelo_de_una_serie(self):
+        micro0 = MicroBloque("microParalelo0")
         micro1 = MicroBloque("microParalelo1")
         micro2 = MicroBloque("microParalelo2")
         macro = MacroBloque()
         macro.topologia.agregar_elemento(micro1,5)
+        micro1.agregar_arriba(micro0)
+        micro1.padre.agregar_serie_abajo(micro2)
+        #print(str(macro))
 
-        macro.topologia.agregar_elemento(micro0,0)
+    
+    def test_eliminar_base(self):
+        micro0 = MicroBloque("microSerie0")
+        macro = MacroBloque()
+        macro.topologia.agregar_elemento(micro0)
+        micro0.borrar_elemento()
 
-        macro.topologia.agregar_elemento(micro2,2)
+        #print(str(macro))
+    
+    def test_eliminar_de_paralela_normal(self):
+        micro0 = MicroBloque("microSerie0")
+        micro1 = MicroBloque("microSerie1")
+        micro3 = MicroBloque("microSerie3")
+        macro = MacroBloque()
+        macro.topologia.agregar_elemento(micro0)
+        micro0.agregar_arriba(micro1)
+        micro1.agregar_despues(micro3)
+
+        micro1.borrar_elemento()
+
+        #print(str(macro))
+
+    def test_eliminar_de_paralela_borra_serie_no_paralela(self):
+        micro0 = MicroBloque("microSerie0")
+        micro1 = MicroBloque("microSerie1")
+        micro3 = MicroBloque("microSerie3")
+        macro = MacroBloque()
+        macro.topologia.agregar_elemento(micro0)
+        micro0.agregar_arriba(micro1)
+        micro1.padre.agregar_serie_abajo(micro3)
+
+        micro1.borrar_elemento()
+
+        #print(str(macro))
+
+    def test_eliminar_de_paralela_borra_serie_y_paralela(self):
+        micro0 = MicroBloque("microSerie0")
+        micro1 = MicroBloque("microSerie1")
+        micro3 = MicroBloque("microSerie3")
+        macro = MacroBloque()
+        macro.topologia.agregar_elemento(micro0)
+        micro0.agregar_arriba(micro1)
+        micro0.agregar_despues(micro3)
+
+        micro1.borrar_elemento()
+        
 
         print(str(macro))
+
 
 if __name__ == '__main__':
     unittest.main()
