@@ -1,5 +1,5 @@
 from __future__ import annotations
-from src.back.topologia.interfaz_topologia import InterfazTopologia
+from back.topologia.interfaz_topologia import InterfazTopologia
 class TopologiaSerie(InterfazTopologia):
     
     def __init__(self,micro: TopologiaParalelo | MicroBloque = None,lista_micros: list=None,padre = None):

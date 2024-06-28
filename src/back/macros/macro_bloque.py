@@ -1,5 +1,5 @@
-from src.back.topologia.topologia_serie import TopologiaSerie
-from src.back.topologia.interfaz_topologia import InterfazTopologia
+from back.topologia.topologia_serie import TopologiaSerie
+from back.topologia.interfaz_topologia import InterfazTopologia
 
 class MacroBloque(InterfazTopologia):
     
