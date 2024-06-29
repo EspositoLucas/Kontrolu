@@ -20,3 +20,6 @@ class MacroBloque(InterfazTopologia):
 
     def obtener_microbloques(self):
         return self.topologia.obtener_micros()
+    
+    def reset_topologia(self):
+        self.topologia = TopologiaSerie(padre=self)

@@ -257,8 +257,8 @@ class DrawingArea(QWidget):
     
     def load_microbloques(self):
         for microbloque in self.microbloques:
-            microbloque.deleteLater()
-        self.microbloques.clear()
+                microbloque.deleteLater() # elimina cada elemento
+        self.microbloques.clear() # vacia la lista de microbloques
         self.dibujar_topologia(self.modelo.topologia, QPointF(150, self.height() / 2))
         self.update()
     
@@ -303,7 +303,17 @@ class DrawingArea(QWidget):
         microbloque.setPos(pos)
         self.microbloques.append(microbloque)
         microbloque.show()
-        return microbloque
+        self.update()
+    
+    def clear_all(self):
+        if self.microbloques:
+            for microbloque in self.microbloques:
+                microbloque.deleteLater() # elimina cada elemento
+            self.microbloques.clear() # vacia la lista de microbloques
+        
+        self.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
+        self.load_microbloques() # resetea la vista
+        self.update()
     
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -515,8 +525,36 @@ class DrawingArea(QWidget):
         microbloque.deleteLater()
         self.selected_microbloque = None
         self.hide_add_buttons()
-        self.load_microbloques()
-        self.update()
+        positions = [
+            ('arriba', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() - self.button_size/2)),
+            ('abajo', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() + microbloque.height() + self.button_size/2)),
+            ('izquierda', QPointF(microbloque.x() - self.button_size/2, microbloque.y() + microbloque.height()/2)),
+            ('derecha', QPointF(microbloque.x() + microbloque.width() + self.button_size/2, microbloque.y() + microbloque.height()/2))
+        ]
+        
+        for direction, pos in positions:
+            button = QPushButton("+", self)
+            button.setGeometry(int(pos.x() - self.button_size/2), int(pos.y() - self.button_size/2), self.button_size, self.button_size)
+            button.clicked.connect(lambda _, d=direction: self.add_microbloque(d))
+            button.show()
+            self.add_buttons.append(button)
+
+    def hide_add_buttons(self):
+        for button in self.add_buttons:
+            button.deleteLater()
+        self.add_buttons.clear()
+
+    def add_microbloque(self, direction):
+        # segun la dirección en la que se hizo click, determino la relación con el microbloque seleccionado
+        if self.selected_microbloque:
+            if direction in ['arriba', 'abajo']:
+                relation = direction
+            elif direction == 'izquierda':
+                relation = 'antes'
+            else:  # derecha
+                relation = 'despues'
+            
+            self.create_new_microbloque(self.selected_microbloque.pos(), relation, self.selected_microbloque)    
 
     def clear_all(self):
         self.microbloques = []
