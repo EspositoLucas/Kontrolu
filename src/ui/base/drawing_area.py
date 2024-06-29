@@ -105,8 +105,8 @@ class DrawingArea(QWidget):
     def draw_connections(self, painter):
         painter.setPen(QPen(Qt.black, 2))
         for i in range(len(self.microbloques) - 1):
-            start = self.microbloques[i].pos() + QPoint(self.microbloques[i].width(), self.microbloques[i].height() / 2)
-            end = self.microbloques[i+1].pos() + QPoint(0, self.microbloques[i+1].height() / 2)
+            start = self.microbloques[i].pos() + QPoint(self.microbloques[i].width(), self.microbloques[i].height() // 2)
+            end = self.microbloques[i+1].pos() + QPoint(0, self.microbloques[i+1].height() // 2)
             painter.drawLine(start, end)
 
         # Conectar el primer microbloque con la entrada
