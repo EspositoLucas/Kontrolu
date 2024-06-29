@@ -4,12 +4,13 @@ from PyQt5.QtCore import Qt, QPointF
 from .latex_editor import LatexEditor
 
 class Microbloque(QWidget):
-    def __init__(self, nombre, parent=None, color=None, funcion_transferencia=None, opciones_adicionales=None):
+    def __init__(self, parent=None, microbloque_back=None):
         super().__init__(parent)
-        self.nombre = nombre
-        self.color = color or QColor(255, 255, 0)
-        self.funcion_transferencia = funcion_transferencia or ""
-        self.opciones_adicionales = opciones_adicionales or {}
+        self.elemento_back = microbloque_back
+        self.nombre = microbloque_back.nombre
+        self.color = microbloque_back.color or QColor(255, 255, 0)
+        self.funcion_transferencia = microbloque_back.funcion_transferencia or ""
+        self.opciones_adicionales = microbloque_back.opciones_adicionales or {}
         self.setFixedSize(150, 80)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(f"background-color: {self.color.name()};")
@@ -68,9 +69,10 @@ class Microbloque(QWidget):
         dialog.setLayout(layout)
 
         if dialog.exec_():
+            self.elemento_back.nombre = name_input.text()
             self.nombre = name_input.text()
+            self.elemento_back.funcion_transferencia = latex_editor.get_latex()
             self.funcion_transferencia = latex_editor.get_latex()
-            self.micro_back.set_funcion_transferencia(self.funcion_transferencia)
             
             for i in range(layout.count()):
                 widget = layout.itemAt(i).widget()
