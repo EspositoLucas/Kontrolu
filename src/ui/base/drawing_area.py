@@ -232,7 +232,6 @@
 #     def update_connections(self):
 #         self.update()
 
-
 from PyQt5.QtWidgets import QWidget, QMenu, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMessageBox
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QCursor
 from PyQt5.QtCore import Qt, pyqtSignal, QPointF, QRectF, QPoint
@@ -250,38 +249,53 @@ class DrawingArea(QWidget):
         self.new_microbloque_config = {}
         self.add_buttons = []
         self.button_size = 20
+        self.margen_paralelo = 30  # Margen para las bifurcaciones
         self.init_ui()
         
     def init_ui(self):
         self.setStyleSheet("background-color: white; border: 1px solid black;")
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_context_menu)
     
     def load_microbloques(self):
-        self.microbloques = []
+        for microbloque in self.microbloques:
+            microbloque.deleteLater()
+        self.microbloques.clear()
         self.dibujar_topologia(self.modelo.topologia, QPointF(150, self.height() / 2))
         self.update()
     
     def dibujar_topologia(self, topologia, posicion_inicial):
         if isinstance(topologia, TopologiaSerie):
-            self.dibujar_serie(topologia, posicion_inicial)
+            return self.dibujar_serie(topologia, posicion_inicial)
         elif isinstance(topologia, TopologiaParalelo):
-            self.dibujar_paralelo(topologia, posicion_inicial)
+            return self.dibujar_paralelo(topologia, posicion_inicial)
         elif isinstance(topologia, MicroBloque):
-            self.create_microbloque(topologia, posicion_inicial)
+            return self.create_microbloque(topologia, posicion_inicial)
         
     def dibujar_serie(self, serie, posicion_inicial):
         posicion_actual = posicion_inicial
+        microbloques_serie = []
         for hijo in serie.hijos:
-            self.dibujar_topologia(hijo, posicion_actual)
-            posicion_actual.setX(posicion_actual.x() + 200)
+            micro = self.dibujar_topologia(hijo, posicion_actual)
+            if isinstance(micro, list):
+                microbloques_serie.extend(micro)
+                if micro:  # Solo ajusta la posición si se crearon microbloques
+                    posicion_actual.setX(posicion_actual.x() + 200 + self.margen_paralelo * 2)
+            elif micro:
+                microbloques_serie.append(micro)
+                posicion_actual.setX(posicion_actual.x() + 200)
+        return microbloques_serie
 
     def dibujar_paralelo(self, paralelo, posicion_inicial):
-        posicion_actual = posicion_inicial
-        vertical_offset = 100
-        for i, hijo in enumerate(paralelo.hijos):
-            y_offset = (i - (len(paralelo.hijos) - 1) / 2) * vertical_offset
-            self.dibujar_topologia(hijo, QPointF(posicion_actual.x(), posicion_actual.y() + y_offset))
+        microbloques_paralelos = []
+        posicion_actual = posicion_inicial.y()
+        for hijo in paralelo.hijos:
+            micro = self.dibujar_topologia(hijo, QPointF(posicion_inicial.x() + self.margen_paralelo, posicion_actual))
+            if isinstance(micro, list):
+                microbloques_paralelos.extend(micro)
+            elif micro:
+                microbloques_paralelos.append(micro)
+            if micro:  # Solo ajusta la posición si se crearon microbloques
+                posicion_actual += 100
+        return microbloques_paralelos
 
     def create_microbloque(self, microbloque_back, pos):
         microbloque = Microbloque(self, microbloque_back)
@@ -289,17 +303,7 @@ class DrawingArea(QWidget):
         microbloque.setPos(pos)
         self.microbloques.append(microbloque)
         microbloque.show()
-        self.update_connections()
-    
-    def clear_all(self):
-        reply = QMessageBox.question(self, 'Confirmar borrado', '¿Está seguro de que desea borrar todos los microbloques?',
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            for microbloque in self.microbloques:
-                microbloque.deleteLater()
-            self.microbloques = []
-            self.modelo.topologia = TopologiaSerie()
-            self.update_connections()
+        return microbloque
     
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -323,7 +327,6 @@ class DrawingArea(QWidget):
         painter.setBrush(QBrush(Qt.white))
         painter.drawEllipse(button_rect)
         painter.drawText(button_rect, Qt.AlignCenter, "+")
-
         self.add_button_rect = button_rect
 
     def draw_io_blocks(self, painter):
@@ -343,55 +346,111 @@ class DrawingArea(QWidget):
     
     def draw_connections(self, painter):
         painter.setPen(QPen(Qt.black, 2))
-        self.draw_topologia_connections(self.modelo.topologia, painter)
-
+        
         if self.microbloques:
             entrada = QPointF(90, self.height() / 2)
-            primer_micro = self.microbloques[0].pos() + QPoint(0, self.microbloques[0].height() // 2)
-            painter.drawLine(entrada, primer_micro)
-
             salida = QPointF(self.width() - 170, self.height() / 2)
-            ultimo_micro = self.microbloques[-1].pos() + QPoint(self.microbloques[-1].width(), self.microbloques[-1].height() // 2)
-            painter.drawLine(ultimo_micro, salida)
-
-    def draw_topologia_connections(self, topologia, painter):
-        if isinstance(topologia, TopologiaSerie):
-            self.draw_serie_connections(topologia, painter)
-        elif isinstance(topologia, TopologiaParalelo):
-            self.draw_paralelo_connections(topologia, painter)
-
-    def draw_serie_connections(self, serie, painter):
-        for i in range(len(serie.hijos) - 1):
-            start = self.get_microbloque_by_back(serie.hijos[i]).pos() + QPoint(self.microbloques[0].width(), self.microbloques[0].height() // 2)
-            end = self.get_microbloque_by_back(serie.hijos[i+1]).pos() + QPoint(0, self.microbloques[0].height() // 2)
-            painter.drawLine(start, end)
-
-    def draw_paralelo_connections(self, paralelo, painter):
-        start_x = min(self.get_microbloque_by_back(hijo).pos().x() for hijo in paralelo.hijos)
-        end_x = max(self.get_microbloque_by_back(hijo).pos().x() + self.microbloques[0].width() for hijo in paralelo.hijos)
-        
-        start_y = sum(self.get_microbloque_by_back(hijo).pos().y() + self.microbloques[0].height() // 2 for hijo in paralelo.hijos) / len(paralelo.hijos)
-        
-        start_point = QPointF(start_x, start_y)
-        end_point = QPointF(end_x, start_y)
-        
-        painter.drawLine(start_point, end_point)
-        
-        for hijo in paralelo.hijos:
-            microbloque = self.get_microbloque_by_back(hijo)
-            start = QPointF(start_x, microbloque.pos().y() + microbloque.height() // 2)
-            end = microbloque.pos() + QPoint(0, microbloque.height() // 2)
-            painter.drawLine(start, end)
             
-            start = microbloque.pos() + QPoint(microbloque.width(), microbloque.height() // 2)
-            end = QPointF(end_x, microbloque.pos().y() + microbloque.height() // 2)
-            painter.drawLine(start, end)
+            self.draw_connection_tree(painter, self.modelo.topologia, entrada, salida)
 
-    def get_microbloque_by_back(self, back):
-        for microbloque in self.microbloques:
-            if microbloque.elemento_back == back:
-                return microbloque
-        return None
+    def draw_connection_tree(self, painter, topologia, start, end):
+        if isinstance(topologia, TopologiaSerie):
+            self.draw_serie_connections(painter, topologia, start, end)
+        elif isinstance(topologia, TopologiaParalelo):
+            self.draw_paralelo_connections(painter, topologia, start, end)
+        elif isinstance(topologia, MicroBloque):
+            microbloque = next(m for m in self.microbloques if m.elemento_back == topologia)
+            painter.drawLine(start, microbloque.pos() + QPoint(0, microbloque.height() // 2))
+            painter.drawLine(microbloque.pos() + QPoint(microbloque.width(), microbloque.height() // 2), end)
+
+    def draw_serie_connections(self, painter, serie, start, end):
+        current_pos = start
+        for i, hijo in enumerate(serie.hijos):
+            if i == len(serie.hijos) - 1:
+                next_pos = end
+            else:
+                next_pos = QPointF(current_pos.x() + 200, current_pos.y())
+            self.draw_connection_tree(painter, hijo, current_pos, next_pos)
+            current_pos = next_pos
+
+    def draw_paralelo_connections(self, painter, paralelo, start, end):
+        bifurcacion = QPointF(start.x() + self.margen_paralelo, start.y())
+        unificacion = QPointF(end.x() - self.margen_paralelo, end.y())
+        
+        painter.drawLine(start, bifurcacion)
+        painter.drawLine(unificacion, end)
+        
+        y_positions = []
+        for hijo in paralelo.hijos:
+            if isinstance(hijo, MicroBloque):
+                microbloque = next((m for m in self.microbloques if m.elemento_back == hijo), None)
+                if microbloque:
+                    y_positions.append(microbloque.pos().y() + microbloque.height() // 2)
+            elif isinstance(hijo, TopologiaSerie):
+                # Calculamos la posición Y promedio de los microbloques en la serie
+                serie_y_positions = [m.pos().y() + m.height() // 2 for m in self.microbloques if m.elemento_back in hijo.hijos]
+                if serie_y_positions:
+                    y_positions.append(sum(serie_y_positions) / len(serie_y_positions))
+        
+        for y in y_positions:
+            painter.drawLine(bifurcacion, QPointF(bifurcacion.x(), y))
+            painter.drawLine(QPointF(unificacion.x(), y), unificacion)
+        
+        for i, hijo in enumerate(paralelo.hijos):
+            if i < len(y_positions):
+                self.draw_connection_tree(painter, hijo, 
+                                        QPointF(bifurcacion.x(), y_positions[i]),
+                                        QPointF(unificacion.x(), y_positions[i]))
+
+    def mousePressEvent(self, event):
+        super().mousePressEvent(event)
+
+        if not self.microbloques:
+            if hasattr(self, 'add_button_rect') and self.add_button_rect.contains(event.pos()):
+                self.create_new_microbloque(self.add_button_rect.center())
+        else:
+            for microbloque in self.microbloques:
+                if microbloque.geometry().contains(event.pos()):
+                    self.selected_microbloque = microbloque
+                    self.show_add_buttons(microbloque)
+                    break
+            else:
+                self.selected_microbloque = None
+                self.hide_add_buttons()
+        
+        self.update()
+
+    def show_add_buttons(self, microbloque):
+        self.hide_add_buttons()
+        positions = [
+            ('arriba', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() - self.button_size/2)),
+            ('abajo', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() + microbloque.height() + self.button_size/2)),
+            ('izquierda', QPointF(microbloque.x() - self.button_size/2, microbloque.y() + microbloque.height()/2)),
+            ('derecha', QPointF(microbloque.x() + microbloque.width() + self.button_size/2, microbloque.y() + microbloque.height()/2))
+        ]
+        
+        for direction, pos in positions:
+            button = QPushButton("+", self)
+            button.setGeometry(int(pos.x() - self.button_size/2), int(pos.y() - self.button_size/2), self.button_size, self.button_size)
+            button.clicked.connect(lambda _, d=direction: self.add_microbloque(d))
+            button.show()
+            self.add_buttons.append(button)
+
+    def hide_add_buttons(self):
+        for button in self.add_buttons:
+            button.deleteLater()
+        self.add_buttons.clear()
+
+    def add_microbloque(self, direction):
+        if self.selected_microbloque:
+            if direction in ['arriba', 'abajo']:
+                relation = direction
+            elif direction == 'izquierda':
+                relation = 'antes'
+            else:
+                relation = 'despues'
+            
+            self.create_new_microbloque(self.selected_microbloque.pos(), relation, self.selected_microbloque)
 
     def create_new_microbloque(self, pos, relation=None, reference_microbloque=None):
         dialog = QDialog(self)
@@ -443,71 +502,9 @@ class DrawingArea(QWidget):
         if color.isValid():
             button.setStyleSheet(f"background-color: {color.name()};")
             button.setProperty("selected_color", color)
-    
-    def mousePressEvent(self, event):
-        super().mousePressEvent(event)
-
-        if not self.microbloques:
-            if hasattr(self, 'add_button_rect') and self.add_button_rect.contains(event.pos()):
-                self.create_new_microbloque(self.add_button_rect.center())
-        else:
-            for microbloque in self.microbloques:
-                if microbloque.geometry().contains(event.pos()):
-                    self.selected_microbloque = microbloque
-                    self.show_add_buttons(microbloque)
-                    break
-            else:
-                self.selected_microbloque = None
-                self.hide_add_buttons()
-        
-        self.update()
-
-    def show_add_buttons(self, microbloque):
-        self.hide_add_buttons()
-        positions = [
-            ('arriba', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() - self.button_size/2)),
-            ('abajo', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() + microbloque.height() + self.button_size/2)),
-            ('izquierda', QPointF(microbloque.x() - self.button_size/2, microbloque.y() + microbloque.height()/2)),
-            ('derecha', QPointF(microbloque.x() + microbloque.width() + self.button_size/2, microbloque.y() + microbloque.height()/2))
-        ]
-        
-        for direction, pos in positions:
-            button = QPushButton("+", self)
-            button.setGeometry(int(pos.x() - self.button_size/2), int(pos.y() - self.button_size/2), self.button_size, self.button_size)
-            button.clicked.connect(lambda _, d=direction: self.add_microbloque(d))
-            button.show()
-            self.add_buttons.append(button)
-
-    def hide_add_buttons(self):
-        for button in self.add_buttons:
-            button.deleteLater()
-        self.add_buttons.clear()
-
-    def add_microbloque(self, direction):
-        if self.selected_microbloque:
-            if direction in ['arriba', 'abajo']:
-                relation = direction
-            elif direction == 'izquierda':
-                relation = 'antes'
-            else:
-                relation = 'despues'
-            
-            self.create_new_microbloque(self.selected_microbloque.pos(), relation, self.selected_microbloque)
-
-    def update_connections(self):
-        self.update()
-
-    def show_context_menu(self, position):
-        if self.selected_microbloque:
-            context_menu = QMenu(self)
-            delete_action = context_menu.addAction("Borrar microbloque")
-            action = context_menu.exec_(self.mapToGlobal(position))
-            if action == delete_action:
-                self.delete_microbloque(self.selected_microbloque)
 
     def delete_microbloque(self, microbloque):
         self.microbloques.remove(microbloque)
-        # En lugar de llamar a eliminar(), vamos a eliminar el microbloque de la topología
         if isinstance(self.modelo.topologia, TopologiaSerie):
             self.modelo.topologia.hijos.remove(microbloque.elemento_back)
         elif isinstance(self.modelo.topologia, TopologiaParalelo):
@@ -521,3 +518,7 @@ class DrawingArea(QWidget):
         self.load_microbloques()
         self.update()
 
+    def clear_all(self):
+        self.microbloques = []
+        # TODO: Si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
+        self.update_connections()

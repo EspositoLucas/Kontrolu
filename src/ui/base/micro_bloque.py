@@ -193,7 +193,9 @@ class Microbloque(QWidget):
         color = QColorDialog.getColor()
         if color.isValid():
             self.color = color
+            self.elemento_back.color = color
             button.setStyleSheet(f"background-color: {color.name()};")
+            self.setStyleSheet(f"background-color: {color.name()};")
 
     def get_center(self):
         return self.pos() + QPointF(self.width() / 2, self.height() / 2)
