@@ -19,11 +19,6 @@ class DrawingArea(QWidget):
         self.setStyleSheet("background-color: white; border: 1px solid black;")
         self.setContextMenuPolicy(Qt.CustomContextMenu)
     
-    #def load_microbloques(self):
-    #    microbloques_back = self.modelo.obtener_microbloques()
-    #    for microbloque_back in microbloques_back:
-    #        self.create_microbloque(microbloque_back)
-    
     def load_microbloques(self):
         self.microbloques = []
         self.dibujar_topologia(self.modelo.topologia, QPointF(150, self.height() / 2))
@@ -47,13 +42,15 @@ class DrawingArea(QWidget):
         posicion_actual = posicion_inicial
         for hijo in paralelo.hijos:
             self.dibujar_topologia(hijo, posicion_actual)
-            posicion_actual.setY(posicion_actual.y() + 100)
+            posicion_actual.setY(posicion_actual.y() + 100) # TODO: Modificar el valor segun convenga (es el margen vertical entre microbloques)
 
     def create_microbloque(self, microbloque_back, pos):
         microbloque = Microbloque(microbloque_back.nombre, self, microbloque_back.color, microbloque_back.funcion_transferencia, microbloque_back.opciones_adicionales)
+        microbloque.setParent(self)
         microbloque.setPos(pos)
         microbloque.moved.connect(self.update_connections)
         self.microbloques.append(microbloque)
+        microbloque.show()
         self.update_connections()
     
     def clear_all(self):
