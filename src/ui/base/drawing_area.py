@@ -52,12 +52,16 @@ class DrawingArea(QWidget):
         microbloque.setPos(pos)
         self.microbloques.append(microbloque)
         microbloque.show()
-        self.update_connections()
+        self.update()
     
     def clear_all(self):
-        self.microbloques = []
-        # TODO: Si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
-        self.update_connections()
+        if self.microbloques:
+            for microbloque in self.microbloques:
+                microbloque.deleteLater() # elimina cada elemento
+            self.microbloques.clear() # vacia la lista de microbloques
+        
+        self.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
+        self.load_microbloques() # resetea la vista
     
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -227,7 +231,4 @@ class DrawingArea(QWidget):
             else:  # derecha
                 relation = 'despues'
             
-            self.create_new_microbloque(self.selected_microbloque.pos(), relation, self.selected_microbloque)
-
-    def update_connections(self):
-        self.update()
+            self.create_new_microbloque(self.selected_microbloque.pos(), relation, self.selected_microbloque)    
