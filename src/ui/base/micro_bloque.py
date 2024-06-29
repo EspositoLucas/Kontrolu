@@ -1,11 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog
 from PyQt5.QtGui import QPainter, QColor, QPen
-from PyQt5.QtCore import Qt, pyqtSignal, QPointF, QRectF
+from PyQt5.QtCore import Qt, QPointF
 from .latex_editor import LatexEditor
 
 class Microbloque(QWidget):
-    moved = pyqtSignal()
-
     def __init__(self, nombre, parent=None, color=None, funcion_transferencia=None, opciones_adicionales=None):
         super().__init__(parent)
         self.nombre = nombre
@@ -13,7 +11,8 @@ class Microbloque(QWidget):
         self.funcion_transferencia = funcion_transferencia or ""
         self.opciones_adicionales = opciones_adicionales or {}
         self.setFixedSize(150, 80)
-        self.show()
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setStyleSheet(f"background-color: {self.color.name()};")
 
     def setPos(self, pos):
         self.move(pos.toPoint())
@@ -21,10 +20,18 @@ class Microbloque(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(QPen(Qt.black, 2))
+        
+        # Dibuja el rectángulo
+        painter.setPen(QPen(Qt.black, 2)) # color y grosor del border
         painter.setBrush(self.color)
-        painter.drawRect(self.rect)
-        painter.drawText(self.rect, Qt.AlignCenter, self.nombre)
+        painter.drawRect(self.rect().adjusted(1, 1, -1, -1))  # incluye el borde dentro del rectángulo
+        
+        font = painter.font() # fuente default
+        font.setPointSize(10) # 10 es el tamaño de la fuente del texto
+        painter.setFont(font)
+        painter.setPen(Qt.black) # color del texto
+        text_rect = self.rect().adjusted(5, 5, -5, -5)  # permite centrar el texto dentro del microbloque
+        painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre) # escribe el texto centrado
 
     def mouseDoubleClickEvent(self, event):
         self.edit_properties()
@@ -93,15 +100,3 @@ class Microbloque(QWidget):
 
     def __repr__(self):
         return self.__str__()
-    
-    def mousePressEvent(self, event):
-        self.old_pos = event.pos()
-    
-    def mouseMoveEvent(self, event):
-        delta = event.pos() - self.old_pos
-        self.move(self.pos() + delta)
-        self.moved.emit(self)
-    
-    @property
-    def rect(self):
-        return QRectF(self.geometry())
