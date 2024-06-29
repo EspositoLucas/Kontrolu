@@ -69,9 +69,10 @@ class Microbloque(QWidget):
         dialog.setLayout(layout)
 
         if dialog.exec_():
+            self.elemento_back.nombre = name_input.text()
             self.nombre = name_input.text()
+            self.elemento_back.funcion_transferencia = latex_editor.get_latex()
             self.funcion_transferencia = latex_editor.get_latex()
-            self.micro_back.set_funcion_transferencia(self.funcion_transferencia)
             
             for i in range(layout.count()):
                 widget = layout.itemAt(i).widget()
