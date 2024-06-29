@@ -19,10 +19,11 @@ class DrawingArea(QWidget):
         
     def init_ui(self):
         self.setStyleSheet("background-color: white; border: 1px solid black;")
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
     
     def load_microbloques(self):
-        self.microbloques = []
+        for microbloque in self.microbloques:
+                microbloque.deleteLater() # elimina cada elemento
+        self.microbloques.clear() # vacia la lista de microbloques
         self.dibujar_topologia(self.modelo.topologia, QPointF(150, self.height() / 2))
         self.update()
     
@@ -62,6 +63,7 @@ class DrawingArea(QWidget):
         
         self.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
         self.load_microbloques() # resetea la vista
+        self.update()
     
     def paintEvent(self, event):
         super().paintEvent(event)
