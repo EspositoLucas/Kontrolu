@@ -70,6 +70,7 @@ class Microbloque(QWidget):
 
         if dialog.exec_():
             self.elemento_back.nombre = name_input.text()
+            self.elemento_back.color = self.color
             self.nombre = name_input.text()
             self.elemento_back.funcion_transferencia = latex_editor.get_latex()
             self.funcion_transferencia = latex_editor.get_latex()
@@ -83,6 +84,7 @@ class Microbloque(QWidget):
                     self.micro_back.set_opcion_adicional(key, value)
             
             self.update()
+
 
     def select_color(self, button):
         color = QColorDialog.getColor()
@@ -102,3 +104,4 @@ class Microbloque(QWidget):
 
     def __repr__(self):
         return self.__str__()
+  
