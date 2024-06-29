@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import List, Tuple
 import itertools
 class InterfazTopologia():
     def __init__(self) -> None:
@@ -11,7 +12,7 @@ class InterfazTopologia():
     def alto(self) -> int:
         pass
 
-    def tamanio(self) -> tuple(int,int):
+    def tamanio(self) -> Tuple[int,int]:
         return(self.ancho(),self.alto())
 
     def obtenerHijo(self):

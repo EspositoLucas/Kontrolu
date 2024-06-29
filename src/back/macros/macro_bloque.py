@@ -1,12 +1,10 @@
-from src.back.topologia.topologia_serie import TopologiaSerie
-from src.back.topologia.interfaz_topologia import InterfazTopologia
+from back.topologia.topologia_serie import TopologiaSerie
+from back.topologia.interfaz_topologia import InterfazTopologia
 
 class MacroBloque(InterfazTopologia):
-    
     def __init__(self):
         self.topologia = TopologiaSerie(padre=self)
         self.nombre = "MacroBloque"
-        self.representacion = None # ESTA SERÍA LA REPRESENTACIÓN VISUAL DEL ELEMENTO (TODO: VINCULARLO CON LAS CLASES DEFINIDAS EN LA CARPETA "ui")
 
     def __str__(self):
         return f"{self.nombre}: {str(self.topologia)}"
@@ -19,4 +17,6 @@ class MacroBloque(InterfazTopologia):
     
     def borrar_elemento(self, elemento):
         pass
-    
+
+    def obtener_microbloques(self):
+        return self.topologia.obtener_micros()
