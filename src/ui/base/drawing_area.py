@@ -47,7 +47,7 @@ class DrawingArea(QWidget):
             posicion_actual.setY(posicion_actual.y() + 100) # TODO: Modificar el valor segun convenga (es el margen vertical entre microbloques)
 
     def create_microbloque(self, microbloque_back, pos):
-        microbloque = Microbloque(microbloque_back.nombre, self, microbloque_back.color, microbloque_back.funcion_transferencia, microbloque_back.opciones_adicionales)
+        microbloque = Microbloque(self, microbloque_back)
         microbloque.setParent(self)
         microbloque.setPos(pos)
         self.microbloques.append(microbloque)
@@ -158,13 +158,13 @@ class DrawingArea(QWidget):
             new_microbloque = MicroBloque(nombre, color, funcion_transferencia, {}, self.modelo.topologia)
 
             if reference_microbloque and relation == "arriba":
-                self.modelo.topologia.agregar_arriba(reference_microbloque, new_microbloque)
+                reference_microbloque.elemento_back.agregar_arriba(new_microbloque)
             elif reference_microbloque and relation == "abajo":
-                self.modelo.topologia.agregar_abajo(reference_microbloque, new_microbloque)
+                reference_microbloque.elemento_back.agregar_abajo(new_microbloque)
             elif reference_microbloque and relation == "antes":
-                self.modelo.topologia.agregar_antes(reference_microbloque, new_microbloque)
+                reference_microbloque.elemento_back.agregar_antes(new_microbloque)
             elif reference_microbloque and relation == "despues":
-                self.modelo.topologia.agregar_despues(reference_microbloque, new_microbloque)
+                reference_microbloque.elemento_back.agregar_despues(new_microbloque)
             else:
                 self.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
             
