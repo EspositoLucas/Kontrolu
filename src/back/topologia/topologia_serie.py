@@ -99,10 +99,10 @@ class MicroBloque(InterfazTopologia):
         self.padre.agregar_despues_de(microbloque,self)
     
     def alto(self) -> int:
-        return 1
+        return 80
     
     def ancho(self) -> int:
-        return 1
+        return 150
     
     def __str__(self) -> str:
         return self.nombre
