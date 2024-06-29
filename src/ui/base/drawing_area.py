@@ -13,6 +13,8 @@ class DrawingArea(QWidget):
         self.modelo = modelo # es la representacion backend del macrobloque
         self.creating_microbloque = False
         self.new_microbloque_config = {}
+        self.add_buttons = []
+        self.button_size = 20
         self.init_ui()
         
     def init_ui(self):
@@ -48,7 +50,6 @@ class DrawingArea(QWidget):
         microbloque = Microbloque(microbloque_back.nombre, self, microbloque_back.color, microbloque_back.funcion_transferencia, microbloque_back.opciones_adicionales)
         microbloque.setParent(self)
         microbloque.setPos(pos)
-        microbloque.moved.connect(self.update_connections)
         self.microbloques.append(microbloque)
         microbloque.show()
         self.update_connections()
@@ -157,18 +158,19 @@ class DrawingArea(QWidget):
             new_microbloque = MicroBloque(nombre, color, funcion_transferencia, {}, self.modelo.topologia)
 
             if reference_microbloque and relation == "arriba":
-                reference_microbloque.modelo.agregar_arriba(new_microbloque)
+                self.modelo.topologia.agregar_arriba(reference_microbloque, new_microbloque)
             elif reference_microbloque and relation == "abajo":
-                reference_microbloque.modelo.agregar_abajo(new_microbloque)
+                self.modelo.topologia.agregar_abajo(reference_microbloque, new_microbloque)
             elif reference_microbloque and relation == "antes":
-                reference_microbloque.modelo.agregar_antes(new_microbloque)
+                self.modelo.topologia.agregar_antes(reference_microbloque, new_microbloque)
             elif reference_microbloque and relation == "despues":
-                reference_microbloque.modelo.agregar_despues(new_microbloque)
+                self.modelo.topologia.agregar_despues(reference_microbloque, new_microbloque)
             else:
                 self.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
             
-            self.load_microbloques()  # Recargamos todos los microbloques
+            self.load_microbloques()  # recargo todos los microbloques
             self.update()
+            self.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
 
     def select_color(self, button):
         color = QColorDialog.getColor()
@@ -178,17 +180,54 @@ class DrawingArea(QWidget):
     
     def mousePressEvent(self, event):
         super().mousePressEvent(event)
-        
-        if not self.microbloques:
+
+        if not self.microbloques: # si no hay microbloques y se hace click sobre el único botón "+", entonces se crea un microbloque 
             if hasattr(self, 'add_button_rect') and self.add_button_rect.contains(event.pos()):
                 self.create_new_microbloque(self.add_button_rect.center())
-        else:
+        else: # si hay microbloques, se busca el microbloque que se seleccionó
             for microbloque in self.microbloques:
                 if microbloque.geometry().contains(event.pos()):
                     self.selected_microbloque = microbloque
+                    self.show_add_buttons(microbloque) # muestra los botones "+" alrededor del microbloque
                     break
             else:
                 self.selected_microbloque = None
+                self.hide_add_buttons() # oculta los botones "+"
+        
+        self.update()
+
+    def show_add_buttons(self, microbloque):
+        self.hide_add_buttons()
+        positions = [
+            ('arriba', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() - self.button_size/2)),
+            ('abajo', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() + microbloque.height() + self.button_size/2)),
+            ('izquierda', QPointF(microbloque.x() - self.button_size/2, microbloque.y() + microbloque.height()/2)),
+            ('derecha', QPointF(microbloque.x() + microbloque.width() + self.button_size/2, microbloque.y() + microbloque.height()/2))
+        ]
+        
+        for direction, pos in positions:
+            button = QPushButton("+", self)
+            button.setGeometry(int(pos.x() - self.button_size/2), int(pos.y() - self.button_size/2), self.button_size, self.button_size)
+            button.clicked.connect(lambda _, d=direction: self.add_microbloque(d))
+            button.show()
+            self.add_buttons.append(button)
+
+    def hide_add_buttons(self):
+        for button in self.add_buttons:
+            button.deleteLater()
+        self.add_buttons.clear()
+
+    def add_microbloque(self, direction):
+        # segun la dirección en la que se hizo click, determino la relación con el microbloque seleccionado
+        if self.selected_microbloque:
+            if direction in ['arriba', 'abajo']:
+                relation = direction
+            elif direction == 'izquierda':
+                relation = 'antes'
+            else:  # derecha
+                relation = 'despues'
+            
+            self.create_new_microbloque(self.selected_microbloque.pos(), relation, self.selected_microbloque)
 
     def update_connections(self):
         self.update()

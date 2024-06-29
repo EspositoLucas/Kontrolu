@@ -1,11 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog
 from PyQt5.QtGui import QPainter, QColor, QPen
-from PyQt5.QtCore import Qt, pyqtSignal, QPointF, QRectF
+from PyQt5.QtCore import Qt, QPointF
 from .latex_editor import LatexEditor
 
 class Microbloque(QWidget):
-    moved = pyqtSignal()
-
     def __init__(self, nombre, parent=None, color=None, funcion_transferencia=None, opciones_adicionales=None):
         super().__init__(parent)
         self.nombre = nombre
