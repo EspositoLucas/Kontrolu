@@ -111,8 +111,8 @@ class DrawingArea(QWidget):
         painter.setPen(QPen(Qt.black, 2))
         
         if self.microbloques:
-            entrada = QPointF(50, self.height() / 2)
-            salida = QPointF(self.width() - 170, self.height() / 2)
+            entrada = QPointF(130, self.height() / 2)
+            salida = QPointF(self.width() - 210, self.height() / 2)
             
             self.draw_connection_tree(painter, self.modelo.topologia, entrada, salida)
 
