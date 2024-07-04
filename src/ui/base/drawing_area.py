@@ -49,6 +49,7 @@ class DrawingArea(QWidget):
             posicion_actual.setX(posicion_actual.x() + MARGEN_HORIZONTAL) # TODO: Modificar el valor segun convenga (es el margen horizontal entre microbloques)
 
     def dibujar_paralelo(self, paralelo, posicion_inicial):
+        posicion_inicial.setX(posicion_inicial.x() + MARGEN_PARALELO) # se agrega un margen antes de hacer la bifurcación
         altura_total = sum(hijo.alto() for hijo in paralelo.hijos) # la altura total de los microbloques es la suma de sus alturas (porque se dibujan uno debajo del otro)
         altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL # se agrega el margen vertical entre microbloques
 
@@ -163,7 +164,7 @@ class DrawingArea(QWidget):
             return None
 
         # Calcular punto de bifurcación
-        comienzo_de_rama = QPointF(punto_inicial.x() + MARGEN_PARALELO, punto_inicial.y())  # 20 pixels antes del bloque (es el margen antes de hacer la bifurcación)
+        comienzo_de_rama = QPointF(punto_inicial.x() + MARGEN_PARALELO, punto_inicial.y())  # es el margen antes de hacer la bifurcación
         altura_total = sum(hijo.alto() for hijo in paralelo.hijos) # idem que en dibujar_paralelo
         altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL # idem que en dibujar_paralelo
         
@@ -192,7 +193,7 @@ class DrawingArea(QWidget):
             painter.drawLine(end_point, QPointF(max_x, end_point.y())) # le sumamos 20 para tener una linea horizontal (al salir del microbloque) antes de reconectar
         
         # Punto de reconexión
-        punto_de_reconexion = QPointF(max_x, punto_inicial.y())
+        punto_de_reconexion = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
         
         # Dibujar líneas verticales para reconectar (En realidad es una unica linea desde una rama a la otra)
         # QPointF(max_x + 20, puntos_finales[0].y()) --> es para la rama de arriba (indice 0 es el primer elemento de una lista)
