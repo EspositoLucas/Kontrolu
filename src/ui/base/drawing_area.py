@@ -24,7 +24,7 @@ class DrawingArea(QWidget):
         for microbloque in self.microbloques:
                 microbloque.deleteLater() # elimina cada elemento
         self.microbloques.clear() # vacia la lista de microbloques
-        self.dibujar_topologia(self.modelo.topologia, QPointF(150, self.height() / 2))
+        self.dibujar_topologia(self.modelo.topologia, QPointF(150, (self.height() / 2) - 40))#le agregue el 40 para que quede centrado
         #self.print_topologia(self.modelo.topologia)
         self.update()
     
@@ -93,8 +93,8 @@ class DrawingArea(QWidget):
 
     def draw_empty_connection(self, painter):
         painter.setPen(QPen(Qt.black, 2))
-        entrada = QPointF(90, self.height() / 2)
-        salida = QPointF(self.width() - 170, self.height() / 2)
+        entrada = QPointF(130, self.height() / 2)
+        salida = QPointF(self.width() - 210, self.height() / 2)
         painter.drawLine(entrada, salida)
         
         # Dibujar el botón "+" en el medio
