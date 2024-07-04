@@ -101,9 +101,17 @@ class Microbloque(QWidget):
         self.setFixedSize(150, 80)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(f"background-color: {self.color.name()};")
+        
 
     def setPos(self, pos):
         self.move(pos.toPoint())
+        
+    # def adjust_size(self, scale_factor):
+    #     current_size = self.size()
+    #     new_width = int(current_size.width() * scale_factor)
+    #     new_height = int(current_size.height() * scale_factor)
+    #     self.resize(new_width, new_height)
+    #     self.update()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -186,8 +194,8 @@ class Microbloque(QWidget):
         new_pos = point - QPointF(self.width() / 2, self.height() / 2)
         self.move(new_pos.toPoint())
 
-    def __str__(self):
-        return f"Microbloque(nombre={self.nombre}, color={self.color.name()}, funcion_transferencia={self.funcion_transferencia})"
+    # def __str__(self):
+    #     return f"Microbloque(nombre={self.nombre}, color={self.color.name()}, funcion_transferencia={self.funcion_transferencia})"
 
-    def __repr__(self):
-        return self.__str__()
+    # def __repr__(self):
+    #     return self.__str__()
