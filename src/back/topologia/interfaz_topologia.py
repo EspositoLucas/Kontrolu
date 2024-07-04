@@ -31,3 +31,10 @@ class InterfazTopologia():
 
     def obtener_micros(self):
         return list(itertools.chain.from_iterable(map(lambda x: x.obtener_micros(),self.hijos)))
+    
+    
+    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque):
+        pass
+        
+    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque):
+        pass
