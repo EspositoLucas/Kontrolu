@@ -1,9 +1,15 @@
-from PyQt5.QtWidgets import QWidget, QMenu, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel
-from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QCursor
-from PyQt5.QtCore import Qt, pyqtSignal, QPointF, QRectF, QPoint
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
+from PyQt5.QtCore import Qt, QPointF, QRectF
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
-from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque
+from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
+
+MARGEN_HORIZONTAL = 200
+MARGEN_VERTICAL = 50
+BUTTON_SIZE = 20
+RADIO = 40
+MARGEN_PARALELO = 20
 
 class DrawingArea(QWidget):
     def __init__(self, parent=None, modelo=None):
@@ -14,7 +20,7 @@ class DrawingArea(QWidget):
         self.creating_microbloque = False
         self.new_microbloque_config = {}
         self.add_buttons = []
-        self.button_size = 20
+        self.add_buttons_paralelo = []
         self.init_ui()
         
     def init_ui(self):
@@ -24,7 +30,7 @@ class DrawingArea(QWidget):
         for microbloque in self.microbloques:
                 microbloque.deleteLater() # elimina cada elemento
         self.microbloques.clear() # vacia la lista de microbloques
-        self.dibujar_topologia(self.modelo.topologia, QPointF(150, (self.height() / 2) - 40))#le agregue el 40 para que quede centrado
+        self.dibujar_topologia(self.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
         #self.print_topologia(self.modelo.topologia)
         self.update()
     
@@ -40,19 +46,18 @@ class DrawingArea(QWidget):
         posicion_actual = posicion_inicial
         for hijo in serie.hijos:
             self.dibujar_topologia(hijo, posicion_actual)
-            posicion_actual.setX(posicion_actual.x() + 200) # TODO: Modificar el valor segun convenga (es el margen horizontal entre microbloques)
+            posicion_actual.setX(posicion_actual.x() + MARGEN_HORIZONTAL) # TODO: Modificar el valor segun convenga (es el margen horizontal entre microbloques)
 
     def dibujar_paralelo(self, paralelo, posicion_inicial):
         altura_total = sum(hijo.alto() for hijo in paralelo.hijos) # la altura total de los microbloques es la suma de sus alturas (porque se dibujan uno debajo del otro)
-        vertical_margin = 50  # TODO: Modificar el valor segun convenga (es el margen vertical entre microbloques)
-        altura_total += (len(paralelo.hijos) - 1) * vertical_margin # se agrega el margen vertical entre microbloques
+        altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL # se agrega el margen vertical entre microbloques
 
         y_actual = posicion_inicial.y() - altura_total / 2 # empiezo desde la mitad de la altura total
         for hijo in paralelo.hijos:
             centro_del_hijo = y_actual + hijo.alto() / 2 # centro del microbloque
             posicion_del_hijo = QPointF(posicion_inicial.x(), centro_del_hijo)
             self.dibujar_topologia(hijo, posicion_del_hijo)
-            y_actual += hijo.alto() + vertical_margin # la posicion del siguiente será más abajo
+            y_actual += hijo.alto() + MARGEN_VERTICAL # la posicion del siguiente será más abajo
 
     def create_microbloque(self, microbloque_back, pos):
         microbloque = Microbloque(self, microbloque_back)
@@ -99,8 +104,7 @@ class DrawingArea(QWidget):
         
         # Dibujar el botón "+" en el medio
         center = QPointF((entrada.x() + salida.x()) / 2, self.height() / 2)
-        button_size = 30
-        button_rect = QRectF(center.x() - button_size/2, center.y() - button_size/2, button_size, button_size)
+        button_rect = QRectF(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
         painter.setBrush(QBrush(Qt.white))
         painter.drawEllipse(button_rect)
         painter.drawText(button_rect, Qt.AlignCenter, "+")
@@ -111,17 +115,16 @@ class DrawingArea(QWidget):
     def draw_io_blocks(self, painter):
         painter.setPen(QPen(Qt.black, 2))
         
-        radio = 40  # Radio del círculo
         centro_y = self.height() / 2  # Posición y del centro para ambos círculos
         
-        centro_entrada_x = 50 + radio  # Posición x del centro del círculo de entrada
-        centro_salida_x = self.width() - 130 - radio  # Posición x del centro del círculo de salida
+        centro_entrada_x = 50 + RADIO  # Posición x del centro del círculo de entrada
+        centro_salida_x = self.width() - 130 - RADIO  # Posición x del centro del círculo de salida
         
         # Dibujar los círculos de entrada y salida
-        painter.drawEllipse(QPointF(centro_entrada_x, centro_y), radio, radio)
+        painter.drawEllipse(QPointF(centro_entrada_x, centro_y), RADIO, RADIO)
         painter.drawText(QRectF(50, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Entrada")
         
-        painter.drawEllipse(QPointF(centro_salida_x, centro_y), radio, radio)
+        painter.drawEllipse(QPointF(centro_salida_x, centro_y), RADIO, RADIO)
         painter.drawText(QRectF(self.width()-209, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Salida")
     
     def draw_connections(self, painter, topologia, punto_de_partida, is_parallel=False):
@@ -160,10 +163,9 @@ class DrawingArea(QWidget):
             return None
 
         # Calcular punto de bifurcación
-        comienzo_de_rama = QPointF(punto_inicial.x() + 20, punto_inicial.y())  # 20 pixels antes del bloque (es el margen antes de hacer la bifurcación)
+        comienzo_de_rama = QPointF(punto_inicial.x() + MARGEN_PARALELO, punto_inicial.y())  # 20 pixels antes del bloque (es el margen antes de hacer la bifurcación)
         altura_total = sum(hijo.alto() for hijo in paralelo.hijos) # idem que en dibujar_paralelo
-        vertical_margin = 50 # idem que en dibujar_paralelo
-        altura_total += (len(paralelo.hijos) - 1) * vertical_margin # idem que en dibujar_paralelo
+        altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL # idem que en dibujar_paralelo
         
         # Dibujar línea horizontal antes de la bifurcación
         painter.drawLine(punto_inicial, comienzo_de_rama)
@@ -177,14 +179,13 @@ class DrawingArea(QWidget):
             punto_final_rama_actual = self.draw_connections(painter, hijo, punto_final_rama_vertical, True) # partiendo desde el extremo de la linea vertical de bifurcacion, comienza a dibujar lo que sigue
             if punto_final_rama_actual is not None:
                 puntos_finales.append(punto_final_rama_actual) # se va guardando los puntos finales de cada rama del paralelo
-            y_actual += hijo.alto() + vertical_margin # incorpora el margen vertical
+            y_actual += hijo.alto() + MARGEN_VERTICAL # incorpora el margen vertical
         
         if not puntos_finales: # querria decir que no dibujo nada en los paralelos (no creo que pase nunca, pero por las dudas lo dejo)
             return punto_inicial
 
-        margen_horizontal_final = 30 # margen horizontal para salir del paralelo
-        # Encontrar el punto final más a la derecha
-        max_x = max(point.x() for point in puntos_finales) + margen_horizontal_final # esto está por si una rama quedó "mas larga horizontalmente" que la otra
+        # Encontrar el punto final más a la derecha (margen paralelo permite dibujar la linea horizontal final, al salir de una rama paralela)
+        max_x = max(point.x() for point in puntos_finales) + MARGEN_PARALELO # esto está por si una rama quedó "mas larga horizontalmente" que la otra
          
         # Dibujar líneas horizontales para reconectar las ramas
         for end_point in puntos_finales:
@@ -201,8 +202,19 @@ class DrawingArea(QWidget):
         # Dibujar línea horizontal final (para salir de la estructura paralelo)
         painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_de_reconexion)
         
+        coordenada_final = self.boton_agregar_despues_de_paralelo(painter, punto_de_reconexion) # dibuja el botón "+" para agregar un microbloque después de la estructura paralelo
+        
         # retorna el punto de reconexión porque es el punto "mas a la derecha" de la estructura paralelo
-        return punto_de_reconexion 
+        return coordenada_final 
+
+    def boton_agregar_despues_de_paralelo(self, painter, pos):
+            button_rect = QRectF(pos.x() - BUTTON_SIZE/2, pos.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
+            painter.setBrush(QBrush(Qt.white))
+            painter.drawEllipse(button_rect)
+            painter.drawText(button_rect, Qt.AlignCenter, "+")
+            self.add_buttons_paralelo.append(button_rect) # lo agrega a la lista de botones para agregar microbloques después de la estructura paralelo
+            punto_derecho = QPointF(pos.x() + BUTTON_SIZE/2, pos.y())
+            return punto_derecho
 
     def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo):
         # busca en la lista de microbloques de la drawing_area, el microbloque que queremos conectar
@@ -291,7 +303,11 @@ class DrawingArea(QWidget):
                 if microbloque.geometry().contains(event.pos()):
                     self.selected_microbloque = microbloque
                     self.show_add_buttons(microbloque) # muestra los botones "+" alrededor del microbloque
-                    break
+                    return
+            for button_rect in self.add_buttons_paralelo:
+                if button_rect.contains(event.pos()):
+                    self.create_new_microbloque(button_rect.center(), relation="despues") # TODO: Definir funcion back para agregar después de un paralelo
+                    return
             else:
                 self.selected_microbloque = None
                 self.hide_add_buttons() # oculta los botones "+"
@@ -301,15 +317,15 @@ class DrawingArea(QWidget):
     def show_add_buttons(self, microbloque):
         self.hide_add_buttons()
         positions = [
-            ('arriba', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() - self.button_size/2)),
-            ('abajo', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() + microbloque.height() + self.button_size/2)),
-            ('izquierda', QPointF(microbloque.x() - self.button_size/2, microbloque.y() + microbloque.height()/2)),
-            ('derecha', QPointF(microbloque.x() + microbloque.width() + self.button_size/2, microbloque.y() + microbloque.height()/2))
+            ('arriba', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() - BUTTON_SIZE/2)),
+            ('abajo', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() + microbloque.height() + BUTTON_SIZE/2)),
+            ('izquierda', QPointF(microbloque.x() - BUTTON_SIZE/2, microbloque.y() + microbloque.height()/2)),
+            ('derecha', QPointF(microbloque.x() + microbloque.width() + BUTTON_SIZE/2, microbloque.y() + microbloque.height()/2))
         ]
         
         for direction, pos in positions:
             button = QPushButton("+", self)
-            button.setGeometry(int(pos.x() - self.button_size/2), int(pos.y() - self.button_size/2), self.button_size, self.button_size)
+            button.setGeometry(int(pos.x() - BUTTON_SIZE/2), int(pos.y() - BUTTON_SIZE/2), BUTTON_SIZE, BUTTON_SIZE)
             button.clicked.connect(lambda _, d=direction: self.add_microbloque(d))
             button.show()
             self.add_buttons.append(button)
