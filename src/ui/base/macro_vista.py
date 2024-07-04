@@ -40,6 +40,8 @@
 
 # 
 
+
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar
 from .drawing_area import DrawingArea
@@ -76,3 +78,6 @@ class MacroVista(QPushButton):
 
     def configure_microbloque(self):
         self.drawing_area.canvas.create_new_microbloque()
+
+
+
