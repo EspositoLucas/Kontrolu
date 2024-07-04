@@ -1,6 +1,10 @@
 from __future__ import annotations
 from back.topologia.interfaz_topologia import InterfazTopologia
 from PyQt5.QtGui import QColor
+
+ANCHO = 150
+ALTO = 80
+
 class TopologiaSerie(InterfazTopologia):
     
     def __init__(self,micro: TopologiaParalelo | MicroBloque = None,lista_micros: list=None,padre = None):
