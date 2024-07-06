@@ -18,15 +18,11 @@ class TopologiaSerie(InterfazTopologia):
                 micro.cambiar_padre(self)
             self.hijos.extend(lista_micros)
 
-
     def agregar_serie_arriba(self,microbloque:MicroBloque):
         self.padre.agregar_arriba_de(microbloque,self)
 
-    
     def agregar_serie_abajo(self,microbloque:MicroBloque):
         self.padre.agregar_abajo_de(microbloque,self)
-
-
 
     def agregar_elemento(self,microbloque: InterfazTopologia, posicion: int = 0):
         microbloque.cambiar_padre(self)
@@ -38,12 +34,10 @@ class TopologiaSerie(InterfazTopologia):
         paralelo = TopologiaParalelo(microbloque,actual,padre=self)
         self.hijos[indice] = paralelo
         
-
     def agregar_abajo_de(self,microbloque:MicroBloque,actual:MicroBloque):
         indice = self.hijos.index(actual)
         paralelo = TopologiaParalelo(actual,microbloque,padre=self)
         self.hijos[indice] = paralelo
-
 
     def agregar_despues_de(self,microbloque:MicroBloque,actual:InterfazTopologia):
         indice = self.hijos.index(actual)
@@ -67,16 +61,11 @@ class TopologiaSerie(InterfazTopologia):
             micro.cambiar_padre(self)
             self.hijos.insert(posicion,micro)
 
-    
-    
-
-
     def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque):
         self.padre.agregar_en_serie_fuera_de_paralela_antes(microbloque)
         
     def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque):
         self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
-
 
     def alto(self) -> int:
         return max(map(lambda x: x.alto(),self.hijos))
@@ -132,6 +121,7 @@ class MicroBloque(InterfazTopologia):
 
     def get_opcion_adicional(self, clave):
         return self.opciones_adicionales.get(clave)
+    
     def agregar_en_paralela_en_padre_arriba(self,microbloque:MicroBloque):
         self.padre.agregar_serie_arriba(microbloque)
         
@@ -143,6 +133,15 @@ class MicroBloque(InterfazTopologia):
         
     def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque):
         self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
+    
+    def get_parent_structures(self):
+        parents = []
+        current = self.padre
+        while current and "Macro" not in current.__class__.__name__:
+            # seguir hasta llegar al macrobloque --> esto porque el padre de la serie principal es el macrobloque
+            parents.append(current)
+            current = current.padre
+        return parents
 
     
 
@@ -157,7 +156,6 @@ class TopologiaParalelo(InterfazTopologia):
         serie = TopologiaSerie(micro=microbloque,padre=self)
         serie2 = TopologiaSerie(micro=microbloque2,padre=self)
         self.hijos = [serie,serie2]
-
     
     def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque):
         self.padre.agregar_antes_de(microbloque,self)
@@ -165,17 +163,13 @@ class TopologiaParalelo(InterfazTopologia):
     def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque):
         self.padre.agregar_despues_de(microbloque,self)
 
-
     def agregar_abajo_de(self,microbloque,actual):
         indice = self.hijos.index(actual)
         self.agregar_paralela(microbloque,indice+1)
-
-    
     
     def agregar_arriba_de(self,microbloque,actual):
         indice = self.hijos.index(actual)
         self.agregar_paralela(microbloque,indice)
-
 
     def agregar_paralela(self,microbloque,indice):
         serie = TopologiaSerie(micro=microbloque,padre=self)

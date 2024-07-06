@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
 from PyQt5.QtCore import Qt, QPointF, QRectF
 from .micro_bloque import Microbloque
@@ -74,6 +74,7 @@ class DrawingArea(QWidget):
                 microbloque.deleteLater() # elimina cada elemento
             self.microbloques.clear() # vacia la lista de microbloques
         
+        self.add_buttons.clear() # vacia la lista de botones "+"
         self.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
         self.load_microbloques() # resetea la vista
         self.update()
@@ -203,11 +204,12 @@ class DrawingArea(QWidget):
         # Dibujar línea horizontal final (para salir de la estructura paralelo)
         painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_de_reconexion)
         
-        coordenada_final = self.boton_agregar_despues_de_paralelo(painter, punto_de_reconexion) # dibuja el botón "+" para agregar un microbloque después de la estructura paralelo
+        # coordenada_final = self.boton_agregar_despues_de_paralelo(painter, punto_de_reconexion) # dibuja el botón "+" para agregar un microbloque después de la estructura paralelo
         
         # retorna el punto de reconexión porque es el punto "mas a la derecha" de la estructura paralelo
-        return coordenada_final 
+        return punto_de_reconexion 
 
+    """
     def boton_agregar_despues_de_paralelo(self, painter, pos):
             button_rect = QRectF(pos.x() - BUTTON_SIZE/2, pos.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
             painter.setBrush(QBrush(Qt.white))
@@ -216,7 +218,7 @@ class DrawingArea(QWidget):
             self.add_buttons_paralelo.append(button_rect) # lo agrega a la lista de botones para agregar microbloques después de la estructura paralelo
             punto_derecho = QPointF(pos.x() + BUTTON_SIZE/2, pos.y())
             return punto_derecho
-
+    """
     def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo):
         # busca en la lista de microbloques de la drawing_area, el microbloque que queremos conectar
         for mb in self.microbloques:
@@ -236,7 +238,7 @@ class DrawingArea(QWidget):
         # Si no se encuentra el microbloque, retornamos el punto de inicio --> Si no encuentra el microbloque en la lista, simplemente retorna el punto_inicial
         return punto_inicial
 
-    def create_new_microbloque(self, pos, relation=None, reference_microbloque=None):
+    def create_new_microbloque(self, pos, relation=None, reference_structure=None):
         dialog = QDialog(self)
         dialog.setWindowTitle("Nuevo Microbloque")
         layout = QVBoxLayout()
@@ -272,20 +274,48 @@ class DrawingArea(QWidget):
             }
             new_microbloque = MicroBloque(nombre, color, funcion_transferencia, {}, self.modelo.topologia)
 
-            if reference_microbloque and relation == "arriba":
-                reference_microbloque.elemento_back.agregar_arriba(new_microbloque)
-            elif reference_microbloque and relation == "abajo":
-                reference_microbloque.elemento_back.agregar_abajo(new_microbloque)
-            elif reference_microbloque and relation == "antes":
-                reference_microbloque.elemento_back.agregar_antes(new_microbloque)
-            elif reference_microbloque and relation == "despues":
-                reference_microbloque.elemento_back.agregar_despues(new_microbloque)
+            if isinstance(reference_structure, MicroBloque):
+                self.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)
+            elif isinstance(reference_structure, TopologiaSerie):
+                self.agregar_respecto_serie(new_microbloque, relation, reference_structure)
+            elif isinstance(reference_structure, TopologiaParalelo):
+                self.agregar_respecto_paralelo(new_microbloque, relation, reference_structure)
             else:
                 self.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
             
             self.load_microbloques()  # recargo todos los microbloques
             self.update()
             self.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
+
+    def agregar_respecto_microbloque(self, new_microbloque, relation, reference_microbloque):
+        if relation == "arriba":
+            reference_microbloque.agregar_arriba(new_microbloque) # agrega el nuevo microbloque arriba del microbloque de referencia
+        elif relation == "abajo":
+            reference_microbloque.agregar_abajo(new_microbloque) # agrega el nuevo microbloque abajo del microbloque de referencia
+        elif relation == "antes": # izquierda
+            reference_microbloque.agregar_antes(new_microbloque) # agrega el nuevo microbloque antes del microbloque de referencia
+        else: # despues
+            reference_microbloque.agregar_despues(new_microbloque) # agrega el nuevo microbloque después del microbloque de referencia
+
+    def agregar_respecto_serie(self, new_microbloque, relation, reference_serie):
+        if relation == "antes":
+            reference_serie.agregar_elemento(new_microbloque, 0) # agrega el nuevo microbloque al principio de la serie
+        elif relation == "despues": 
+            reference_serie.agregar_elemento(new_microbloque, len(reference_serie.hijos)) # agrega el nuevo microbloque al final de la serie
+        elif relation == "arriba": # TODO: No funciona cuando la serie es la serie principal
+            reference_serie.agregar_serie_arriba(new_microbloque) # agrega un microbloque en serie arriba de la estructura serie
+        else: # abajo # TODO: No funciona cuando la serie es la serie principal
+            reference_serie.agregar_serie_abajo(new_microbloque) # agrega un microbloque en serie abajo de la estructura serie
+
+    def agregar_respecto_paralelo(self, new_microbloque, relation, reference_paralelo):
+        if relation == "antes":
+            reference_paralelo.agregar_en_serie_fuera_de_paralela_antes(new_microbloque) # agrega un microbloque en serie antes de la estructura paralelo
+        elif relation == "despues":
+            reference_paralelo.agregar_en_serie_fuera_de_paralela_despues(new_microbloque) # agrega un microbloque en serie después de la estructura paralelo
+        elif relation == "arriba":
+            reference_paralelo.agregar_arriba_de(new_microbloque, self.selected_microbloque.elemento_back.padre) # agrega una rama más, arriba de la rama actual
+        else: # abajo
+            reference_paralelo.agregar_abajo_de(new_microbloque, self.selected_microbloque.elemento_back.padre) # agrega una rama más, abajo de la rama actual
 
     def select_color(self, button):
         color = QColorDialog.getColor()
@@ -304,14 +334,16 @@ class DrawingArea(QWidget):
                 if microbloque.geometry().contains(event.pos()):
                     self.selected_microbloque = microbloque
                     self.show_add_buttons(microbloque) # muestra los botones "+" alrededor del microbloque
-                    return
+                    break
+            else:
+                self.selected_microbloque = None
+                self.hide_add_buttons() # oculta los botones "+"
+            """
             for button_rect in self.add_buttons_paralelo:
                 if button_rect.contains(event.pos()):
                     self.create_new_microbloque(button_rect.center(), relation="despues") # TODO: Definir funcion back para agregar después de un paralelo
                     return
-            else:
-                self.selected_microbloque = None
-                self.hide_add_buttons() # oculta los botones "+"
+            """
         
         self.update()
 
@@ -327,7 +359,7 @@ class DrawingArea(QWidget):
         for direction, pos in positions:
             button = QPushButton("+", self)
             button.setGeometry(int(pos.x() - BUTTON_SIZE/2), int(pos.y() - BUTTON_SIZE/2), BUTTON_SIZE, BUTTON_SIZE)
-            button.clicked.connect(lambda _, d=direction: self.add_microbloque(d))
+            button.clicked.connect(lambda _, d=direction: self.show_add_menu(d))
             button.show()
             self.add_buttons.append(button)
 
@@ -336,9 +368,30 @@ class DrawingArea(QWidget):
             button.deleteLater()
         self.add_buttons.clear()
 
-    def add_microbloque(self, direction):
+    def show_add_menu(self, direction):
+        menu = QMenu(self)
+        micro_back = self.selected_microbloque.elemento_back
+        parent_structures = micro_back.get_parent_structures()
+        for parent in [micro_back] + parent_structures:
+            action = menu.addAction(f"Respecto a {self.get_structure_name(parent)}")
+            action.triggered.connect(lambda _, s=parent: self.add_microbloque(direction, s))
+        
+        button = self.sender()
+        menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
+
+    def get_structure_name(self, estructura):
+        if isinstance(estructura, MicroBloque):
+            return f"Microbloque '{estructura.nombre}'"
+        elif isinstance(estructura, TopologiaSerie):
+            return "Serie"
+        elif isinstance(estructura, TopologiaParalelo):
+            return "Paralelo"
+        else:
+            return "Estructura desconocida"
+
+    def add_microbloque(self, direction, estructura_de_referencia):
         # segun la dirección en la que se hizo click, determino la relación con el microbloque seleccionado
-        if self.selected_microbloque:
+        if estructura_de_referencia:
             if direction in ['arriba', 'abajo']:
                 relation = direction
             elif direction == 'izquierda':
@@ -346,7 +399,7 @@ class DrawingArea(QWidget):
             else:  # derecha
                 relation = 'despues'
             
-            self.create_new_microbloque(self.selected_microbloque.pos(), relation, self.selected_microbloque)    
+            self.create_new_microbloque(self.selected_microbloque.pos(), relation, estructura_de_referencia)    
 
     def print_topologia(self, topologia, indent=0):
         """
