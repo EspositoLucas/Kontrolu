@@ -136,11 +136,13 @@ class MicroBloque(InterfazTopologia):
     
     def get_parent_structures(self):
         parents = []
-        current = self.padre
-        while current and "Macro" not in current.__class__.__name__:
+        actual = self.padre
+        nivel = 0
+        while actual and "Macro" not in actual.__class__.__name__: # "Macro" not in actual.__class__.__name__ esta condicion es para que no se incluya el macrobloque en la lista de padres 
             # seguir hasta llegar al macrobloque --> esto porque el padre de la serie principal es el macrobloque
-            parents.append(current)
-            current = current.padre
+            parents.append([actual, nivel])
+            actual = actual.padre
+            nivel += 1
         return parents
 
     

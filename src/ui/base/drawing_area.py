@@ -193,32 +193,24 @@ class DrawingArea(QWidget):
         for end_point in puntos_finales:
             painter.drawLine(end_point, QPointF(max_x, end_point.y())) # le sumamos 20 para tener una linea horizontal (al salir del microbloque) antes de reconectar
         
+        punto_de_reconexion = QPointF(max_x, punto_inicial.y())  # punto de reconexión (es el punto más a la derecha de la estructura paralelo)
+        # insertar imagen de punto suma en el punto de reconexión
+        painter.drawEllipse(punto_de_reconexion, 5, 5)
+
         # Punto de reconexión
-        punto_de_reconexion = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
-        
+        punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
+
         # Dibujar líneas verticales para reconectar (En realidad es una unica linea desde una rama a la otra)
         # QPointF(max_x + 20, puntos_finales[0].y()) --> es para la rama de arriba (indice 0 es el primer elemento de una lista)
         # QPointF(max_x + 20, puntos_finales[-1].y()) --> es para la rama de abajo (indice -1 es el último elemento de una lista)
         painter.drawLine(QPointF(max_x, puntos_finales[0].y()), QPointF(max_x, puntos_finales[-1].y()))
         
         # Dibujar línea horizontal final (para salir de la estructura paralelo)
-        painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_de_reconexion)
-        
-        # coordenada_final = self.boton_agregar_despues_de_paralelo(painter, punto_de_reconexion) # dibuja el botón "+" para agregar un microbloque después de la estructura paralelo
+        painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_mas_alejado)
         
         # retorna el punto de reconexión porque es el punto "mas a la derecha" de la estructura paralelo
-        return punto_de_reconexion 
-
-    """
-    def boton_agregar_despues_de_paralelo(self, painter, pos):
-            button_rect = QRectF(pos.x() - BUTTON_SIZE/2, pos.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
-            painter.setBrush(QBrush(Qt.white))
-            painter.drawEllipse(button_rect)
-            painter.drawText(button_rect, Qt.AlignCenter, "+")
-            self.add_buttons_paralelo.append(button_rect) # lo agrega a la lista de botones para agregar microbloques después de la estructura paralelo
-            punto_derecho = QPointF(pos.x() + BUTTON_SIZE/2, pos.y())
-            return punto_derecho
-    """
+        return punto_mas_alejado 
+    
     def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo):
         # busca en la lista de microbloques de la drawing_area, el microbloque que queremos conectar
         for mb in self.microbloques:
@@ -311,7 +303,7 @@ class DrawingArea(QWidget):
         if relation == "antes":
             reference_paralelo.agregar_en_serie_fuera_de_paralela_antes(new_microbloque) # agrega un microbloque en serie antes de la estructura paralelo
         elif relation == "despues":
-            reference_paralelo.agregar_en_serie_fuera_de_paralela_despues(new_microbloque) # agrega un microbloque en serie después de la estructura paralelo
+            reference_paralelo.agregar_en_serie_fuera_de_paralela_despues(new_microbloque) # agrega un microbloque en serie después de la estructura paralelo # TODO: A veces se dibuja mal
         elif relation == "arriba":
             reference_paralelo.agregar_arriba_de(new_microbloque, self.selected_microbloque.elemento_back.padre) # agrega una rama más, arriba de la rama actual
         else: # abajo
@@ -338,12 +330,6 @@ class DrawingArea(QWidget):
             else:
                 self.selected_microbloque = None
                 self.hide_add_buttons() # oculta los botones "+"
-            """
-            for button_rect in self.add_buttons_paralelo:
-                if button_rect.contains(event.pos()):
-                    self.create_new_microbloque(button_rect.center(), relation="despues") # TODO: Definir funcion back para agregar después de un paralelo
-                    return
-            """
         
         self.update()
 
@@ -372,20 +358,22 @@ class DrawingArea(QWidget):
         menu = QMenu(self)
         micro_back = self.selected_microbloque.elemento_back
         parent_structures = micro_back.get_parent_structures()
-        for parent in [micro_back] + parent_structures:
+        for parent in [[micro_back, 0]] + parent_structures:
             action = menu.addAction(f"Respecto a {self.get_structure_name(parent)}")
-            action.triggered.connect(lambda _, s=parent: self.add_microbloque(direction, s))
+            action.triggered.connect(lambda _, s=parent[0]: self.add_microbloque(direction, s))
         
         button = self.sender()
         menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
 
     def get_structure_name(self, estructura):
-        if isinstance(estructura, MicroBloque):
-            return f"Microbloque '{estructura.nombre}'"
-        elif isinstance(estructura, TopologiaSerie):
-            return "Serie"
-        elif isinstance(estructura, TopologiaParalelo):
-            return "Paralelo"
+        nodo = estructura[0]
+        nivel = estructura[1]
+        if isinstance(nodo, MicroBloque):
+            return nodo.nombre
+        elif isinstance(nodo, TopologiaSerie):
+            return f"Serie {nivel}"
+        elif isinstance(nodo, TopologiaParalelo):
+            return f"Paralelo {nivel}"
         else:
             return "Estructura desconocida"
 
