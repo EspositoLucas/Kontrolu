@@ -1,10 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu
-from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
-from PyQt5.QtCore import Qt, QPointF, QRectF
+from PyQt5.QtWidgets import QWidget, QMenu, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QScrollArea
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QTransform
+from PyQt5.QtCore import Qt, QPointF, QRectF, QSize
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
-
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
 BUTTON_SIZE = 20
