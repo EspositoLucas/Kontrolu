@@ -14,6 +14,8 @@ class Microbloque(QWidget):
         self.setFixedSize(microbloque_back.ancho(), microbloque_back.alto())
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(f"background-color: {self.color.name()};")
+        # self.initial_pos = self.pos()
+        # self.initial_size = self.size()
 
     def setPos(self, pos):
         self.move(pos.toPoint())
