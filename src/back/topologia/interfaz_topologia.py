@@ -39,3 +39,9 @@ class InterfazTopologia():
         
     def agregar_en_serie_fuera_de_paralela_despues(self,microbloque):
         pass
+
+    def agregar_abajo_de(self,microbloque,actual):
+        pass
+
+    def agregar_arriba_de(self,microbloque,actual):
+        pass

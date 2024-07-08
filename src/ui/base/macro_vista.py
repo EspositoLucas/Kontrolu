@@ -8,7 +8,6 @@ class MacroVista(QPushButton):
         self.modelo = elementoBack
         self.setText(self.modelo.nombre)
         self.setGeometry(geometria)
-        self.setCheckable(True)
         self.clicked.connect(self.click)
     
     def click(self):
@@ -16,7 +15,7 @@ class MacroVista(QPushButton):
         self.ventana.setWindowTitle(self.modelo.nombre)
         self.ventana.setGeometry(0, 0, 600, 600)
         
-        self.drawing_area = DrawingArea(self.ventana, self.modelo)
+        self.drawing_area = DrawingArea(self, self.ventana)
         self.ventana.setCentralWidget(self.drawing_area)
         
         self.init_tool_bar()
