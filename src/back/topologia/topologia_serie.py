@@ -31,12 +31,12 @@ class TopologiaSerie(InterfazTopologia):
 
     def agregar_arriba_de(self,microbloque:MicroBloque,actual:MicroBloque):
         indice = self.hijos.index(actual)
-        paralelo = TopologiaParalelo(microbloque,actual,padre=self)
+        paralelo = TopologiaParalelo(microbloqueNuevo=microbloque,microbloque2=actual,arriba=True,padre=self)
         self.hijos[indice] = paralelo
         
     def agregar_abajo_de(self,microbloque:MicroBloque,actual:MicroBloque):
         indice = self.hijos.index(actual)
-        paralelo = TopologiaParalelo(actual,microbloque,padre=self)
+        paralelo = TopologiaParalelo(microbloqueNuevo=microbloque,microbloque2=actual,arriba=False,padre=self)
         self.hijos[indice] = paralelo
 
     def agregar_despues_de(self,microbloque:MicroBloque,actual:InterfazTopologia):
@@ -153,11 +153,14 @@ class MicroBloque(InterfazTopologia):
 class TopologiaParalelo(InterfazTopologia):
     
     
-    def __init__(self,microbloque,microbloque2,padre:TopologiaSerie=None):
+    def __init__(self,microbloqueNuevo,microbloque2:MicroBloque=None,serie:TopologiaSerie=None,arriba=True,padre:TopologiaSerie=None):
         self.padre = padre
-        serie = TopologiaSerie(micro=microbloque,padre=self)
-        serie2 = TopologiaSerie(micro=microbloque2,padre=self)
-        self.hijos = [serie,serie2]
+        serie = TopologiaSerie(micro=microbloqueNuevo,padre=self)
+        if(serie):  nuevo = serie
+        if(microbloque2): nuevo = TopologiaSerie(micro=microbloque2,padre=self)
+        nuevo.cambiar_padre(self)
+        if(arriba): self.hijos = [serie,nuevo]
+        else: self.hijos = [nuevo,serie]
     
     def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque):
         self.padre.agregar_antes_de(microbloque,self)

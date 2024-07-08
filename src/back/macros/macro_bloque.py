@@ -1,4 +1,6 @@
 from back.topologia.topologia_serie import TopologiaSerie
+from back.topologia.topologia_serie import TopologiaParalelo
+
 from back.topologia.interfaz_topologia import InterfazTopologia
 
 class MacroBloque(InterfazTopologia):
@@ -23,3 +25,24 @@ class MacroBloque(InterfazTopologia):
     
     def reset_topologia(self):
         self.topologia = TopologiaSerie(padre=self)
+    
+    def agregar_abajo_de(self, microbloque, actual):
+        self.topologia = TopologiaSerie(
+            micro=TopologiaParalelo(
+                microbloqueNuevo=microbloque,
+                serie=actual,
+                arriba=True
+                ),
+            padre=self
+            )
+        
+    
+    def agregar_arriba_de(self,microbloque,actual):
+        self.topologia = TopologiaSerie(
+            micro=TopologiaParalelo(
+                microbloqueNuevo=microbloque,
+                serie=actual,
+                arriba=False
+                ),
+            padre=self
+            )

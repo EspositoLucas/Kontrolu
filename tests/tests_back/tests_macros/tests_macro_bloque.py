@@ -115,6 +115,17 @@ class TestMacroBloque(unittest.TestCase):
         micro0.agregar_en_serie_fuera_de_paralela_antes(micro3)
         micro0.agregar_en_serie_fuera_de_paralela_despues(micro4)
 
+        #print(str(macro))
+
+    
+
+    def test_agregar_antes_de_paralela_microbloque(self):
+        micro0 = MicroBloque("microArriba")
+        micro1 = MicroBloque("microAbajo")
+        macro = MacroBloque()
+        macro.topologia.agregar_elemento(micro0)
+        macro.topologia.agregar_serie_abajo(micro1)
+
         print(str(macro))
 
 

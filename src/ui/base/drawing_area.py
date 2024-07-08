@@ -958,21 +958,13 @@ BUTTON_SIZE = 20
 RADIO = 40
 MARGEN_PARALELO = 20
 
-class DrawingArea(QScrollArea):
-    def __init__(self, parent=None, modelo=None):
-        super().__init__(parent)
-        self.content = DrawingContent(parent, modelo)
-        self.setWidget(self.content)
-        self.setWidgetResizable(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-
-class DrawingContent(QWidget):
-    def __init__(self, parent=None, modelo=None):
-        super().__init__(parent)
+class DrawingArea(QWidget):
+    def __init__(self, macrobloque=None, ventana=None):
+        super().__init__(ventana)
         self.microbloques = []
         self.selected_microbloque = None
-        self.modelo = modelo
+        self.macrobloque = macrobloque
+        self.modelo = macrobloque.modelo # es la representacion backend del macrobloque
         self.creating_microbloque = False
         self.new_microbloque_config = {}
         self.add_buttons = []
@@ -1018,10 +1010,10 @@ class DrawingContent(QWidget):
 
     def load_microbloques(self):
         for microbloque in self.microbloques:
-            microbloque.deleteLater()
-        self.microbloques.clear()
-        self.dibujar_topologia(self.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2)))
-        self.ajustar_tamano_widget()
+                microbloque.deleteLater() # elimina cada elemento
+        self.microbloques.clear() # vacia la lista de microbloques
+        self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
+        self.print_topologia(self.macrobloque.modelo.topologia)
         self.update()
     
     def ajustar_tamano_widget(self):
@@ -1036,17 +1028,19 @@ class DrawingContent(QWidget):
     
     def dibujar_topologia(self, topologia, posicion_inicial):
         if isinstance(topologia, TopologiaSerie):
-            self.dibujar_serie(topologia, posicion_inicial)
+            return self.dibujar_serie(topologia, posicion_inicial)
         elif isinstance(topologia, TopologiaParalelo):
-            self.dibujar_paralelo(topologia, posicion_inicial)
+            return self.dibujar_paralelo(topologia, posicion_inicial)
         elif isinstance(topologia, MicroBloque):
-            self.create_microbloque(topologia, posicion_inicial)
+            return self.create_microbloque(topologia, posicion_inicial)
         
     def dibujar_serie(self, serie, posicion_inicial):
         posicion_actual = posicion_inicial
+        punto_final = posicion_inicial
         for hijo in serie.hijos:
-            self.dibujar_topologia(hijo, posicion_actual)
-            posicion_actual.setX(posicion_actual.x() + MARGEN_HORIZONTAL)
+            punto_final = self.dibujar_topologia(hijo, posicion_actual)
+            posicion_actual = QPointF(punto_final.x() + MARGEN_HORIZONTAL, posicion_inicial.y())
+        return punto_final
 
     def dibujar_paralelo(self, paralelo, posicion_inicial):
         posicion_inicial.setX(posicion_inicial.x() + MARGEN_PARALELO)
@@ -1054,11 +1048,16 @@ class DrawingContent(QWidget):
         altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL
 
         y_actual = posicion_inicial.y() - altura_total / 2
+        punto_final_max = posicion_inicial
         for hijo in paralelo.hijos:
             centro_del_hijo = y_actual + hijo.alto() / 2
             posicion_del_hijo = QPointF(posicion_inicial.x(), centro_del_hijo)
-            self.dibujar_topologia(hijo, posicion_del_hijo)
+            punto_final = self.dibujar_topologia(hijo, posicion_del_hijo)
+            if punto_final.x() > punto_final_max.x():
+                punto_final_max = punto_final
             y_actual += hijo.alto() + MARGEN_VERTICAL
+
+        return QPointF(punto_final_max.x() + MARGEN_PARALELO, posicion_inicial.y())
 
     def create_microbloque(self, microbloque_back, pos):
         microbloque = Microbloque(self, microbloque_back)
@@ -1067,6 +1066,7 @@ class DrawingContent(QWidget):
         self.microbloques.append(microbloque)
         microbloque.show()
         self.update()
+        return pos
     
     def clear_all(self):
         if self.microbloques:
@@ -1075,7 +1075,7 @@ class DrawingContent(QWidget):
             self.microbloques.clear()
         
         self.add_buttons.clear() # vacia la lista de botones "+"
-        self.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
+        self.macrobloque.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
         self.load_microbloques() # resetea la vista
         self.update()
     
@@ -1095,8 +1095,8 @@ class DrawingContent(QWidget):
         if not self.microbloques:
             self.draw_empty_connection(painter)
         else:
-            punto_final = self.draw_connections(painter, self.modelo.topologia, QPointF(90, self.height() / 2))
-            self.draw_final_connection(painter, punto_final)
+           punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, QPointF(90, self.height() / 2))
+           self.draw_final_connection(painter, punto_final) # punto_final es el punto de salida de la última conexión
 
     def draw_final_connection(self, painter, start_point):
         if start_point is None:
@@ -1199,7 +1199,7 @@ class DrawingContent(QWidget):
         
         punto_de_reconexion = QPointF(max_x, punto_inicial.y())  # punto de reconexión (es el punto más a la derecha de la estructura paralelo)
         # insertar imagen de punto suma en el punto de reconexión
-        painter.drawEllipse(punto_de_reconexion, 5, 5)
+        painter.drawEllipse(punto_de_reconexion, 5, 5) # TODO: Cambiar por imagen de punto suma
 
         # Punto de reconexión
         punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
@@ -1264,7 +1264,7 @@ class DrawingContent(QWidget):
                 'funcion_transferencia': funcion_transferencia,
                 'opciones_adicionales': {}
             }
-            new_microbloque = MicroBloque(nombre, color, funcion_transferencia, {}, self.modelo.topologia)
+            new_microbloque = MicroBloque(nombre, color, funcion_transferencia, {}, self.macrobloque.modelo.topologia)
 
             if isinstance(reference_structure, MicroBloque):
                 self.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)
@@ -1273,7 +1273,7 @@ class DrawingContent(QWidget):
             elif isinstance(reference_structure, TopologiaParalelo):
                 self.agregar_respecto_paralelo(new_microbloque, relation, reference_structure)
             else:
-                self.modelo.topologia.agregar_elemento(new_microbloque)
+                self.macrobloque.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
             
             self.load_microbloques()
             self.update()
@@ -1303,7 +1303,7 @@ class DrawingContent(QWidget):
         if relation == "antes":
             reference_paralelo.agregar_en_serie_fuera_de_paralela_antes(new_microbloque) # agrega un microbloque en serie antes de la estructura paralelo
         elif relation == "despues":
-            reference_paralelo.agregar_en_serie_fuera_de_paralela_despues(new_microbloque) # agrega un microbloque en serie después de la estructura paralelo # TODO: A veces se dibuja mal
+            reference_paralelo.agregar_en_serie_fuera_de_paralela_despues(new_microbloque) # agrega un microbloque en serie después de la estructura paralelo
         elif relation == "arriba":
             reference_paralelo.agregar_arriba_de(new_microbloque, self.selected_microbloque.elemento_back.padre) # agrega una rama más, arriba de la rama actual
         else: # abajo
