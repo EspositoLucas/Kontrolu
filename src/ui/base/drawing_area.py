@@ -1074,7 +1074,10 @@ class DrawingArea(QWidget):
                 microbloque.deleteLater()
             self.microbloques.clear()
         
-        self.add_buttons.clear() # vacia la lista de botones "+"
+         # vacia la lista de botones "+"
+        for button in self.add_buttons:
+            button.deleteLater()
+        self.add_buttons.clear()
         self.macrobloque.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
         self.load_microbloques() # resetea la vista
         self.update()
@@ -1294,10 +1297,10 @@ class DrawingArea(QWidget):
             reference_serie.agregar_elemento(new_microbloque, 0) # agrega el nuevo microbloque al principio de la serie
         elif relation == "despues": 
             reference_serie.agregar_elemento(new_microbloque, len(reference_serie.hijos)) # agrega el nuevo microbloque al final de la serie
-        elif relation == "arriba": # TODO: No funciona cuando la serie es la serie principal
-            reference_serie.agregar_serie_arriba(new_microbloque) # agrega un microbloque en serie arriba de la estructura serie
-        else: # abajo # TODO: No funciona cuando la serie es la serie principal
-            reference_serie.agregar_serie_abajo(new_microbloque) # agrega un microbloque en serie abajo de la estructura serie
+        elif relation == "arriba": 
+            reference_serie.crear_paralela_respecto_de_serie_arriba(new_microbloque) # agrega un microbloque en serie arriba de la estructura serie
+        else: # abajo 
+            reference_serie.crear_paralela_respecto_de_serie_abajo(new_microbloque) # agrega un microbloque en serie abajo de la estructura serie
 
     def agregar_respecto_paralelo(self, new_microbloque, relation, reference_paralelo):
         if relation == "antes":
