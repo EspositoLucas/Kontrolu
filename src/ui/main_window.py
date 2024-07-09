@@ -1,13 +1,14 @@
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QToolBar, QPushButton
 from PyQt5.QtCore import Qt
-
+import os
 from .menu.archivo import Archivo
 from .menu.menu_bar import Menu
 from .macro_diagrama import MacroDiagrama
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
-from PyQt5.QtGui import QColor, QPalette
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
+
 class MainWindow(QMainWindow):
     def __init__(self,sesion):
         super().__init__()
@@ -17,36 +18,35 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle('Kontrolu')
- 
-        #layout = QVBoxLayout()
-        # Establecer un fondo azul
+        # Establecer el color de fondo de la ventana principal
+        self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
+        
         #self.setStyleSheet("""
-        #    background-color: #0000FF;  /* Azul */
+        #background-color: qradialgradient(
+        #cx: 0.5, cy: 0.5, radius: 0.5,
+        #fx: 0.5, fy: 0.5,
+        #stop: 0 #ADD8E6,
+        #stop: 1 #4B86B4
+        #    );
         #""")
-
+       
+        # Ruta de la imagen del logo
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'base/imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
+    
         menuBar = Menu(self)
         self.setMenuBar(menuBar)
 
         self.statusBar().showMessage('Listo')
-        
-        # Panel de herramientas lateral
-        self.init_tool_bar()
         
         # Diagrama inicial de lazo cerrado
         self.init_macrobloques()
         
         self.showMaximized() # se maximiza al final de todo, luego de cargar todos los elementos
     
-
-    def init_tool_bar(self):
-        toolbar = QToolBar("Herramientas", self)
-        self.addToolBar(Qt.LeftToolBarArea, toolbar)
-
-        delete_button = QPushButton('Borrar', self)
-        # delete_button.clicked.connect(lambda: self.drawing_area.clear())
-        toolbar.addWidget(delete_button)
-        pass
-
     def init_macrobloques(self):
         self.diagrama = MacroDiagrama()
         self.diagrama.setupUi(self)

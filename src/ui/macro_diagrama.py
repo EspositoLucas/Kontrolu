@@ -16,6 +16,7 @@ class MacroDiagrama(QtWidgets.QWidget):
     def setupUi(self, mainWindow):
         self.scene = QtWidgets.QGraphicsScene()
         self.view = QtWidgets.QGraphicsView(self.scene, mainWindow)
+        self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.view)
         self.setLayout(layout)

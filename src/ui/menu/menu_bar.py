@@ -17,30 +17,14 @@ class Menu(QMenuBar):
                 background-color: #333;
                 color: white;
                 font-size: 14px;
+                padding: 5px 5px;  /* Ajustar el relleno para cambiar el ancho */
             }
             
             QMenuBar::item {
-                padding: 4px 10px;
+                padding: 5px;
                 background-color: #555;
                 border-radius: 3px;
-            }
-            
-            QMenuBar::item:selected {
-                background-color: #666;
-            }
-            
-            QMenu {
-                background-color: #555;
-                border: 1px solid #777;
-            }
-            
-            QMenu::item {
-                padding: 8px 20px;
-            }
-            
-            QMenu::item:selected {
-                background-color: #666;
-            }
+            }      
         """)
         
         font = QFont("Arial", 12)

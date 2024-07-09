@@ -9,12 +9,14 @@ class MacroVista(QPushButton):
         self.setText(self.modelo.nombre)
         self.setGeometry(geometria)
         self.clicked.connect(self.click)
-        # Aplicar estilo CSS para un fondo azul y bordes redondeados
+        # Aplicar estilo CSS para un fondo azul y bordes
         self.setStyleSheet("""
             background-color: #0072BB;;  /* Color de fondo azul /
-            border: 2px solid #34495e;  / Borde sólido de 2px color gris oscuro /
-            font-size: 12px;            / Tamaño de fuente /
-            font-weight: bold;          / Texto en negrita */
+            font-weight: bold;          /* Texto en negrita */
+            font-weight: bold;          /* Texto en negrita */
+            color: white;               /* Color de texto blanco */
+            font-size: 15px;            /* Tamaño de fuente */
+            font-family: Arial;  
         """)
     
     def click(self):
