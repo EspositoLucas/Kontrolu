@@ -19,16 +19,6 @@ class MainWindow(QMainWindow):
     def initUI(self):
         self.setWindowTitle('Kontrolu')
         self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
-        
-        #self.setStyleSheet("""
-        #background-color: qradialgradient(
-        #cx: 0.5, cy: 0.5, radius: 0.5,
-        #fx: 0.5, fy: 0.5,
-        #stop: 0 #ADD8E6,
-        #stop: 1 #4B86B4
-        #    );
-        #""")
-       
         # Ruta de la imagen del logo
         path = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path, 'base/imgs', 'logo.png')
@@ -41,8 +31,7 @@ class MainWindow(QMainWindow):
 
         self.statusBar().showMessage('Listo')
         
-        # Diagrama inicial de lazo cerrado
-        self.init_macrobloques()
+        self.init_macrobloques() # Diagrama inicial de lazo cerrado
         
         self.showMaximized() # se maximiza al final de todo, luego de cargar todos los elementos
     
