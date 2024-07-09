@@ -4,7 +4,10 @@ from PyQt5.QtCore import Qt
 from .menu.archivo import Archivo
 from .menu.menu_bar import Menu
 from .macro_diagrama import MacroDiagrama
-
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
+from PyQt5.QtGui import QColor, QPalette
+from PyQt5.QtCore import Qt
 class MainWindow(QMainWindow):
     def __init__(self,sesion):
         super().__init__()
@@ -14,6 +17,12 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle('Kontrolu')
+ 
+        #layout = QVBoxLayout()
+        # Establecer un fondo azul
+        #self.setStyleSheet("""
+        #    background-color: #0000FF;  /* Azul */
+        #""")
 
         menuBar = Menu(self)
         self.setMenuBar(menuBar)

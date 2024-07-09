@@ -10,6 +10,13 @@ class MacroVista(QPushButton):
         self.setGeometry(geometria)
         self.setCheckable(True)
         self.clicked.connect(self.click)
+        # Aplicar estilo CSS para un fondo azul y bordes redondeados
+        self.setStyleSheet("""
+            background-color: #0072BB;;  /* Color de fondo azul /
+            border: 2px solid #34495e;  / Borde sólido de 2px color gris oscuro /
+            font-size: 12px;            / Tamaño de fuente /
+            font-weight: bold;          / Texto en negrita */
+        """)
     
     def click(self):
         self.ventana = QMainWindow()

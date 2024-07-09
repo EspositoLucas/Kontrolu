@@ -1,10 +1,16 @@
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import Qt
 from .base.elemento_control import ElementoControl
 from .base.elemento_actuador import ElementoActuador
 from .base.elemento_proceso import ElementoProceso
 from .base.elemento_medicion import ElementoMedicion
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QGraphicsScene, QGraphicsView, QGraphicsTextItem
+from PyQt5.QtGui import QFont, QColor
+from PyQt5 import QtWidgets, QtGui, QtCore
+import sys
 
 class MacroDiagrama(QtWidgets.QWidget):
     def setupUi(self, mainWindow):
@@ -13,7 +19,7 @@ class MacroDiagrama(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.view)
         self.setLayout(layout)
-
+        
         # CONTROLADOR
         controlador = ElementoControl(mainWindow.sesion.controlador)
         self.scene.addWidget(controlador)
