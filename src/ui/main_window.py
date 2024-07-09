@@ -18,7 +18,6 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle('Kontrolu')
-        # Establecer el color de fondo de la ventana principal
         self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
         
         #self.setStyleSheet("""
@@ -52,6 +51,7 @@ class MainWindow(QMainWindow):
         self.diagrama.setupUi(self)
         self.setCentralWidget(self.diagrama)
         self.diagrama.mostrarElementos()
+        self.diagrama.zoom_in()
 
     def new_project(self):
         self.statusBar().showMessage('Nuevo proyecto creado')

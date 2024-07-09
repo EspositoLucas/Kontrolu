@@ -19,7 +19,7 @@ class PuntoSuma(MacroVista):
         if self.pixmap.isNull():
             print(f"Error al cargar la imagen: {self.image_path}")
         else:
-            self.pixmap = self.pixmap.scaled(51, 51, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+            self.pixmap = self.pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
     def paintEvent(self, event):
         if not self.pixmap.isNull():
