@@ -11,7 +11,7 @@ class Microbloque(QWidget):
         self.color = microbloque_back.color or QColor(255, 255, 0)
         self.funcion_transferencia = microbloque_back.funcion_transferencia or ""
         self.opciones_adicionales = microbloque_back.opciones_adicionales or {}
-        self.setFixedSize(150, 80)
+        self.setFixedSize(microbloque_back.ancho(), microbloque_back.alto())
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(f"background-color: {self.color.name()};")
 
