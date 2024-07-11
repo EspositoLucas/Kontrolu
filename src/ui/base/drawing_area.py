@@ -159,14 +159,6 @@ class DrawingContent(QWidget):
         end_point = QPointF(ancho - 170, self.height() / 2)
         painter.setPen(QPen(Qt.black, 2))
         painter.drawLine(start_point, end_point)
-        
-    def draw_final_connection(self, painter, start_point):
-        if start_point is None:
-            return
-
-        end_point = QPointF(self.width() - 170, self.height() / 2)
-        painter.setPen(QPen(Qt.black, 2))
-        painter.drawLine(start_point, end_point)
 
     def draw_empty_connection(self, painter):
         painter.setPen(QPen(Qt.black, 2))
