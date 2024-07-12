@@ -2,17 +2,28 @@ import os
 from .macro_vista import MacroVista
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class PuntoSuma(MacroVista):
-    def __init__(self, puntoSuma):
-        MacroVista.__init__(self, puntoSuma, QtCore.QRect(140, 205, 51, 51))
-        self.setText("") # el punto suma no tiene texto
-        self.setDisabled(True) # el punto suma no se puede apretar
-        self.setStyleSheet("background-color: transparent;") # Establecer fondo transparente
+from PyQt5 import QtCore, QtGui, QtWidgets
+import os
 
-        # ICONO
-        icon = QtGui.QIcon()
+class PuntoSuma(MacroVista):
+    def __init__(self, parent=None):
+        super(PuntoSuma, self).__init__(parent, QtCore.QRect(140, 206, 51, 51))
+        self.setText("")
+        self.setDisabled(True)
+        self.setStyleSheet("background-color: transparent;")
+
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'imgs', 'puntoSuma.png')
-        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.setIcon(icon)
-        self.setIconSize(QtCore.QSize(51, 51)) # Ajustar el tamaño del icono al tamaño del botón
+        self.image_path = os.path.join(path, 'imgs', 'puntoSuma.png')
+        self.pixmap = QtGui.QPixmap(self.image_path)
+        
+        if self.pixmap.isNull():
+            print(f"Error al cargar la imagen: {self.image_path}")
+        else:
+            self.pixmap = self.pixmap.scaled(200, 200, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+
+    def paintEvent(self, event):
+        if not self.pixmap.isNull():
+            painter = QtGui.QPainter(self)
+            painter.drawPixmap(self.rect(), self.pixmap)
+
+        

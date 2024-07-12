@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QMenuBar
+from PyQt5.QtGui import QFont
 
 from .archivo import Archivo
 
@@ -11,3 +12,20 @@ class Menu(QMenuBar):
         archivo = Archivo(main_window)
         self.addMenu(archivo)
 
+        self.setStyleSheet("""
+            QMenuBar {
+                background-color: #333;
+                color: white;
+                font-size: 14px;
+                padding: 5px 5px;  /* Ajustar el relleno para cambiar el ancho */
+            }
+            
+            QMenuBar::item {
+                padding: 5px;
+                background-color: #555;
+                border-radius: 3px;
+            }      
+        """)
+        
+        font = QFont("Arial", 12)
+        self.setFont(font)

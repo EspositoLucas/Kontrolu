@@ -1,19 +1,21 @@
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from .base.elemento_control import ElementoControl
 from .base.elemento_actuador import ElementoActuador
 from .base.elemento_proceso import ElementoProceso
 from .base.elemento_medicion import ElementoMedicion
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
+from PyQt5 import QtWidgets, QtGui, QtCore
 
 class MacroDiagrama(QtWidgets.QWidget):
     def setupUi(self, mainWindow):
         self.scene = QtWidgets.QGraphicsScene()
         self.view = QtWidgets.QGraphicsView(self.scene, mainWindow)
+        self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.view)
         self.setLayout(layout)
-
+        
         # CONTROLADOR
         controlador = ElementoControl(mainWindow.sesion.controlador)
         self.scene.addWidget(controlador)
@@ -69,4 +71,7 @@ class MacroDiagrama(QtWidgets.QWidget):
         for item in self.scene.items():
             if isinstance(item, QtWidgets.QWidget):
                 item.show()
-        
+    
+    def zoom_in(self):
+        self.view.scale(1.25, 1.25)
+        pass

@@ -46,6 +46,14 @@ class MacroVista(QPushButton):
         self.setText(self.modelo.nombre)
         self.setGeometry(geometria)
         self.clicked.connect(self.click)
+        self.setStyleSheet("""
+            background-color: #0072BB;;  /* Color de fondo azul /
+            font-weight: bold;          /* Texto en negrita */
+            font-weight: bold;          /* Texto en negrita */
+            color: white;               /* Color de texto blanco */
+            font-size: 15px;            /* Tamaño de fuente */
+            font-family: Arial;  
+        """)
     
     def click(self):
         self.ventana = QMainWindow()
