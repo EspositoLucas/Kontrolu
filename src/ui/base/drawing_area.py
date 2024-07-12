@@ -13,15 +13,16 @@ MARGEN_PARALELO = 20
 class DrawingArea(QScrollArea):
     def __init__(self, parent=None, modelo=None):
         super().__init__(parent)
-        self.content = DrawingContent(parent, modelo)
+        self.content = DrawingContent(parent, modelo, self)  # Pasamos self como referencia
         self.setWidget(self.content)
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
 class DrawingContent(QWidget):
-    def __init__(self, macrobloque=None, ventana=None):
+    def __init__(self, macrobloque=None, ventana=None, scroll_area=None):
         super().__init__(ventana)
+        self.scroll_area = scroll_area  # Guardamos la referencia al QScrollArea
         self.microbloques = []
         self.selected_microbloque = None
         self.selected_microbloques = [] 
@@ -32,25 +33,27 @@ class DrawingContent(QWidget):
         self.add_buttons_paralelo = []
         self.scale_factor = 1.0
         self.multiple_selection_active = False
-        self.add_selection_button()
+        self.setMinimumSize(2000, 2000)  # Asegura un tamaño mínimo grande
+        self.panning = False
+        self.last_pos = None
+        self.setCursor(Qt.ArrowCursor)
         self.init_ui()
-        
+
     def init_ui(self):
         self.setStyleSheet("background-color: white; border: 1px solid black;")
         self.setMinimumSize(800, 600)
-
+        
 
     def ajustar_tamano_widget(self):
         if self.microbloques:
             max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
             max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
-            nuevo_ancho = int(max(max_x + 400, 800) * self.scale_factor)
-            nuevo_alto = int(max(max_y + 100, 600) * self.scale_factor)
+            nuevo_ancho = max(int(max_x + 400), self.scroll_area.viewport().width())
+            nuevo_alto = max(int(max_y + 100), self.scroll_area.viewport().height())
             self.setMinimumSize(nuevo_ancho, nuevo_alto)
         else:
-            self.setMinimumSize(800, 600)
-
-
+            self.setMinimumSize(self.scroll_area.viewport().width(), self.scroll_area.viewport().height())
+        
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:
             zoom_in_factor = 1.25
@@ -155,8 +158,7 @@ class DrawingContent(QWidget):
         if start_point is None:
             return
 
-        ancho, _ = self.calcular_tamano_topologia()
-        end_point = QPointF(ancho - 170, self.height() / 2)
+        end_point = QPointF(self.width() - 170, self.height() / 2) # end_point es el lugar donde está el bloque de salida
         painter.setPen(QPen(Qt.black, 2))
         painter.drawLine(start_point, end_point)
 
@@ -361,8 +363,16 @@ class DrawingContent(QWidget):
             button.setProperty("selected_color", color)
     
     def mousePressEvent(self, event):
-        super().mousePressEvent(event)
+        
+        if event.button() == Qt.LeftButton and event.modifiers() & Qt.ControlModifier:
+            self.panning = True
+            self.last_pan_pos = event.pos()
+            self.setCursor(Qt.ClosedHandCursor)
+            event.accept()
+            return
 
+        super().mousePressEvent(event)
+        
         scaled_pos = event.pos() / self.scale_factor
 
         if not self.microbloques:
@@ -389,7 +399,31 @@ class DrawingContent(QWidget):
                 self.hide_add_buttons()
         
         self.update()
+    
+    def mouseMoveEvent(self, event):
+        if self.panning and self.last_pan_pos:
+            delta = event.pos() - self.last_pan_pos
+            h_bar = self.scroll_area.horizontalScrollBar()
+            v_bar = self.scroll_area.verticalScrollBar()
+            
+            h_bar.setValue(h_bar.value() - delta.x())
+            v_bar.setValue(v_bar.value() - delta.y())
+            
+            self.last_pan_pos = event.pos()
+            event.accept()
+            return
 
+        super().mouseMoveEvent(event)
+        
+    def mouseReleaseEvent(self, event):
+        if self.panning:
+            self.panning = False
+            self.setCursor(Qt.ArrowCursor)
+            event.accept()
+            return
+
+        super().mouseReleaseEvent(event)
+        
     def sizeHint(self):
         return QSize(1000, 600)
 
@@ -512,19 +546,4 @@ class DrawingContent(QWidget):
         
         painter.restore()
     
-    def add_selection_button(self):
-        self.selection_button = QPushButton("Selección múltiple", self)
-        self.selection_button.setGeometry(10, 40, 150, 30)  # Ajusta la posición según necesites
-        self.selection_button.clicked.connect(self.toggle_multiple_selection)
-        self.selection_button.show()
 
-    def toggle_multiple_selection(self):
-        if self.selection_button.text() == "Selección múltiple":
-            self.selection_button.setText("Desactivar selección")
-            self.multiple_selection_active = True
-        else:
-            self.selection_button.setText("Selección múltiple")
-            self.multiple_selection_active = False
-            self.selected_microbloques.clear()
-        self.update()
-    

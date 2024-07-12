@@ -68,6 +68,7 @@ class MacroVista(QPushButton):
         
         self.drawing_area.content.load_microbloques()
     
+        
     def init_tool_bar(self):
         toolbar = QToolBar("Herramientas", self.ventana)
         self.ventana.addToolBar(Qt.LeftToolBarArea, toolbar)
@@ -75,9 +76,28 @@ class MacroVista(QPushButton):
         delete_button = QPushButton('Borrar todo', self)
         delete_button.clicked.connect(self.drawing_area.content.clear_all)
         toolbar.addWidget(delete_button)
-
+        
+        # Mover el botón de selección múltiple a la toolbar
+        self.selection_button = QPushButton("Selección múltiple", self)
+        self.selection_button.setCheckable(True)
+        self.selection_button.clicked.connect(self.toggle_multiple_selection)
+        toolbar.addWidget(self.selection_button)
+        
+    def toggle_multiple_selection(self):
+        if self.selection_button.text() == "Selección múltiple":
+            self.selection_button.setText("Desactivar selección")
+            self.drawing_area.content.multiple_selection_active = True
+        else:
+            self.selection_button.setText("Selección múltiple")
+            self.drawing_area.content.multiple_selection_active = False
+            self.drawing_area.content.selected_microbloques.clear()
+        self.update()
+    
     def configure_microbloque(self):
         self.drawing_area.content.create_new_microbloque()
+        
+
+    
 
 
 
