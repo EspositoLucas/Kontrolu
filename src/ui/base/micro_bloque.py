@@ -11,28 +11,42 @@ class Microbloque(QWidget):
         self.color = microbloque_back.color or QColor(255, 255, 0)
         self.funcion_transferencia = microbloque_back.funcion_transferencia or ""
         self.opciones_adicionales = microbloque_back.opciones_adicionales or {}
-        self.setFixedSize(microbloque_back.ancho(), microbloque_back.alto())
+        self.ancho = microbloque_back.ancho()
+        self.alto = microbloque_back.alto()
+        self.escala = 1.0
+        self.setFixedSize(self.ancho, self.alto)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(f"background-color: {self.color.name()};")
 
     def setPos(self, pos):
         self.move(pos.toPoint())
 
+    def setScale(self, scale):
+        self.escala = scale
+        nuevo_ancho = round(self.ancho * scale)
+        nuevo_alto = round(self.alto * scale)
+        self.setFixedSize(nuevo_ancho, nuevo_alto)
+        self.update()
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         
         # Dibuja el rectángulo
-        painter.setPen(QPen(Qt.black, 2)) # color y grosor del border
+        painter.setPen(QPen(Qt.black, 2))  # Grosor constante del borde
         painter.setBrush(self.color)
-        painter.drawRect(self.rect().adjusted(1, 1, -1, -1))  # incluye el borde dentro del rectángulo
+        painter.drawRect(self.rect().adjusted(1, 1, -1, -1))  # Dibuja el rectángulo ajustado al tamaño actual del widget
         
-        font = painter.font() # fuente default
-        font.setPointSize(10) # 10 es el tamaño de la fuente del texto
+        # Configura la fuente
+        font = painter.font()
+        font_size = max(1, round(10 * self.escala))  # Escala el tamaño de la fuente
+        font.setPointSize(font_size)
         painter.setFont(font)
-        painter.setPen(Qt.black) # color del texto
-        text_rect = self.rect().adjusted(5, 5, -5, -5)  # permite centrar el texto dentro del microbloque
-        painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre) # escribe el texto centrado
+        
+        # Dibuja el texto
+        painter.setPen(Qt.black)
+        text_rect = self.rect().adjusted(5, 5, -5, -5)  # Margen para el texto
+        painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
 
     def mouseDoubleClickEvent(self, event):
         self.edit_properties()

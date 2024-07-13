@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
-from PyQt5.QtCore import Qt, QPointF, QRectF
+from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
@@ -22,59 +22,84 @@ class DrawingArea(QWidget):
         self.new_microbloque_config = {}
         self.add_buttons = []
         self.add_buttons_paralelo = []
+        self.resize_timer = QTimer(self)
+        self.resize_timer.setSingleShot(True)
+        self.resize_timer.timeout.connect(self.resize_retardado)
         self.init_ui()
-        
+    
+    def resizeEvent(self, event):
+        # reinicia el temporizador cada vez que se produce un evento de cambio de tamaño
+        super().resizeEvent(event)
+        self.resize_timer.start(200) # 200 ms
+
+    def resize_retardado(self):
+        self.hide_add_buttons()
+        self.load_microbloques()
+        self.update()
+
     def init_ui(self):
         self.setStyleSheet("background-color: white; border: 1px solid black;")
     
+    def calcular_factor_escala(self):
+        ancho_ventana = self.width()
+        alto_ventana = self.height()
+        factor_ancho = ancho_ventana / 600 
+        factor_alto = alto_ventana / 600
+        self.escala = min(factor_ancho, factor_alto)  # Usamos el menor para mantener la proporción    
+
     def load_microbloques(self):
         for microbloque in self.microbloques:
                 microbloque.deleteLater() # elimina cada elemento
         self.microbloques.clear() # vacia la lista de microbloques
-        self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
+        self.calcular_factor_escala()
+        self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO + 100, (self.height() / 2)))
         self.print_topologia(self.macrobloque.modelo.topologia)
         self.update()
     
     def dibujar_topologia(self, topologia, posicion_inicial):
         if isinstance(topologia, TopologiaSerie):
-            return self.dibujar_serie(topologia, posicion_inicial)
+            return self.dibujar_serie(topologia, posicion_inicial, self.escala)
         elif isinstance(topologia, TopologiaParalelo):
-            return self.dibujar_paralelo(topologia, posicion_inicial)
+            return self.dibujar_paralelo(topologia, posicion_inicial, self.escala)
         elif isinstance(topologia, MicroBloque):
-            return self.create_microbloque(topologia, posicion_inicial)
+            return self.create_microbloque(topologia, posicion_inicial, self.escala)
         
-    def dibujar_serie(self, serie, posicion_inicial):
+    def dibujar_serie(self, serie, posicion_inicial, factor_escala):
         posicion_actual = posicion_inicial
         punto_final = posicion_inicial
         for hijo in serie.hijos:
             punto_final = self.dibujar_topologia(hijo, posicion_actual)
-            posicion_actual = QPointF(punto_final.x() + MARGEN_HORIZONTAL, posicion_inicial.y())
+            posicion_actual = QPointF(punto_final.x() + MARGEN_HORIZONTAL * factor_escala, posicion_inicial.y())
         return punto_final
 
-    def dibujar_paralelo(self, paralelo, posicion_inicial):
-        posicion_inicial.setX(posicion_inicial.x() + MARGEN_PARALELO)
-        altura_total = sum(hijo.alto() for hijo in paralelo.hijos)
-        altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL
+    def dibujar_paralelo(self, paralelo, posicion_inicial, factor_escala):
+        posicion_inicial.setX(posicion_inicial.x() + MARGEN_PARALELO * factor_escala)
+        altura_total = sum(hijo.alto() for hijo in paralelo.hijos) * factor_escala
+        altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL * factor_escala
 
         y_actual = posicion_inicial.y() - altura_total / 2
         punto_final_max = posicion_inicial
         for hijo in paralelo.hijos:
-            centro_del_hijo = y_actual + hijo.alto() / 2
+            centro_del_hijo = y_actual + hijo.alto() * factor_escala / 2
             posicion_del_hijo = QPointF(posicion_inicial.x(), centro_del_hijo)
             punto_final = self.dibujar_topologia(hijo, posicion_del_hijo)
             if punto_final.x() > punto_final_max.x():
                 punto_final_max = punto_final
-            y_actual += hijo.alto() + MARGEN_VERTICAL
+            y_actual += hijo.alto() * factor_escala + MARGEN_VERTICAL * factor_escala
 
-        return QPointF(punto_final_max.x() + MARGEN_PARALELO, posicion_inicial.y())
+        return QPointF(punto_final_max.x() + MARGEN_PARALELO * factor_escala, posicion_inicial.y())
 
-    def create_microbloque(self, microbloque_back, pos):
+    def create_microbloque(self, microbloque_back, pos, factor_escala):
         microbloque = Microbloque(self, microbloque_back)
         microbloque.setParent(self)
         microbloque.setPos(pos)
+        microbloque.setScale(factor_escala)
         self.microbloques.append(microbloque)
         microbloque.show()
         self.update()
+        print(f"Microbloque {microbloque_back.nombre} creado en {pos}")
+        print(f"Centro del microbloque calculado con microbloque.pos(): {microbloque.pos() + QPointF(microbloque.width() / 2, microbloque.height() / 2)}")
+        print(f"Altura vertical de la topologia {self.calcular_punto_medio_topologia()}")
         return pos
     
     def clear_all(self):
@@ -96,150 +121,153 @@ class DrawingArea(QWidget):
         painter = QPainter(self)
         self.draw_io_blocks(painter)
         
-        if not self.microbloques:
-            self.draw_empty_connection(painter)
-        else:
-           punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, QPointF(90, self.height() / 2))
-           self.draw_final_connection(painter, punto_final) # punto_final es el punto de salida de la última conexión
+        centro_y = self.calcular_punto_medio_topologia()
 
-    def draw_final_connection(self, painter, start_point):
+        if not self.microbloques:
+            self.draw_empty_connection(painter, centro_y)
+        else:
+            punto_inicial = QPointF((50 + RADIO) * self.escala + RADIO * self.escala, centro_y)
+            punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, punto_inicial)
+            self.draw_final_connection(painter, punto_final, centro_y)
+
+    def draw_final_connection(self, painter, start_point, centro_y):
         if start_point is None:
             return
 
-        end_point = QPointF(self.width() - 170, self.height() / 2) # end_point es el lugar donde está el bloque de salida
-        painter.setPen(QPen(Qt.black, 2))
+        mb_mas_lejano = self.encontrar_bloque_mas_a_la_derecha()
+        if mb_mas_lejano:
+            end_x = mb_mas_lejano.pos().x() + mb_mas_lejano.width() * self.escala + (MARGEN_HORIZONTAL / 2) * self.escala
+        else:
+            end_x = self.width() - (130 + RADIO) * self.escala
+
+        end_point = QPointF(end_x, centro_y)
+        painter.setPen(QPen(Qt.black, 2 * self.escala))
         painter.drawLine(start_point, end_point)
 
-    def draw_empty_connection(self, painter):
-        painter.setPen(QPen(Qt.black, 2))
-        entrada = QPointF(130, self.height() / 2)
-        salida = QPointF(self.width() - 210, self.height() / 2)
+    def draw_empty_connection(self, painter, centro_y):
+        painter.setPen(QPen(Qt.black, 2 * self.escala))
+        entrada = QPointF(130 * self.escala, centro_y)
+        salida = QPointF(self.width() - (130 + RADIO) * self.escala, centro_y)
         painter.drawLine(entrada, salida)
-        
-        # Dibujar el botón "+" en el medio
-        center = QPointF((entrada.x() + salida.x()) / 2, self.height() / 2)
-        button_rect = QRectF(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
+
+        center = QPointF((entrada.x() + salida.x()) / 2, centro_y)
+        button_size = BUTTON_SIZE * self.escala
+        button_rect = QRectF(center.x() - button_size/2, center.y() - button_size/2, button_size, button_size)
         painter.setBrush(QBrush(Qt.white))
         painter.drawEllipse(button_rect)
         painter.drawText(button_rect, Qt.AlignCenter, "+")
 
-        # Guardar la posición del botón para detectar clics
         self.add_button_rect = button_rect
 
     def draw_io_blocks(self, painter):
-        painter.setPen(QPen(Qt.black, 2))
+        painter.setPen(QPen(Qt.black, 2 * self.escala))
+
+        centro_y = self.calcular_punto_medio_topologia()
         
-        centro_y = self.height() / 2  # Posición y del centro para ambos círculos
-        
-        centro_entrada_x = 50 + RADIO  # Posición x del centro del círculo de entrada
-        centro_salida_x = self.width() - 130 - RADIO  # Posición x del centro del círculo de salida
-        
-        # Dibujar los círculos de entrada y salida
-        painter.drawEllipse(QPointF(centro_entrada_x, centro_y), RADIO, RADIO)
-        painter.drawText(QRectF(50, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Entrada")
-        
-        painter.drawEllipse(QPointF(centro_salida_x, centro_y), RADIO, RADIO)
-        painter.drawText(QRectF(self.width()-209, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Salida")
+        centro_entrada_x = (50 + RADIO) * self.escala
+
+        radio_escalado = RADIO * self.escala
+
+        # Dibujar círculo de entrada
+        painter.drawEllipse(QPointF(centro_entrada_x, centro_y), radio_escalado, radio_escalado)
+        painter.drawText(QRectF(50 * self.escala, centro_y - 30 * self.escala, 80 * self.escala, 60 * self.escala), Qt.AlignCenter, "Entrada")
+
+        # Calcular posición del círculo de salida
+        mb_mas_lejano = self.encontrar_bloque_mas_a_la_derecha()
+        if mb_mas_lejano:
+            centro_salida_x = mb_mas_lejano.pos().x() + mb_mas_lejano.width() * self.escala + (MARGEN_HORIZONTAL / 2) * self.escala
+        else:
+            centro_salida_x = self.width() - (130 + RADIO) * self.escala
+
+        # Dibujar círculo de salida
+        painter.drawEllipse(QPointF(centro_salida_x + radio_escalado, centro_y), radio_escalado, radio_escalado)
+        painter.drawText(QRectF(centro_salida_x - 40 * self.escala + radio_escalado, centro_y - 30 * self.escala, 80 * self.escala, 60 * self.escala), Qt.AlignCenter, "Salida")
+
+        # Logs:
+        print(f"Centro de entrada: {centro_entrada_x, centro_y}")
+        print(f"Centro de salida: {centro_salida_x + radio_escalado, centro_y}")
     
     def draw_connections(self, painter, topologia, punto_de_partida, is_parallel=False):
         if punto_de_partida is None:
             return None
 
-        painter.setPen(QPen(Qt.black, 2)) # configura el color y grosor de la línea
+        painter.setPen(QPen(Qt.black, 2 * self.escala))  # Ajusta el grosor de la línea
         
         if isinstance(topologia, TopologiaSerie):
-            return self.draw_serie_connections(painter, topologia, punto_de_partida)
+            return self.draw_serie_connections(painter, topologia, punto_de_partida, self.escala)
         elif isinstance(topologia, TopologiaParalelo):
-            return self.draw_paralelo_connections(painter, topologia, punto_de_partida)
+            return self.draw_paralelo_connections(painter, topologia, punto_de_partida, self.escala)
         elif isinstance(topologia, MicroBloque):
-            return self.draw_microbloque_connection(painter, topologia, punto_de_partida, is_parallel)
+            return self.draw_microbloque_connection(painter, topologia, punto_de_partida, is_parallel, self.escala)
         else:
             return punto_de_partida
 
-    def draw_serie_connections(self, painter, serie, punto_inicial):
-        """
-        Dibuja las conexiones de una serie de microbloques
-        @return el punto final de la serie
-        """
+    def draw_serie_connections(self, painter, serie, punto_inicial, factor_escala):
         if punto_inicial is None:
             return None
 
-        punto_actual = punto_inicial
+        punto_actual = punto_inicial # borde entrada 
         for hijo in serie.hijos:
-            # para cada elemento de la serie, llama a draw_connections para que dibuje sus componentes (si las hubiera)
-            punto_final = self.draw_connections(painter, hijo, punto_actual) 
-            punto_actual = punto_final
+            punto_final = self.draw_connections(painter, hijo, punto_actual)
+            if punto_final:
+                punto_actual = punto_final
 
         return punto_actual
 
-    def draw_paralelo_connections(self, painter, paralelo, punto_inicial):
+    def draw_paralelo_connections(self, painter, paralelo, punto_inicial, factor_escala):
         if punto_inicial is None:
             return None
 
-        # Calcular punto de bifurcación
-        comienzo_de_rama = QPointF(punto_inicial.x() + MARGEN_PARALELO, punto_inicial.y())  # es el margen antes de hacer la bifurcación
-        altura_total = sum(hijo.alto() for hijo in paralelo.hijos) # idem que en dibujar_paralelo
-        altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL # idem que en dibujar_paralelo
-        
+        comienzo_de_rama = QPointF(punto_inicial.x() + MARGEN_PARALELO * factor_escala, punto_inicial.y())
+        altura_total = sum(hijo.alto() for hijo in paralelo.hijos) * factor_escala
+        altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL * factor_escala
+
         # Dibujar línea horizontal antes de la bifurcación
         painter.drawLine(punto_inicial, comienzo_de_rama)
         
-        # Dibujar conexiones para cada rama
+        # Dibujar conexiones para cada rama        
         y_actual = punto_inicial.y() - altura_total / 2
         puntos_finales = []
         for hijo in paralelo.hijos:
-            punto_final_rama_vertical = QPointF(comienzo_de_rama.x(), y_actual + hijo.alto() / 2) # deja igual la "x" y pone la "y" en el centro del microbloque
-            painter.drawLine(comienzo_de_rama, punto_final_rama_vertical)  # Línea vertical de bifurcación
-            punto_final_rama_actual = self.draw_connections(painter, hijo, punto_final_rama_vertical, True) # partiendo desde el extremo de la linea vertical de bifurcacion, comienza a dibujar lo que sigue
+            punto_final_rama_vertical = QPointF(comienzo_de_rama.x(), y_actual + hijo.alto() * factor_escala / 2)
+            painter.drawLine(comienzo_de_rama, punto_final_rama_vertical)
+            punto_final_rama_actual = self.draw_connections(painter, hijo, punto_final_rama_vertical, True)
             if punto_final_rama_actual is not None:
-                puntos_finales.append(punto_final_rama_actual) # se va guardando los puntos finales de cada rama del paralelo
-            y_actual += hijo.alto() + MARGEN_VERTICAL # incorpora el margen vertical
+                puntos_finales.append(punto_final_rama_actual)
+            y_actual += hijo.alto() * factor_escala + MARGEN_VERTICAL * factor_escala
         
-        if not puntos_finales: # querria decir que no dibujo nada en los paralelos (no creo que pase nunca, pero por las dudas lo dejo)
+        if not puntos_finales:
             return punto_inicial
 
-        # Encontrar el punto final más a la derecha (margen paralelo permite dibujar la linea horizontal final, al salir de una rama paralela)
-        max_x = max(point.x() for point in puntos_finales) + MARGEN_PARALELO # esto está por si una rama quedó "mas larga horizontalmente" que la otra
-         
-        # Dibujar líneas horizontales para reconectar las ramas
-        for end_point in puntos_finales:
-            painter.drawLine(end_point, QPointF(max_x, end_point.y())) # le sumamos 20 para tener una linea horizontal (al salir del microbloque) antes de reconectar
+        max_x = max(point.x() for point in puntos_finales) + MARGEN_PARALELO * factor_escala
         
-        punto_de_reconexion = QPointF(max_x, punto_inicial.y())  # punto de reconexión (es el punto más a la derecha de la estructura paralelo)
-        # insertar imagen de punto suma en el punto de reconexión
-        painter.drawEllipse(punto_de_reconexion, 5, 5) # TODO: Cambiar por imagen de punto suma
+        for end_point in puntos_finales:
+            painter.drawLine(end_point, QPointF(max_x, end_point.y()))
+        
+        punto_de_reconexion = QPointF(max_x, punto_inicial.y())
+        painter.drawEllipse(punto_de_reconexion, 5 * factor_escala, 5 * factor_escala)
 
-        # Punto de reconexión
-        punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
+        punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO * factor_escala, punto_inicial.y())
 
-        # Dibujar líneas verticales para reconectar (En realidad es una unica linea desde una rama a la otra)
-        # QPointF(max_x + 20, puntos_finales[0].y()) --> es para la rama de arriba (indice 0 es el primer elemento de una lista)
-        # QPointF(max_x + 20, puntos_finales[-1].y()) --> es para la rama de abajo (indice -1 es el último elemento de una lista)
         painter.drawLine(QPointF(max_x, puntos_finales[0].y()), QPointF(max_x, puntos_finales[-1].y()))
         
-        # Dibujar línea horizontal final (para salir de la estructura paralelo)
         painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_mas_alejado)
         
-        # retorna el punto de reconexión porque es el punto "mas a la derecha" de la estructura paralelo
         return punto_mas_alejado 
     
-    def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo):
-        # busca en la lista de microbloques de la drawing_area, el microbloque que queremos conectar
+    def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo, factor_escala):
         for mb in self.microbloques:
-            if mb.elemento_back == microbloque: # compara su elemento back
+            if mb.elemento_back == microbloque:
                 if es_paralelo:
-                    punto_final = QPointF(mb.pos().x(), punto_inicial.y()) # deja igual el "x", y el "y" lo deja igual respecto a de la rama paralela en donde está
+                    punto_final = QPointF(mb.pos().x(), punto_inicial.y())
                 else:
-                    punto_final = mb.pos() + QPointF(0, mb.height() / 2) # mb.pos() = da la esquina superior izquierda del microbloque ||| + QPointF(0, mb.height() / 2) = mueve el punto hacia abajo hasta la mitad de la altura del microbloque.
+                    punto_final = mb.pos() + QPointF(0, mb.height() / 2)
                 
-                # punto_final seria el punto en donde va a llegar la flecha que proviene del microbloque anterior (punto medio izquierdo del microbloque actual)
-
                 if punto_inicial is not None and punto_final is not None:
-                    painter.drawLine(punto_inicial, punto_final) # dibuja la linea
+                    painter.drawLine(punto_inicial, punto_final)
                 
-                return mb.pos() + QPointF(mb.width(), mb.height() / 2) # retorna un punto que representa la mitad del lado derecho del microbloque. Este punto se usará como punto de inicio para la siguiente conexión.
-        
-        # Si no se encuentra el microbloque, retornamos el punto de inicio --> Si no encuentra el microbloque en la lista, simplemente retorna el punto_inicial
+                return mb.pos() + QPointF(mb.width(), mb.height() / 2)
+
         return punto_inicial
 
     def create_new_microbloque(self, pos, relation=None, reference_structure=None):
@@ -347,16 +375,30 @@ class DrawingArea(QWidget):
 
     def show_add_buttons(self, microbloque):
         self.hide_add_buttons()
-        positions = [
-            ('arriba', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() - BUTTON_SIZE/2)),
-            ('abajo', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() + microbloque.height() + BUTTON_SIZE/2)),
-            ('izquierda', QPointF(microbloque.x() - BUTTON_SIZE/2, microbloque.y() + microbloque.height()/2)),
-            ('derecha', QPointF(microbloque.x() + microbloque.width() + BUTTON_SIZE/2, microbloque.y() + microbloque.height()/2))
-        ]
         
+        # Obtener la posición y dimensiones reales del microbloque
+        mb_pos = microbloque.pos()
+        mb_width = microbloque.width()
+        mb_height = microbloque.height()
+        
+        # Calcular el tamaño del botón
+        button_size = int(BUTTON_SIZE * self.escala)
+        
+        positions = [
+            ('arriba', QPointF(mb_pos.x() + mb_width/2, mb_pos.y() - button_size/2)),
+            ('abajo', QPointF(mb_pos.x() + mb_width/2, mb_pos.y() + mb_height + button_size/2)),
+            ('izquierda', QPointF(mb_pos.x() - button_size/2, mb_pos.y() + mb_height/2)),
+            ('derecha', QPointF(mb_pos.x() + mb_width + button_size/2, mb_pos.y() + mb_height/2))
+        ]
+
         for direction, pos in positions:
             button = QPushButton("+", self)
-            button.setGeometry(int(pos.x() - BUTTON_SIZE/2), int(pos.y() - BUTTON_SIZE/2), BUTTON_SIZE, BUTTON_SIZE)
+            button.setGeometry(
+                int(pos.x() - button_size/2),
+                int(pos.y() - button_size/2),
+                button_size,
+                button_size
+            )
             button.clicked.connect(lambda _, d=direction: self.show_add_menu(d))
             button.show()
             self.add_buttons.append(button)
@@ -400,6 +442,22 @@ class DrawingArea(QWidget):
                 relation = 'despues'
             
             self.create_new_microbloque(self.selected_microbloque.pos(), relation, estructura_de_referencia)    
+
+    def calcular_punto_medio_topologia(self):
+        if not self.microbloques:
+            return self.height() / 2
+        top = float('inf') # infinito
+        bottom = float('-inf') # - infinito
+        for mb in self.microbloques:
+            mb_centro = mb.pos().y() + mb.height() / 2
+            top = min(top, mb_centro)
+            bottom = max(bottom, mb_centro)
+        return (top + bottom) / 2
+
+    def encontrar_bloque_mas_a_la_derecha(self):
+        if not self.microbloques:
+            return None
+        return max(self.microbloques, key=lambda mb: mb.pos().x() + mb.width() * self.escala) # retorna el que tenga mayor x
 
     def print_topologia(self, topologia, indent=0):
         """
