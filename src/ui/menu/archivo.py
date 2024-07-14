@@ -6,6 +6,17 @@ class Archivo(QMenu):
         super().__init__('Archivo',main_window)
         self.main_window = main_window
         self.setup()
+        self.setStyleSheet("""
+            QMenu {
+                background-color: white;
+                border: 1px solid #777;
+            }
+            
+            QMenu::item:selected {
+                background-color: #ADD8E6;
+                color: black;
+            }
+        """)
     
     def setup(self):
         # Menú de archivo
@@ -25,7 +36,6 @@ class Archivo(QMenu):
         self.addAction(open_action)
         self.addAction(save_action)
     
-
     def new_project(self):
         print('Nuevo proyecto creado')
         self.main_window.statusBar().showMessage('Nuevo proyecto creado')
