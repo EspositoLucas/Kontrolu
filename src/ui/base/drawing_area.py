@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
 from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer
 from .micro_bloque import Microbloque
@@ -19,9 +19,11 @@ class DrawingArea(QWidget):
         self.macrobloque = macrobloque
         self.modelo = macrobloque.modelo # es la representacion backend del macrobloque
         self.creating_microbloque = False
+        self.seleccion_multiple = False
         self.new_microbloque_config = {}
         self.add_buttons = []
         self.add_buttons_paralelo = []
+        self.selected_microbloques = []
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.resize_retardado)
@@ -39,6 +41,9 @@ class DrawingArea(QWidget):
 
     def init_ui(self):
         self.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.setFocusPolicy(Qt.StrongFocus) # sirve para permitir que el teclado de la compu interactue con la ventana
+        self.setContextMenuPolicy(Qt.CustomContextMenu) # sirve para poder mostrar un menu contextual (por ejemplo, cuando hago click derecho)
+        self.customContextMenuRequested.connect(self.mostrar_menu_contextual) # permite agregar nuestro propio menu contextual
     
     def calcular_factor_escala(self):
         ancho_ventana = self.width()
@@ -51,6 +56,7 @@ class DrawingArea(QWidget):
         for microbloque in self.microbloques:
                 microbloque.deleteLater() # elimina cada elemento
         self.microbloques.clear() # vacia la lista de microbloques
+        self.limpiar_seleccion() # si habia seleccionados, los limpia
         self.calcular_factor_escala()
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO + 100, (self.height() / 2)))
         self.print_topologia(self.macrobloque.modelo.topologia)
@@ -361,15 +367,45 @@ class DrawingArea(QWidget):
         if not self.microbloques: # si no hay microbloques y se hace click sobre el único botón "+", entonces se crea un microbloque 
             if hasattr(self, 'add_button_rect') and self.add_button_rect.contains(event.pos()):
                 self.create_new_microbloque(self.add_button_rect.center())
-        else: # si hay microbloques, se busca el microbloque que se seleccionó
-            for microbloque in self.microbloques:
-                if microbloque.geometry().contains(event.pos()):
-                    self.selected_microbloque = microbloque
-                    self.show_add_buttons(microbloque) # muestra los botones "+" alrededor del microbloque
-                    break
-            else:
-                self.selected_microbloque = None
-                self.hide_add_buttons() # oculta los botones "+"
+        else: 
+            if event.button() == Qt.LeftButton: # si se hace click izquierdo
+                for microbloque in self.microbloques: # si hay microbloques, se busca el microbloque que se seleccionó
+                    if microbloque.geometry().contains(event.pos()):
+                        if self.seleccion_multiple: # si está activa la seleccion multiple
+                            if microbloque in self.selected_microbloques: # si el microbloque seleccionado ya estaba seleccionado
+                                self.selected_microbloques.remove(microbloque) # lo deseleccionamos
+                                microbloque.setSeleccionado(False) # cambiar el color del borde del microbloque deseleccionado
+                            else: # si no está seleccionado
+                                self.selected_microbloques.append(microbloque) # lo agregamos
+                                microbloque.setSeleccionado(True) # cambiar el color del borde del microbloque seleccionado
+                        else: # si no está activada la seleccion multiple, quiere decir que se está queriendo seleccionar 1 microbloque
+                            if self.selected_microbloque: # si ya había un microbloque seleccionado
+                                self.selected_microbloque.setSeleccionado(False)
+                                self.hide_add_buttons() # ocultamos los botones "+"
+                            self.selected_microbloque = microbloque
+                            microbloque.setSeleccionado(True) # cambiar el color del borde del microbloque seleccionado
+                            self.show_add_buttons(microbloque) # muestra los botones "+" alrededor del microbloque
+                        break
+                else: # quiere decir que se hizo click izquierdo pero en un lugar que no es un microbloque
+                    if not self.seleccion_multiple: # si no está activada la seleccion multiple
+                        if self.selected_microbloque: # si ya había un microbloque seleccionado
+                            self.selected_microbloque.setSeleccionado(False) # cambiar el color del borde del microbloque deseleccionado
+                        self.selected_microbloque = None
+                        self.hide_add_buttons() # oculta los botones "+"
+
+            elif event.button() == Qt.RightButton: # si se hace click derecho
+                self.hide_add_buttons()
+                for microbloque in self.microbloques: # busca el microbloque que se seleccionó
+                    if microbloque.geometry().contains(event.pos()):
+                        if not self.seleccion_multiple: # si no está activada la seleccion multiple
+                            self.selected_microbloque = microbloque # seleccionamos el microbloque
+                            microbloque.setSeleccionado(True) # cambiar el color del borde del microbloque seleccionado
+                        break
+                else: # si se hizo click derecho pero en un lugar que no es un microbloque
+                    if self.selected_microbloque:
+                        self.selected_microbloque.setSeleccionado(False)
+                    self.selected_microbloque = None
+                    self.limpiar_seleccion()
         
         self.update()
 
@@ -418,6 +454,61 @@ class DrawingArea(QWidget):
         
         button = self.sender()
         menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
+    
+    def mostrar_menu_contextual(self, position):
+        context_menu = QMenu(self) # creamos el menu
+        if self.seleccion_multiple and len(self.selected_microbloques) > 0: # si está activa la seleccion multiple y hay microbloques seleccionados
+            delete_action = QAction("Eliminar microbloques", self) # definimos una opción: será la accion de eliminar los microbloques seleccionados
+            delete_action.triggered.connect(lambda: self.delete_selected_microbloques()) # la funcion a la que se llama cuando se elige esa opción
+            context_menu.addAction(delete_action) # agregamos la opción al menu
+        elif self.selected_microbloque: # si se seleccionó un microbloque
+            delete_action = QAction("Eliminar microbloque", self) # definimos una opción: será la accion de eliminar el microbloque
+            delete_action.triggered.connect(lambda: self.delete_microbloque(self.selected_microbloque)) # la funcion a la que se llama cuando se elige esa opción
+            context_menu.addAction(delete_action) # agregamos la opción al menu
+        if context_menu.actions(): # si hay opciones en el menu
+            context_menu.exec_(self.mapToGlobal(position)) # mostramos el menu en la posición del mouse
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete: # si se aprieta la tecla "Delete" ("Suprimir")
+            if self.seleccion_multiple and self.selected_microbloques: # si está activa la seleccion multiple y hay microbloques seleccionados
+                self.delete_selected_microbloques() # borramos los microbloques seleccionados
+            elif self.selected_microbloque: # si hay un microbloque seleccionado (y no está activa la seleccion multiple)
+                self.delete_microbloque(self.selected_microbloque) # borramos el microbloque seleccionado
+        else:
+            super().keyPressEvent(event)
+
+    def delete_microbloque(self, microbloque):
+        self.microbloques.remove(microbloque)
+        microbloque.elemento_back.borrar_elemento()
+        microbloque.deleteLater()
+        self.selected_microbloque = None
+        self.hide_add_buttons()
+        self.load_microbloques()
+        self.update()
+
+    def delete_selected_microbloques(self):
+        for microbloque in self.selected_microbloques:
+            self.microbloques.remove(microbloque)
+            microbloque.elemento_back.borrar_elemento()
+            microbloque.deleteLater()
+            self.hide_add_buttons()
+        self.selected_microbloques.clear() # limpio la lista de microbloques seleccionados
+        self.load_microbloques()
+        self.update()
+
+    def set_seleccion_multiple(self, valor):
+        self.seleccion_multiple = valor # seteamos el valor
+        if not valor: # si se deselecciona la opción de seleccionar varios
+            self.limpiar_seleccion() # limpiamos la selección
+        self.update()
+
+    def limpiar_seleccion(self):
+        for microbloque in self.selected_microbloques:
+            microbloque.setSeleccionado(False)
+        self.selected_microbloques.clear()
+        if self.selected_microbloque:
+            self.selected_microbloque.setSeleccionado(False)
+            self.selected_microbloque = None
 
     def get_structure_name(self, estructura):
         nodo = estructura[0]

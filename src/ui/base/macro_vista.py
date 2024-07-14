@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar
+from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QAction
 from .drawing_area import DrawingArea
 
 class MacroVista(QPushButton):
@@ -38,6 +38,14 @@ class MacroVista(QPushButton):
         delete_button = QPushButton('Borrar todo', self)
         delete_button.clicked.connect(self.drawing_area.clear_all)
         toolbar.addWidget(delete_button)
+
+        self.seleccion_multiple = QPushButton('Seleccionar varios', self)
+        self.seleccion_multiple.setCheckable(True)
+        self.seleccion_multiple.toggled.connect(self.drawing_area.set_seleccion_multiple)
+        toolbar.addWidget(self.seleccion_multiple)
+
+    def activar_seleccion_multiple(self, checked):
+        self.drawing_area.set_seleccion_multiple(checked)
 
     def configure_microbloque(self):
         self.drawing_area.create_new_microbloque()

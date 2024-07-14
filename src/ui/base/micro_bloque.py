@@ -14,6 +14,7 @@ class Microbloque(QWidget):
         self.ancho = microbloque_back.ancho()
         self.alto = microbloque_back.alto()
         self.escala = 1.0
+        self.esta_selecionado = False
         self.setFixedSize(self.ancho, self.alto)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(f"background-color: {self.color.name()};")
@@ -28,14 +29,21 @@ class Microbloque(QWidget):
         self.setFixedSize(nuevo_ancho, nuevo_alto)
         self.update()
 
+    def setSeleccionado(self, seleccionado):
+        self.esta_selecionado = seleccionado
+        self.update()
+
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         
         # Dibuja el rectángulo
-        painter.setPen(QPen(Qt.black, 2))  # Grosor constante del borde
+        if self.esta_selecionado:
+            painter.setPen(QPen(Qt.red, 3))  # Borde rojo y más grueso para seleccionados
+        else:
+            painter.setPen(QPen(Qt.black, 2))
         painter.setBrush(self.color)
-        painter.drawRect(self.rect().adjusted(1, 1, -1, -1))  # Dibuja el rectángulo ajustado al tamaño actual del widget
+        painter.drawRect(self.rect().adjusted(1, 1, -1, -1))
         
         # Configura la fuente
         font = painter.font()
