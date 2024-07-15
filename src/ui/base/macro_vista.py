@@ -36,7 +36,7 @@
 
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar
+from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QAction
 from .drawing_area import DrawingArea
 
 class MacroVista(QPushButton):
@@ -76,23 +76,15 @@ class MacroVista(QPushButton):
         delete_button = QPushButton('Borrar todo', self)
         delete_button.clicked.connect(self.drawing_area.content.clear_all)
         toolbar.addWidget(delete_button)
-        
-        # Mover el botón de selección múltiple a la toolbar
-        self.selection_button = QPushButton("Selección múltiple", self)
-        self.selection_button.setCheckable(True)
-        self.selection_button.clicked.connect(self.toggle_multiple_selection)
-        toolbar.addWidget(self.selection_button)
-        
-    def toggle_multiple_selection(self):
-        if self.selection_button.text() == "Selección múltiple":
-            self.selection_button.setText("Desactivar selección")
-            self.drawing_area.content.multiple_selection_active = True
-        else:
-            self.selection_button.setText("Selección múltiple")
-            self.drawing_area.content.multiple_selection_active = False
-            self.drawing_area.content.selected_microbloques.clear()
-        self.update()
-    
+
+        self.seleccion_multiple = QPushButton('Seleccionar varios', self)
+        self.seleccion_multiple.setCheckable(True)
+        self.seleccion_multiple.toggled.connect(self.drawing_area.set_seleccion_multiple)
+        toolbar.addWidget(self.seleccion_multiple)
+
+    def activar_seleccion_multiple(self, checked):
+        self.drawing_area.set_seleccion_multiple(checked)
+
     def configure_microbloque(self):
         self.drawing_area.content.create_new_microbloque()
         
