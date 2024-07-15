@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog,QGraphicsItem
+from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog
 from PyQt5.QtGui import QPainter, QColor, QPen
 from PyQt5.QtCore import Qt, QPointF
 from .latex_editor import LatexEditor
@@ -18,8 +18,6 @@ class Microbloque(QWidget):
         self.setFixedSize(self.ancho, self.alto)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setStyleSheet(f"background-color: {self.color.name()};")
-        # self.initial_pos = self.pos()
-        # self.initial_size = self.size()
 
     def setPos(self, pos):
         self.move(pos.toPoint())

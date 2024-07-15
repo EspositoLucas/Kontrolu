@@ -79,11 +79,11 @@ class MacroVista(QPushButton):
 
         self.seleccion_multiple = QPushButton('Seleccionar varios', self)
         self.seleccion_multiple.setCheckable(True)
-        self.seleccion_multiple.toggled.connect(self.drawing_area.set_seleccion_multiple)
+        self.seleccion_multiple.toggled.connect(self.drawing_area.content.set_seleccion_multiple)
         toolbar.addWidget(self.seleccion_multiple)
 
     def activar_seleccion_multiple(self, checked):
-        self.drawing_area.set_seleccion_multiple(checked)
+        self.drawing_area.content.set_seleccion_multiple(checked)
 
     def configure_microbloque(self):
         self.drawing_area.content.create_new_microbloque()

@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction
-from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
-from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush,QTransform
+from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer,QSize
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
@@ -36,6 +36,8 @@ class DrawingContent(QWidget):
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.resize_retardado)
+        self.scale_factor = 1.0
+        self.panning = False
         self.init_ui()
     
     def resizeEvent(self, event):
@@ -59,7 +61,32 @@ class DrawingContent(QWidget):
         alto_ventana = self.height()
         factor_ancho = ancho_ventana / 600 
         factor_alto = alto_ventana / 600
-        self.escala = min(factor_ancho, factor_alto)  # Usamos el menor para mantener la proporción    
+        self.escala = min(factor_ancho, factor_alto)  # Usamos el menor para mantener la proporción 
+    
+    def ajustar_tamano_widget(self):
+        if self.microbloques:
+            max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
+            max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
+            nuevo_ancho = max(int(max_x + 400), self.scroll_area.viewport().width())
+            nuevo_alto = max(int(max_y + 100), self.scroll_area.viewport().height())
+            self.setMinimumSize(nuevo_ancho, nuevo_alto)
+        else:
+            self.setMinimumSize(self.scroll_area.viewport().width(), self.scroll_area.viewport().height())
+    
+    def wheelEvent(self, event):
+        if event.modifiers() & Qt.ControlModifier:
+            zoom_in_factor = 1.25
+            zoom_out_factor = 1 / zoom_in_factor
+
+            if event.angleDelta().y() > 0:
+                self.scale_factor *= zoom_in_factor
+            else:
+                self.scale_factor *= zoom_out_factor
+
+            self.scale_factor = max(0.1, min(self.scale_factor, 10.0))
+            self.update()
+        else:
+            super().wheelEvent(event)   
 
     def load_microbloques(self):
         for microbloque in self.microbloques:
@@ -69,6 +96,7 @@ class DrawingContent(QWidget):
         self.calcular_factor_escala()
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO + 100, (self.height() / 2)))
         self.print_topologia(self.macrobloque.modelo.topologia)
+        self.ajustar_tamano_widget()
         self.update()
     
     
@@ -82,6 +110,7 @@ class DrawingContent(QWidget):
         
     def dibujar_serie(self, serie, posicion_inicial, factor_escala):
         posicion_actual = posicion_inicial
+        punto_final = posicion_inicial
         for hijo in serie.hijos:
             punto_final = self.dibujar_topologia(hijo, posicion_actual)
             posicion_actual = QPointF(punto_final.x() + MARGEN_HORIZONTAL * factor_escala, posicion_inicial.y())
@@ -93,6 +122,7 @@ class DrawingContent(QWidget):
         altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL * factor_escala
 
         y_actual = posicion_inicial.y() - altura_total / 2
+        punto_final_max = posicion_inicial
         for hijo in paralelo.hijos:
             centro_del_hijo = y_actual + hijo.alto() * factor_escala / 2
             posicion_del_hijo = QPointF(posicion_inicial.x(), centro_del_hijo)
@@ -102,7 +132,7 @@ class DrawingContent(QWidget):
             y_actual += hijo.alto() * factor_escala + MARGEN_VERTICAL * factor_escala
 
         return QPointF(punto_final_max.x() + MARGEN_PARALELO * factor_escala, posicion_inicial.y())
-
+    
     def create_microbloque(self, microbloque_back, pos, factor_escala):
         microbloque = Microbloque(self, microbloque_back)
         microbloque.setParent(self)
@@ -505,14 +535,13 @@ class DrawingContent(QWidget):
             button.deleteLater()
         self.add_buttons.clear()
 
-    def show_add_menu(self, direction, microbloque):
+    def show_add_menu(self, direction):
         menu = QMenu(self)
-        if microbloque and microbloque.elemento_back:
-            micro_back = microbloque.elemento_back
-            parent_structures = micro_back.get_parent_structures()
-            for parent in [[micro_back, 0]] + parent_structures:
-                action = menu.addAction(f"Respecto a {self.get_structure_name(parent)}")
-                action.triggered.connect(lambda _, s=parent[0], m=microbloque: self.add_microbloque(direction, s, m))
+        micro_back = self.selected_microbloque.elemento_back
+        parent_structures = micro_back.get_parent_structures()
+        for parent in [[micro_back, 0]] + parent_structures:
+            action = menu.addAction(f"Respecto a {self.get_structure_name(parent)}")
+            action.triggered.connect(lambda _, s=parent[0]: self.add_microbloque(direction, s))
         
         button = self.sender()
         menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
@@ -584,8 +613,9 @@ class DrawingContent(QWidget):
         else:
             return "Estructura desconocida"
 
-    def add_microbloque(self, direction, estructura_de_referencia, microbloque):
-        if microbloque and estructura_de_referencia:
+    def add_microbloque(self, direction, estructura_de_referencia):
+        # segun la dirección en la que se hizo click, determino la relación con el microbloque seleccionado
+        if estructura_de_referencia:
             if direction in ['arriba', 'abajo']:
                 relation = direction
             elif direction == 'izquierda':
