@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea
-from PyQt5.QtGui import QPainter, QPen, QColor, QBrush,QTransform
-from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer,QSize
+import os
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea,QTextEdit,QToolTip,QApplication
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush,QTransform,QPixmap,QCursor
+from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer,QSize,QPoint
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
@@ -38,7 +39,23 @@ class DrawingContent(QWidget):
         self.resize_timer.timeout.connect(self.resize_retardado)
         self.scale_factor = 1.0
         self.panning = False
+        # self.help_level = "principiante"  # Nivel de ayuda por defecto
+        self.load_preview_images()
         self.init_ui()
+
+
+    def load_preview_images(self):
+        # Obtener la ruta del directorio actual del script
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # Navegar hacia arriba dos niveles y luego a la carpeta 'imgs'
+        imgs_dir = os.path.join(current_dir, '..', 'base', 'imgs')
+        
+        self.preview_images = {
+            'arriba': QPixmap(os.path.join(imgs_dir, 'paralelo.png')),
+            'abajo': QPixmap(os.path.join(imgs_dir, 'paralelo.png')),
+            'izquierda': QPixmap(os.path.join(imgs_dir, 'serie.png')),
+            'derecha': QPixmap(os.path.join(imgs_dir, 'serie.png'))
+        }
     
     def resizeEvent(self, event):
         # reinicia el temporizador cada vez que se produce un evento de cambio de tamaño
@@ -55,7 +72,51 @@ class DrawingContent(QWidget):
         self.setFocusPolicy(Qt.StrongFocus) # sirve para permitir que el teclado de la compu interactue con la ventana
         self.setContextMenuPolicy(Qt.CustomContextMenu) # sirve para poder mostrar un menu contextual (por ejemplo, cuando hago click derecho)
         self.customContextMenuRequested.connect(self.mostrar_menu_contextual) # permite agregar nuestro propio menu contextual
+        # Agregar botón de ayuda
+        self.help_button = QPushButton("?", self)
+        self.help_button.setGeometry(10, 10, 30, 30)
+        self.help_button.clicked.connect(self.show_help)
+        self.help_button.setToolTip("Mostrar ayuda")
     
+    def show_help(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda")
+        layout = QVBoxLayout()
+
+        help_text = QTextEdit()
+        help_text.setReadOnly(True)
+        help_text.setHtml("""
+        <h2>Bienvenido al sistema de ayuda</h2>
+        <h3>Creación de microbloques</h3>
+        <p>Para crear un nuevo microbloque:</p>
+        <ol>
+            <li>Haga clic en el botón '+' en el centro del diagrama vacío, o en los botones '+' alrededor de un microbloque existente.</li>
+            <li>Seleccione la ubicación deseada en el menú desplegable.</li>
+            <li>Complete la información requerida en el diálogo que aparece.</li>
+        </ol>
+
+        <h3>Edición de microbloques</h3>
+        <p>Para editar un microbloque existente:</p>
+        <ul>
+            <li>Haga doble clic en el microbloque para abrir el diálogo de edición.</li>
+            <li>Para eliminar un microbloque, selecciónelo y presione la tecla 'Suprimir' o use el menú contextual (clic derecho).</li>
+        </ul>
+
+        <h3>Navegación</h3>
+        <p>Use la rueda del ratón para hacer zoom. Mantenga presionada la tecla Ctrl mientras arrastra para desplazarse por el diagrama.</p>
+
+        <h3>Selección múltiple</h3>
+        <p>Mantenga presionada la tecla Ctrl mientras hace clic para seleccionar varios microbloques a la vez.</p>
+        """)
+        layout.addWidget(help_text)
+
+        close_button = QPushButton("Cerrar")
+        close_button.clicked.connect(help_dialog.close)
+        layout.addWidget(close_button)
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
+
+        
     def calcular_factor_escala(self):
         ancho_ventana = self.width()
         alto_ventana = self.height()
@@ -218,7 +279,10 @@ class DrawingContent(QWidget):
         painter.drawText(button_rect, Qt.AlignCenter, "+")
 
         self.add_button_rect = button_rect
-
+        
+        # Agregar un QToolTip para el botón '+'
+        QToolTip.showText(self.mapToGlobal(button_rect.center().toPoint()), "Agregar nuevo microbloque", self)
+    
     def draw_io_blocks(self, painter):
         painter.setPen(QPen(Qt.black, 2 * self.escala))
 
@@ -246,7 +310,7 @@ class DrawingContent(QWidget):
         # Logs:
         print(f"Centro de entrada: {centro_entrada_x, centro_y}")
         print(f"Centro de salida: {centro_salida_x + radio_escalado, centro_y}")
-    
+        
     def draw_connections(self, painter, topologia, punto_de_partida, is_parallel=False):
         if punto_de_partida is None:
             return None
@@ -527,6 +591,16 @@ class DrawingContent(QWidget):
                 button_size
             )
             button.clicked.connect(lambda _, d=direction: self.show_add_menu(d))
+            
+            # Agregar tooltip
+            tooltip_text = {
+                'arriba': "Agregar microbloque arriba",
+                'abajo': "Agregar microbloque abajo",
+                'izquierda': "Agregar microbloque a la izquierda",
+                'derecha': "Agregar microbloque a la derecha"
+            }
+            button.setToolTip(tooltip_text[direction])
+            
             button.show()
             self.add_buttons.append(button)
 
@@ -539,13 +613,95 @@ class DrawingContent(QWidget):
         menu = QMenu(self)
         micro_back = self.selected_microbloque.elemento_back
         parent_structures = micro_back.get_parent_structures()
+        
         for parent in [[micro_back, 0]] + parent_structures:
-            action = menu.addAction(f"Respecto a {self.get_structure_name(parent)}")
-            action.triggered.connect(lambda _, s=parent[0]: self.add_microbloque(direction, s))
+            structure_name = self.get_structure_name(parent)
+            action_text = self.get_descriptive_action_text(direction, structure_name)
+            action = menu.addAction(action_text)
+            action.triggered.connect(lambda checked, s=parent: self.add_microbloque(direction, s[0] if isinstance(s, list) else s))
+            
+            # Conectar los eventos de entrada y salida del mouse
+            action.hovered.connect(lambda s=parent, d=direction: self.show_preview(d, s))
+            action.triggered.connect(self.hide_preview)
         
         button = self.sender()
         menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
+
+    def show_preview(self, direction, structure):
+        if not hasattr(self, 'preview_dialog'):
+            self.preview_dialog = QDialog(self)
+            self.preview_dialog.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
+            layout = QVBoxLayout()
+            self.preview_label = QLabel()
+            self.description_label = QLabel()
+            self.description_label.setWordWrap(True)
+            layout.addWidget(self.preview_label)
+            layout.addWidget(self.description_label)
+            self.preview_dialog.setLayout(layout)
+        
+        preview_pixmap = self.preview_images[direction].scaled(300, 175, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.preview_label.setPixmap(preview_pixmap)
+        self.description_label.setText(self.get_preview_description(direction, structure))
+        
+        self.preview_dialog.adjustSize()
+        
+        # Calcular la posición del diálogo
+        cursor_pos = QCursor.pos()
+        dialog_pos = cursor_pos + QPoint(50, -self.preview_dialog.height() // 2)
+        
+        # Asegurarse de que el diálogo no se salga de la pantalla
+        screen = QApplication.primaryScreen().geometry()
+        if dialog_pos.x() + self.preview_dialog.width() > screen.width():
+            dialog_pos.setX(cursor_pos.x() - self.preview_dialog.width() - 20)
+        if dialog_pos.y() + self.preview_dialog.height() > screen.height():
+            dialog_pos.setY(screen.height() - self.preview_dialog.height())
+        elif dialog_pos.y() < 0:
+            dialog_pos.setY(0)
+        
+        self.preview_dialog.move(dialog_pos)
+        self.preview_dialog.show()
     
+    def hide_preview(self):
+        if hasattr(self, 'preview_dialog'):
+            self.preview_dialog.hide()
+    
+
+    def get_descriptive_action_text(self, direction, structure_name):
+        direction_text = {
+            'arriba': "encima de",
+            'abajo': "debajo de",
+            'izquierda': "antes de",
+            'derecha': "después de"
+        }
+        return f"Agregar {direction_text[direction]} {structure_name}"
+
+    def get_structure_name(self, estructura):
+        if isinstance(estructura, list):
+            nodo = estructura[0]
+            nivel = estructura[1]
+        else:
+            nodo = estructura
+            nivel = 0
+
+        if isinstance(nodo, MicroBloque):
+            return f"el microbloque '{nodo.nombre}'"
+        elif isinstance(nodo, TopologiaSerie):
+            return f"la estructura en serie (nivel {nivel})"
+        elif isinstance(nodo, TopologiaParalelo):
+            return f"la estructura en paralelo (nivel {nivel})"
+        else:
+            return "la estructura desconocida"
+
+    def get_preview_description(self, direction, estructura):
+        structure_name = self.get_structure_name(estructura)
+        direction_text = {
+            'arriba': "encima de",
+            'abajo': "debajo de",
+            'izquierda': "antes de",
+            'derecha': "después de"
+        }
+        return f"Se agregará un nuevo microbloque {direction_text[direction]} {structure_name}."
+        
     def mostrar_menu_contextual(self, position):
         context_menu = QMenu(self) # creamos el menu
         if self.seleccion_multiple and len(self.selected_microbloques) > 0: # si está activa la seleccion multiple y hay microbloques seleccionados
@@ -600,18 +756,6 @@ class DrawingContent(QWidget):
         if self.selected_microbloque:
             self.selected_microbloque.setSeleccionado(False)
             self.selected_microbloque = None
-
-    def get_structure_name(self, estructura):
-        nodo = estructura[0]
-        nivel = estructura[1]
-        if isinstance(nodo, MicroBloque):
-            return nodo.nombre
-        elif isinstance(nodo, TopologiaSerie):
-            return f"Serie {nivel}"
-        elif isinstance(nodo, TopologiaParalelo):
-            return f"Paralelo {nivel}"
-        else:
-            return "Estructura desconocida"
 
     def add_microbloque(self, direction, estructura_de_referencia):
         # segun la dirección en la que se hizo click, determino la relación con el microbloque seleccionado
