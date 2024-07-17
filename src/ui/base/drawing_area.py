@@ -50,7 +50,8 @@ class DrawingArea(QWidget):
         alto_ventana = self.height()
         factor_ancho = ancho_ventana / 600 
         factor_alto = alto_ventana / 600
-        self.escala = min(factor_ancho, factor_alto)  # Usamos el menor para mantener la proporción    
+        self.escala = min(factor_ancho, factor_alto)  # Usamos el menor para mantener la proporción
+        print("usando factor de escala: ", self.escala)    
 
     def load_microbloques(self):
         for microbloque in self.microbloques:
@@ -59,7 +60,7 @@ class DrawingArea(QWidget):
         self.limpiar_seleccion() # si habia seleccionados, los limpia
         self.calcular_factor_escala()
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO + 100, (self.height() / 2)))
-        self.print_topologia(self.macrobloque.modelo.topologia)
+        #self.print_topologia(self.macrobloque.modelo.topologia)
         self.update()
     
     def dibujar_topologia(self, topologia, posicion_inicial):
@@ -80,13 +81,13 @@ class DrawingArea(QWidget):
 
     def dibujar_paralelo(self, paralelo, posicion_inicial, factor_escala):
         posicion_inicial.setX(posicion_inicial.x() + MARGEN_PARALELO * factor_escala)
-        altura_total = sum(hijo.alto() for hijo in paralelo.hijos) * factor_escala
+        altura_total = sum(hijo.alto() for hijo in paralelo.hijos) 
         altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL * factor_escala
 
         y_actual = posicion_inicial.y() - altura_total / 2
         punto_final_max = posicion_inicial
         for hijo in paralelo.hijos:
-            centro_del_hijo = y_actual + hijo.alto() * factor_escala / 2
+            centro_del_hijo = y_actual + hijo.alto() / 2
             posicion_del_hijo = QPointF(posicion_inicial.x(), centro_del_hijo)
             punto_final = self.dibujar_topologia(hijo, posicion_del_hijo)
             if punto_final.x() > punto_final_max.x():
@@ -188,10 +189,6 @@ class DrawingArea(QWidget):
         # Dibujar círculo de salida
         painter.drawEllipse(QPointF(centro_salida_x + radio_escalado, centro_y), radio_escalado, radio_escalado)
         painter.drawText(QRectF(centro_salida_x - 40 * self.escala + radio_escalado, centro_y - 30 * self.escala, 80 * self.escala, 60 * self.escala), Qt.AlignCenter, "Salida")
-
-        # Logs:
-        print(f"Centro de entrada: {centro_entrada_x, centro_y}")
-        print(f"Centro de salida: {centro_salida_x + radio_escalado, centro_y}")
     
     def draw_connections(self, painter, topologia, punto_de_partida, is_parallel=False):
         if punto_de_partida is None:
@@ -223,9 +220,10 @@ class DrawingArea(QWidget):
     def draw_paralelo_connections(self, painter, paralelo, punto_inicial, factor_escala):
         if punto_inicial is None:
             return None
-
+        
         comienzo_de_rama = QPointF(punto_inicial.x() + MARGEN_PARALELO * factor_escala, punto_inicial.y())
-        altura_total = sum(hijo.alto() for hijo in paralelo.hijos) * factor_escala
+        altura_total = sum(hijo.alto() for hijo in paralelo.hijos)
+        print("Altura total: ", altura_total)
         altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL * factor_escala
 
         # Dibujar línea horizontal antes de la bifurcación
@@ -235,12 +233,15 @@ class DrawingArea(QWidget):
         y_actual = punto_inicial.y() - altura_total / 2
         puntos_finales = []
         for hijo in paralelo.hijos:
-            punto_final_rama_vertical = QPointF(comienzo_de_rama.x(), y_actual + hijo.alto() * factor_escala / 2)
+            print("y_actual: ", y_actual)
+            punto_final_rama_vertical = QPointF(comienzo_de_rama.x(), y_actual + hijo.alto() / 2)
+            print("punto_final_rama_vertical: ", punto_final_rama_vertical)
             painter.drawLine(comienzo_de_rama, punto_final_rama_vertical)
             punto_final_rama_actual = self.draw_connections(painter, hijo, punto_final_rama_vertical, True)
+            print("punto_final_rama_actual: ", punto_final_rama_actual)
             if punto_final_rama_actual is not None:
                 puntos_finales.append(punto_final_rama_actual)
-            y_actual += hijo.alto() * factor_escala + MARGEN_VERTICAL * factor_escala
+            y_actual += hijo.alto() + MARGEN_VERTICAL * factor_escala
         
         if not puntos_finales:
             return punto_inicial
@@ -548,7 +549,7 @@ class DrawingArea(QWidget):
     def encontrar_bloque_mas_a_la_derecha(self):
         if not self.microbloques:
             return None
-        return max(self.microbloques, key=lambda mb: mb.pos().x() + mb.width() * self.escala) # retorna el que tenga mayor x
+        return max(self.microbloques, key=lambda mb: mb.pos().x() + mb.width()) # retorna el que tenga mayor x
 
     def print_topologia(self, topologia, indent=0):
         """
