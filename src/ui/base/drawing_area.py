@@ -41,6 +41,7 @@ class DrawingContent(QWidget):
         self.panning = False
         # self.help_level = "principiante"  # Nivel de ayuda por defecto
         self.load_preview_images()
+        self.load_connection_image()
         self.init_ui()
 
 
@@ -56,6 +57,13 @@ class DrawingContent(QWidget):
             'izquierda': QPixmap(os.path.join(imgs_dir, 'serie.png')),
             'derecha': QPixmap(os.path.join(imgs_dir, 'serie.png'))
         }
+    
+    def load_connection_image(self):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        img_path = os.path.join(current_dir, '..','base', 'imgs')
+        self.connection_image = QPixmap(os.path.join(img_path,'puntoSuma.png'))
+        if self.connection_image.isNull():
+            print(f"Error: No se pudo cargar la imagen en {img_path}")
     
     def resizeEvent(self, event):
         # reinicia el temporizador cada vez que se produce un evento de cambio de tamaño
@@ -368,8 +376,24 @@ class DrawingContent(QWidget):
         for end_point in puntos_finales:
             painter.drawLine(end_point, QPointF(max_x, end_point.y()))
         
+        # punto_de_reconexion = QPointF(max_x, punto_inicial.y())
+        # painter.drawEllipse(punto_de_reconexion, 5 * factor_escala, 5 * factor_escala)
+        
         punto_de_reconexion = QPointF(max_x, punto_inicial.y())
-        painter.drawEllipse(punto_de_reconexion, 5 * factor_escala, 5 * factor_escala)
+        if not self.connection_image.isNull():
+            # Escalamos la imagen según el factor de escala
+            scaled_image = self.connection_image.scaled(
+                int(40 * factor_escala), 
+                int(40 * factor_escala), 
+                Qt.KeepAspectRatio, 
+                Qt.SmoothTransformation
+            )
+            # Convertimos las coordenadas a enteros y ajustamos por el tamaño de la imagen
+            x = int(punto_de_reconexion.x() - scaled_image.width() / 2)
+            y = int(punto_de_reconexion.y() - scaled_image.height() / 2)
+            painter.drawPixmap(x, y, scaled_image)
+        else:
+            painter.drawEllipse(punto_de_reconexion, 5 * factor_escala, 5 * factor_escala)
 
         punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO * factor_escala, punto_inicial.y())
 
