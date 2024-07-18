@@ -91,6 +91,8 @@ class MicroBloque(InterfazTopologia):
         self.padre = padre
         self.nombre = nombre
         self.color = color
+        self.alto_bloque = ALTO
+        self.ancho_bloque = ANCHO
         self.funcion_transferencia = funcion_transferencia
         self.opciones_adicionales = opciones_adicionales
 
@@ -111,11 +113,17 @@ class MicroBloque(InterfazTopologia):
         self.padre.agregar_despues_de(microbloque,self)
     
     def alto(self) -> int:
-        return 80
+        print("alto retornado: ", self.alto_bloque)
+        return self.alto_bloque
     
     def ancho(self) -> int:
-        return 150
+        print("ancho retornado: ", self.ancho_bloque)
+        return self.ancho_bloque
     
+    def escalar(self,ancho:int,alto:int):
+        self.ancho_bloque = ancho
+        self.alto_bloque = alto
+
     def __str__(self) -> str:
         return self.nombre
     

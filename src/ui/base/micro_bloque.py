@@ -3,6 +3,9 @@ from PyQt5.QtGui import QPainter, QColor, QPen
 from PyQt5.QtCore import Qt, QPointF
 from .latex_editor import LatexEditor
 
+ALTO = 80
+ANCHO = 150
+
 class Microbloque(QWidget):
     def __init__(self, parent=None, microbloque_back=None):
         super().__init__(parent)
@@ -24,8 +27,9 @@ class Microbloque(QWidget):
 
     def setScale(self, scale):
         self.escala = scale
-        nuevo_ancho = round(self.ancho * scale)
-        nuevo_alto = round(self.alto * scale)
+        nuevo_ancho = round(ANCHO * scale)
+        nuevo_alto = round(ALTO * scale)
+        self.elemento_back.escalar(nuevo_ancho, nuevo_alto)
         self.setFixedSize(nuevo_ancho, nuevo_alto)
         self.update()
 
