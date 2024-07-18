@@ -61,7 +61,7 @@ class DrawingContent(QWidget):
     def load_connection_image(self):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         img_path = os.path.join(current_dir, '..','base', 'imgs')
-        self.connection_image = QPixmap(os.path.join(img_path,'puntoSuma.png'))
+        self.connection_image = QPixmap(os.path.join(img_path,'puntoSuma_positiva.png'))
         if self.connection_image.isNull():
             print(f"Error: No se pudo cargar la imagen en {img_path}")
     
@@ -131,7 +131,32 @@ class DrawingContent(QWidget):
         factor_ancho = ancho_ventana / 600 
         factor_alto = alto_ventana / 600
         self.escala = min(factor_ancho, factor_alto)  # Usamos el menor para mantener la proporción
-        print("usando factor de escala: ", self.escala)    
+        print("usando factor de escala: ", self.escala)
+    
+    def ajustar_tamano_widget(self):
+        if self.microbloques:
+            max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
+            max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
+            nuevo_ancho = max(int(max_x + 400), self.scroll_area.viewport().width())
+            nuevo_alto = max(int(max_y + 100), self.scroll_area.viewport().height())
+            self.setMinimumSize(nuevo_ancho, nuevo_alto)
+        else:
+            self.setMinimumSize(self.scroll_area.viewport().width(), self.scroll_area.viewport().height())
+    
+    def wheelEvent(self, event):
+        if event.modifiers() & Qt.ControlModifier:
+            zoom_in_factor = 1.25
+            zoom_out_factor = 1 / zoom_in_factor
+
+            if event.angleDelta().y() > 0:
+                self.scale_factor *= zoom_in_factor
+            else:
+                self.scale_factor *= zoom_out_factor
+
+            self.scale_factor = max(0.1, min(self.scale_factor, 10.0))
+            self.update()
+        else:
+            super().wheelEvent(event)     
 
     def load_microbloques(self):
         for microbloque in self.microbloques:
@@ -141,6 +166,7 @@ class DrawingContent(QWidget):
         self.calcular_factor_escala()
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO + 100, (self.height() / 2)))
         #self.print_topologia(self.macrobloque.modelo.topologia)
+        self.ajustar_tamano_widget()
         self.update()
     
     
@@ -348,13 +374,8 @@ class DrawingContent(QWidget):
 
         max_x = max(point.x() for point in puntos_finales) + MARGEN_PARALELO * factor_escala
         
-        for end_point in puntos_finales:
-            painter.drawLine(end_point, QPointF(max_x, end_point.y()))
-        
-        # punto_de_reconexion = QPointF(max_x, punto_inicial.y())
-        # painter.drawEllipse(punto_de_reconexion, 5 * factor_escala, 5 * factor_escala)
-        
         punto_de_reconexion = QPointF(max_x, punto_inicial.y())
+        
         if not self.connection_image.isNull():
             # Escalamos la imagen según el factor de escala
             scaled_image = self.connection_image.scaled(
@@ -369,6 +390,13 @@ class DrawingContent(QWidget):
             painter.drawPixmap(x, y, scaled_image)
         else:
             painter.drawEllipse(punto_de_reconexion, 5 * factor_escala, 5 * factor_escala)
+        
+        for end_point in puntos_finales:
+            painter.drawLine(end_point, QPointF(max_x, end_point.y()))
+        
+        # punto_de_reconexion = QPointF(max_x, punto_inicial.y())
+        # painter.drawEllipse(punto_de_reconexion, 5 * factor_escala, 5 * factor_escala)
+        
 
         punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO * factor_escala, punto_inicial.y())
 
