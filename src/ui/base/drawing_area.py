@@ -1,5 +1,6 @@
+
 import os
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea,QTextEdit,QToolTip,QApplication
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea,QTextEdit,QToolTip,QApplication,QComboBox
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush,QTransform,QPixmap,QCursor
 from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer,QSize,QPoint
 from .micro_bloque import Microbloque
@@ -19,6 +20,17 @@ class DrawingArea(QScrollArea):
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        
+        
+        # Añadir ComboBox para zoom
+        self.zoom_combo = QComboBox(self)
+        self.zoom_combo.addItems(['25%', '50%', '75%', '100%', '125%', '150%', '200%'])
+        self.zoom_combo.setCurrentText('100%')
+        self.zoom_combo.currentTextChanged.connect(self.zoom_changed)
+
+    def zoom_changed(self, value):
+        zoom = int(value.rstrip('%'))
+        self.content.set_zoom(zoom)
 
 class DrawingContent(QWidget):
     def __init__(self, macrobloque=None, ventana=None, scroll_area=None):
@@ -39,12 +51,18 @@ class DrawingContent(QWidget):
         self.resize_timer.timeout.connect(self.resize_retardado)
         self.scale_factor = 1.0
         self.panning = False
+        self.zoom_level = 100  # Porcentaje de zoom, 100 es el tamaño normal
         # self.help_level = "principiante"  # Nivel de ayuda por defecto
         self.load_preview_images()
         self.load_connection_image()
         self.init_ui()
+    
+    def set_zoom(self, zoom_percentage):
+        self.zoom_level = zoom_percentage
+        self.scale_factor = self.zoom_level / 100.0
+        self.update()
 
-
+    
     def load_preview_images(self):
         # Obtener la ruta del directorio actual del script
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -82,7 +100,7 @@ class DrawingContent(QWidget):
         self.customContextMenuRequested.connect(self.mostrar_menu_contextual) # permite agregar nuestro propio menu contextual
         # Agregar botón de ayuda
         self.help_button = QPushButton("?", self)
-        self.help_button.setGeometry(10, 10, 30, 30)
+        self.help_button.setGeometry(10, 60, 30, 30)
         self.help_button.clicked.connect(self.show_help)
         self.help_button.setToolTip("Mostrar ayuda")
     
@@ -133,7 +151,7 @@ class DrawingContent(QWidget):
         self.escala = min(factor_ancho, factor_alto)  # Usamos el menor para mantener la proporción
         print("usando factor de escala: ", self.escala)
     
-    def ajustar_tamano_widget(self):
+    def ajustar_tamanio_widget(self):
         if self.microbloques:
             max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
             max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
@@ -145,16 +163,11 @@ class DrawingContent(QWidget):
     
     def wheelEvent(self, event):
         if event.modifiers() & Qt.ControlModifier:
-            zoom_in_factor = 1.25
-            zoom_out_factor = 1 / zoom_in_factor
-
-            if event.angleDelta().y() > 0:
-                self.scale_factor *= zoom_in_factor
+            delta = event.angleDelta().y()
+            if delta > 0:
+                self.set_zoom(min(self.zoom_level + 10, 500))  # Aumentar zoom
             else:
-                self.scale_factor *= zoom_out_factor
-
-            self.scale_factor = max(0.1, min(self.scale_factor, 10.0))
-            self.update()
+                self.set_zoom(max(self.zoom_level - 10, 10))  # Disminuir zoom
         else:
             super().wheelEvent(event)     
 
@@ -166,7 +179,7 @@ class DrawingContent(QWidget):
         self.calcular_factor_escala()
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO + 100, (self.height() / 2)))
         #self.print_topologia(self.macrobloque.modelo.topologia)
-        self.ajustar_tamano_widget()
+        self.ajustar_tamanio_widget()
         self.update()
     
     
@@ -237,6 +250,9 @@ class DrawingContent(QWidget):
         transform = QTransform().scale(self.scale_factor, self.scale_factor)
         painter.setTransform(transform)
         
+        # Aplicar la transformación de escala
+        painter.scale(self.scale_factor, self.scale_factor)
+        
         # Dibujar borde alrededor de los microbloques seleccionados
         painter.setPen(QPen(Qt.blue, 2, Qt.DashLine))
         for microbloque in self.selected_microbloques[:]:  # Usamos una copia de la lista
@@ -259,6 +275,7 @@ class DrawingContent(QWidget):
             punto_inicial = QPointF((50 + RADIO) * self.escala + RADIO * self.escala, centro_y)
             punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, punto_inicial)
             self.draw_final_connection(painter, punto_final, centro_y)
+            
 
     def draw_final_connection(self, painter, start_point, centro_y):
         if start_point is None:
@@ -873,4 +890,5 @@ class DrawingContent(QWidget):
         
         painter.restore()
     
+
 
