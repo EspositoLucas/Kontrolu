@@ -1,11 +1,11 @@
-
 import os
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea,QTextEdit,QToolTip,QApplication,QComboBox
-from PyQt5.QtGui import QPainter, QPen, QColor, QBrush,QTransform,QPixmap,QCursor
-from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer,QSize,QPoint
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QToolTip, QApplication, QComboBox,QShortcut
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QTransform, QPixmap, QCursor,QKeySequence
+from PyQt5.QtCore import Qt, QPointF, QRectF, QTimer, QSize, QPoint, QLineF
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
-from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
+from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque,ANCHO,ALTO
+
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
 BUTTON_SIZE = 20
@@ -15,22 +15,45 @@ MARGEN_PARALELO = 20
 class DrawingArea(QScrollArea):
     def __init__(self, parent=None, modelo=None):
         super().__init__(parent)
-        self.content = DrawingContent(parent, modelo, self)  # Pasamos self como referencia
+        self.content = DrawingContent(parent, modelo, self)
         self.setWidget(self.content)
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         
-        
-        # Añadir ComboBox para zoom
         self.zoom_combo = QComboBox(self)
         self.zoom_combo.addItems(['25%', '50%', '75%', '100%', '125%', '150%', '200%'])
         self.zoom_combo.setCurrentText('100%')
         self.zoom_combo.currentTextChanged.connect(self.zoom_changed)
+        
+        # Agregar atajos de teclado para zoom
+        self.zoom_in_shortcut = QShortcut(QKeySequence.ZoomIn, self)
+        self.zoom_in_shortcut.activated.connect(self.zoom_in)
+        self.zoom_out_shortcut = QShortcut(QKeySequence.ZoomOut, self)
+        self.zoom_out_shortcut.activated.connect(self.zoom_out)
 
     def zoom_changed(self, value):
         zoom = int(value.rstrip('%'))
         self.content.set_zoom(zoom)
+
+    def zoom_in(self):
+        current_index = self.zoom_combo.currentIndex()
+        if current_index < self.zoom_combo.count() - 1:
+            self.zoom_combo.setCurrentIndex(current_index + 1)
+
+    def zoom_out(self):
+        current_index = self.zoom_combo.currentIndex()
+        if current_index > 0:
+            self.zoom_combo.setCurrentIndex(current_index - 1)
+
+    def wheelEvent(self, event):
+        if event.modifiers() & Qt.ControlModifier:
+            if event.angleDelta().y() > 0:
+                self.zoom_in()
+            else:
+                self.zoom_out()
+        else:
+            super().wheelEvent(event)
 
 class DrawingContent(QWidget):
     def __init__(self, macrobloque=None, ventana=None, scroll_area=None):
@@ -60,9 +83,82 @@ class DrawingContent(QWidget):
     def set_zoom(self, zoom_percentage):
         self.zoom_level = zoom_percentage
         self.scale_factor = self.zoom_level / 100.0
+        self.update_all_elements()
         self.update()
 
-    
+    def update_all_elements(self):
+        centro_y = self.calcular_punto_medio_topologia()
+        ancho_total = self.width()
+        
+        # Actualizar posición de los círculos de entrada y salida
+        entrada_x = 130 * self.scale_factor
+        salida_x = ancho_total - 130 * self.scale_factor
+        
+        # Actualizar posiciones de los microbloques
+        num_microbloques = len(self.microbloques)
+        if num_microbloques > 0:
+            espacio_disponible = salida_x - entrada_x
+            espacio_entre_bloques = espacio_disponible / (num_microbloques + 1)
+            
+            for i, microbloque in enumerate(self.microbloques):
+                nueva_x = entrada_x + espacio_entre_bloques * (i + 1) - microbloque.width() / 2
+                nueva_y = centro_y - microbloque.height() / 2
+                microbloque.setPos(QPointF(nueva_x, nueva_y))
+                microbloque.setScale(self.scale_factor)
+        
+        # Actualizar líneas de conexión
+        self.lineas_conexion = []
+        x_actual = entrada_x + RADIO * self.scale_factor
+        for i, microbloque in enumerate(self.microbloques):
+            x_inicio = x_actual
+            x_fin = microbloque.pos().x()
+            self.lineas_conexion.append(QLineF(x_inicio, centro_y, x_fin, centro_y))
+            x_actual = microbloque.pos().x() + microbloque.width()
+        
+        # Línea final hasta la salida
+        self.lineas_conexion.append(QLineF(x_actual, centro_y, salida_x - RADIO * self.scale_factor, centro_y))
+        
+        self.update()
+
+    def update_connections(self):
+        self.lineas_conexion = []
+        centro_y = self.calcular_punto_medio_topologia()
+        x_actual = (130 + RADIO) * self.scale_factor
+        
+        for i, microbloque in enumerate(self.microbloques):
+            x_inicio = x_actual
+            x_fin = microbloque.pos().x()
+            self.lineas_conexion.append(QLineF(x_inicio, centro_y, x_fin, centro_y))
+            x_actual = microbloque.pos().x() + microbloque.width()
+        
+        self.lineas_conexion.append(QLineF(x_actual, centro_y, self.width() - (130 + RADIO) * self.scale_factor, centro_y))
+
+        
+    def update_add_buttons(self):
+        if self.selected_microbloque:
+            mb_pos = self.selected_microbloque.pos()
+            mb_width = self.selected_microbloque.width()
+            mb_height = self.selected_microbloque.height()
+            button_size = int(BUTTON_SIZE * self.scale_factor)
+            
+            positions = [
+                ('arriba', QPointF(mb_pos.x() + mb_width/2, mb_pos.y() - button_size/2)),
+                ('abajo', QPointF(mb_pos.x() + mb_width/2, mb_pos.y() + mb_height + button_size/2)),
+                ('izquierda', QPointF(mb_pos.x() - button_size/2, mb_pos.y() + mb_height/2)),
+                ('derecha', QPointF(mb_pos.x() + mb_width + button_size/2, mb_pos.y() + mb_height/2))
+            ]
+            
+            for i, (direction, pos) in enumerate(positions):
+                if i < len(self.add_buttons):
+                    button = self.add_buttons[i]
+                    button.setGeometry(
+                        int(pos.x() - button_size/2),
+                        int(pos.y() - button_size/2),
+                        button_size,
+                        button_size
+                    )
+
+
     def load_preview_images(self):
         # Obtener la ruta del directorio actual del script
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -87,6 +183,7 @@ class DrawingContent(QWidget):
         # reinicia el temporizador cada vez que se produce un evento de cambio de tamaño
         super().resizeEvent(event)
         self.resize_timer.start(200) # 200 ms
+        self.update_all_elements()
 
     def resize_retardado(self):
         self.hide_add_buttons()
@@ -267,15 +364,16 @@ class DrawingContent(QWidget):
 
         self.draw_io_blocks(painter)
         
+        
         centro_y = self.calcular_punto_medio_topologia()
-
+        
         if not self.microbloques:
             self.draw_empty_connection(painter, centro_y)
         else:
             punto_inicial = QPointF((50 + RADIO) * self.escala + RADIO * self.escala, centro_y)
             punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, punto_inicial)
             self.draw_final_connection(painter, punto_final, centro_y)
-            
+        
 
     def draw_final_connection(self, painter, start_point, centro_y):
         if start_point is None:
@@ -337,14 +435,14 @@ class DrawingContent(QWidget):
         if punto_de_partida is None:
             return None
 
-        painter.setPen(QPen(Qt.black, 2 * self.escala))  # Ajusta el grosor de la línea
+        painter.setPen(QPen(Qt.black, 2 * self.scale_factor))
         
         if isinstance(topologia, TopologiaSerie):
-            return self.draw_serie_connections(painter, topologia, punto_de_partida, self.escala)
+            return self.draw_serie_connections(painter, topologia, punto_de_partida,self.escala)
         elif isinstance(topologia, TopologiaParalelo):
-            return self.draw_paralelo_connections(painter, topologia, punto_de_partida, self.escala)
+            return self.draw_paralelo_connections(painter, topologia, punto_de_partida,self.escala)
         elif isinstance(topologia, MicroBloque):
-            return self.draw_microbloque_connection(painter, topologia, punto_de_partida, is_parallel, self.escala)
+            return self.draw_microbloque_connection(painter, topologia, punto_de_partida, is_parallel)
         else:
             return punto_de_partida
 
@@ -423,13 +521,10 @@ class DrawingContent(QWidget):
         
         return punto_mas_alejado 
     
-    def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo, factor_escala):
+    def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo):
         for mb in self.microbloques:
             if mb.elemento_back == microbloque:
-                if es_paralelo:
-                    punto_final = QPointF(mb.pos().x(), punto_inicial.y())
-                else:
-                    punto_final = mb.pos() + QPointF(0, mb.height() / 2)
+                punto_final = mb.pos() + QPointF(0, mb.height() / 2)
                 
                 if punto_inicial is not None and punto_final is not None:
                     painter.drawLine(punto_inicial, punto_final)
@@ -890,5 +985,6 @@ class DrawingContent(QWidget):
         
         painter.restore()
     
+
 
 
