@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu
-from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
@@ -19,18 +19,23 @@ class DrawingArea(QWidget):
         self.macrobloque = macrobloque
         self.modelo = macrobloque.modelo # es la representacion backend del macrobloque
         self.creating_microbloque = False
+        self.seleccion_multiple = False
         self.new_microbloque_config = {}
         self.add_buttons = []
         self.add_buttons_paralelo = []
+        self.selected_microbloques = []
         self.init_ui()
         
     def init_ui(self):
-        self.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.setFocusPolicy(Qt.StrongFocus) # sirve para permitir que el teclado de la compu interactue con la ventana
+        self.setContextMenuPolicy(Qt.CustomContextMenu) # sirve para poder mostrar un menu contextual (por ejemplo, cuando hago click derecho)
+        self.customContextMenuRequested.connect(self.mostrar_menu_contextual) # permite agregar nuestro propio menu contextual
     
     def load_microbloques(self):
         for microbloque in self.microbloques:
                 microbloque.deleteLater() # elimina cada elemento
         self.microbloques.clear() # vacia la lista de microbloques
+        self.limpiar_seleccion() # si habia seleccionados, los limpia
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
         self.print_topologia(self.macrobloque.modelo.topologia)
         self.update()
@@ -99,14 +104,21 @@ class DrawingArea(QWidget):
         if not self.microbloques:
             self.draw_empty_connection(painter)
         else:
-           punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, QPointF(90, self.height() / 2))
+           punto_inicial = QPointF((50 + RADIO) + RADIO, self.height() / 2)
+           punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, punto_inicial)
            self.draw_final_connection(painter, punto_final) # punto_final es el punto de salida de la última conexión
 
     def draw_final_connection(self, painter, start_point):
         if start_point is None:
             return
 
-        end_point = QPointF(self.width() - 170, self.height() / 2) # end_point es el lugar donde está el bloque de salida
+        mb_mas_lejano = self.encontrar_bloque_mas_a_la_derecha()
+        if mb_mas_lejano:
+            end_x = mb_mas_lejano.pos().x() + mb_mas_lejano.width() + (MARGEN_HORIZONTAL / 2) - RADIO
+        else:
+            end_x = self.width() - (130 + RADIO)
+
+        end_point = QPointF(end_x, self.height() / 2) # end_point es el lugar donde está el bloque de salida
         painter.setPen(QPen(Qt.black, 2))
         painter.drawLine(start_point, end_point)
 
@@ -119,7 +131,8 @@ class DrawingArea(QWidget):
         # Dibujar el botón "+" en el medio
         center = QPointF((entrada.x() + salida.x()) / 2, self.height() / 2)
         button_rect = QRectF(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
-        painter.setBrush(QBrush(Qt.white))
+        button_fill_color = QColor("#ADD8E6")
+        painter.setBrush(QBrush(button_fill_color))
         painter.drawEllipse(button_rect)
         painter.drawText(button_rect, Qt.AlignCenter, "+")
 
@@ -129,17 +142,39 @@ class DrawingArea(QWidget):
     def draw_io_blocks(self, painter):
         painter.setPen(QPen(Qt.black, 2))
         
+        contour_color = QColor(0, 0, 0)  # Negro para el contorno
+        contour_pen = QPen(contour_color, 3)  # Grosor del contorno
+        fill_color = QColor(128, 128, 128)
+        text_color = QColor(255, 255, 255)  # Blanco para el texto
+        text_font = QFont('Arial', int(12))  # Fuente Arial y tamaño ajustado
+
+        painter.setPen(contour_pen)
+        painter.setBrush(QBrush(fill_color))
+
         centro_y = self.height() / 2  # Posición y del centro para ambos círculos
         
         centro_entrada_x = 50 + RADIO  # Posición x del centro del círculo de entrada
         centro_salida_x = self.width() - 130 - RADIO  # Posición x del centro del círculo de salida
         
-        # Dibujar los círculos de entrada y salida
+        # Dibujar el círculo de entrada
         painter.drawEllipse(QPointF(centro_entrada_x, centro_y), RADIO, RADIO)
-        painter.drawText(QRectF(50, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Entrada")
-        
+
+        mb_mas_lejano = self.encontrar_bloque_mas_a_la_derecha()
+        if mb_mas_lejano:
+            centro_salida_x = mb_mas_lejano.pos().x() + mb_mas_lejano.width()  + (MARGEN_HORIZONTAL / 2)
+        else:
+            centro_salida_x = self.width() - (130 + RADIO)
+
+        # Dibujar círculo de salida
         painter.drawEllipse(QPointF(centro_salida_x, centro_y), RADIO, RADIO)
-        painter.drawText(QRectF(self.width()-209, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Salida")
+
+        # Establecer el color y la fuente para el texto
+        painter.setPen(text_color)
+        painter.setFont(text_font)
+
+        # Dibujar texto en los círculos
+        painter.drawText(QRectF(50, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Entrada")
+        painter.drawText(QRectF(centro_salida_x - 40, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Salida")
     
     def draw_connections(self, painter, topologia, punto_de_partida, is_parallel=False):
         if punto_de_partida is None:
@@ -245,22 +280,28 @@ class DrawingArea(QWidget):
     def create_new_microbloque(self, pos, relation=None, reference_structure=None):
         dialog = QDialog(self)
         dialog.setWindowTitle("Nuevo Microbloque")
+        dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
 
         name_input = QLineEdit()
         name_input.setPlaceholderText("Nombre del microbloque")
+        name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(name_input)
 
         color_button = QPushButton("Seleccionar Color")
+        color_button.setStyleSheet("background-color: #444; color: white;")
         color_button.clicked.connect(lambda: self.select_color(color_button))
         layout.addWidget(color_button)
 
         transfer_label = QLabel("Función de Transferencia:")
+        transfer_label.setStyleSheet("color: white;")
         latex_editor = LatexEditor()
+        latex_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(transfer_label)
         layout.addWidget(latex_editor)
 
         save_button = QPushButton("Guardar")
+        save_button.setStyleSheet("background-color: #444; color: white;")
         save_button.clicked.connect(dialog.accept)
         layout.addWidget(save_button)
 
@@ -333,15 +374,45 @@ class DrawingArea(QWidget):
         if not self.microbloques: # si no hay microbloques y se hace click sobre el único botón "+", entonces se crea un microbloque 
             if hasattr(self, 'add_button_rect') and self.add_button_rect.contains(event.pos()):
                 self.create_new_microbloque(self.add_button_rect.center())
-        else: # si hay microbloques, se busca el microbloque que se seleccionó
-            for microbloque in self.microbloques:
-                if microbloque.geometry().contains(event.pos()):
-                    self.selected_microbloque = microbloque
-                    self.show_add_buttons(microbloque) # muestra los botones "+" alrededor del microbloque
-                    break
-            else:
-                self.selected_microbloque = None
-                self.hide_add_buttons() # oculta los botones "+"
+        else: 
+            if event.button() == Qt.LeftButton: # si se hace click izquierdo
+                for microbloque in self.microbloques: # si hay microbloques, se busca el microbloque que se seleccionó
+                    if microbloque.geometry().contains(event.pos()):
+                        if self.seleccion_multiple: # si está activa la seleccion multiple
+                            if microbloque in self.selected_microbloques: # si el microbloque seleccionado ya estaba seleccionado
+                                self.selected_microbloques.remove(microbloque) # lo deseleccionamos
+                                microbloque.setSeleccionado(False) # cambiar el color del borde del microbloque deseleccionado
+                            else: # si no está seleccionado
+                                self.selected_microbloques.append(microbloque) # lo agregamos
+                                microbloque.setSeleccionado(True) # cambiar el color del borde del microbloque seleccionado
+                        else: # si no está activada la seleccion multiple, quiere decir que se está queriendo seleccionar 1 microbloque
+                            if self.selected_microbloque: # si ya había un microbloque seleccionado
+                                self.selected_microbloque.setSeleccionado(False)
+                                self.hide_add_buttons() # ocultamos los botones "+"
+                            self.selected_microbloque = microbloque
+                            microbloque.setSeleccionado(True) # cambiar el color del borde del microbloque seleccionado
+                            self.show_add_buttons(microbloque) # muestra los botones "+" alrededor del microbloque
+                        break
+                else: # quiere decir que se hizo click izquierdo pero en un lugar que no es un microbloque
+                    if not self.seleccion_multiple: # si no está activada la seleccion multiple
+                        if self.selected_microbloque: # si ya había un microbloque seleccionado
+                            self.selected_microbloque.setSeleccionado(False) # cambiar el color del borde del microbloque deseleccionado
+                        self.selected_microbloque = None
+                        self.hide_add_buttons() # oculta los botones "+"
+
+            elif event.button() == Qt.RightButton: # si se hace click derecho
+                self.hide_add_buttons()
+                for microbloque in self.microbloques: # busca el microbloque que se seleccionó
+                    if microbloque.geometry().contains(event.pos()):
+                        if not self.seleccion_multiple: # si no está activada la seleccion multiple
+                            self.selected_microbloque = microbloque # seleccionamos el microbloque
+                            microbloque.setSeleccionado(True) # cambiar el color del borde del microbloque seleccionado
+                        break
+                else: # si se hizo click derecho pero en un lugar que no es un microbloque
+                    if self.selected_microbloque:
+                        self.selected_microbloque.setSeleccionado(False)
+                    self.selected_microbloque = None
+                    self.limpiar_seleccion()
         
         self.update()
 
@@ -356,6 +427,7 @@ class DrawingArea(QWidget):
         
         for direction, pos in positions:
             button = QPushButton("+", self)
+            button.setStyleSheet("background-color: white; color: black;")
             button.setGeometry(int(pos.x() - BUTTON_SIZE/2), int(pos.y() - BUTTON_SIZE/2), BUTTON_SIZE, BUTTON_SIZE)
             button.clicked.connect(lambda _, d=direction: self.show_add_menu(d))
             button.show()
@@ -368,6 +440,11 @@ class DrawingArea(QWidget):
 
     def show_add_menu(self, direction):
         menu = QMenu(self)
+        menu.setStyleSheet("""
+            QMenu {
+                border: 2px solid black;  /* Agrega un borde negro */
+            }
+        """)
         micro_back = self.selected_microbloque.elemento_back
         parent_structures = micro_back.get_parent_structures()
         for parent in [[micro_back, 0]] + parent_structures:
@@ -376,6 +453,66 @@ class DrawingArea(QWidget):
         
         button = self.sender()
         menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
+    
+    def mostrar_menu_contextual(self, position):
+        context_menu = QMenu(self) # creamos el menu
+        context_menu.setStyleSheet("""
+            QMenu {
+                border: 2px solid black;  /* Agrega un borde negro */
+            }
+        """)
+        if self.seleccion_multiple and len(self.selected_microbloques) > 0: # si está activa la seleccion multiple y hay microbloques seleccionados
+            delete_action = QAction("Eliminar microbloques", self) # definimos una opción: será la accion de eliminar los microbloques seleccionados
+            delete_action.triggered.connect(lambda: self.delete_selected_microbloques()) # la funcion a la que se llama cuando se elige esa opción
+            context_menu.addAction(delete_action) # agregamos la opción al menu
+        elif self.selected_microbloque: # si se seleccionó un microbloque
+            delete_action = QAction("Eliminar microbloque", self) # definimos una opción: será la accion de eliminar el microbloque
+            delete_action.triggered.connect(lambda: self.delete_microbloque(self.selected_microbloque)) # la funcion a la que se llama cuando se elige esa opción
+            context_menu.addAction(delete_action) # agregamos la opción al menu
+        if context_menu.actions(): # si hay opciones en el menu
+            context_menu.exec_(self.mapToGlobal(position)) # mostramos el menu en la posición del mouse
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Delete: # si se aprieta la tecla "Delete" ("Suprimir")
+            if self.seleccion_multiple and self.selected_microbloques: # si está activa la seleccion multiple y hay microbloques seleccionados
+                self.delete_selected_microbloques() # borramos los microbloques seleccionados
+            elif self.selected_microbloque: # si hay un microbloque seleccionado (y no está activa la seleccion multiple)
+                self.delete_microbloque(self.selected_microbloque) # borramos el microbloque seleccionado
+        else:
+            super().keyPressEvent(event)
+
+    def delete_microbloque(self, microbloque):
+        self.microbloques.remove(microbloque)
+        microbloque.elemento_back.borrar_elemento()
+        microbloque.deleteLater()
+        self.selected_microbloque = None
+        self.hide_add_buttons()
+        self.load_microbloques()
+        self.update()
+
+    def delete_selected_microbloques(self):
+        for microbloque in self.selected_microbloques:
+            self.microbloques.remove(microbloque)
+            microbloque.elemento_back.borrar_elemento()
+            microbloque.deleteLater()
+            self.hide_add_buttons()
+        self.selected_microbloques.clear() # limpio la lista de microbloques seleccionados
+        self.load_microbloques()
+        self.update()
+
+    def set_seleccion_multiple(self, valor):
+        self.seleccion_multiple = valor # seteamos el valor
+        if not valor: # si se deselecciona la opción de seleccionar varios
+            self.limpiar_seleccion() # limpiamos la selección
+        self.update()
+
+    def limpiar_seleccion(self):
+        for microbloque in self.selected_microbloques:
+            microbloque.setSeleccionado(False)
+        self.selected_microbloques.clear()
+        if self.selected_microbloque:
+            self.selected_microbloque.setSeleccionado(False)
+            self.selected_microbloque = None
 
     def get_structure_name(self, estructura):
         nodo = estructura[0]
@@ -400,6 +537,11 @@ class DrawingArea(QWidget):
                 relation = 'despues'
             
             self.create_new_microbloque(self.selected_microbloque.pos(), relation, estructura_de_referencia)    
+
+    def encontrar_bloque_mas_a_la_derecha(self):
+        if not self.microbloques:
+            return None
+        return max(self.microbloques, key=lambda mb: mb.pos().x() + mb.width()) # retorna el que tenga mayor x
 
     def print_topologia(self, topologia, indent=0):
         """
