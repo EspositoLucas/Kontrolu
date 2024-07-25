@@ -24,6 +24,7 @@ class DrawingArea(QWidget):
         self.add_buttons = []
         self.add_buttons_paralelo = []
         self.selected_microbloques = []
+        self.punto_salida_actual = None
         self.init_ui()
         
     def init_ui(self):
@@ -112,11 +113,11 @@ class DrawingArea(QWidget):
         if start_point is None:
             return
 
-        mb_mas_lejano = self.encontrar_bloque_mas_a_la_derecha()
-        if mb_mas_lejano:
-            end_x = mb_mas_lejano.pos().x() + mb_mas_lejano.width() + (MARGEN_HORIZONTAL / 2) - RADIO
+        if start_point.x() < self.punto_salida_actual.x():
+            end_x = self.punto_salida_actual.x()
         else:
-            end_x = self.width() - (130 + RADIO)
+            self.punto_salida_actual.setX(start_point.x() + MARGEN_HORIZONTAL)
+            end_x = self.punto_salida_actual.x()
 
         end_point = QPointF(end_x, self.height() / 2) # end_point es el lugar donde está el bloque de salida
         painter.setPen(QPen(Qt.black, 2))
@@ -126,6 +127,7 @@ class DrawingArea(QWidget):
         painter.setPen(QPen(Qt.black, 2))
         entrada = QPointF(130, self.height() / 2)
         salida = QPointF(self.width() - 210, self.height() / 2)
+        self.punto_salida_actual = salida
         painter.drawLine(entrada, salida)
         
         # Dibujar el botón "+" en el medio
@@ -159,11 +161,10 @@ class DrawingArea(QWidget):
         # Dibujar el círculo de entrada
         painter.drawEllipse(QPointF(centro_entrada_x, centro_y), RADIO, RADIO)
 
-        mb_mas_lejano = self.encontrar_bloque_mas_a_la_derecha()
-        if mb_mas_lejano:
-            centro_salida_x = mb_mas_lejano.pos().x() + mb_mas_lejano.width()  + (MARGEN_HORIZONTAL / 2)
-        else:
+        if not self.punto_salida_actual:
             centro_salida_x = self.width() - (130 + RADIO)
+        else:
+            centro_salida_x = self.punto_salida_actual.x() + RADIO
 
         # Dibujar círculo de salida
         painter.drawEllipse(QPointF(centro_salida_x, centro_y), RADIO, RADIO)
