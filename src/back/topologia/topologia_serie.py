@@ -37,7 +37,6 @@ class TopologiaSerie(InterfazTopologia):
         self.hijos = [TopologiaParalelo(microbloqueNuevo=microbloque,serie=TopologiaSerie(lista_micros=self.hijos),arriba=False,padre=self)]
     
 
-
     def agregar_arriba_de(self,microbloque:MicroBloque,actual:MicroBloque):
         indice = self.hijos.index(actual)
         paralelo = TopologiaParalelo(microbloqueNuevo=microbloque,microbloque2=actual,arriba=True,padre=self)
@@ -81,7 +80,6 @@ class TopologiaSerie(InterfazTopologia):
     
     def ancho(self) -> int:
         return sum(map(lambda x: x.ancho(),self.hijos))
-
 
     def __str__(self):
         return "SERIE: " + str(list(map(lambda hijo: str(hijo),self.hijos)))

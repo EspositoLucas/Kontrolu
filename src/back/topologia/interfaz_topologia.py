@@ -23,7 +23,6 @@ class InterfazTopologia():
 
     def borrar_elemento(self,elemento):
         self.hijos.remove(elemento)
-        pass  
 
     def reemplazar_elemento(self,elemento,nuevo):
         self.hijos[self.hijos.index(elemento)] = nuevo

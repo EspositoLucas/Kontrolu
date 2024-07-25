@@ -25,5 +25,3 @@ class PuntoSuma(MacroVista):
         if not self.pixmap.isNull():
             painter = QtGui.QPainter(self)
             painter.drawPixmap(self.rect(), self.pixmap)
-
-        
