@@ -108,6 +108,8 @@ class DrawingArea(QWidget):
            punto_inicial = QPointF((50 + RADIO) + RADIO, self.height() / 2)
            punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, punto_inicial)
            self.draw_final_connection(painter, punto_final) # punto_final es el punto de salida de la última conexión
+           
+           self.update()
 
     def draw_final_connection(self, painter, start_point):
         if start_point is None:
@@ -122,6 +124,8 @@ class DrawingArea(QWidget):
         end_point = QPointF(end_x, self.height() / 2) # end_point es el lugar donde está el bloque de salida
         painter.setPen(QPen(Qt.black, 2))
         painter.drawLine(start_point, end_point)
+        
+        self.update()
 
     def draw_empty_connection(self, painter):
         painter.setPen(QPen(Qt.black, 2))
@@ -140,6 +144,8 @@ class DrawingArea(QWidget):
 
         # Guardar la posición del botón para detectar clics
         self.add_button_rect = button_rect
+        
+        self.update()
 
     def draw_io_blocks(self, painter):
         painter.setPen(QPen(Qt.black, 2))
@@ -166,6 +172,10 @@ class DrawingArea(QWidget):
         else:
             centro_salida_x = self.punto_salida_actual.x() + RADIO
 
+        if not self.microbloques:
+            centro_salida_x = self.width() - (130 + RADIO)
+            self.punto_salida_actual = None
+
         # Dibujar círculo de salida
         painter.drawEllipse(QPointF(centro_salida_x, centro_y), RADIO, RADIO)
 
@@ -176,6 +186,8 @@ class DrawingArea(QWidget):
         # Dibujar texto en los círculos
         painter.drawText(QRectF(50, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Entrada")
         painter.drawText(QRectF(centro_salida_x - 40, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Salida")
+        
+        self.update()
     
     def draw_connections(self, painter, topologia, punto_de_partida, is_parallel=False):
         if punto_de_partida is None:
@@ -191,6 +203,7 @@ class DrawingArea(QWidget):
             return self.draw_microbloque_connection(painter, topologia, punto_de_partida, is_parallel)
         else:
             return punto_de_partida
+        
 
     def draw_serie_connections(self, painter, serie, punto_inicial):
         """
