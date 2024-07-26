@@ -13,10 +13,11 @@ class LatexEditor(QWidget):
     def init_ui(self, initial_latex):
         layout = QVBoxLayout()
 
-        self.preview_label = QLabel("Funcion de Transferencia")
+        self.preview_label = QLabel("Vista previa:")
         layout.addWidget(self.preview_label)
 
         self.web_view = QWebEngineView()
+        self.web_view.setFixedHeight(50)
         channel = QWebChannel()
         self.web_view.page().setWebChannel(channel)
         channel.registerObject("latex_editor", self)
@@ -48,12 +49,12 @@ class LatexEditor(QWidget):
         layout.addWidget(self.web_view)
 
         self.editor = QTextEdit()
+        self.editor.setFixedHeight(50)
         self.editor.setText(initial_latex)
         self.editor.textChanged.connect(self.update_preview)
         layout.addWidget(self.editor)
 
         self.setLayout(layout)
-
         self.update_preview()
 
     def update_preview(self):
@@ -66,3 +67,4 @@ class LatexEditor(QWidget):
 
     def set_latex(self, latex):
         self.editor.setText(latex)
+        self.update_preview()
