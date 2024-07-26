@@ -119,15 +119,38 @@ class DrawingContent(QWidget):
         help_dialog.setLayout(layout)
         help_dialog.exec_()
     
+    # def ajustar_tamanio_widget(self):
+    #     if self.microbloques:
+    #         max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
+    #         max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
+    #         nuevo_ancho = max(int(max_x + 700), self.scroll_area.viewport().width())
+    #         nuevo_alto = max(int(max_y + 300), self.scroll_area.viewport().height())
+    #         self.setMinimumSize(nuevo_ancho, nuevo_alto)
+    #     else:
+    #         self.setMinimumSize(self.scroll_area.viewport().width(), self.scroll_area.viewport().height())
+    
     def ajustar_tamanio_widget(self):
+        margen_x = 700  # Margen horizontal
+        margen_y = 300  # Margen vertical
+        
         if self.microbloques:
             max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
             max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
-            nuevo_ancho = max(int(max_x + 700), self.scroll_area.viewport().width())
-            nuevo_alto = max(int(max_y + 300), self.scroll_area.viewport().height())
-            self.setMinimumSize(nuevo_ancho, nuevo_alto)
+            
+            nuevo_ancho = max(int(max_x + margen_x), self.scroll_area.viewport().width())
+            nuevo_alto = max(int(max_y + margen_y), self.scroll_area.viewport().height())
+        
         else:
-            self.setMinimumSize(self.scroll_area.viewport().width(), self.scroll_area.viewport().height())
+            nuevo_ancho = self.scroll_area.viewport().width()
+            nuevo_alto = self.scroll_area.viewport().height()
+        
+        # Ajustar el tamaño mínimo solo si es necesario
+        if nuevo_ancho > self.width() or nuevo_alto > self.height():
+            self.setMinimumSize(nuevo_ancho, nuevo_alto)
+        
+        self.update()
+    
+    
     
     def mouseMoveEvent(self, event):
         if self.panning and self.last_pan_pos:

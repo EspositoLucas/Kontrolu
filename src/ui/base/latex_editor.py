@@ -9,6 +9,8 @@ class LatexEditor(QWidget):
     def __init__(self, initial_latex="", parent=None):
         super().__init__(parent)
         self.init_ui(initial_latex)
+        # self.load_saved_content()
+        self.connect_web_signals()
 
     def init_ui(self, initial_latex):
         layout = QVBoxLayout()
@@ -23,27 +25,57 @@ class LatexEditor(QWidget):
         channel.registerObject("latex_editor", self)
         
         html_content = """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML"></script>
-            <script>
-                MathJax.Hub.Config({
-                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
-                });
-                new QWebChannel(qt.webChannelTransport, function (channel) {
-                    window.latex_editor = channel.objects.latex_editor;
-                });
-                function updateLatex(latex) {
-                    document.getElementById('latex-content').innerHTML = latex;
-                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+  <!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <script>
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$','$'], ['\\(','\\)']],
+                processEscapes: true
+            },
+            TeX: {
+                equationNumbers: { autoNumber: "AMS" },
+                extensions: ["AMSmath.js", "AMSsymbols.js"]
+            },
+            messageStyle: "none"
+        });
+
+        function updateLatex(latex) {
+            console.log("updateLatex called with:", latex);
+            var content = document.getElementById('latex-content');
+            if (content) {
+                content.innerHTML = '$$' + latex + '$$';
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, content]);
+            } else {
+                console.error("Element 'latex-content' not found");
+            }
+        }
+
+        function initWebChannel() {
+            new QWebChannel(qt.webChannelTransport, function (channel) {
+                window.latex_editor = channel.objects.latex_editor;
+                console.log("QWebChannel initialized");
+                if (window.latex_editor && typeof window.latex_editor.get_latex === 'function') {
+                    window.latex_editor.get_latex(function(initialLatex) {
+                        console.log("Initial LaTeX:", initialLatex);
+                        updateLatex(initialLatex);
+                    });
+                } else {
+                    console.error("latex_editor or get_latex not available");
                 }
-            </script>
-        </head>
-        <body>
-            <div id="latex-content"></div>
-        </body>
-        </html>
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", initWebChannel);
+    </script>
+</head>
+<body>
+    <div id="latex-content" style="font-size: 16px;"></div>
+</body>
+</html>
         """
         self.web_view.setHtml(html_content)
         layout.addWidget(self.web_view)
@@ -59,8 +91,26 @@ class LatexEditor(QWidget):
 
     def update_preview(self):
         latex = self.editor.toPlainText()
-        self.web_view.page().runJavaScript(f"updateLatex('${latex}$');")
+        escaped_latex = latex.replace('\\', '\\\\').replace("'", "\\'")
+        js_code = f"console.log('Updating LaTeX:', '{escaped_latex}'); window.updateLatex('{escaped_latex}');"
+        self.web_view.page().runJavaScript(js_code)
         self.latex_changed.emit(latex)
+        
+    def load_saved_content(self):
+        latex = self.get_latex()
+        escaped_latex = latex.replace('\\', '\\\\').replace("'", "\\'")
+        js_code = f"console.log('Loading saved content:', '{escaped_latex}'); window.updateLatex('{escaped_latex}');"
+        self.web_view.page().runJavaScript(js_code)
+        
+    def connect_web_signals(self):
+        self.web_view.loadFinished.connect(self.on_load_finished)
+
+    def on_load_finished(self, ok):
+        if ok:
+            print("Web page loaded successfully")
+            self.load_saved_content()
+        else:
+            print("Failed to load web page")
 
     def get_latex(self):
         return self.editor.toPlainText()

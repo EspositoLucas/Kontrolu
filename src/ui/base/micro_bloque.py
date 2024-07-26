@@ -110,7 +110,6 @@ class Microbloque(QWidget):
             nueva_funcion = latex_editor.get_latex()
             self.elemento_back.funcion_transferencia = nueva_funcion
             self.funcion_transferencia = nueva_funcion
-            nueva_funcion.latex_editor.update_preview()
             
             for i in range(layout.count()):
                 widget = layout.itemAt(i).widget()
