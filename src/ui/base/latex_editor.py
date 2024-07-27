@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
 
@@ -9,7 +9,6 @@ class LatexEditor(QWidget):
     def __init__(self, initial_latex="", parent=None):
         super().__init__(parent)
         self.init_ui(initial_latex)
-        # self.load_saved_content()
         self.connect_web_signals()
 
     def init_ui(self, initial_latex):
@@ -25,12 +24,14 @@ class LatexEditor(QWidget):
         channel.registerObject("latex_editor", self)
         
         html_content = """
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML"></script>
     <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script>
+        var latex_editor;
+
         MathJax.Hub.Config({
             tex2jax: {
                 inlineMath: [['$','$'], ['\\(','\\)']],
@@ -56,10 +57,10 @@ class LatexEditor(QWidget):
 
         function initWebChannel() {
             new QWebChannel(qt.webChannelTransport, function (channel) {
-                window.latex_editor = channel.objects.latex_editor;
+                latex_editor = channel.objects.latex_editor;
                 console.log("QWebChannel initialized");
-                if (window.latex_editor && typeof window.latex_editor.get_latex === 'function') {
-                    window.latex_editor.get_latex(function(initialLatex) {
+                if (latex_editor && typeof latex_editor.get_latex === 'function') {
+                    latex_editor.get_latex(function(initialLatex) {
                         console.log("Initial LaTeX:", initialLatex);
                         updateLatex(initialLatex);
                     });
@@ -70,6 +71,9 @@ class LatexEditor(QWidget):
         }
 
         document.addEventListener("DOMContentLoaded", initWebChannel);
+
+        // Make updateLatex globally accessible
+        window.updateLatex = updateLatex;
     </script>
 </head>
 <body>
@@ -87,20 +91,13 @@ class LatexEditor(QWidget):
         layout.addWidget(self.editor)
 
         self.setLayout(layout)
-        self.update_preview()
 
     def update_preview(self):
         latex = self.editor.toPlainText()
         escaped_latex = latex.replace('\\', '\\\\').replace("'", "\\'")
-        js_code = f"console.log('Updating LaTeX:', '{escaped_latex}'); window.updateLatex('{escaped_latex}');"
+        js_code = f"if(window.updateLatex) {{ window.updateLatex('{escaped_latex}'); }} else {{ console.error('updateLatex not available'); }}"
         self.web_view.page().runJavaScript(js_code)
         self.latex_changed.emit(latex)
-        
-    def load_saved_content(self):
-        latex = self.get_latex()
-        escaped_latex = latex.replace('\\', '\\\\').replace("'", "\\'")
-        js_code = f"console.log('Loading saved content:', '{escaped_latex}'); window.updateLatex('{escaped_latex}');"
-        self.web_view.page().runJavaScript(js_code)
         
     def connect_web_signals(self):
         self.web_view.loadFinished.connect(self.on_load_finished)
@@ -108,7 +105,7 @@ class LatexEditor(QWidget):
     def on_load_finished(self, ok):
         if ok:
             print("Web page loaded successfully")
-            self.load_saved_content()
+            QTimer.singleShot(500, self.update_preview)  # Delay the initial update
         else:
             print("Failed to load web page")
 
