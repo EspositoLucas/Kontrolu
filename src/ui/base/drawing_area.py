@@ -56,10 +56,8 @@ class DrawingContent(QWidget):
                 microbloque.deleteLater() # elimina cada elemento
         self.microbloques.clear() # vacia la lista de microbloques
         self.limpiar_seleccion() # si habia seleccionados, los limpia
-        print("self.height() / 2 en load_microbloques", self.height() / 2)
-        print("iniciando el dibujo en: ", QPointF(ANCHO, (self.height() / 2) - (ALTO / 2)))
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
-        self.print_topologia(self.macrobloque.modelo.topologia)
+        # self.print_topologia(self.macrobloque.modelo.topologia)
         self.ajustar_tamanio_widget()
         self.update()
         
@@ -202,7 +200,6 @@ class DrawingContent(QWidget):
         microbloque = Microbloque(self, microbloque_back)
         microbloque.setParent(self)
         microbloque.setPos(pos)
-        print("Microbloque creado en", pos)
         self.microbloques.append(microbloque)
         microbloque.show()
         self.update()
@@ -278,7 +275,6 @@ class DrawingContent(QWidget):
         self.update()
 
     def draw_io_blocks(self, painter):
-        print("self.height() / 2 en draw_io_blocks", self.height() / 2)
         painter.setPen(QPen(Qt.black, 2))
         
         contour_color = QColor(0, 0, 0)  # Negro para el contorno
