@@ -1,6 +1,6 @@
 import os
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QWidget
 from .drawing_area import DrawingArea
 
@@ -43,7 +43,7 @@ class MacroVista(QPushButton):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.ventana.setWindowIcon(icon)
         
-        self.drawing_area.content.load_microbloques()
+        QTimer.singleShot(100, self.drawing_area.content.load_microbloques)
         
     def init_tool_bar(self):
         toolbar = QToolBar("Herramientas", self.ventana)

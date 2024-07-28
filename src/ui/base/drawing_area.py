@@ -56,28 +56,28 @@ class DrawingContent(QWidget):
                 microbloque.deleteLater() # elimina cada elemento
         self.microbloques.clear() # vacia la lista de microbloques
         self.limpiar_seleccion() # si habia seleccionados, los limpia
+        print("self.height() / 2 en load_microbloques", self.height() / 2)
+        print("iniciando el dibujo en: ", QPointF(ANCHO, (self.height() / 2) - (ALTO / 2)))
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
         self.print_topologia(self.macrobloque.modelo.topologia)
         self.ajustar_tamanio_widget()
         self.update()
         
     def load_preview_images(self):
-        # Obtener la ruta del directorio actual del script
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        # Navegar hacia arriba dos niveles y luego a la carpeta 'imgs'
-        imgs_dir = os.path.join(current_dir, '..', 'base', 'imgs')
+        current_dir = os.path.dirname(os.path.abspath(__file__)) # obtiene la ruta actual del archivo actual
+        imgs_dir = os.path.join(current_dir, '..', 'base', 'imgs') # navega hacia arriba dos niveles y luego a la carpeta 'imgs'
         
-        self.preview_images = {
+        self.preview_images = { # arma las rutas y carga las imagenes
             'arriba': QPixmap(os.path.join(imgs_dir, 'paralelo.png')),
             'abajo': QPixmap(os.path.join(imgs_dir, 'paralelo.png')),
             'izquierda': QPixmap(os.path.join(imgs_dir, 'serie.png')),
             'derecha': QPixmap(os.path.join(imgs_dir, 'serie.png'))
         }
     
-    def load_connection_image(self):
+    def load_connection_image(self): # dibuja la imagen de punto suma en las conexiones de paralelo
         current_dir = os.path.dirname(os.path.abspath(__file__))
         img_path = os.path.join(current_dir, '..','base', 'imgs')
-        self.connection_image = QPixmap(os.path.join(img_path,'puntoSuma_positiva.png'))
+        self.connection_image = QPixmap(os.path.join(img_path, 'puntoSuma_positiva.png'))
         if self.connection_image.isNull():
             print(f"Error: No se pudo cargar la imagen en {img_path}")
     
@@ -119,58 +119,47 @@ class DrawingContent(QWidget):
         help_dialog.setLayout(layout)
         help_dialog.exec_()
     
-    # def ajustar_tamanio_widget(self):
-    #     if self.microbloques:
-    #         max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
-    #         max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
-    #         nuevo_ancho = max(int(max_x + 700), self.scroll_area.viewport().width())
-    #         nuevo_alto = max(int(max_y + 300), self.scroll_area.viewport().height())
-    #         self.setMinimumSize(nuevo_ancho, nuevo_alto)
-    #     else:
-    #         self.setMinimumSize(self.scroll_area.viewport().width(), self.scroll_area.viewport().height())
-    
     def ajustar_tamanio_widget(self):
         margen_x = 700  # Margen horizontal
         margen_y = 300  # Margen vertical
         
-        if self.microbloques:
-            max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
-            max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
+        if self.microbloques: # si hay microbloques
+            max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques) # posicion mas a la derecha de los microbloques
+            max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques) # posicion mas arriba de los microbloques
             
-            nuevo_ancho = max(int(max_x + margen_x), self.scroll_area.viewport().width())
-            nuevo_alto = max(int(max_y + margen_y), self.scroll_area.viewport().height())
+            nuevo_ancho = max(int(max_x + margen_x), self.scroll_area.viewport().width()) # ancho del scroll area
+            nuevo_alto = max(int(max_y + margen_y), self.scroll_area.viewport().height()) # alto del scroll area
         
-        else:
-            nuevo_ancho = self.scroll_area.viewport().width()
-            nuevo_alto = self.scroll_area.viewport().height()
+        else: # si no hay microbloques
+            nuevo_ancho = self.scroll_area.viewport().width() # ancho del scroll area
+            nuevo_alto = self.scroll_area.viewport().height() # alto del scroll area
         
-        # Ajustar el tamaño mínimo solo si es necesario
-        if nuevo_ancho > self.width() or nuevo_alto > self.height():
-            self.setMinimumSize(nuevo_ancho, nuevo_alto)
+        if nuevo_ancho > self.width() or nuevo_alto > self.height(): # si el ancho o el alto del scroll area es mayor al ancho o alto de la ventana
+            self.setMinimumSize(nuevo_ancho, nuevo_alto) # se ajusta el tamaño de la ventana
         
         self.update()
     
     
     
-    def mouseMoveEvent(self, event):
-        if self.panning and self.last_pan_pos:
-            delta = event.pos() - self.last_pan_pos
-            h_bar = self.scroll_area.horizontalScrollBar()
-            v_bar = self.scroll_area.verticalScrollBar()
+    def mouseMoveEvent(self, event): 
+        if self.panning and self.last_pan_pos: # si se está moviendo el mouse y se está haciendo panning (arrastrar la pantalla)
+            delta = event.pos() - self.last_pan_pos # calcula la diferencia entre la posición actual y la última posición
+            h_bar = self.scroll_area.horizontalScrollBar() # obtiene el scrollbar horizontal
+            v_bar = self.scroll_area.verticalScrollBar() # obtiene el scrollbar vertical
             
-            h_bar.setValue(h_bar.value() - delta.x())
-            v_bar.setValue(v_bar.value() - delta.y())
+            h_bar.setValue(h_bar.value() - delta.x()) # mueve el scrollbar horizontal
+            v_bar.setValue(v_bar.value() - delta.y()) # mueve el scrollbar vertical
             
-            self.last_pan_pos = event.pos()
+            self.last_pan_pos = event.pos() # actualiza la última posición
             event.accept()
             return
 
         super().mouseMoveEvent(event)
         
     def mouseReleaseEvent(self, event):
-        if self.panning:
-            self.panning = False
-            self.setCursor(Qt.ArrowCursor)
+        if self.panning: # si se estaba haciendo panning
+            self.panning = False # se desactiva el panning
+            self.setCursor(Qt.ArrowCursor) # se cambia el cursor a la flecha
             event.accept()
             return
 
@@ -213,6 +202,7 @@ class DrawingContent(QWidget):
         microbloque = Microbloque(self, microbloque_back)
         microbloque.setParent(self)
         microbloque.setPos(pos)
+        print("Microbloque creado en", pos)
         self.microbloques.append(microbloque)
         microbloque.show()
         self.update()
@@ -242,7 +232,7 @@ class DrawingContent(QWidget):
         if not self.microbloques:
             self.draw_empty_connection(painter)
         else:
-           punto_inicial = QPointF((50 + RADIO) + RADIO, self.height() / 2)
+           punto_inicial = QPointF((50 + RADIO) + RADIO, self.height() / 2) # punto de inicio de la primera conexión
            punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, punto_inicial)
            self.draw_final_connection(painter, punto_final) # punto_final es el punto de salida de la última conexión
            
@@ -288,6 +278,7 @@ class DrawingContent(QWidget):
         self.update()
 
     def draw_io_blocks(self, painter):
+        print("self.height() / 2 en draw_io_blocks", self.height() / 2)
         painter.setPen(QPen(Qt.black, 2))
         
         contour_color = QColor(0, 0, 0)  # Negro para el contorno
@@ -326,7 +317,6 @@ class DrawingContent(QWidget):
         # Dibujar texto en los círculos
         painter.drawText(QRectF(50, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Entrada")
         painter.drawText(QRectF(centro_salida_x - 40, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Salida")
-        
         self.update()
     
     def draw_connections(self, painter, topologia, punto_de_partida, is_parallel=False):
@@ -410,8 +400,6 @@ class DrawingContent(QWidget):
             painter.drawPixmap(x, y, scaled_image)
         else:
             painter.drawEllipse(punto_de_reconexion, 5 , 5 )
-        # insertar imagen de punto suma en el punto de reconexión
-        painter.drawEllipse(punto_de_reconexion, 5, 5) # TODO: Cambiar por imagen de punto suma
 
         # Punto de reconexión
         punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
@@ -538,10 +526,10 @@ class DrawingContent(QWidget):
             button.setProperty("selected_color", color)
     
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton and event.modifiers() & Qt.ControlModifier:
-            self.panning = True
-            self.last_pan_pos = event.pos()
-            self.setCursor(Qt.ClosedHandCursor)
+        if event.button() == Qt.LeftButton and event.modifiers() & Qt.ControlModifier: # si se hace click izquierdo y se mantiene presionado "Ctrl"
+            self.panning = True # activa el panning (arrastrar la pantalla)
+            self.last_pan_pos = event.pos() # guarda la posición actual
+            self.setCursor(Qt.ClosedHandCursor) # cambia el cursor (mano cerrada)
             event.accept()
             return
         super().mousePressEvent(event)
@@ -639,7 +627,6 @@ class DrawingContent(QWidget):
             # action = menu.addAction(f"Respecto a {self.get_structure_name(parent)}")
             action.triggered.connect(lambda _, s=parent[0]: self.add_microbloque(direction, s))
             
-            # Conectar los eventos de entrada y salida del mouse
             action.hovered.connect(lambda s=parent, d=direction: self.show_preview(d, s))
             action.triggered.connect(self.hide_preview)
         
@@ -648,21 +635,21 @@ class DrawingContent(QWidget):
     
     def show_preview(self, direction, structure):
         if not hasattr(self, 'preview_dialog'):
-            self.preview_dialog = QDialog(self)
-            self.preview_dialog.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint)
-            layout = QVBoxLayout()
-            self.preview_label = QLabel()
-            self.description_label = QLabel()
-            self.description_label.setWordWrap(True)
-            layout.addWidget(self.preview_label)
-            layout.addWidget(self.description_label)
-            self.preview_dialog.setLayout(layout)
+            self.preview_dialog = QDialog(self) # crea un diálogo
+            self.preview_dialog.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint) # le quita el borde
+            layout = QVBoxLayout() # crea un layout vertical
+            self.preview_label = QLabel() # crea un label
+            self.description_label = QLabel() # crea otro label
+            self.description_label.setWordWrap(True) # permite que el texto se ajuste al tamaño del label
+            layout.addWidget(self.preview_label) # agrega el label al layout
+            layout.addWidget(self.description_label) # agrega el otro label al layout
+            self.preview_dialog.setLayout(layout) # agrega el layout al diálogo
         
-        preview_pixmap = self.preview_images[direction].scaled(300, 175, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.preview_label.setPixmap(preview_pixmap)
-        self.description_label.setText(self.get_preview_description(direction, structure))
+        preview_pixmap = self.preview_images[direction].scaled(300, 175, Qt.KeepAspectRatio, Qt.SmoothTransformation) # escala la imagen para que no sea tan grande
+        self.preview_label.setPixmap(preview_pixmap) # muestra la imagen en el label
+        self.description_label.setText(self.get_preview_description(direction, structure)) # muestra la descripción en el otro label
         
-        self.preview_dialog.adjustSize()
+        self.preview_dialog.adjustSize() # ajusta el tamaño del diálogo
         
         # Calcular la posición del diálogo
         cursor_pos = QCursor.pos()
@@ -680,18 +667,18 @@ class DrawingContent(QWidget):
         self.preview_dialog.move(dialog_pos)
         self.preview_dialog.show()
     
-    def hide_preview(self):
-        if hasattr(self, 'preview_dialog'):
-            self.preview_dialog.hide()
+    def hide_preview(self): # oculta el diálogo de vista previa
+        if hasattr(self, 'preview_dialog'): # si existe el diálogo
+            self.preview_dialog.hide() # lo oculta
     
     def get_descriptive_action_text(self, direction, structure_name):
-        direction_text = {
+        direction_text = { # textos segun direccion
             'arriba': "encima de",
             'abajo': "debajo de",
             'izquierda': "antes de",
             'derecha': "después de"
         }
-        return f"Agregar {direction_text[direction]} {structure_name}"
+        return f"Agregar {direction_text[direction]} {structure_name}" # retorna el string formateado segun la dirección y la estructura
 
     def get_structure_name(self, estructura):
         if isinstance(estructura, list):
