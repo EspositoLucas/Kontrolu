@@ -35,7 +35,16 @@ class Configuracion:
                 return f"({self.funcion_efecto}) * ({funcion_transferencia})"
             elif self.tipo == TipoConfiguracion.NUMERICA:
                 return f"({self.valor}) * ({funcion_transferencia})"
-            
+            elif self.tipo == TipoConfiguracion.BOOLEANA:
+                return f"({funcion_transferencia})" if self.valor else "0"
+            elif self.tipo == TipoConfiguracion.ENUMERADA:
+                return f"({self.valores_posibles[self.valor]}) * ({funcion_transferencia})"
         else:
             # TODO: Aplicar efecto indirecto
-            pass
+            if self.efecto:
+                return f"limitar({funcion_transferencia}, {self.funcion_efecto(self.valor)})"
+            if self.tipo == TipoConfiguracion.NUMERICA:
+                return f"limitar({funcion_transferencia}, {self.valor})"
+        return funcion_transferencia
+
+
