@@ -1,5 +1,6 @@
 from __future__ import annotations
 from back.topologia.interfaz_topologia import InterfazTopologia
+from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
 from PyQt5.QtGui import QColor
 
 ANCHO = 150
@@ -93,6 +94,16 @@ class MicroBloque(InterfazTopologia):
         self.color = color
         self.funcion_transferencia = funcion_transferencia
         self.opciones_adicionales = opciones_adicionales
+        self.configuracion = ConfiguracionMicrobloque()
+
+    def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto, valores_posibles, funcion_efecto):
+        self.configuracion.agregar_configuracion(nombre, tipo, valor_por_defecto, efecto, valores_posibles, funcion_efecto)
+    
+    def set_configuracion(self, nombre, valor):
+        self.configuracion.set_configuracion(nombre, valor)
+
+    def aplicar_efecto(self):
+        self.configuracion.aplicar_efecto(self.funcion_transferencia)
 
     def borrar_elemento(self):
         self.padre.borrar_elemento(self)

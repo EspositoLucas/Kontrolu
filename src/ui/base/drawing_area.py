@@ -470,12 +470,6 @@ class DrawingContent(QWidget):
             nombre = name_input.text() or f"Microbloque {len(self.microbloques) + 1}"
             color = color_button.property("selected_color") or QColor(255, 255, 255)
             funcion_transferencia = latex_editor.get_latex()
-            config = {
-                'nombre': nombre,
-                'color': color,
-                'funcion_transferencia': funcion_transferencia,
-                'opciones_adicionales': {}
-            }
             new_microbloque = MicroBloque(nombre, color, funcion_transferencia, {}, self.macrobloque.modelo.topologia)
 
             if isinstance(reference_structure, MicroBloque):
