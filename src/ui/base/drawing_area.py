@@ -1,7 +1,7 @@
 import os
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QToolTip, QApplication, QComboBox,QShortcut
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QApplication
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
-from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint
+from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
@@ -20,6 +20,7 @@ class DrawingArea(QScrollArea):
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        
 
 class DrawingContent(QWidget):
     def __init__(self, macrobloque=None, ventana=None,scroll_area=None):
@@ -39,6 +40,11 @@ class DrawingContent(QWidget):
         self.panning = False
         self.load_preview_images()
         self.load_connection_image()
+        # Ajustar el tamaño máximo de la ventana
+        desktop = QApplication.desktop()
+        screen_rect = desktop.availableGeometry(self)
+        self.setMaximumSize(screen_rect.width(), screen_rect.height())
+    
         self.init_ui()
         
     def init_ui(self):
@@ -50,7 +56,7 @@ class DrawingContent(QWidget):
         self.help_button.setGeometry(10, 60, 30, 30)
         self.help_button.clicked.connect(self.show_help)
         self.help_button.setToolTip("Mostrar ayuda")
-    
+        
     def load_microbloques(self):
         for microbloque in self.microbloques:
                 microbloque.deleteLater() # elimina cada elemento
@@ -610,7 +616,7 @@ class DrawingContent(QWidget):
         menu = QMenu(self)
         menu.setStyleSheet("""
             QMenu {
-                border: 2px solid black;  /* Agrega un borde negro */
+                border: 2px solid black;
             }
         """)
         micro_back = self.selected_microbloque.elemento_back
@@ -620,16 +626,31 @@ class DrawingContent(QWidget):
             structure_name = self.get_structure_name(parent)
             action_text = self.get_descriptive_action_text(direction, structure_name)
             action = menu.addAction(action_text)
-            # action = menu.addAction(f"Respecto a {self.get_structure_name(parent)}")
-            action.triggered.connect(lambda _, s=parent[0]: self.add_microbloque(direction, s))
+            
+            # Usamos una función lambda que llama directamente a add_microbloque
+            action.triggered.connect(lambda checked, d=direction, s=parent[0]: 
+                QTimer.singleShot(0, lambda: self.add_microbloque(d, s)))
             
             action.hovered.connect(lambda s=parent, d=direction: self.show_preview(d, s))
-            action.triggered.connect(self.hide_preview)
+        
+        menu.setMouseTracking(True)
+        menu.leaveEvent = lambda event: self.hide_preview()
         
         button = self.sender()
         menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
-    
+
     def show_preview(self, direction, structure):
+        # Si ya existe un timer, lo detenemos
+        if hasattr(self, 'preview_timer'):
+            self.preview_timer.stop()
+        
+        # Creamos un nuevo timer
+        self.preview_timer = QTimer()
+        self.preview_timer.setSingleShot(True)
+        self.preview_timer.timeout.connect(lambda: self.show_preview_now(direction, structure))
+        self.preview_timer.start(100)  # 100 ms de retraso
+    
+    def show_preview_now(self, direction, structure):
         if not hasattr(self, 'preview_dialog'):
             self.preview_dialog = QDialog(self) # crea un diálogo
             self.preview_dialog.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint) # le quita el borde
@@ -763,20 +784,7 @@ class DrawingContent(QWidget):
             self.selected_microbloque.setSeleccionado(False)
             self.selected_microbloque = None
 
-    def get_structure_name(self, estructura):
-        nodo = estructura[0]
-        nivel = estructura[1]
-        if isinstance(nodo, MicroBloque):
-            return nodo.nombre
-        elif isinstance(nodo, TopologiaSerie):
-            return f"Serie {nivel}"
-        elif isinstance(nodo, TopologiaParalelo):
-            return f"Paralelo {nivel}"
-        else:
-            return "Estructura desconocida"
-
     def add_microbloque(self, direction, estructura_de_referencia):
-        # segun la dirección en la que se hizo click, determino la relación con el microbloque seleccionado
         if estructura_de_referencia:
             if direction in ['arriba', 'abajo']:
                 relation = direction
@@ -785,8 +793,11 @@ class DrawingContent(QWidget):
             else:  # derecha
                 relation = 'despues'
             
-            self.create_new_microbloque(self.selected_microbloque.pos(), relation, estructura_de_referencia)    
-
+            # Llamamos directamente a create_new_microbloque
+            self.create_new_microbloque(self.selected_microbloque.pos(), relation, estructura_de_referencia)
+        
+        self.hide_preview()
+        
     def encontrar_bloque_mas_a_la_derecha(self):
         if not self.microbloques:
             return None
