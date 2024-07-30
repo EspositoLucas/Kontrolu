@@ -51,11 +51,6 @@ class DrawingContent(QWidget):
         self.setFocusPolicy(Qt.StrongFocus) # sirve para permitir que el teclado de la compu interactue con la ventana
         self.setContextMenuPolicy(Qt.CustomContextMenu) # sirve para poder mostrar un menu contextual (por ejemplo, cuando hago click derecho)
         self.customContextMenuRequested.connect(self.mostrar_menu_contextual) # permite agregar nuestro propio menu contextual
-        # Agregar botón de ayuda
-        self.help_button = QPushButton("?", self)
-        self.help_button.setGeometry(10, 60, 30, 30)
-        self.help_button.clicked.connect(self.show_help)
-        self.help_button.setToolTip("Mostrar ayuda")
         
     def load_microbloques(self):
         for microbloque in self.microbloques:
@@ -92,29 +87,14 @@ class DrawingContent(QWidget):
 
         help_text = QTextEdit()
         help_text.setReadOnly(True)
-        help_text.setHtml("""
-        <h2>Bienvenido al sistema de ayuda</h2>
-        <h3>Creación de microbloques</h3>
-        <p>Para crear un nuevo microbloque:</p>
-        <ol>
-            <li>Haga clic en el botón '+' en el centro del diagrama vacío, o en los botones '+' alrededor de un microbloque existente.</li>
-            <li>Seleccione la ubicación deseada en el menú desplegable.</li>
-            <li>Complete la información requerida en el diálogo que aparece.</li>
-        </ol>
 
-        <h3>Edición de microbloques</h3>
-        <p>Para editar un microbloque existente:</p>
-        <ul>
-            <li>Haga doble clic en el microbloque para abrir el diálogo de edición.</li>
-            <li>Para eliminar un microbloque, selecciónelo y presione la tecla 'Suprimir' o use el menú contextual (clic derecho).</li>
-        </ul>
+        # Leer el contenido HTML del archivo externo
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        help_file_path = os.path.join(current_dir, 'help_content.html')
+        with open(help_file_path, 'r', encoding='utf-8') as help_file:
+            help_content = help_file.read()
 
-        <h3>Navegación</h3>
-        <p>Use la rueda del ratón para hacer zoom. Mantenga presionada la tecla Ctrl mientras arrastra para desplazarse por el diagrama.</p>
-
-        <h3>Selección múltiple</h3>
-        <p>Mantenga presionada la tecla Ctrl mientras hace clic para seleccionar varios microbloques a la vez.</p>
-        """)
+        help_text.setHtml(help_content)
         layout.addWidget(help_text)
 
         close_button = QPushButton("Cerrar")
@@ -122,7 +102,7 @@ class DrawingContent(QWidget):
         layout.addWidget(close_button)
         help_dialog.setLayout(layout)
         help_dialog.exec_()
-    
+        
     def ajustar_tamanio_widget(self):
         margen_x = 700  # Margen horizontal
         margen_y = 300  # Margen vertical
@@ -142,8 +122,7 @@ class DrawingContent(QWidget):
             self.setMinimumSize(nuevo_ancho, nuevo_alto) # se ajusta el tamaño de la ventana
         
         self.update()
-    
-    
+ 
     
     def mouseMoveEvent(self, event): 
         if self.panning and self.last_pan_pos: # si se está moviendo el mouse y se está haciendo panning (arrastrar la pantalla)

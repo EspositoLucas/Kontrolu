@@ -74,6 +74,7 @@ class MacroVista(QPushButton):
         spacer.setFixedSize(50, 5)  # Ajusta el tamaño del espaciador (ancho x alto)
         spacer.setStyleSheet("background-color: #333;")  # Establece el color de fondo
         toolbar.addWidget(spacer)
+        
 
         # Botón de seleccionar varios
         self.seleccion_multiple = QPushButton('Seleccionar varios', self)
@@ -85,6 +86,25 @@ class MacroVista(QPushButton):
         }
         """)
         toolbar.addWidget(self.seleccion_multiple)
+        
+        # Espaciador
+        spacer = QWidget()
+        spacer.setFixedSize(50, 5)
+        spacer.setStyleSheet("background-color: #333;")
+        toolbar.addWidget(spacer)
+
+        # Botón de ayuda
+        help_button = QPushButton('?', self)
+        help_button.clicked.connect(self.drawing_area.content.show_help)
+        help_button.setStyleSheet(button_style + """
+        QPushButton {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        """)
+        help_button.setFixedSize(30, 30)
+        help_button.setToolTip("Mostrar ayuda")
+        toolbar.addWidget(help_button)
 
         toolbar.setStyleSheet("QToolBar { background-color: #333; }")  # Establece el color de fondo de la barra de herramientas
 
