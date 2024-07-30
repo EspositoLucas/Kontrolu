@@ -93,7 +93,6 @@ class MicroBloque(InterfazTopologia):
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia
-        self.opciones_adicionales = opciones_adicionales
         self.configuracion = ConfiguracionMicrobloque()
 
     def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto, valores_posibles, funcion_efecto):

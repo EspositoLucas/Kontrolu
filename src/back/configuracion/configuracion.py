@@ -20,7 +20,7 @@ class Configuracion:
         self.valores_posibles = valores_posibles
         self.funcion_efecto = funcion_efecto
     
-    def set_valor(self, valor):
+    def set_valor(self, valor): 
         self.valor = valor
 
     def set_efecto(self, efecto):
@@ -40,7 +40,6 @@ class Configuracion:
             elif self.tipo == TipoConfiguracion.ENUMERADA:
                 return f"({self.valores_posibles[self.valor]}) * ({funcion_transferencia})"
         else:
-            # TODO: Aplicar efecto indirecto
             if self.efecto:
                 return f"limitar({funcion_transferencia}, {self.funcion_efecto(self.valor)})"
             if self.tipo == TipoConfiguracion.NUMERICA:

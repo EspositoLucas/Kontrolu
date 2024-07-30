@@ -1,4 +1,4 @@
-from src.back.configuracion.configuracion import Configuracion, EfectoConfiguracion
+from back.configuracion.configuracion import Configuracion, EfectoConfiguracion
 
 class ConfiguracionMicrobloque:
     def __init__(self):

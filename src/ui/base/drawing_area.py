@@ -1,10 +1,11 @@
 import os
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QApplication
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QApplication,QComboBox
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
+from back.configuracion.configuracion import Configuracion, TipoConfiguracion,EfectoConfiguracion
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
@@ -38,6 +39,8 @@ class DrawingContent(QWidget):
         self.selected_microbloques = []
         self.punto_salida_actual = None
         self.panning = False
+        self.input_widget = None
+        self.config_layout = QVBoxLayout()
         self.load_preview_images()
         self.load_connection_image()
         # Ajustar el tamaño máximo de la ventana
@@ -458,6 +461,17 @@ class DrawingContent(QWidget):
         latex_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(transfer_label)
         layout.addWidget(latex_editor)
+        
+        # Agregar sección para configuraciones
+        config_label = QLabel("Configuraciones:")
+        config_label.setStyleSheet("color: white;")
+        layout.addWidget(config_label)
+
+        config_list = []
+        add_config_button = QPushButton("Agregar Configuración")
+        add_config_button.setStyleSheet("background-color: #444; color: white;")
+        add_config_button.clicked.connect(lambda: self.add_configuration())
+        layout.addWidget(add_config_button)
 
         save_button = QPushButton("Guardar")
         save_button.setStyleSheet("background-color: #444; color: white;")
@@ -470,7 +484,22 @@ class DrawingContent(QWidget):
             nombre = name_input.text() or f"Microbloque {len(self.microbloques) + 1}"
             color = color_button.property("selected_color") or QColor(255, 255, 255)
             funcion_transferencia = latex_editor.get_latex()
-            new_microbloque = MicroBloque(nombre, color, funcion_transferencia, {}, self.macrobloque.modelo.topologia)
+            
+            # Crear configuraciones
+            configuraciones = {}
+            for config in config_list:
+                nueva_config = Configuracion(
+                    config['nombre'], 
+                    config['tipo'], 
+                    config['valor_por_defecto'], 
+                    config['efecto'],
+                    config['valores_posibles'],
+                    config['funcion_efecto']
+                )
+                configuraciones[config['nombre']] = nueva_config
+
+            new_microbloque = MicroBloque(nombre, color, funcion_transferencia, configuraciones, self.macrobloque.modelo.topologia)
+
 
             if isinstance(reference_structure, MicroBloque):
                 self.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)
@@ -484,6 +513,65 @@ class DrawingContent(QWidget):
             self.load_microbloques()  # recargo todos los microbloques
             self.update()
             self.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
+    
+    
+    def seleccion_tipo_configuracion(self):
+        if self.input_widget != None:
+            self.config_layout.removeWidget(self.input_widget)
+            self.input_widget.deleteLater()
+            self.update()
+            self.input_widget = None
+        self.input_widget = QLineEdit()
+        valor_seleccionado = self.type_combo.currentText()
+        
+        if valor_seleccionado == TipoConfiguracion.BOOLEANA:
+            return
+        elif valor_seleccionado == TipoConfiguracion.NUMERICA:
+            self.input_widget.setPlaceholderText("Ingrese un valor de tipo numérico")
+        elif valor_seleccionado == TipoConfiguracion.FUNCION:
+            self.input_widget.setPlaceholderText("Ingrese una función")
+        elif valor_seleccionado == TipoConfiguracion.ENUMERADA:
+            self.input_widget.setPlaceholderText("Ingrese valores separados por comas")
+
+        if self.input_widget:
+            self.input_widget.setStyleSheet("""
+                QLineEdit {
+                    background-color: white;
+                    color: white;
+                    border: 1px solid #555;
+                }
+                QLineEdit::placeholder {
+                    color: white;
+                }
+            """)
+            self.config_layout.insertWidget(2, self.input_widget)
+            self.update()
+
+    def add_configuration(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Agregar Configuración")
+        dialog.setStyleSheet("background-color: #333; color: white;")
+        self.config_layout = QVBoxLayout()
+
+        name_input = QLineEdit()
+        name_input.setPlaceholderText("Nombre de la configuración")
+        self.config_layout.addWidget(name_input)
+
+        self.type_combo = QComboBox()
+        self.type_combo.addItems([t.name for t in TipoConfiguracion])
+        self.config_layout.addWidget(self.type_combo)
+
+
+        self.type_combo.currentIndexChanged.connect(self.seleccion_tipo_configuracion)
+        
+        save_button = QPushButton("Guardar")
+        save_button.clicked.connect(dialog.accept)
+        self.config_layout.addWidget(save_button)
+        dialog.setLayout(self.config_layout)
+
+        if dialog.exec_():
+            # TODO: dar comportamiento de guardado de configuracion
+            pass
 
     def agregar_respecto_microbloque(self, new_microbloque, relation, reference_microbloque):
         if relation == "arriba":
