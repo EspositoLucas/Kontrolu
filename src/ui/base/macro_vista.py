@@ -94,15 +94,21 @@ class MacroVista(QPushButton):
         toolbar.addWidget(spacer)
 
         # Botón de ayuda
-        help_button = QPushButton('?', self)
+        help_button = QPushButton('Ayuda', self)
         help_button.clicked.connect(self.drawing_area.content.show_help)
         help_button.setStyleSheet(button_style + """
         QPushButton {
-            font-weight: bold;
-            font-size: 16px;
-        }
+                background-color: #808080; /* Color gris */
+                color: white;
+                font-size: 14px;
+                padding: 5px;
+                border-radius: 3px;
+            }
+
+            QPushButton:hover {
+                background-color: #696969; /* Un gris más oscuro para el hover */
+            }
         """)
-        help_button.setFixedSize(30, 30)
         help_button.setToolTip("Mostrar ayuda")
         toolbar.addWidget(help_button)
 
