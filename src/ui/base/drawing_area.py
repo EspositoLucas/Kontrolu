@@ -337,9 +337,9 @@ class DrawingContent(QWidget):
             return None
 
         # Calcular punto de bifurcación
-        comienzo_de_rama = QPointF(punto_inicial.x() + MARGEN_PARALELO, punto_inicial.y())  # es el margen antes de hacer la bifurcación
-        altura_total = sum(hijo.alto() for hijo in paralelo.hijos) # idem que en dibujar_paralelo
-        altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL # idem que en dibujar_paralelo
+        comienzo_de_rama = QPointF(punto_inicial.x() + MARGEN_PARALELO, punto_inicial.y())
+        altura_total = sum(hijo.alto() for hijo in paralelo.hijos)
+        altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL
         
         # Dibujar línea horizontal antes de la bifurcación
         painter.drawLine(punto_inicial, comienzo_de_rama)
@@ -348,53 +348,61 @@ class DrawingContent(QWidget):
         y_actual = punto_inicial.y() - altura_total / 2
         puntos_finales = []
         for hijo in paralelo.hijos:
-            punto_final_rama_vertical = QPointF(comienzo_de_rama.x(), y_actual + hijo.alto() / 2) # deja igual la "x" y pone la "y" en el centro del microbloque
+            punto_final_rama_vertical = QPointF(comienzo_de_rama.x(), y_actual + hijo.alto() / 2)
             painter.drawLine(comienzo_de_rama, punto_final_rama_vertical)  # Línea vertical de bifurcación
-            punto_final_rama_actual = self.draw_connections(painter, hijo, punto_final_rama_vertical, True) # partiendo desde el extremo de la linea vertical de bifurcacion, comienza a dibujar lo que sigue
+            punto_final_rama_actual = self.draw_connections(painter, hijo, punto_final_rama_vertical, True)
             if punto_final_rama_actual is not None:
-                puntos_finales.append(punto_final_rama_actual) # se va guardando los puntos finales de cada rama del paralelo
-            y_actual += hijo.alto() + MARGEN_VERTICAL # incorpora el margen vertical
+                puntos_finales.append(punto_final_rama_actual)
+            y_actual += hijo.alto() + MARGEN_VERTICAL
         
-        if not puntos_finales: # querria decir que no dibujo nada en los paralelos (no creo que pase nunca, pero por las dudas lo dejo)
+        if not puntos_finales:
             return punto_inicial
 
-        # Encontrar el punto final más a la derecha (margen paralelo permite dibujar la linea horizontal final, al salir de una rama paralela)
-        max_x = max(point.x() for point in puntos_finales) + MARGEN_PARALELO # esto está por si una rama quedó "mas larga horizontalmente" que la otra
-         
+        # Encontrar el punto final más a la derecha
+        max_x = max(point.x() for point in puntos_finales) + MARGEN_PARALELO
+        
         # Dibujar líneas horizontales para reconectar las ramas
         for end_point in puntos_finales:
-            painter.drawLine(end_point, QPointF(max_x, end_point.y())) # le sumamos 20 para tener una linea horizontal (al salir del microbloque) antes de reconectar
+            painter.drawLine(end_point, QPointF(max_x, end_point.y()))
         
-        punto_de_reconexion = QPointF(max_x, punto_inicial.y())  # punto de reconexión (es el punto más a la derecha de la estructura paralelo)
+        punto_de_reconexion = QPointF(max_x, punto_inicial.y())
         
         if not self.connection_image.isNull():
-            # Escalamos la imagen según el factor de escala
+            # Escalar y dibujar la imagen del punto suma
             scaled_image = self.connection_image.scaled(
                 int(40), 
                 int(40), 
                 Qt.KeepAspectRatio, 
                 Qt.SmoothTransformation
             )
-            # Convertimos las coordenadas a enteros y ajustamos por el tamaño de la imagen
             x = int(punto_de_reconexion.x() - scaled_image.width() / 2)
             y = int(punto_de_reconexion.y() - scaled_image.height() / 2)
             painter.drawPixmap(x, y, scaled_image)
+            
+            # Calcular el centro y radio de la imagen del punto suma
+            imagen_centro = QPointF(x + scaled_image.width() / 2, y + scaled_image.height() / 2)
+            radio_imagen = scaled_image.width() / 2
+            
+            # Dibujar línea desde la rama superior al borde superior de la imagen
+            punto_superior = QPointF(imagen_centro.x(), imagen_centro.y() - radio_imagen)
+            painter.drawLine(QPointF(max_x, puntos_finales[0].y()), punto_superior)
+            
+            # Dibujar línea desde la rama inferior al borde inferior de la imagen
+            punto_inferior = QPointF(imagen_centro.x(), imagen_centro.y() + radio_imagen)
+            painter.drawLine(QPointF(max_x, puntos_finales[-1].y()), punto_inferior)
+            
+            # Dibujar línea horizontal final desde el borde derecho de la imagen
+            punto_derecho = QPointF(imagen_centro.x() + radio_imagen, imagen_centro.y())
+            punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
+            painter.drawLine(punto_derecho, punto_mas_alejado)
         else:
-            painter.drawEllipse(punto_de_reconexion, 5 , 5 )
-
-        # Punto de reconexión
-        punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
-
-        # Dibujar líneas verticales para reconectar (En realidad es una unica linea desde una rama a la otra)
-        # QPointF(max_x + 20, puntos_finales[0].y()) --> es para la rama de arriba (indice 0 es el primer elemento de una lista)
-        # QPointF(max_x + 20, puntos_finales[-1].y()) --> es para la rama de abajo (indice -1 es el último elemento de una lista)
-        painter.drawLine(QPointF(max_x, puntos_finales[0].y()), QPointF(max_x, puntos_finales[-1].y()))
+            # Si no hay imagen, mantener el comportamiento original
+            painter.drawEllipse(punto_de_reconexion, 5, 5)
+            painter.drawLine(QPointF(max_x, puntos_finales[0].y()), QPointF(max_x, puntos_finales[-1].y()))
+            punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
+            painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_mas_alejado)
         
-        # Dibujar línea horizontal final (para salir de la estructura paralelo)
-        painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_mas_alejado)
-        
-        # retorna el punto de reconexión porque es el punto "mas a la derecha" de la estructura paralelo
-        return punto_mas_alejado 
+        return punto_mas_alejado
     
     def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo):
         # busca en la lista de microbloques de la drawing_area, el microbloque que queremos conectar
