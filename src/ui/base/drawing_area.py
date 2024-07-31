@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QApplication,QComboBox
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QApplication,QComboBox,QMessageBox
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
@@ -514,64 +514,124 @@ class DrawingContent(QWidget):
             self.update()
             self.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
     
-    
     def seleccion_tipo_configuracion(self):
-        if self.input_widget != None:
+        # Este método se llama cuando el usuario selecciona un tipo de configuración en el combo box
+
+        # Limpiar los widgets anteriores para evitar conflictos
+        if hasattr(self, 'input_widget') and self.input_widget:
             self.config_layout.removeWidget(self.input_widget)
             self.input_widget.deleteLater()
-            self.update()
             self.input_widget = None
-        self.input_widget = QLineEdit()
-        valor_seleccionado = self.type_combo.currentText()
         
-        if valor_seleccionado == TipoConfiguracion.BOOLEANA:
-            return
-        elif valor_seleccionado == TipoConfiguracion.NUMERICA:
+        if hasattr(self, 'efecto_combo') and self.efecto_combo:
+            self.config_layout.removeWidget(self.efecto_combo)
+            self.efecto_combo.deleteLater()
+            self.efecto_combo = None
+
+        # Obtener el tipo de configuración seleccionado
+        tipo_seleccionado = self.type_combo.currentData()
+        if tipo_seleccionado is None:
+            return  # Si no hay tipo seleccionado, no hacemos nada
+
+        # Crear los widgets específicos según el tipo de configuración seleccionado
+        if tipo_seleccionado == TipoConfiguracion.NUMERICA:
+            # Para configuración numérica, se crea un campo de entrada de texto
+            self.input_widget = QLineEdit()
             self.input_widget.setPlaceholderText("Ingrese un valor de tipo numérico")
-        elif valor_seleccionado == TipoConfiguracion.FUNCION:
+        elif tipo_seleccionado == TipoConfiguracion.FUNCION:
+            # Para configuración de función, se crea un campo de entrada y un combo box para el efecto
+            self.input_widget = QLineEdit()
             self.input_widget.setPlaceholderText("Ingrese una función")
-        elif valor_seleccionado == TipoConfiguracion.ENUMERADA:
+            self.efecto_combo = QComboBox()
+            self.efecto_combo.addItem("Seleccione tipo de efecto", None)  # Opción por defecto
+            self.efecto_combo.addItem("DIRECTO", EfectoConfiguracion.DIRECTO)
+            self.efecto_combo.addItem("INDIRECTO", EfectoConfiguracion.INDIRECTO)
+            self.efecto_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        elif tipo_seleccionado == TipoConfiguracion.ENUMERADA:
+            # Para configuración enumerada, se crea un campo de entrada de texto
+            self.input_widget = QLineEdit()
             self.input_widget.setPlaceholderText("Ingrese valores separados por comas")
 
-        if self.input_widget:
-            self.input_widget.setStyleSheet("""
-                QLineEdit {
-                    background-color: white;
-                    color: white;
-                    border: 1px solid #555;
-                }
-                QLineEdit::placeholder {
-                    color: white;
-                }
-            """)
+        # Aplicar estilo y agregar los widgets al layout
+        if hasattr(self, 'input_widget') and self.input_widget:
+            self.input_widget.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
             self.config_layout.insertWidget(2, self.input_widget)
-            self.update()
+        if hasattr(self, 'efecto_combo') and self.efecto_combo:
+            self.config_layout.insertWidget(3, self.efecto_combo)
+
+        # Actualizar la interfaz para reflejar los cambios
+        self.update()
+
+    def guardar_configuracion(self, dialog, name_input):
+        # Este método se llama cuando el usuario intenta guardar una configuración
+
+        # Obtener el nombre y el tipo de la configuración
+        nombre = name_input.text()
+        tipo_seleccionado = self.type_combo.currentData()
+        
+        # Validar que todos los campos necesarios estén completos
+        if not nombre or tipo_seleccionado is None or not self.input_widget:
+            QMessageBox.warning(self, "Error", "Por favor, complete todos los campos.")
+            return
+        
+        # Obtener el valor ingresado por el usuario
+        valor = self.input_widget.text() if isinstance(self.input_widget, QLineEdit) else self.input_widget.currentText()
+        
+        # Validar que se haya ingresado un valor
+        if not valor:
+            QMessageBox.warning(self, "Error", "Por favor, ingrese un valor para la configuración.")
+            return
+        
+        # Manejar configuraciones de tipo FUNCION
+        efecto = None
+        if tipo_seleccionado == TipoConfiguracion.FUNCION:
+            # Verificar que se haya seleccionado un efecto válido
+            if not hasattr(self, 'efecto_combo') or self.efecto_combo.currentData() is None:
+                QMessageBox.warning(self, "Error", "Por favor, seleccione un efecto para la función.")
+                return
+            efecto = self.efecto_combo.currentText()
+        
+        # Imprimir la configuración guardada
+        print(f"Configuración guardada: Nombre={nombre}, Tipo={tipo_seleccionado.name}, Valor={valor}, Efecto={efecto}")
+        
+        # Cerrar el diálogo de configuración
+        dialog.accept()
 
     def add_configuration(self):
+        # Este método crea y muestra el diálogo para agregar una nueva configuración
+
+        # Crear el diálogo
         dialog = QDialog(self)
         dialog.setWindowTitle("Agregar Configuración")
         dialog.setStyleSheet("background-color: #333; color: white;")
         self.config_layout = QVBoxLayout()
 
+        # Creamr el campo de entrada para el nombre de la configuración
         name_input = QLineEdit()
         name_input.setPlaceholderText("Nombre de la configuración")
+        name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.config_layout.addWidget(name_input)
 
+        # Crear el combo box para seleccionar el tipo de configuración
         self.type_combo = QComboBox()
-        self.type_combo.addItems([t.name for t in TipoConfiguracion])
+        self.type_combo.addItem("Seleccione un tipo", None)
+        for t in TipoConfiguracion:
+            self.type_combo.addItem(t.name, t)
+        self.type_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.config_layout.addWidget(self.type_combo)
 
-
+        # Conectar el cambio de selección del tipo con el método que actualiza la interfaz
         self.type_combo.currentIndexChanged.connect(self.seleccion_tipo_configuracion)
-        
-        save_button = QPushButton("Guardar")
-        save_button.clicked.connect(dialog.accept)
-        self.config_layout.addWidget(save_button)
-        dialog.setLayout(self.config_layout)
 
-        if dialog.exec_():
-            # TODO: dar comportamiento de guardado de configuracion
-            pass
+        # Crear el botón para guardar la configuración
+        save_button = QPushButton("Guardar")
+        save_button.clicked.connect(lambda: self.guardar_configuracion(dialog, name_input))
+        save_button.setStyleSheet("background-color: #444; color: white;")
+        self.config_layout.addWidget(save_button)
+
+        # Configurar y mostramos el diálogo
+        dialog.setLayout(self.config_layout)
+        dialog.exec_()
 
     def agregar_respecto_microbloque(self, new_microbloque, relation, reference_microbloque):
         if relation == "arriba":
@@ -914,3 +974,4 @@ class DrawingContent(QWidget):
             painter.drawLine(0, y, self.width(), y)
         
         painter.restore()
+
