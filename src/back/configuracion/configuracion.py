@@ -12,16 +12,32 @@ class EfectoConfiguracion(Enum):
     INDIRECTO = 2
 
 class Configuracion:
-    def __init__(self, nombre, tipo, valor_por_defecto, efecto, valores_posibles, funcion_efecto):
+    def __init__(self, nombre, tipo, valor_por_defecto, efecto):
         self.nombre = nombre
         self.tipo = tipo 
         self.efecto = efecto
-        self.valor = valor_por_defecto
-        self.valores_posibles = valores_posibles
-        self.funcion_efecto = funcion_efecto
+        self.set_valor(valor_por_defecto, efecto)
     
-    def set_valor(self, valor): 
-        self.valor = valor
+    def get_valor(self):
+        if self.tipo == TipoConfiguracion.NUMERICA:
+            return self.valor
+        elif self.tipo == TipoConfiguracion.BOOLEANA:
+            pass
+        elif self.tipo == TipoConfiguracion.ENUMERADA:
+            return self.valores_posibles
+        elif self.tipo == TipoConfiguracion.FUNCION:
+            return self.funcion_efecto, self.efecto
+
+    def set_valor(self, valor=None, efecto=None): 
+        if self.tipo == TipoConfiguracion.NUMERICA:
+            self.valor = valor
+        elif self.tipo == TipoConfiguracion.BOOLEANA:
+            pass
+        elif self.tipo == TipoConfiguracion.ENUMERADA:
+            self.valores_posibles = valor
+        elif self.tipo == TipoConfiguracion.FUNCION:
+            self.funcion_efecto = valor
+            self.efecto = efecto
 
     def set_efecto(self, efecto):
         self.efecto = efecto
@@ -45,5 +61,11 @@ class Configuracion:
             if self.tipo == TipoConfiguracion.NUMERICA:
                 return f"limitar({funcion_transferencia}, {self.valor})"
         return funcion_transferencia
+    
+    def actualizar_configuracion(self, nombre_nuevo, tipo_nuevo, valor_nuevo, efecto_nuevo):
+        self.nombre = nombre_nuevo
+        self.tipo = tipo_nuevo
+        self.set_valor(valor_nuevo, efecto_nuevo)
+
 
 

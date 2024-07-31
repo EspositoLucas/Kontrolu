@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
+from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
 from back.configuracion.configuracion import Configuracion, TipoConfiguracion,EfectoConfiguracion
 
 MARGEN_HORIZONTAL = 200
@@ -41,6 +42,8 @@ class DrawingContent(QWidget):
         self.panning = False
         self.input_widget = None
         self.config_layout = QVBoxLayout()
+        self.edit_config_layout = QVBoxLayout()
+        self.lista_configuraciones = None
         self.load_preview_images()
         self.load_connection_image()
         # Ajustar el tamaño máximo de la ventana
@@ -467,10 +470,10 @@ class DrawingContent(QWidget):
         config_label.setStyleSheet("color: white;")
         layout.addWidget(config_label)
 
-        config_list = []
+        self.lista_configuraciones = ConfiguracionMicrobloque()
         add_config_button = QPushButton("Agregar Configuración")
         add_config_button.setStyleSheet("background-color: #444; color: white;")
-        add_config_button.clicked.connect(lambda: self.add_configuration())
+        add_config_button.clicked.connect(lambda: self.add_configuration(layout))
         layout.addWidget(add_config_button)
 
         save_button = QPushButton("Guardar")
@@ -485,22 +488,9 @@ class DrawingContent(QWidget):
             color = color_button.property("selected_color") or QColor(255, 255, 255)
             funcion_transferencia = latex_editor.get_latex()
             
-            # Crear configuraciones
-            configuraciones = {}
-            for config in config_list:
-                nueva_config = Configuracion(
-                    config['nombre'], 
-                    config['tipo'], 
-                    config['valor_por_defecto'], 
-                    config['efecto'],
-                    config['valores_posibles'],
-                    config['funcion_efecto']
-                )
-                configuraciones[config['nombre']] = nueva_config
-
-            new_microbloque = MicroBloque(nombre, color, funcion_transferencia, configuraciones, self.macrobloque.modelo.topologia)
-
-
+            new_microbloque = MicroBloque(nombre, color, funcion_transferencia, self.lista_configuraciones, self.macrobloque.modelo.topologia)
+            self.lista_configuraciones = None
+            
             if isinstance(reference_structure, MicroBloque):
                 self.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)
             elif isinstance(reference_structure, TopologiaSerie):
@@ -509,7 +499,7 @@ class DrawingContent(QWidget):
                 self.agregar_respecto_paralelo(new_microbloque, relation, reference_structure)
             else:
                 self.macrobloque.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
-            
+
             self.load_microbloques()  # recargo todos los microbloques
             self.update()
             self.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
@@ -562,7 +552,7 @@ class DrawingContent(QWidget):
         # Actualizar la interfaz para reflejar los cambios
         self.update()
 
-    def guardar_configuracion(self, dialog, name_input):
+    def guardar_configuracion(self, dialog, name_input, layout_del_dialog_principal):
         # Este método se llama cuando el usuario intenta guardar una configuración
 
         # Obtener el nombre y el tipo de la configuración
@@ -589,15 +579,177 @@ class DrawingContent(QWidget):
             if not hasattr(self, 'efecto_combo') or self.efecto_combo.currentData() is None:
                 QMessageBox.warning(self, "Error", "Por favor, seleccione un efecto para la función.")
                 return
-            efecto = self.efecto_combo.currentText()
+            efecto = self.efecto_combo.currentData()
         
-        # Imprimir la configuración guardada
-        print(f"Configuración guardada: Nombre={nombre}, Tipo={tipo_seleccionado.name}, Valor={valor}, Efecto={efecto}")
-        
+        self.lista_configuraciones.agregar_configuracion(nombre, tipo_seleccionado, valor, efecto)
+        boton_de_la_configuracion = QPushButton(nombre)
+        boton_de_la_configuracion.setStyleSheet("background-color: #444; color: white;")
+        boton_de_la_configuracion.clicked.connect(lambda: self.edit_configuracion(nombre))
+        layout_del_dialog_principal.insertWidget(layout_del_dialog_principal.count() - 2, boton_de_la_configuracion)
         # Cerrar el diálogo de configuración
         dialog.accept()
 
-    def add_configuration(self):
+    def seleccion_tipo_configuracion_edit(self, edit_config_layout, type_combo):
+        # paso 1: eliminar el input de valor (si existe en el edit_config_layout) --> seria el segundo QLineEdit del layout
+        
+        # Identificar y eliminar el segundo QLineEdit
+        qlineedit_counter = 0
+        for i in range(edit_config_layout.count()):
+            item = edit_config_layout.itemAt(i)
+            widget = item.widget()
+            if isinstance(widget, QLineEdit):
+                qlineedit_counter += 1
+                if qlineedit_counter == 2:
+                    edit_config_layout.removeWidget(widget)
+                    widget.deleteLater()
+                    break
+    
+        # paso 2: eliminar el combo de efecto (si exite en el edit_config_layout) --> sería el segundo QComboBox del layout 
+
+        qcombobox_counter = 0
+        for i in range(edit_config_layout.count()):
+            item = edit_config_layout.itemAt(i)
+            widget = item.widget()
+            if isinstance(widget, QComboBox):
+                qcombobox_counter += 1
+                if qcombobox_counter == 2:
+                    edit_config_layout.removeWidget(widget)
+                    widget.deleteLater()
+                    break
+
+        # Obtener el tipo de configuración seleccionado
+        tipo_seleccionado = type_combo.currentData()
+        if tipo_seleccionado is None:
+            return  # Si no hay tipo seleccionado, no hacemos nada
+
+        # Crear los widgets específicos según el tipo de configuración seleccionado
+        input_widget = None
+        efecto_combo = None
+        if tipo_seleccionado == TipoConfiguracion.NUMERICA:
+            # Para configuración numérica, se crea un campo de entrada de texto
+            input_widget = QLineEdit()
+            input_widget.setPlaceholderText("Ingrese un valor de tipo numérico")
+        elif tipo_seleccionado == TipoConfiguracion.FUNCION:
+            # Para configuración de función, se crea un campo de entrada y un combo box para el efecto
+            input_widget = QLineEdit()
+            input_widget.setPlaceholderText("Ingrese una función")
+            efecto_combo = QComboBox()
+            efecto_combo.addItem("Seleccione tipo de efecto", None)  # Opción por defecto
+            efecto_combo.addItem(EfectoConfiguracion.DIRECTO.name, EfectoConfiguracion.DIRECTO)
+            efecto_combo.addItem(EfectoConfiguracion.INDIRECTO.name, EfectoConfiguracion.INDIRECTO)
+            efecto_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        elif tipo_seleccionado == TipoConfiguracion.ENUMERADA:
+            # Para configuración enumerada, se crea un campo de entrada de texto
+            input_widget = QLineEdit()
+            input_widget.setPlaceholderText("Ingrese valores separados por comas")
+
+        if input_widget != None:
+            input_widget.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
+            edit_config_layout.insertWidget(2, input_widget)
+        if efecto_combo:
+            edit_config_layout.insertWidget(3, efecto_combo)
+
+        # Actualizar la interfaz para reflejar los cambios
+        self.update()
+
+    def edit_configuracion(self, nombre):
+        configuracion = self.lista_configuraciones.get_configuracion(nombre)
+        if configuracion is None: # esto sería raro que pase
+            QMessageBox.warning(self, "Error", f"No se encontró la configuración {nombre}")
+            return
+        
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Editar Configuración: {nombre}")
+        dialog.setStyleSheet("background-color: #333; color: white;")
+        edit_config_layout = QVBoxLayout()
+
+        name_input = QLineEdit()
+        name_input.setText(configuracion.nombre)
+        name_input.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
+        edit_config_layout.addWidget(name_input)
+
+        type_combo = QComboBox()
+        for t in TipoConfiguracion:
+            type_combo.addItem(t.name, t)
+        type_combo.setCurrentIndex(type_combo.findData(configuracion.tipo)) # esto selecciona el tipo de la configuracion en el combo
+        type_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        type_combo.currentIndexChanged.connect(lambda: self.seleccion_tipo_configuracion_edit(edit_config_layout, type_combo))
+        edit_config_layout.addWidget(type_combo)
+        
+        if configuracion.tipo != TipoConfiguracion.BOOLEANA: # si no es booleana
+            if configuracion.tipo == TipoConfiguracion.FUNCION: # si es de tipo funcion
+                funcion, efecto = configuracion.get_valor() # capturamos tanto la funcion como el efecto
+                value_input = QLineEdit(funcion) # creamos un input para la funcion
+                edit_config_layout.addWidget(value_input) # agrega el input a la ventana
+                efecto_combo = QComboBox() # creamos el combo del efecto y le agregamos las opciones
+                efecto_combo.addItem(EfectoConfiguracion.DIRECTO.name, EfectoConfiguracion.DIRECTO)
+                efecto_combo.addItem(EfectoConfiguracion.INDIRECTO.name, EfectoConfiguracion.INDIRECTO)
+                print("efecto: ", efecto)
+                print("el tipo de dato del efecto es: ", type(efecto))
+                efecto_combo.setCurrentIndex(efecto_combo.findData(efecto)) # seleccionamos la opcion segun el tipo de efecto que tenia la configuracion
+                efecto_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+                edit_config_layout.addWidget(efecto_combo)
+            else: # si entra por acá, entonces es de tipo ENUMERADA O NUMERICA
+                valor = configuracion.get_valor() 
+                value_input = QLineEdit(valor)
+                value_input.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
+                edit_config_layout.addWidget(value_input)
+
+        save_button = QPushButton("Guardar cambios")
+        save_button.setStyleSheet("background-color: #444; color: white;")
+        save_button.clicked.connect(lambda: self.save_edited_configuration(
+            dialog,
+            nombre, 
+            name_input, 
+            type_combo, 
+            self.find_input_widget(edit_config_layout, QLineEdit, 2), 
+            self.find_input_widget(edit_config_layout, QComboBox, 3).currentData() if (configuracion.tipo == TipoConfiguracion.FUNCION and self.find_input_widget(edit_config_layout, QComboBox, 3)) else None
+        ))
+        edit_config_layout.addWidget(save_button)
+
+        dialog.setLayout(edit_config_layout)
+        dialog.exec_()
+
+    def find_input_widget(self, layout, widget_type, occurrence=2):
+        counter = 0
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            widget = item.widget()
+            if isinstance(widget, widget_type):
+                counter += 1
+                if counter == occurrence:
+                    return widget
+        return None
+
+    def save_edited_configuration(self, dialog, old_name, name_input, type_combo, value_input, efecto_combo=None):
+        new_name = name_input.text()
+        new_type = type_combo.currentData()
+        new_value = value_input.text()
+        new_efecto = efecto_combo if efecto_combo else None
+
+        print("guardando cambios")
+        print("old_name: ", old_name)
+        print("new_name: ", new_name)
+        print("new_type: ", new_type)
+        print("new_value: ", new_value)
+        print("new_efecto: ", new_efecto)
+        print("\n")
+
+        self.lista_configuraciones.actualizar_configuracion(old_name, new_name, new_type, new_value, new_efecto)
+
+        # Actualizar el texto del botón si el nombre ha cambiado
+        if old_name != new_name:
+            for i in range(self.layout().count()):
+                widget = self.layout().itemAt(i).widget()
+                if isinstance(widget, QPushButton) and widget.text() == old_name: # busca los botones del dialog por el nombre
+                    widget.setText(new_name) # le cambia el nombre
+                    widget.clicked.disconnect() # le desasocia la accion vieja para el evento clicked
+                    widget.clicked.connect(lambda: self.edit_configuracion(new_name)) # le configura la nueva accion de edicion
+                    break
+
+        dialog.accept()
+
+    def add_configuration(self, layout_del_dialog_principal):
         # Este método crea y muestra el diálogo para agregar una nueva configuración
 
         # Crear el diálogo
@@ -606,10 +758,10 @@ class DrawingContent(QWidget):
         dialog.setStyleSheet("background-color: #333; color: white;")
         self.config_layout = QVBoxLayout()
 
-        # Creamr el campo de entrada para el nombre de la configuración
+        # Crear el campo de entrada para el nombre de la configuración
         name_input = QLineEdit()
         name_input.setPlaceholderText("Nombre de la configuración")
-        name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        name_input.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
         self.config_layout.addWidget(name_input)
 
         # Crear el combo box para seleccionar el tipo de configuración
@@ -625,11 +777,11 @@ class DrawingContent(QWidget):
 
         # Crear el botón para guardar la configuración
         save_button = QPushButton("Guardar")
-        save_button.clicked.connect(lambda: self.guardar_configuracion(dialog, name_input))
+        save_button.clicked.connect(lambda: self.guardar_configuracion(dialog, name_input, layout_del_dialog_principal))
         save_button.setStyleSheet("background-color: #444; color: white;")
         self.config_layout.addWidget(save_button)
 
-        # Configurar y mostramos el diálogo
+        # Configurar y mostrar el diálogo
         dialog.setLayout(self.config_layout)
         dialog.exec_()
 

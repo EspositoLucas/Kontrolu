@@ -88,12 +88,12 @@ class TopologiaSerie(InterfazTopologia):
         return "SERIE: " + str(list(map(lambda hijo: str(hijo),self.hijos)))
 
 class MicroBloque(InterfazTopologia):
-    def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, opciones_adicionales: dict=None, padre: TopologiaSerie=None) -> None:
+    def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None) -> None:
         self.padre = padre
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia
-        self.configuracion = ConfiguracionMicrobloque()
+        self.configuracion = configuracion
 
     def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto, valores_posibles, funcion_efecto):
         self.configuracion.agregar_configuracion(nombre, tipo, valor_por_defecto, efecto, valores_posibles, funcion_efecto)
