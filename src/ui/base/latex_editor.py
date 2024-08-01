@@ -18,7 +18,7 @@ class LatexEditor(QWidget):
         layout.addWidget(self.preview_label)
 
         self.web_view = QWebEngineView()
-        self.web_view.setFixedHeight(50)
+        self.web_view.setFixedHeight(35)
         channel = QWebChannel()
         self.web_view.page().setWebChannel(channel)
         channel.registerObject("latex_editor", self)
@@ -85,7 +85,7 @@ class LatexEditor(QWidget):
         layout.addWidget(self.web_view)
 
         self.editor = QTextEdit()
-        self.editor.setFixedHeight(50)
+        self.editor.setFixedHeight(35)
         self.editor.setText(initial_latex)
         self.editor.textChanged.connect(self.update_preview)
         layout.addWidget(self.editor)

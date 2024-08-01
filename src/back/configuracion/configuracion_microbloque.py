@@ -22,4 +22,7 @@ class ConfiguracionMicrobloque:
     def aplicar_efecto(self, funcion_transferencia):
         for configuracion in self.configuraciones.values():
             configuracion.aplicar_efecto(funcion_transferencia)
+    
+    def get_configuraciones(self):
+        return self.configuraciones
             

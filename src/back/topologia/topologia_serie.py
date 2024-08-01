@@ -95,11 +95,20 @@ class MicroBloque(InterfazTopologia):
         self.funcion_transferencia = funcion_transferencia
         self.configuracion = configuracion
 
-    def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto, valores_posibles, funcion_efecto):
-        self.configuracion.agregar_configuracion(nombre, tipo, valor_por_defecto, efecto, valores_posibles, funcion_efecto)
+    def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto):
+        self.configuracion.agregar_configuracion(nombre, tipo, valor_por_defecto, efecto)
     
     def set_configuracion(self, nombre, valor):
         self.configuracion.set_configuracion(nombre, valor)
+
+    def get_configuraciones(self):
+        return self.configuracion.get_configuraciones()
+    
+    def get_configuracion(self, nombre):
+        return self.configuracion.get_configuracion(nombre)
+
+    def actualizar_configuracion(self, old_name, new_name, new_type, new_value, new_efecto):
+        self.configuracion.actualizar_configuracion(old_name, new_name, new_type, new_value, new_efecto)
 
     def aplicar_efecto(self):
         self.configuracion.aplicar_efecto(self.funcion_transferencia)

@@ -133,24 +133,22 @@ class DrawingContent(QWidget):
         margen_x = 700  # Margen horizontal
         margen_y = 300  # Margen vertical
         
-        if self.microbloques: # si hay microbloques
-            max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques) # posicion mas a la derecha de los microbloques
-            max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques) # posicion mas arriba de los microbloques
+        if self.microbloques:
+            max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
+            max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
             
-            nuevo_ancho = max(int(max_x + margen_x), self.scroll_area.viewport().width()) # ancho del scroll area
-            nuevo_alto = max(int(max_y + margen_y), self.scroll_area.viewport().height()) # alto del scroll area
+            nuevo_ancho = max(int(max_x + margen_x), self.scroll_area.viewport().width())
+            nuevo_alto = max(int(max_y + margen_y), self.scroll_area.viewport().height())
         
-        else: # si no hay microbloques
-            nuevo_ancho = self.scroll_area.viewport().width() # ancho del scroll area
-            nuevo_alto = self.scroll_area.viewport().height() # alto del scroll area
+        else:
+            nuevo_ancho = self.scroll_area.viewport().width()
+            nuevo_alto = self.scroll_area.viewport().height()
         
-        if nuevo_ancho > self.width() or nuevo_alto > self.height(): # si el ancho o el alto del scroll area es mayor al ancho o alto de la ventana
-            self.setMinimumSize(nuevo_ancho, nuevo_alto) # se ajusta el tamaño de la ventana
+        #if nuevo_ancho > self.width() or nuevo_alto > self.height(): # TODO: Esto hace que se dibujen mal cuando se dibujan muchos paralelos seguidos
+            #self.setMinimumSize(nuevo_ancho, nuevo_alto)
         
         self.update()
-    
-    
-    
+
     def mouseMoveEvent(self, event): 
         if self.panning and self.last_pan_pos: # si se está moviendo el mouse y se está haciendo panning (arrastrar la pantalla)
             delta = event.pos() - self.last_pan_pos # calcula la diferencia entre la posición actual y la última posición
@@ -564,6 +562,7 @@ class DrawingContent(QWidget):
             return
         
         # Manejar configuraciones no booleanas
+        efecto = None
         if tipo_seleccionado != TipoConfiguracion.BOOLEANA:
             # Verificar que se haya ingresado un valor
             if not self.input_widget:
@@ -600,12 +599,12 @@ class DrawingContent(QWidget):
             # Para configuraciones booleanas, usar True como valor por defecto
             valor = True
         
-        efecto = None
-        if tipo_seleccionado == TipoConfiguracion.FUNCION:
-            if not hasattr(self, 'efecto_combo') or self.efecto_combo.currentData() is None:
-                QMessageBox.warning(self, "Error", "Por favor, seleccione un efecto para la función.")
-                return
-            efecto = self.efecto_combo.currentData()
+        
+        # if tipo_seleccionado == TipoConfiguracion.FUNCION:
+        #     if not hasattr(self, 'efecto_combo') or self.efecto_combo.currentData() is None:
+        #         QMessageBox.warning(self, "Error", "Por favor, seleccione un efecto para la función.")
+        #         return
+        #     efecto = self.efecto_combo.currentData()
         
         self.lista_configuraciones.agregar_configuracion(nombre, tipo_seleccionado, valor, efecto)
         boton_de_la_configuracion = QPushButton(nombre)
@@ -657,8 +656,7 @@ class DrawingContent(QWidget):
             input_widget.setPlaceholderText("Ingrese un valor de tipo numérico")
         elif tipo_seleccionado == TipoConfiguracion.FUNCION:
             # Para configuración de función, se crea un campo de entrada y un combo box para el efecto
-            input_widget = QLineEdit()
-            input_widget.setPlaceholderText("Ingrese una función")
+            input_widget = LatexEditor()
             efecto_combo = QComboBox()
             efecto_combo.addItem("Seleccione tipo de efecto", None)  # Opción por defecto
             efecto_combo.addItem(EfectoConfiguracion.DIRECTO.name, EfectoConfiguracion.DIRECTO)
@@ -705,13 +703,12 @@ class DrawingContent(QWidget):
         if configuracion.tipo != TipoConfiguracion.BOOLEANA: # si no es booleana
             if configuracion.tipo == TipoConfiguracion.FUNCION: # si es de tipo funcion
                 funcion, efecto = configuracion.get_valor() # capturamos tanto la funcion como el efecto
-                value_input = QLineEdit(funcion) # creamos un input para la funcion
+                value_input = LatexEditor(initial_latex=funcion)
+                value_input.update_preview()
                 edit_config_layout.addWidget(value_input) # agrega el input a la ventana
                 efecto_combo = QComboBox() # creamos el combo del efecto y le agregamos las opciones
                 efecto_combo.addItem(EfectoConfiguracion.DIRECTO.name, EfectoConfiguracion.DIRECTO)
                 efecto_combo.addItem(EfectoConfiguracion.INDIRECTO.name, EfectoConfiguracion.INDIRECTO)
-                print("efecto: ", efecto)
-                print("el tipo de dato del efecto es: ", type(efecto))
                 efecto_combo.setCurrentIndex(efecto_combo.findData(efecto)) # seleccionamos la opcion segun el tipo de efecto que tenia la configuracion
                 efecto_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
                 edit_config_layout.addWidget(efecto_combo)
@@ -728,8 +725,8 @@ class DrawingContent(QWidget):
             nombre, 
             name_input, 
             type_combo, 
-            self.find_input_widget(edit_config_layout, QLineEdit, 2), 
-            self.find_input_widget(edit_config_layout, QComboBox, 3).currentData() if (configuracion.tipo == TipoConfiguracion.FUNCION and self.find_input_widget(edit_config_layout, QComboBox, 3)) else None
+            self.find_input_widget(edit_config_layout, QLineEdit, 2) if (type_combo.currentData() != TipoConfiguracion.FUNCION) else self.find_input_widget(edit_config_layout, LatexEditor, 1), #El numero es la ocurrencia del widget en el layout, no el numero de widget
+            self.find_input_widget(edit_config_layout, QComboBox, 2).currentData() if (type_combo.currentData() == TipoConfiguracion.FUNCION and self.find_input_widget(edit_config_layout, QComboBox, 2)) else None
         ))
         edit_config_layout.addWidget(save_button)
 
@@ -750,16 +747,14 @@ class DrawingContent(QWidget):
     def save_edited_configuration(self, dialog, old_name, name_input, type_combo, value_input, efecto_combo=None):
         new_name = name_input.text()
         new_type = type_combo.currentData()
-        new_value = value_input.text()
+        if new_type == TipoConfiguracion.BOOLEANA:
+            new_value = True
+        else:
+            if new_type == TipoConfiguracion.FUNCION:
+                new_value = value_input.get_latex()
+            else:
+                new_value = value_input.text()  
         new_efecto = efecto_combo if efecto_combo else None
-
-        print("guardando cambios")
-        print("old_name: ", old_name)
-        print("new_name: ", new_name)
-        print("new_type: ", new_type)
-        print("new_value: ", new_value)
-        print("new_efecto: ", new_efecto)
-        print("\n")
 
         self.lista_configuraciones.actualizar_configuracion(old_name, new_name, new_type, new_value, new_efecto)
 
