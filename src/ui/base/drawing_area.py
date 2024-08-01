@@ -530,8 +530,7 @@ class DrawingContent(QWidget):
             self.input_widget.setPlaceholderText("Ingrese un valor de tipo numérico")
         elif tipo_seleccionado == TipoConfiguracion.FUNCION:
             # Para configuración de función, se crea un campo de entrada y un combo box para el efecto
-            self.input_widget = QLineEdit()
-            self.input_widget.setPlaceholderText("Ingrese una función")
+            self.input_widget = LatexEditor() # se crea el editor y la vista previa de latex
             self.efecto_combo = QComboBox()
             self.efecto_combo.addItem("Seleccione tipo de efecto", None)  # Opción por defecto
             self.efecto_combo.addItem("DIRECTO", EfectoConfiguracion.DIRECTO)
@@ -555,27 +554,54 @@ class DrawingContent(QWidget):
     def guardar_configuracion(self, dialog, name_input, layout_del_dialog_principal):
         # Este método se llama cuando el usuario intenta guardar una configuración
 
-        # Obtener el nombre y el tipo de la configuración
+        # Obtener el nombre y tipo de la configuración
         nombre = name_input.text()
         tipo_seleccionado = self.type_combo.currentData()
         
-        # Validar que todos los campos necesarios estén completos
-        if not nombre or tipo_seleccionado is None or not self.input_widget:
+        # Validar que se hayan completado los campos básicos
+        if not nombre or tipo_seleccionado is None:
             QMessageBox.warning(self, "Error", "Por favor, complete todos los campos.")
             return
         
-        # Obtener el valor ingresado por el usuario
-        valor = self.input_widget.text() if isinstance(self.input_widget, QLineEdit) else self.input_widget.currentText()
+        # Manejar configuraciones no booleanas
+        if tipo_seleccionado != TipoConfiguracion.BOOLEANA:
+            # Verificar que se haya ingresado un valor
+            if not self.input_widget:
+                QMessageBox.warning(self, "Error", "Por favor, ingrese un valor para la configuración.")
+                return
+            
+            # Obtener el valor ingresado (texto para QLineEdit, LaTeX para LatexEditor)
+            valor = self.input_widget.text() if isinstance(self.input_widget, QLineEdit) else self.input_widget.get_latex()
+            
+            # Validación específica para cada tipo de configuración
+            if tipo_seleccionado == TipoConfiguracion.NUMERICA:
+                # Asegurar que el valor sea numérico
+                if not valor or not valor.replace('.', '').isdigit():
+                    QMessageBox.warning(self, "Error", "Por favor, ingrese un valor numérico válido.")
+                    return
+            elif tipo_seleccionado == TipoConfiguracion.ENUMERADA:
+                # Asegurar que haya al menos dos valores separados por comas
+                valores = [v.strip() for v in valor.split(',') if v.strip()]
+                if len(valores) < 2:
+                    QMessageBox.warning(self, "Error", "Por favor, ingrese al menos dos valores separados por comas.")
+                    return
+                valor = ','.join(valores)  # Reformatear el valor
+            elif tipo_seleccionado == TipoConfiguracion.FUNCION:
+                # Asegurar que se haya ingresado una función LaTeX no vacía
+                if not valor.strip():
+                    QMessageBox.warning(self, "Error", "Por favor, ingrese una función válida en LaTeX.")
+                    return
+                # Verificar que se haya seleccionado un efecto para la función
+                if not hasattr(self, 'efecto_combo') or self.efecto_combo.currentData() is None:
+                    QMessageBox.warning(self, "Error", "Por favor, seleccione un efecto para la función.")
+                    return
+                efecto = self.efecto_combo.currentData()
+        else:
+            # Para configuraciones booleanas, usar True como valor por defecto
+            valor = True
         
-        # Validar que se haya ingresado un valor
-        if not valor:
-            QMessageBox.warning(self, "Error", "Por favor, ingrese un valor para la configuración.")
-            return
-        
-        # Manejar configuraciones de tipo FUNCION
         efecto = None
         if tipo_seleccionado == TipoConfiguracion.FUNCION:
-            # Verificar que se haya seleccionado un efecto válido
             if not hasattr(self, 'efecto_combo') or self.efecto_combo.currentData() is None:
                 QMessageBox.warning(self, "Error", "Por favor, seleccione un efecto para la función.")
                 return
