@@ -1774,17 +1774,29 @@ class DrawingContent(QWidget):
         #         return
         
         self.lista_configuraciones.agregar_configuracion(nombre, tipo_seleccionado, valor, efecto)
+        if not hasattr(self, 'config_buttons_layout'):
+            self.config_buttons_layout = QHBoxLayout()
+            layout_del_dialog_principal.insertLayout(layout_del_dialog_principal.count() - 2, self.config_buttons_layout)
+
         boton_de_la_configuracion = QPushButton(nombre)
         boton_de_la_configuracion.setStyleSheet("background-color: #444; color: white;")
         boton_de_la_configuracion.clicked.connect(lambda: self.edit_configuracion(nombre))
-        layout_del_dialog_principal.insertWidget(layout_del_dialog_principal.count() - 2, boton_de_la_configuracion)
+        self.config_buttons_layout.addWidget(boton_de_la_configuracion)
+
         # Cerrar el diálogo de configuración
         dialog.accept()
 
     def seleccion_tipo_configuracion_edit(self, edit_config_layout, type_combo):
-        # paso 1: eliminar el input de valor (si existe en el edit_config_layout) --> seria el segundo QLineEdit del layout
-        
-        # Identificar y eliminar el segundo QLineEdit
+        # Eliminar el LatexEditor anterior (si existe en el edit_config_layout)
+        for i in range(edit_config_layout.count()):
+            item = edit_config_layout.itemAt(i)
+            widget = item.widget()
+            if isinstance(widget, LatexEditor):
+                edit_config_layout.removeWidget(widget)
+                widget.deleteLater()
+                break
+
+        # Eliminar el segundo QLineEdit (si existe en el edit_config_layout)
         qlineedit_counter = 0
         for i in range(edit_config_layout.count()):
             item = edit_config_layout.itemAt(i)
@@ -1795,9 +1807,8 @@ class DrawingContent(QWidget):
                     edit_config_layout.removeWidget(widget)
                     widget.deleteLater()
                     break
-    
-        # paso 2: eliminar el combo de efecto (si exite en el edit_config_layout) --> sería el segundo QComboBox del layout 
 
+        # Eliminar el segundo QComboBox (si existe en el edit_config_layout)
         qcombobox_counter = 0
         for i in range(edit_config_layout.count()):
             item = edit_config_layout.itemAt(i)
@@ -1834,7 +1845,7 @@ class DrawingContent(QWidget):
             input_widget = QLineEdit()
             input_widget.setPlaceholderText("Ingrese valores separados por comas")
 
-        if input_widget != None:
+        if input_widget:
             input_widget.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
             edit_config_layout.insertWidget(2, input_widget)
         if efecto_combo:
@@ -1842,6 +1853,8 @@ class DrawingContent(QWidget):
 
         # Actualizar la interfaz para reflejar los cambios
         self.update()
+
+    
 
     def edit_configuracion(self, nombre):
         configuracion = self.lista_configuraciones.get_configuracion(nombre)
