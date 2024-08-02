@@ -1151,6 +1151,7 @@
 
 
 import os
+from PyQt5 import sip 
 from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QApplication,QComboBox,QMessageBox,QHBoxLayout
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
@@ -1660,15 +1661,28 @@ class DrawingContent(QWidget):
     def seleccion_tipo_configuracion(self):
         # Este método se llama cuando el usuario selecciona un tipo de configuración en el combo box
 
-        # Limpiar los widgets anteriores para evitar conflictos
-        if hasattr(self, 'input_widget') and self.input_widget:
-            self.config_layout.removeWidget(self.input_widget)
-            self.input_widget.deleteLater()
+        # # Limpiar los widgets anteriores para evitar conflictos
+        # if hasattr(self, 'input_widget') and self.input_widget:
+        #     self.config_layout.removeWidget(self.input_widget)
+        #     self.input_widget.deleteLater()
+        #     self.input_widget = None
+        
+        # if hasattr(self, 'efecto_combo') and self.efecto_combo:
+        #     self.config_layout.removeWidget(self.efecto_combo)
+        #     self.efecto_combo.deleteLater()
+        #     self.efecto_combo = None
+        
+        # Limpiar los widgets anteriores de manera segura
+        if hasattr(self, 'input_widget'):
+            if self.input_widget is not None and not sip.isdeleted(self.input_widget):
+                self.config_layout.removeWidget(self.input_widget)
+                self.input_widget.deleteLater()
             self.input_widget = None
         
-        if hasattr(self, 'efecto_combo') and self.efecto_combo:
-            self.config_layout.removeWidget(self.efecto_combo)
-            self.efecto_combo.deleteLater()
+        if hasattr(self, 'efecto_combo'):
+            if self.efecto_combo is not None and not sip.isdeleted(self.efecto_combo):
+                self.config_layout.removeWidget(self.efecto_combo)
+                self.efecto_combo.deleteLater()
             self.efecto_combo = None
 
         # Obtener el tipo de configuración seleccionado
@@ -1853,8 +1867,6 @@ class DrawingContent(QWidget):
 
         # Actualizar la interfaz para reflejar los cambios
         self.update()
-
-    
 
     def edit_configuracion(self, nombre):
         configuracion = self.lista_configuraciones.get_configuracion(nombre)
