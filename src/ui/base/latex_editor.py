@@ -1,7 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel, QMessageBox, QPushButton
 from PyQt5.QtCore import pyqtSignal, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
+from sympy import sympify, Symbol, SympifyError
+import re
+
 
 class LatexEditor(QWidget):
     latex_changed = pyqtSignal(str)
@@ -89,6 +92,10 @@ class LatexEditor(QWidget):
         self.editor.setText(initial_latex)
         self.editor.textChanged.connect(self.update_preview)
         layout.addWidget(self.editor)
+        
+        self.validate_button = QPushButton("Validar Función")
+        self.validate_button.clicked.connect(self.validar_funcion)
+        layout.addWidget(self.validate_button)
 
         self.setLayout(layout)
 
@@ -115,3 +122,35 @@ class LatexEditor(QWidget):
     def set_latex(self, latex):
         self.editor.setText(latex)
         self.update_preview()
+
+    def validar_funcion(self):
+        latex = self.editor.toPlainText()
+        if self.es_funcion_valida(latex):
+            self.update_preview()
+            self.latex_changed.emit(latex)
+        else:
+            QMessageBox.warning(self, "Función inválida", "Por favor ingresar una función en el dominio de Laplace.")
+            self.editor.undo()  
+
+    def es_funcion_valida(self, latex):
+        latex = latex.replace(' ', '').lower()
+        
+        if not latex or latex.count('{') != latex.count('}'):
+            return False
+        
+        if latex.replace('.', '').isdigit():
+            return True
+        
+        latex = latex.replace('\\frac', '')  # eliminar \frac
+        latex = re.sub(r'\{([^}]*)\}\{([^}]*)\}', r'((\1)/(\2))', latex)  # convertir fracciones
+        latex = latex.replace('^', '**')  # cambiar exponentes
+        
+        s = Symbol('s') # intentar parsear con SymPy
+        try:
+            expr = sympify(latex)
+            
+            if 's' not in latex and not expr.is_constant(): # verificar que 's' está en la expresión o es un número constante
+                return False
+            return True
+        except (SympifyError, TypeError, ValueError):
+            return False
