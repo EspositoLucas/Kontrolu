@@ -52,6 +52,8 @@ class DrawingContent(QWidget):
         desktop = QApplication.desktop()
         screen_rect = desktop.availableGeometry(self)
         self.setMaximumSize(screen_rect.width(), screen_rect.height())
+        # # Ajustar el tamaño de la ventana
+        # self.setMinimumSize(400, 300)  # Tamaño mínimo para que quepan los botones
     
         self.init_ui()
         
@@ -649,9 +651,9 @@ class DrawingContent(QWidget):
         # dialog.accept()
         
         self.lista_configuraciones.agregar_configuracion(nombre, tipo_seleccionado, valor, efecto)
-        self.agregar_boton_configuracion(nombre, layout_del_dialog_principal)
+        self.agregar_boton_configuracion(nombre, self.config_buttons_container)
         dialog.accept()
-
+        
     def seleccion_tipo_configuracion_edit(self, edit_config_layout, type_combo):
         # Eliminar el LatexEditor anterior (si existe en el edit_config_layout)
         for i in range(edit_config_layout.count()):
@@ -782,7 +784,7 @@ class DrawingContent(QWidget):
         
         # Agregar el botón de eliminar
         delete_button = QPushButton("Eliminar")
-        delete_button.setStyleSheet("background-color: #FF4444; color: white;")
+        delete_button.setStyleSheet("background-color: #444; color: white;")
         delete_button.clicked.connect(lambda: self.confirm_delete_configuration(dialog, nombre))
         edit_config_layout.addWidget(delete_button)
 
@@ -920,6 +922,12 @@ class DrawingContent(QWidget):
         save_button.clicked.connect(lambda: self.guardar_configuracion(dialog, name_input, layout_del_dialog_principal))
         save_button.setStyleSheet("background-color: #444; color: white;")
         self.config_layout.addWidget(save_button)
+        
+        # Crear un layout para los botones de configuración
+        self.config_buttons_container = QVBoxLayout()
+        self.config_buttons_container.setSpacing(5)  # Espacio entre filas
+        layout_del_dialog_principal.insertLayout(layout_del_dialog_principal.count() - 2, self.config_buttons_container)
+
 
         dialog.setLayout(self.config_layout)
         dialog.exec_()
@@ -988,7 +996,7 @@ class DrawingContent(QWidget):
                 efecto
             )
             
-            self.agregar_boton_configuracion(preset_data["nombre"], layout_del_dialog_principal)
+            self.agregar_boton_configuracion(preset_data["nombre"], self.config_buttons_container)
             dialog.accept()
         except KeyError as e:
             QMessageBox.warning(self, "Error", f"La configuración predeterminada está mal formada: {str(e)}")
@@ -998,13 +1006,26 @@ class DrawingContent(QWidget):
     def agregar_boton_configuracion(self, nombre, layout):
         if not hasattr(self, 'config_buttons_layout'):
             self.config_buttons_layout = QHBoxLayout()
+            self.config_buttons_layout.setAlignment(Qt.AlignLeft)  # Alinear a la izquierda
             layout.insertLayout(layout.count() - 2, self.config_buttons_layout)
-        botonSize = QSize(50, 50)
+        
+        botonSize = QSize(40, 40)  # Tamaño más pequeño
         boton_de_la_configuracion = QPushButton(nombre)
-        boton_de_la_configuracion.setStyleSheet("background-color: red; color: white; height: 2px; width: 2px;") 
+        boton_de_la_configuracion.setStyleSheet("""
+            background-color: red; 
+            color: white; 
+            border-radius: 5px; 
+            font-size: 10px;
+        """)
         boton_de_la_configuracion.setFixedSize(botonSize)
         boton_de_la_configuracion.clicked.connect(lambda: self.edit_configuracion(nombre))
         self.config_buttons_layout.addWidget(boton_de_la_configuracion)
+
+        # Verificar si necesitamos crear una nueva fila
+        if self.config_buttons_layout.count() % 5 == 0:  # Cada 5 botones
+            self.config_buttons_layout = QHBoxLayout()
+            self.config_buttons_layout.setAlignment(Qt.AlignLeft)
+            layout.insertLayout(layout.count() - 2, self.config_buttons_layout)
         
     def agregar_respecto_microbloque(self, new_microbloque, relation, reference_microbloque):
         if relation == "arriba":
@@ -1347,4 +1368,3 @@ class DrawingContent(QWidget):
             painter.drawLine(0, y, self.width(), y)
         
         painter.restore()
-
