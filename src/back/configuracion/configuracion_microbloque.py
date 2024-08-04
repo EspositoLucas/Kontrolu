@@ -25,4 +25,7 @@ class ConfiguracionMicrobloque:
     
     def get_configuraciones(self):
         return self.configuraciones
-            
+    
+    def eliminar_configuracion(self, nombre):
+        if nombre in self.configuraciones:
+            del self.configuraciones[nombre]
