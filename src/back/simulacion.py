@@ -49,28 +49,51 @@ class Simulacion:
         return tf1 + tf2
 
     def procesar_topologia(self, topologia):
+        # Convierte la topología en una función de transferencia
+        if topologia is None:
+            return control.tf(1, 1)  # Retorna una función de transferencia unitaria si la topología es None
+        
+        # Procesa diferentes tipos de topologías (MicroBloque, TopologiaSerie, TopologiaParalelo)
+        
         if isinstance(topologia, MicroBloque):
             return self.crear_funcion_transferencia(topologia.funcion_transferencia)
         elif isinstance(topologia, TopologiaSerie):
             tf_total = control.tf(1, 1)  # Función de transferencia unitaria
             for hijo in topologia.hijos:
-                tf_total = self.combinar_serie(tf_total, self.procesar_topologia(hijo))
+                tf_hijo = self.procesar_topologia(hijo)
+                if tf_hijo is not None:
+                    tf_total = self.combinar_serie(tf_total, tf_hijo)
             return tf_total
         elif isinstance(topologia, TopologiaParalelo):
             tf_total = control.tf(0, 1)  # Función de transferencia cero
             for hijo in topologia.hijos:
-                tf_total = self.combinar_paralelo(tf_total, self.procesar_topologia(hijo))
+                tf_hijo = self.procesar_topologia(hijo)
+                if tf_hijo is not None:
+                    tf_total = self.combinar_paralelo(tf_total, tf_hijo)
             return tf_total
-
+        else:
+            print(f"Tipo de topología desconocido: {type(topologia)}")
+            return control.tf(1, 1) 
+        
+    
     def preparar_sistema(self):
+        # Procesa cada componente del sistema
         tf_controlador = self.procesar_topologia(self.controlador)
         tf_actuador = self.procesar_topologia(self.actuador)
         tf_proceso = self.procesar_topologia(self.proceso)
         tf_medidor = self.procesar_topologia(self.medidor)
         
+        # Imprime las funciones de transferencia para depuración
+        print(f"TF Controlador: {tf_controlador}")
+        print(f"TF Actuador: {tf_actuador}")
+        print(f"TF Proceso: {tf_proceso}")
+        print(f"TF Medidor: {tf_medidor}")
+        
+        # Combina las funciones de transferencia para crear el sistema completo
         tf_directa = tf_controlador * tf_actuador * tf_proceso
         self.sistema = control.feedback(tf_directa, tf_medidor)
-
+        print(f"Sistema completo: {self.sistema}")
+        
     def simular_paso(self, t, dt, u, x0):
         y, _, x0 = control.forced_response(self.sistema, T=[t, t+dt], U=[u, u], X0=x0)
         return y[-1], x0
@@ -79,19 +102,35 @@ class Simulacion:
         if self.sistema is None:
             self.preparar_sistema()
         
-        t_list = [] # lista de tiempos
-        y_list = [] # lista de salidas
-        x0 = np.zeros(self.sistema.A.shape[0])
+        if self.sistema is None:
+            print("Error: No se pudo preparar el sistema")
+            return
         
-        t = 0
-        while t < t_total:
-            t_list.append(t)
-            u = entrada(t)
-            y, x0 = self.simular_paso(t, dt, u, x0)
-            y_list.append(y)
-            t += dt
-            yield t_list, y_list
+        # Genera el vector de tiempo y la señal de entrada
+        t = np.arange(0, t_total, dt)
+        u = np.array([entrada(ti) for ti in t])
+        
+        # Simula la respuesta del sistema
+        result = control.forced_response(self.sistema, T=t, U=u)
+        
+        # Maneja diferentes formatos de salida de forced_response
+        if len(result) == 3:
+            t, y, _ = result
+        elif len(result) == 2:
+            t, y = result
+        else:
+            print(f"Error: forced_response devolvió un número inesperado de valores: {len(result)}")
+            return
 
+        # Grafica los resultados
+        self.ax.clear()
+        self.ax.plot(t, y)
+        self.ax.set_xlabel('Tiempo')
+        self.ax.set_ylabel('Salida')
+        self.ax.set_title('Respuesta del sistema')
+        self.ax.grid(True)
+        plt.show()
+        
     def init_animation(self):
         self.line.set_data([], [])
         return self.line,
