@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLa
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
 import ctypes
+from back.simulacion import Simulacion
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('company.app.1')
 
 class MainWindow(QMainWindow):
@@ -35,7 +36,8 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('Listo')
         
         self.init_macrobloques() # Diagrama inicial de lazo cerrado
-        
+        boton_simulacion = QPushButton('Iniciar Simulación', self)
+        boton_simulacion.clicked.connect(self.iniciar_simulacion)
         self.showMaximized() # se maximiza al final de todo, luego de cargar todos los elementos
     
     def init_macrobloques(self):
@@ -61,3 +63,10 @@ class MainWindow(QMainWindow):
         if file_name:
             self.statusBar().showMessage(f'Proyecto guardado en {file_name}')
             # Lógica para guardar un proyecto
+
+    def iniciar_simulacion(self):
+        simulacion = Simulacion(self.sesion.controlador, self.sesion.actuador, self.sesion.proceso, self.sesion.medidor)
+        entrada = 1
+        t_total = 10
+        dt = 0.01
+        simulacion.simular_sistema_tiempo_real(entrada=entrada, t_total=t_total, dt=dt)

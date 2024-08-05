@@ -1,2 +1,4 @@
 PyQt5==5.15.10
 PyQtWebEngine==5.15.6
+control==0.10.0
+sympy==1.12
