@@ -547,7 +547,8 @@ class DrawingContent(QWidget):
             self.input_widget.setPlaceholderText("Ingrese un valor de tipo numérico")
         elif tipo_seleccionado == TipoConfiguracion.FUNCION:
             # Para configuración de función, se crea un campo de entrada y un combo box para el efecto
-            self.input_widget = LatexEditor() # se crea el editor y la vista previa de latex
+            self.input_widget = LatexEditor()
+            # self.input_widget.validate_button.clicked.connect(self.input_widget.validar_funcion)
             self.efecto_combo = QComboBox()
             self.efecto_combo.addItem("Seleccione tipo de efecto", None)  # Opción por defecto
             self.efecto_combo.addItem("DIRECTO", EfectoConfiguracion.DIRECTO)
@@ -607,8 +608,9 @@ class DrawingContent(QWidget):
                 valor = ','.join(valores)  # Reformatear el valor
             elif tipo_seleccionado == TipoConfiguracion.FUNCION:
                 # Asegurar que se haya ingresado una función LaTeX no vacía
-                if not valor.strip():
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese una función válida en LaTeX.")
+                latex_editor = self.input_widget
+                if not latex_editor.es_funcion_valida(latex_editor.get_latex()):
+                    QMessageBox.warning(self, "Función inválida", "Por favor valide previamente la funcion.")
                     return
                 # Verificar que se haya seleccionado un efecto para la función
                 if not hasattr(self, 'efecto_combo') or self.efecto_combo.currentData() is None:
@@ -618,37 +620,6 @@ class DrawingContent(QWidget):
         else:
             # Para configuraciones booleanas, usar True como valor por defecto
             valor = True
-        
-        
-        #  """
-        # Guarda una nueva configuración o una configuración editada.
-        # """
-        # # ... (código existente) ...
-        # if tipo_seleccionado == TipoConfiguracion.FUNCION:
-        #     funcion_texto = self.input_widget.get_latex()
-        #     try:
-        #         # Creamos una instancia de FuncionTransferencia
-        #         funcion_transferencia = FuncionTransferencia(funcion_texto)
-        #         if not funcion_transferencia.validar():
-        #             QMessageBox.warning(self, "Error", "La función de transferencia no es válida.")
-        #             return
-        #         valor = funcion_transferencia
-        #     except Exception as e:
-        #         QMessageBox.warning(self, "Error", f"Error al procesar la función de transferencia: {str(e)}")
-        #         return
-        
-        # self.lista_configuraciones.agregar_configuracion(nombre, tipo_seleccionado, valor, efecto)
-        # if not hasattr(self, 'config_buttons_layout'):
-        #     self.config_buttons_layout = QHBoxLayout()
-        #     layout_del_dialog_principal.insertLayout(layout_del_dialog_principal.count() - 2, self.config_buttons_layout)
-
-        # boton_de_la_configuracion = QPushButton(nombre)
-        # boton_de_la_configuracion.setStyleSheet("background-color: #444; color: white;")
-        # boton_de_la_configuracion.clicked.connect(lambda: self.edit_configuracion(nombre))
-        # self.config_buttons_layout.addWidget(boton_de_la_configuracion)
-
-        # # Cerrar el diálogo de configuración
-        # dialog.accept()
         
         self.lista_configuraciones.agregar_configuracion(nombre, tipo_seleccionado, valor, efecto)
         self.agregar_boton_configuracion(nombre, self.config_buttons_container)
@@ -703,6 +674,7 @@ class DrawingContent(QWidget):
         elif tipo_seleccionado == TipoConfiguracion.FUNCION:
             # Para configuración de función, se crea un campo de entrada y un combo box para el efecto
             input_widget = LatexEditor()
+            # input_widget.validate_button.clicked.connect(input_widget.validar_funcion)
             efecto_combo = QComboBox()
             efecto_combo.addItem("Seleccione tipo de efecto", None)  # Opción por defecto
             efecto_combo.addItem(EfectoConfiguracion.DIRECTO.name, EfectoConfiguracion.DIRECTO)
@@ -857,27 +829,10 @@ class DrawingContent(QWidget):
                     break
             
         if new_type == TipoConfiguracion.FUNCION:
-            funcion_texto = value_input.get_latex()
-            try:
-                # Intentamos crear un objeto FuncionTransferencia
-                if '/' in funcion_texto:
-                    # Si la función contiene '/', la separamos en numerador y denominador
-                    numerador, denominador = funcion_texto.split('/')
-                else:
-                    # Si no contiene '/', asumimos que es solo el numerador
-                    numerador, denominador = funcion_texto, '1'
-                new_value = FuncionTransferencia(numerador, denominador)
                 # Validamos la función de transferencia
-                if not new_value.validar():
-                    QMessageBox.warning(self, "Error", "La función de transferencia no es válida.")
+                if not value_input.es_funcion_valida(value_input.get_latex()):
+                    QMessageBox.warning(self, "Función inválida", "Por favor valide previamente la funcion.")
                     return
-            except Exception as e:
-                # Si hay algún error al procesar la función, mostramos un mensaje
-                QMessageBox.warning(self, "Error", f"Error al procesar la función de transferencia: {str(e)}")
-                return
-        else:
-            # Para otros tipos de configuración, usamos el texto directamente
-            new_value = value_input.text()
 
         dialog.accept()
     
