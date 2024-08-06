@@ -72,7 +72,7 @@
 #         simulacion.simular_sistema_tiempo_real(entrada=entrada, t_total=t_total, dt=dt)
 
 
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QToolBar, QPushButton, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QToolBar, QPushButton, QVBoxLayout, QDialog, QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui 
 import os
@@ -84,6 +84,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import ctypes
 from back.simulacion import Simulacion
+import math
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('company.app.1')
 
 class MainWindow(QMainWindow):
@@ -141,9 +142,69 @@ class MainWindow(QMainWindow):
             # Lógica para guardar un proyecto
 
     def iniciar_simulacion(self):
-        simulacion = Simulacion(self.sesion.controlador, self.sesion.actuador, self.sesion.proceso, self.sesion.medidor)
-        entrada = lambda t: 1  # Entrada escalón unitario
-        t_total = 10
-        dt = 0.01
-        simulacion.simular_sistema_tiempo_real(entrada=entrada, t_total=t_total, dt=dt)
-        self.statusBar().showMessage('Simulación completada')
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Parámetros de Simulación")
+        layout = QVBoxLayout()
+
+        # Función de entrada
+        entrada_layout = QHBoxLayout()
+        entrada_layout.addWidget(QLabel("Función de entrada:"))
+        entrada_combo = QComboBox()
+        entrada_combo.addItems(["Escalón unitario", "Rampa unitaria", "Parábola unitaria" ,"Senoidal", "Impulso"])
+        entrada_layout.addWidget(entrada_combo)
+        layout.addLayout(entrada_layout)
+
+        # Tiempo total
+        tiempo_layout = QHBoxLayout()
+        tiempo_layout.addWidget(QLabel("Tiempo total (s):"))
+        tiempo_edit = QLineEdit()
+        tiempo_edit.setText("10")
+        tiempo_layout.addWidget(tiempo_edit)
+        layout.addLayout(tiempo_layout)
+
+        # Delta t
+        dt_layout = QHBoxLayout()
+        dt_layout.addWidget(QLabel("Intervalo de tiempo (dt):"))
+        dt_edit = QLineEdit()
+        dt_edit.setText("0.01")
+        dt_layout.addWidget(dt_edit)
+        layout.addLayout(dt_layout)
+
+        # Setpoint
+        setpoint_layout = QHBoxLayout()
+        setpoint_layout.addWidget(QLabel("Valor de salida esperado:"))
+        setpoint_edit = QLineEdit()
+        setpoint_edit.setText("1")
+        setpoint_layout.addWidget(setpoint_edit)
+        layout.addLayout(setpoint_layout)
+
+        # Botones OK y Cancelar
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        layout.addWidget(button_box)
+
+        dialog.setLayout(layout)
+
+        if dialog.exec_():
+            entrada_tipo = entrada_combo.currentText()
+            t_total = float(tiempo_edit.text())
+            dt = float(dt_edit.text())
+            setpoint = float(setpoint_edit.text())
+
+            if entrada_tipo == "Escalón unitario":
+                entrada = lambda t: 1
+            elif entrada_tipo == "Rampa unitaria":
+                entrada = lambda t: t
+            elif entrada_tipo == "Parábola unitaria":
+                entrada = lambda t: 0.5 * t**2 
+            elif entrada_tipo == "Senoidal":
+                entrada = lambda t: math.sin(t)   
+            elif entrada_tipo == "Impulso":
+                entrada = lambda t: 1 if abs(t) < dt/2 else 0  # si esto no funciona, probar esto: elif entrada_tipo == "Impulso": entrada = lambda t: np.dirac(t) 
+            else:
+                entrada = lambda t: 1  # Por defecto, escalón unitario
+
+            simulacion = Simulacion(self.sesion.controlador, self.sesion.actuador, self.sesion.proceso, self.sesion.medidor)
+            simulacion.simular_sistema_tiempo_real(entrada=entrada, t_total=t_total, dt=dt, setpoint=setpoint)
+            self.statusBar().showMessage('Simulación completada')
