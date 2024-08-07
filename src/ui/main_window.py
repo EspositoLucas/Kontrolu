@@ -150,9 +150,17 @@ class MainWindow(QMainWindow):
         entrada_layout = QHBoxLayout()
         entrada_layout.addWidget(QLabel("Función de entrada:"))
         entrada_combo = QComboBox()
-        entrada_combo.addItems(["Escalón unitario", "Rampa unitaria", "Parábola unitaria" ,"Senoidal", "Impulso"])
+        entrada_combo.addItems(["Escalón", "Rampa", "Parábola", "Senoidal", "Impulso"])
         entrada_layout.addWidget(entrada_combo)
         layout.addLayout(entrada_layout)
+
+        # Coeficiente para escalón, rampa y parábola
+        coef_layout = QHBoxLayout()
+        coef_layout.addWidget(QLabel("Coeficiente:"))
+        coef_edit = QLineEdit()
+        coef_edit.setText("1")
+        coef_layout.addWidget(coef_edit)
+        layout.addLayout(coef_layout)
 
         # Tiempo total
         tiempo_layout = QHBoxLayout()
@@ -178,6 +186,14 @@ class MainWindow(QMainWindow):
         setpoint_layout.addWidget(setpoint_edit)
         layout.addLayout(setpoint_layout)
 
+        # Velocidad de animación
+        velocidad_layout = QHBoxLayout()
+        velocidad_layout.addWidget(QLabel("Velocidad de animación:"))
+        velocidad_combo = QComboBox()
+        velocidad_combo.addItems(["Lenta", "Normal", "Rápida"])
+        velocidad_layout.addWidget(velocidad_combo)
+        layout.addLayout(velocidad_layout)
+
         # Botones OK y Cancelar
         button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         button_box.accepted.connect(dialog.accept)
@@ -188,23 +204,25 @@ class MainWindow(QMainWindow):
 
         if dialog.exec_():
             entrada_tipo = entrada_combo.currentText()
+            coef = float(coef_edit.text())
             t_total = float(tiempo_edit.text())
             dt = float(dt_edit.text())
             setpoint = float(setpoint_edit.text())
+            velocidad = velocidad_combo.currentText().lower()
 
-            if entrada_tipo == "Escalón unitario":
-                entrada = lambda t: 1
-            elif entrada_tipo == "Rampa unitaria":
-                entrada = lambda t: t
-            elif entrada_tipo == "Parábola unitaria":
-                entrada = lambda t: 0.5 * t**2 
+            if entrada_tipo == "Escalón":
+                entrada = lambda t: coef
+            elif entrada_tipo == "Rampa":
+                entrada = lambda t: coef * t
+            elif entrada_tipo == "Parábola":
+                entrada = lambda t: coef * 0.5 * t**2 
             elif entrada_tipo == "Senoidal":
                 entrada = lambda t: math.sin(t)   
             elif entrada_tipo == "Impulso":
-                entrada = lambda t: 1 if abs(t) < dt/2 else 0  # si esto no funciona, probar esto: elif entrada_tipo == "Impulso": entrada = lambda t: np.dirac(t) 
+                entrada = lambda t: 1 if abs(t) < dt/2 else 0
             else:
                 entrada = lambda t: 1  # Por defecto, escalón unitario
 
             simulacion = Simulacion(self.sesion.controlador, self.sesion.actuador, self.sesion.proceso, self.sesion.medidor)
-            simulacion.simular_sistema_tiempo_real(entrada=entrada, t_total=t_total, dt=dt, setpoint=setpoint)
+            simulacion.ejecutar_simulacion(entrada=entrada, t_total=t_total, dt=dt, setpoint=setpoint, velocidad=velocidad)
             self.statusBar().showMessage('Simulación completada')
