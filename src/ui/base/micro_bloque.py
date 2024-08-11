@@ -1,28 +1,35 @@
-from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog,QComboBox,QHBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog,QComboBox,QHBoxLayout, QMessageBox, QGraphicsItem
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont
-from PyQt5.QtCore import Qt, QPointF
+from PyQt5.QtCore import Qt, QPointF, QRectF
 from .latex_editor import LatexEditor
 from back.configuracion.configuracion import Configuracion, TipoConfiguracion,EfectoConfiguracion
 from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
-class Microbloque(QWidget):
-    def __init__(self, parent=None, microbloque_back=None):
-        super().__init__(parent)
+class Microbloque(QGraphicsItem):
+    def __init__(self, microbloque_back=None):
+        super().__init__()
         self.elemento_back = microbloque_back
         self.nombre = microbloque_back.nombre
         self.color = microbloque_back.color or QColor(255, 255, 0)
         self.funcion_transferencia = microbloque_back.funcion_transferencia or ""
         self.configuracion_mb = microbloque_back.configuracion
         self.esta_selecionado = False
-        self.setFixedSize(microbloque_back.ancho(), microbloque_back.alto())
-        self.setAttribute(Qt.WA_StyledBackground, True)
+        #self.setFixedSize(microbloque_back.ancho(), microbloque_back.alto())
+        #self.setAttribute(Qt.WA_StyledBackground, True)
         color_texto = self.calcular_color(self.color)
-        self.setStyleSheet(f"""
-            font-weight: bold;
-            color: {color_texto};
-            font-family: Arial;  
-            background-color: {self.color.name()};
-        """)
+        
+        #self.setStyleSheet(f"""
+        #    font-weight: bold;
+        #    color: {color_texto};
+        #    font-family: Arial;  
+        #    background-color: {self.color.name()};
+        #""")
+        
+        self.setFlag(QGraphicsItem.ItemIsSelectable)
+        self.setZValue(1)
     
+    def boundingRect(self):
+        return QRectF(0, 0, self.elemento_back.ancho(), self.elemento_back.alto())
+
     def es_color_claro(self, color):
         r, g, b = color.red(), color.green(), color.blue()
         return r * 0.299 + g * 0.587 + b * 0.114 > 186
@@ -34,34 +41,36 @@ class Microbloque(QWidget):
         return color_texto
 
     def setPos(self, pos):
-        self.move(pos.toPoint())
+        super().setPos(pos)
+
+    def height(self):
+        return self.boundingRect().height()
+    
+    def width(self):
+        return self.boundingRect().width()
 
     def setSeleccionado(self, seleccionado):
         self.esta_selecionado = seleccionado
         self.update()
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
+    def paint(self, painter, option, widget):
         painter.setRenderHint(QPainter.Antialiasing)
         
-        # Dibuja el rectángulo
-        if self.esta_selecionado:
-            painter.setPen(QPen(Qt.red, 3))  # Borde rojo y más grueso para seleccionados
+        if self.isSelected():
+            painter.setPen(QPen(Qt.red, 3))
         else:
             painter.setPen(QPen(Qt.black, 2))
-        painter.setBrush(self.color)
-        painter.drawRect(self.rect().adjusted(1, 1, -1, -1))
         
-        # Configura la fuente
+        painter.setBrush(self.color)
+        painter.drawRect(self.boundingRect())
+        
         font = QFont("Arial", max(1, round(10)), QFont.Bold)
         painter.setFont(font)
-
-        # Configura el color del texto
+        
         color_texto = self.calcular_color(self.color)
         painter.setPen(QPen(QColor(color_texto)))
         
-        # Dibuja el texto
-        text_rect = self.rect().adjusted(5, 5, -5, -5)  # Margen para el texto
+        text_rect = self.boundingRect().adjusted(5, 5, -5, -5)
         painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
 
     def mouseDoubleClickEvent(self, event):

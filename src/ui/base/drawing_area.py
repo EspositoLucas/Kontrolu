@@ -1,6 +1,6 @@
 import os
 from PyQt5 import sip 
-from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QScrollArea, QTextEdit, QApplication,QComboBox,QMessageBox,QHBoxLayout,QInputDialog
+from PyQt5.QtWidgets import QWidget, QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QComboBox, QMessageBox, QHBoxLayout, QInputDialog, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsProxyWidget
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer,QSize
 from .micro_bloque import Microbloque
@@ -15,21 +15,15 @@ MARGEN_VERTICAL = 50
 BUTTON_SIZE = 20
 RADIO = 40
 MARGEN_PARALELO = 20
-
-class DrawingArea(QScrollArea):
-    def __init__(self, parent=None, modelo=None):
-        super().__init__(parent)
-        self.content = DrawingContent(parent, modelo, self)
-        self.setWidget(self.content)
-        self.setWidgetResizable(True)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        
-
-class DrawingContent(QWidget):
-    def __init__(self, macrobloque=None, ventana=None,scroll_area=None):
+class DrawingArea(QGraphicsView):
+    def __init__(self, macrobloque=None, ventana=None):
         super().__init__(ventana)
-        self.scroll_area = scroll_area  # Guardamos la referencia al QScrollArea
+        self.scene = QGraphicsScene(self)
+        self.setScene(self.scene)
+        self.setRenderHint(QPainter.Antialiasing)
+        self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
+        self.scene.setSceneRect(0, 0, 5000, 5000)
+
         self.microbloques = []
         self.selected_microbloque = None
         self.macrobloque = macrobloque
@@ -48,10 +42,6 @@ class DrawingContent(QWidget):
         self.lista_configuraciones = None
         self.load_preview_images()
         self.load_connection_image()
-        # Ajustar el tamaño máximo de la ventana
-        desktop = QApplication.desktop()
-        screen_rect = desktop.availableGeometry(self)
-        self.setMaximumSize(screen_rect.width(), screen_rect.height())
     
         self.init_ui()
         
@@ -67,13 +57,12 @@ class DrawingContent(QWidget):
         self.help_button.setToolTip("Mostrar ayuda")
         
     def load_microbloques(self):
-        for microbloque in self.microbloques:
-                microbloque.deleteLater() # elimina cada elemento
+        self.limpiar_escena()
         self.microbloques.clear() # vacia la lista de microbloques
         self.limpiar_seleccion() # si habia seleccionados, los limpia
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
+        self.dibujar_lo_demas()
         # self.print_topologia(self.macrobloque.modelo.topologia)
-        self.ajustar_tamanio_widget()
         self.update()
         
     def load_preview_images(self):
@@ -131,38 +120,13 @@ class DrawingContent(QWidget):
         layout.addWidget(close_button)
         help_dialog.setLayout(layout)
         help_dialog.exec_()
-    
-    def ajustar_tamanio_widget(self):
-        margen_x = 700  # Margen horizontal
-        margen_y = 300  # Margen vertical
-        
-        if self.microbloques:
-            max_x = max(mb.pos().x() + mb.width() for mb in self.microbloques)
-            max_y = max(mb.pos().y() + mb.height() for mb in self.microbloques)
-            
-            nuevo_ancho = max(int(max_x + margen_x), self.scroll_area.viewport().width())
-            nuevo_alto = max(int(max_y + margen_y), self.scroll_area.viewport().height())
-        
-        else:
-            nuevo_ancho = self.scroll_area.viewport().width()
-            nuevo_alto = self.scroll_area.viewport().height()
-        
-        # if nuevo_ancho > self.width() or nuevo_alto > self.height(): # TODO: Esto hace que se dibujen mal cuando se dibujan muchos paralelos seguidos
-        #     self.setMinimumSize(nuevo_ancho, nuevo_alto)
-        
-        self.update()
 
     def mouseMoveEvent(self, event): 
         if self.panning and self.last_pan_pos: # si se está moviendo el mouse y se está haciendo panning (arrastrar la pantalla)
-            delta = event.pos() - self.last_pan_pos # calcula la diferencia entre la posición actual y la última posición
-            h_bar = self.scroll_area.horizontalScrollBar() # obtiene el scrollbar horizontal
-            v_bar = self.scroll_area.verticalScrollBar() # obtiene el scrollbar vertical
-            
-            h_bar.setValue(h_bar.value() - delta.x()) # mueve el scrollbar horizontal
-            v_bar.setValue(v_bar.value() - delta.y()) # mueve el scrollbar vertical
-            
-            self.last_pan_pos = event.pos() # actualiza la última posición
-            event.accept()
+            delta = event.pos() - self.last_pan_pos
+            self.last_pan_pos = event.pos()
+            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
             return
 
         super().mouseMoveEvent(event)
@@ -210,18 +174,17 @@ class DrawingContent(QWidget):
         return QPointF(punto_final_max.x() + MARGEN_PARALELO, posicion_inicial.y())
 
     def create_microbloque(self, microbloque_back, pos):
-        microbloque = Microbloque(self, microbloque_back)
-        microbloque.setParent(self)
+        microbloque = Microbloque(microbloque_back)
         microbloque.setPos(pos)
         self.microbloques.append(microbloque)
-        microbloque.show()
-        self.update()
+        self.scene.addItem(microbloque)
         return pos
     
     def clear_all(self):
         if self.microbloques:
             for microbloque in self.microbloques:
-                microbloque.deleteLater() # elimina cada elemento
+                #microbloque.deleteLater() # elimina cada elemento
+                self.scene.removeItem(microbloque)
             self.microbloques.clear() # vacia la lista de microbloques
         
          # vacia la lista de botones "+"
@@ -232,28 +195,24 @@ class DrawingContent(QWidget):
         self.load_microbloques() # resetea la vista
         self.update()
     
-    def paintEvent(self, event):
-        super().paintEvent(event)
-        painter = QPainter(self)
-        # Dibujar cuadrícula
-        self.draw_grid(painter)
-        self.draw_io_blocks(painter)
+    def dibujar_lo_demas(self):
+        self.draw_grid() # Dibujar cuadrícula
+        self.draw_io_blocks()
         
         if not self.microbloques:
-            self.draw_empty_connection(painter)
+            self.draw_empty_connection()
         else:
            punto_inicial = QPointF((50 + RADIO) + RADIO, self.height() / 2) # punto de inicio de la primera conexión
-           punto_final = self.draw_connections(painter, self.macrobloque.modelo.topologia, punto_inicial)
-           self.draw_final_connection(painter, punto_final) # punto_final es el punto de salida de la última conexión
-           
+           punto_final = self.draw_connections(self.macrobloque.modelo.topologia, punto_inicial)
+           self.draw_final_connection(punto_final) # punto_final es el punto de salida de la última conexión
            self.update()
 
-    def draw_final_connection(self, painter, start_point):
+    def draw_final_connection(self, start_point):
         if start_point is None:
             return
         
         if self.punto_salida_actual is None:
-            self.punto_salida_actual = QPointF(self.width() - 130 - RADIO,self.height() / 2)
+            self.punto_salida_actual = QPointF(self.width() - 130 - RADIO, self.height() / 2)
 
         if start_point.x() < self.punto_salida_actual.x():
             end_x = self.punto_salida_actual.x()
@@ -262,89 +221,96 @@ class DrawingContent(QWidget):
             end_x = self.punto_salida_actual.x()
 
         end_point = QPointF(end_x, self.height() / 2) # end_point es el lugar donde está el bloque de salida
-        painter.setPen(QPen(Qt.black, 2))
-        painter.drawLine(start_point, end_point)
-        
+        #painter.setPen(QPen(Qt.black, 2))
+        #painter.drawLine(start_point, end_point)
+        line = QGraphicsLineItem(start_point.x(), start_point.y(), end_point.x(), end_point.y())
+        line.setPen(QPen(Qt.black, 2))
+        self.scene.addItem(line)
+
         self.update()
 
-    def draw_empty_connection(self, painter):
-        painter.setPen(QPen(Qt.black, 2))
+    def draw_empty_connection(self):
         entrada = QPointF(130, self.height() / 2)
         salida = QPointF(self.width() - 210, self.height() / 2)
         self.punto_salida_actual = salida
-        painter.drawLine(entrada, salida)
+        line = QGraphicsLineItem(entrada.x(), entrada.y(), salida.x(), salida.y())
+        line.setPen(QPen(Qt.black, 3))
+        self.scene.addItem(line)
         
         # Dibujar el botón "+" en el medio
         center = QPointF((entrada.x() + salida.x()) / 2, self.height() / 2)
-        button_rect = QRectF(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
-        button_fill_color = QColor("#ADD8E6")
-        painter.setBrush(QBrush(button_fill_color))
-        painter.drawEllipse(button_rect)
-        painter.drawText(button_rect, Qt.AlignCenter, "+")
+        button = QGraphicsEllipseItem(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
+        button.setBrush(QBrush(QColor("#ADD8E6")))
+        button.setPen(QPen(Qt.black, 2))
+        self.scene.addItem(button)
+
+        text = QGraphicsTextItem("+")
+        text.setFont(QFont("Arial", 12, QFont.Bold))
+        text.setDefaultTextColor(Qt.black)
+        text.setPos(center.x() - text.boundingRect().width() / 2, center.y() - text.boundingRect().height() / 2)
+        self.scene.addItem(text)
 
         # Guardar la posición del botón para detectar clics
-        self.add_button_rect = button_rect
-        
-        self.update()
+        self.add_button_rect = QRectF(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
 
-    def draw_io_blocks(self, painter):
-        painter.setPen(QPen(Qt.black, 2))
-        
-        contour_color = QColor(0, 0, 0)  # Negro para el contorno
-        contour_pen = QPen(contour_color, 3)  # Grosor del contorno
-        fill_color = QColor(128, 128, 128)
-        text_color = QColor(255, 255, 255)  # Blanco para el texto
-        text_font = QFont('Arial', int(12))  # Fuente Arial y tamaño ajustado
-
-        painter.setPen(contour_pen)
-        painter.setBrush(QBrush(fill_color))
-
-        centro_y = self.height() / 2  # Posición y del centro para ambos círculos
-        
+    def draw_io_blocks(self):
+        centro_y = self.height() / 2  # Posición y del centro para ambos círculos 
         centro_entrada_x = 50 + RADIO  # Posición x del centro del círculo de entrada
         centro_salida_x = self.width() - 130 - RADIO  # Posición x del centro del círculo de salida
         
         # Dibujar el círculo de entrada
-        painter.drawEllipse(QPointF(centro_entrada_x, centro_y), RADIO, RADIO)
+        entrada = QGraphicsEllipseItem(centro_entrada_x - RADIO, centro_y - RADIO, RADIO * 2, RADIO * 2)
+        entrada.setBrush(QBrush(QColor(128, 128, 128)))
+        entrada.setPen(QPen(Qt.black, 3))
+        self.scene.addItem(entrada)
+
+        # Colocar texto "Entrada" en el círculo de entrada
+        text = QGraphicsTextItem("Entrada")
+        text.setFont(QFont("Arial", 12))
+        text.setDefaultTextColor(Qt.black)
+        text.setPos(centro_entrada_x - text.boundingRect().width() / 2, centro_y - text.boundingRect().height() / 2)
+        self.scene.addItem(text)
 
         if not self.punto_salida_actual:
             centro_salida_x = self.width() - (130 + RADIO)
         else:
             centro_salida_x = self.punto_salida_actual.x() + RADIO
+            print("hay punto de salida: ", self.punto_salida_actual)
 
         if not self.microbloques:
             centro_salida_x = self.width() - (130 + RADIO)
             self.punto_salida_actual = None
 
         # Dibujar círculo de salida
-        painter.drawEllipse(QPointF(centro_salida_x, centro_y), RADIO, RADIO)
+        salida = QGraphicsEllipseItem(centro_salida_x - RADIO, centro_y - RADIO, RADIO * 2, RADIO * 2)
+        salida.setBrush(QBrush(QColor(128, 128, 128)))
+        salida.setPen(QPen(Qt.black, 3))
+        self.scene.addItem(salida)
 
-        # Establecer el color y la fuente para el texto
-        painter.setPen(text_color)
-        painter.setFont(text_font)
-
-        # Dibujar texto en los círculos
-        painter.drawText(QRectF(50, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Entrada")
-        painter.drawText(QRectF(centro_salida_x - 40, self.height() / 2 - 30, 80, 60), Qt.AlignCenter, "Salida")
+        # Colocar texto "Salida" en el círculo de salida
+        text = QGraphicsTextItem("Salida")
+        text.setFont(QFont("Arial", 12))
+        text.setDefaultTextColor(Qt.black)
+        text.setPos(centro_salida_x - text.boundingRect().width() / 2, centro_y - text.boundingRect().height() / 2)
+        self.scene.addItem(text)       
+        
         self.update()
     
-    def draw_connections(self, painter, topologia, punto_de_partida, is_parallel=False):
+    def draw_connections(self, topologia, punto_de_partida, is_parallel=False):
         if punto_de_partida is None:
             return None
-
-        painter.setPen(QPen(Qt.black, 2)) # configura el color y grosor de la línea
         
         if isinstance(topologia, TopologiaSerie):
-            return self.draw_serie_connections(painter, topologia, punto_de_partida)
+            return self.draw_serie_connections(topologia, punto_de_partida)
         elif isinstance(topologia, TopologiaParalelo):
-            return self.draw_paralelo_connections(painter, topologia, punto_de_partida)
+            return self.draw_paralelo_connections(topologia, punto_de_partida)
         elif isinstance(topologia, MicroBloque):
-            return self.draw_microbloque_connection(painter, topologia, punto_de_partida, is_parallel)
+            return self.draw_microbloque_connection(topologia, punto_de_partida, is_parallel)
         else:
             return punto_de_partida
         
 
-    def draw_serie_connections(self, painter, serie, punto_inicial):
+    def draw_serie_connections(self, serie, punto_inicial):
         """
         Dibuja las conexiones de una serie de microbloques
         @return el punto final de la serie
@@ -355,12 +321,12 @@ class DrawingContent(QWidget):
         punto_actual = punto_inicial
         for hijo in serie.hijos:
             # para cada elemento de la serie, llama a draw_connections para que dibuje sus componentes (si las hubiera)
-            punto_final = self.draw_connections(painter, hijo, punto_actual) 
+            punto_final = self.draw_connections(hijo, punto_actual) 
             punto_actual = punto_final
 
         return punto_actual
 
-    def draw_paralelo_connections(self, painter, paralelo, punto_inicial):
+    def draw_paralelo_connections(self, paralelo, punto_inicial):
         if punto_inicial is None:
             return None
 
@@ -369,16 +335,22 @@ class DrawingContent(QWidget):
         altura_total = sum(hijo.alto() for hijo in paralelo.hijos) # idem que en dibujar_paralelo
         altura_total += (len(paralelo.hijos) - 1) * MARGEN_VERTICAL # idem que en dibujar_paralelo
         
-        # Dibujar línea horizontal antes de la bifurcación
-        painter.drawLine(punto_inicial, comienzo_de_rama)
+        # Dibujar línea horizontal antes de la bifurcación (desde el punto inicial hasta el comienzo de la rama)
+        line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), comienzo_de_rama.x(), comienzo_de_rama.y())
+        line.setPen(QPen(Qt.black, 2))
+        self.scene.addItem(line)
         
         # Dibujar conexiones para cada rama
         y_actual = punto_inicial.y() - altura_total / 2
         puntos_finales = []
         for hijo in paralelo.hijos:
             punto_final_rama_vertical = QPointF(comienzo_de_rama.x(), y_actual + hijo.alto() / 2) # deja igual la "x" y pone la "y" en el centro del microbloque
-            painter.drawLine(comienzo_de_rama, punto_final_rama_vertical)  # Línea vertical de bifurcación
-            punto_final_rama_actual = self.draw_connections(painter, hijo, punto_final_rama_vertical, True) # partiendo desde el extremo de la linea vertical de bifurcacion, comienza a dibujar lo que sigue
+            
+            line = QGraphicsLineItem(comienzo_de_rama.x(), comienzo_de_rama.y(), punto_final_rama_vertical.x(), punto_final_rama_vertical.y()) # Línea vertical de bifurcación (desde el comienzo de la rama hasta el punto final rama vertical)
+            line.setPen(QPen(Qt.black, 2))
+            self.scene.addItem(line)
+            
+            punto_final_rama_actual = self.draw_connections(hijo, punto_final_rama_vertical, True) # partiendo desde el extremo de la linea vertical de bifurcacion, comienza a dibujar lo que sigue
             if punto_final_rama_actual is not None:
                 puntos_finales.append(punto_final_rama_actual) # se va guardando los puntos finales de cada rama del paralelo
             y_actual += hijo.alto() + MARGEN_VERTICAL # incorpora el margen vertical
@@ -391,8 +363,11 @@ class DrawingContent(QWidget):
          
         # Dibujar líneas horizontales para reconectar las ramas
         for end_point in puntos_finales:
-            painter.drawLine(end_point, QPointF(max_x, end_point.y())) # le sumamos 20 para tener una linea horizontal (al salir del microbloque) antes de reconectar
-        
+            #painter.drawLine(end_point, QPointF(max_x, end_point.y())) # le sumamos 20 para tener una linea horizontal (al salir del microbloque) antes de reconectar
+            line = QGraphicsLineItem(end_point.x(), end_point.y(), max_x, end_point.y())
+            line.setPen(QPen(Qt.black, 2))
+            self.scene.addItem(line)
+
         punto_de_reconexion = QPointF(max_x, punto_inicial.y())  # punto de reconexión (es el punto más a la derecha de la estructura paralelo)
         
         if not self.connection_image.isNull():
@@ -406,9 +381,13 @@ class DrawingContent(QWidget):
             # Convertimos las coordenadas a enteros y ajustamos por el tamaño de la imagen
             x = int(punto_de_reconexion.x() - scaled_image.width() / 2)
             y = int(punto_de_reconexion.y() - scaled_image.height() / 2)
-            painter.drawPixmap(x, y, scaled_image)
+            #painter.drawPixmap(x, y, scaled_image)
+            image = QGraphicsPixmapItem(scaled_image)
+            image.setPos(x, y)
+            self.scene.addItem(image)
         else:
-            painter.drawEllipse(punto_de_reconexion, 5 , 5 )
+            #painter.drawEllipse(punto_de_reconexion, 5 , 5 )
+            ellipse = QGraphicsEllipseItem(punto_de_reconexion.x() - 5, punto_de_reconexion.y() - 5, 10, 10)
 
         # Punto de reconexión
         punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
@@ -416,17 +395,23 @@ class DrawingContent(QWidget):
         # Dibujar líneas verticales para reconectar (En realidad es una unica linea desde una rama a la otra)
         # QPointF(max_x + 20, puntos_finales[0].y()) --> es para la rama de arriba (indice 0 es el primer elemento de una lista)
         # QPointF(max_x + 20, puntos_finales[-1].y()) --> es para la rama de abajo (indice -1 es el último elemento de una lista)
-        painter.drawLine(QPointF(max_x, puntos_finales[0].y()), QPointF(max_x, puntos_finales[-1].y()))
-        
+        #painter.drawLine(QPointF(max_x, puntos_finales[0].y()), QPointF(max_x, puntos_finales[-1].y()))
+        line = QGraphicsLineItem(max_x, puntos_finales[0].y(), max_x, puntos_finales[-1].y())
+        line.setPen(QPen(Qt.black, 2))
+        self.scene.addItem(line)
+
         # Dibujar línea horizontal final (para salir de la estructura paralelo)
-        painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_mas_alejado)
-        
+        #painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_mas_alejado)
+        line = QGraphicsLineItem(max_x, punto_inicial.y(), punto_mas_alejado.x(), punto_mas_alejado.y())
+        line.setPen(QPen(Qt.black, 2))
+        self.scene.addItem(line)
+
         # retorna el punto de reconexión porque es el punto "mas a la derecha" de la estructura paralelo
         return punto_mas_alejado 
     
-    def draw_microbloque_connection(self, painter, microbloque, punto_inicial, es_paralelo):
+    def draw_microbloque_connection(self, microbloque, punto_inicial, es_paralelo):
         # busca en la lista de microbloques de la drawing_area, el microbloque que queremos conectar
-        for mb in self.microbloques:
+        for mb in self.microbloques: # los microbloques ahora heredan de QGraphicsItem
             if mb.elemento_back == microbloque: # compara su elemento back
                 if es_paralelo:
                     punto_final = QPointF(mb.pos().x(), punto_inicial.y()) # deja igual el "x", y el "y" lo deja igual respecto a de la rama paralela en donde está
@@ -436,7 +421,10 @@ class DrawingContent(QWidget):
                 # punto_final seria el punto en donde va a llegar la flecha que proviene del microbloque anterior (punto medio izquierdo del microbloque actual)
 
                 if punto_inicial is not None and punto_final is not None:
-                    painter.drawLine(punto_inicial, punto_final) # dibuja la linea
+                    # dibujar la linea desde el punto_inicial hasta el punto_final
+                    line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), punto_final.x(), punto_final.y())
+                    line.setPen(QPen(Qt.black, 2))
+                    self.scene.addItem(line)
                 
                 return mb.pos() + QPointF(mb.width(), mb.height() / 2) # retorna un punto que representa la mitad del lado derecho del microbloque. Este punto se usará como punto de inicio para la siguiente conexión.
         
@@ -1017,7 +1005,7 @@ class DrawingContent(QWidget):
             button.setProperty("selected_color", color)
     
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton and event.modifiers() & Qt.ControlModifier: # si se hace click izquierdo y se mantiene presionado "Ctrl"
+        if event.button() == Qt.RightButton: # si se hace click izquierdo y se mantiene presionado "Ctrl"
             self.panning = True # activa el panning (arrastrar la pantalla)
             self.last_pan_pos = event.pos() # guarda la posición actual
             self.setCursor(Qt.ClosedHandCursor) # cambia el cursor (mano cerrada)
@@ -1025,13 +1013,15 @@ class DrawingContent(QWidget):
             return
         super().mousePressEvent(event)
 
+        scene_pos = self.mapToScene(event.pos()) # lugar del click en la escena
+
         if not self.microbloques: # si no hay microbloques y se hace click sobre el único botón "+", entonces se crea un microbloque 
-            if hasattr(self, 'add_button_rect') and self.add_button_rect.contains(event.pos()):
+            if hasattr(self, 'add_button_rect') and self.add_button_rect.contains(scene_pos):
                 self.create_new_microbloque(self.add_button_rect.center())
         else: 
             if event.button() == Qt.LeftButton: # si se hace click izquierdo
                 for microbloque in self.microbloques: # si hay microbloques, se busca el microbloque que se seleccionó
-                    if microbloque.geometry().contains(event.pos()):
+                    if microbloque.boundingRect().contains(microbloque.mapFromScene(scene_pos)):
                         if self.seleccion_multiple: # si está activa la seleccion multiple
                             if microbloque in self.selected_microbloques: # si el microbloque seleccionado ya estaba seleccionado
                                 self.selected_microbloques.remove(microbloque) # lo deseleccionamos
@@ -1057,7 +1047,7 @@ class DrawingContent(QWidget):
             elif event.button() == Qt.RightButton: # si se hace click derecho
                 self.hide_add_buttons()
                 for microbloque in self.microbloques: # busca el microbloque que se seleccionó
-                    if microbloque.geometry().contains(event.pos()):
+                    if microbloque.geometry().contains(scene_pos):
                         if not self.seleccion_multiple: # si no está activada la seleccion multiple
                             self.selected_microbloque = microbloque # seleccionamos el microbloque
                             microbloque.setSeleccionado(True) # cambiar el color del borde del microbloque seleccionado
@@ -1072,22 +1062,23 @@ class DrawingContent(QWidget):
 
     def show_add_buttons(self, microbloque):
         self.hide_add_buttons()
+        rect = microbloque.mapToScene(microbloque.boundingRect()).boundingRect()
         positions = [
-            ('arriba', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() - BUTTON_SIZE/2)),
-            ('abajo', QPointF(microbloque.x() + microbloque.width()/2, microbloque.y() + microbloque.height() + BUTTON_SIZE/2)),
-            ('izquierda', QPointF(microbloque.x() - BUTTON_SIZE/2, microbloque.y() + microbloque.height()/2)),
-            ('derecha', QPointF(microbloque.x() + microbloque.width() + BUTTON_SIZE/2, microbloque.y() + microbloque.height()/2))
+            ('arriba', QPointF(rect.center().x(), rect.top() - BUTTON_SIZE / 2)),
+            ('abajo', QPointF(rect.center().x(), rect.bottom() + BUTTON_SIZE / 2)),
+            ('izquierda', QPointF(rect.left() - BUTTON_SIZE / 2, rect.center().y())),
+            ('derecha', QPointF(rect.right() + BUTTON_SIZE / 2, rect.center().y()))
         ]
         
         for direction, pos in positions:
             button = QPushButton("+", self)
-            button.setStyleSheet("background-color: white; color: black;")
+            button.setStyleSheet("background-color: white; color: black; border: 2px solid black;")
             button.setGeometry(int(pos.x() - BUTTON_SIZE/2), int(pos.y() - BUTTON_SIZE/2), BUTTON_SIZE, BUTTON_SIZE)
             button.clicked.connect(lambda _, d=direction: self.show_add_menu(d))
             button.show()
             self.add_buttons.append(button)
-        
-        # Agregar tooltip
+
+            # Agregar tooltip
             tooltip_text = {
                 'arriba': "Agregar microbloque arriba",
                 'abajo': "Agregar microbloque abajo",
@@ -1098,7 +1089,7 @@ class DrawingContent(QWidget):
 
     def hide_add_buttons(self):
         for button in self.add_buttons:
-            button.deleteLater()
+            button.hide()
         self.add_buttons.clear()
 
     def show_add_menu(self, direction):
@@ -1243,7 +1234,7 @@ class DrawingContent(QWidget):
     def delete_microbloque(self, microbloque):
         self.microbloques.remove(microbloque)
         microbloque.elemento_back.borrar_elemento()
-        microbloque.deleteLater()
+        self.scene.removeItem(microbloque)
         self.selected_microbloque = None
         self.hide_add_buttons()
         self.load_microbloques()
@@ -1253,7 +1244,7 @@ class DrawingContent(QWidget):
         for microbloque in self.selected_microbloques:
             self.microbloques.remove(microbloque)
             microbloque.elemento_back.borrar_elemento()
-            microbloque.deleteLater()
+            self.scene.removeItem(microbloque)
             self.hide_add_buttons()
         self.selected_microbloques.clear() # limpio la lista de microbloques seleccionados
         self.load_microbloques()
@@ -1308,16 +1299,20 @@ class DrawingContent(QWidget):
         elif isinstance(topologia, MicroBloque):
             print(f"{space}MicroBloque: {topologia.nombre}")
     
-    def draw_grid(self, painter):
-        painter.save()
-        painter.setPen(QPen(QColor(200, 200, 200), 1))
-        
-        grid_size = 20
-        
-        for x in range(0, int(self.width()), int(grid_size)):
-            painter.drawLine(x, 0, x, self.height())
-        
-        for y in range(0, int(self.height()), int(grid_size)):
-            painter.drawLine(0, y, self.width(), y)
-        
-        painter.restore()
+    def draw_grid(self):
+        for x in range(0, int(self.scene.width()), 50):
+            line = QGraphicsLineItem(x, 0, x, self.scene.height())
+            line.setPen(QPen(QColor(200, 200, 200)))
+            self.scene.addItem(line)
+        for y in range(0, int(self.scene.height()), 50):
+            line = QGraphicsLineItem(0, y, self.scene.width(), y)
+            line.setPen(QPen(QColor(200, 200, 200)))
+            self.scene.addItem(line)
+
+    def limpiar_escena(self):
+        self.scene.clear()
+        self.microbloques.clear()
+        self.selected_microbloque = None
+        self.selected_microbloques.clear()
+        self.hide_add_buttons()
+        self.update()
