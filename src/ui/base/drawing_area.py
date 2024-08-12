@@ -22,9 +22,11 @@ class DrawingArea(QGraphicsView):
         self.setScene(self.scene)
         self.setRenderHint(QPainter.Antialiasing)
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
-        self.scene.setSceneRect(0, 0, 5000, 5000)
+        self.initial_rect = QRectF(0, 0, 1000, 1000)
+        self.scene.setSceneRect(self.initial_rect)
 
         self.microbloques = []
+        self.grid_lines = []
         self.selected_microbloque = None
         self.macrobloque = macrobloque
         self.modelo = macrobloque.modelo # es la representacion backend del macrobloque
@@ -55,14 +57,39 @@ class DrawingArea(QGraphicsView):
         self.help_button.setGeometry(10, 60, 30, 30)
         self.help_button.clicked.connect(self.show_help)
         self.help_button.setToolTip("Mostrar ayuda")
+
+    def update_scene_rect(self, item_rect):
+        current_rect = self.scene.sceneRect() # obtiene el rectangulo actual de la escena
+        new_rect = current_rect.united(item_rect) # une el rectangulo actual con el rectangulo del item
         
+        if new_rect != current_rect: # si el nuevo rectangulo es distinto al actual
+            margin = 100  # es un espacio para que no quede tan pegado al borde
+            new_rect = new_rect.adjusted(-margin, -margin, margin, margin) # ajusta el rectangulo usando el margen
+            self.scene.setSceneRect(new_rect) # se lo setea a la escena
+            self.draw_grid() # redibujo la cuadricula porque cambié el tamaño del fondo
+        
+
+    def add_item(self, item): 
+        # NO BORRAR: es un metodo que se podría usar en vez de llamar a self.scene.addItem(item)
+        self.scene.addItem(item)
+        item_rect = item.sceneBoundingRect()
+        self.update_scene_rect(item_rect)
+
+    def resizeEvent(self, event):
+        # sobreescribo el resizeEvent propio de QGraphicsView
+        super().resizeEvent(event)
+        visible_rect = self.mapToScene(self.viewport().rect()).boundingRect() # calcula el rectangulo en el cual entran todos los items de la escena
+        self.update_scene_rect(visible_rect) # actualiza el rectangulo de la escena
+
     def load_microbloques(self):
         self.limpiar_escena()
+        self.scene.setSceneRect(self.initial_rect) # reinicia el rectangulo al tamaño default
         self.microbloques.clear() # vacia la lista de microbloques
         self.limpiar_seleccion() # si habia seleccionados, los limpia
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
         self.dibujar_lo_demas()
         # self.print_topologia(self.macrobloque.modelo.topologia)
+        self.update_scene_rect(self.scene.itemsBoundingRect()) # actualiza el rectangulo de la escena en funcion de lo dibujado
         self.update()
         
     def load_preview_images(self):
@@ -196,7 +223,6 @@ class DrawingArea(QGraphicsView):
         self.update()
     
     def dibujar_lo_demas(self):
-        self.draw_grid() # Dibujar cuadrícula
         self.draw_io_blocks()
         
         if not self.microbloques:
@@ -1300,17 +1326,29 @@ class DrawingArea(QGraphicsView):
             print(f"{space}MicroBloque: {topologia.nombre}")
     
     def draw_grid(self):
-        for x in range(0, int(self.scene.width()), 50):
-            line = QGraphicsLineItem(x, 0, x, self.scene.height())
+        if len(self.grid_lines) > 0: # si ya hay lineas en la escena
+            for line in self.grid_lines: # las borramos
+                self.scene.removeItem(line) # primero las saco de la escena
+            self.grid_lines.clear() # luego, limpio toda la lista de lineas
+
+        rect = self.scene.sceneRect() # obtengo el rectángulo actual de la escena
+
+        for x in range(int(rect.left()), int(rect.right()), 50): # lineas verticales
+            line = QGraphicsLineItem(x, rect.top(), x, rect.bottom())
+            line.setZValue(-1) # la dibujo en el fondo
             line.setPen(QPen(QColor(200, 200, 200)))
             self.scene.addItem(line)
-        for y in range(0, int(self.scene.height()), 50):
-            line = QGraphicsLineItem(0, y, self.scene.width(), y)
+            self.grid_lines.append(line)
+        for y in range(int(rect.top()), int(rect.bottom()), 50): # lineas horizontales
+            line = QGraphicsLineItem(rect.left(), y, rect.right(), y)
+            line.setZValue(-1) # la dibujo en el fondo
             line.setPen(QPen(QColor(200, 200, 200)))
             self.scene.addItem(line)
+            self.grid_lines.append(line)
 
     def limpiar_escena(self):
         self.scene.clear()
+        self.grid_lines.clear()
         self.microbloques.clear()
         self.selected_microbloque = None
         self.selected_microbloques.clear()
