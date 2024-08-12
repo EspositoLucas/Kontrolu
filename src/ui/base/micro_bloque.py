@@ -140,11 +140,18 @@ class Microbloque(QGraphicsItem):
         self.update()
 
     def edit_configuration(self, configuracion, layout):
+        # Obtener la ventana principal como el padre del diálogo
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+        
         if configuracion is None: # esto sería raro que pase
             QMessageBox.warning(self, "Error", f"No se encontró la configuración")
             return
         
-        dialog = QDialog(self)
+        dialog = QDialog(parent)
         dialog.setWindowTitle(f"Editar Configuración: {configuracion.nombre}")
         dialog.setStyleSheet("background-color: #333; color: white;")
         edit_config_layout = QVBoxLayout()
@@ -233,7 +240,14 @@ class Microbloque(QGraphicsItem):
         dialog.accept()
 
     def edit_properties(self):
-        dialog = QDialog(self)
+        # Obtener la ventana principal como el padre del diálogo
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+
+        dialog = QDialog(parent)
         dialog.setWindowTitle("Editar Microbloque")
         dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
@@ -340,11 +354,18 @@ class Microbloque(QGraphicsItem):
         self.update()
 
     def edit_configuracion(self, configuracion):
+        # Obtener la ventana principal como el padre del diálogo
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+                
         if configuracion is None: # esto sería raro que pase
             QMessageBox.warning(self, "Error", f"No se encontró la configuración")
             return
-        
-        dialog = QDialog(self)
+
+        dialog = QDialog(parent)
         dialog.setWindowTitle(f"Editar Configuración: {configuracion.nombre}")
         dialog.setStyleSheet("background-color: #333; color: white;")
         edit_config_layout = QHBoxLayout()
@@ -398,13 +419,20 @@ class Microbloque(QGraphicsItem):
     def guardar_configuracion(self, dialog, name_input, layout_del_dialog_principal, type_combo, config_layout):
         # Este método se llama cuando el usuario intenta guardar una configuración
 
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+
         # Obtener el nombre y tipo de la configuración
         nombre = name_input.text()
         tipo_seleccionado = type_combo.currentData()
 
         # Validar que se hayan completado los campos básicos
         if not nombre or tipo_seleccionado is None:
-            QMessageBox.warning(self, "Error", "Por favor, complete todos los campos.")
+            # Obtener la ventana principal como el padre del diálogo
+            QMessageBox.warning(parent, "Error", "Por favor, complete todos los campos.")
             return
         
         # buscar input_widget
@@ -417,7 +445,7 @@ class Microbloque(QGraphicsItem):
             if not input_widget:
                 input_widget = self.find_input_widget(config_layout, LatexEditor, 1)
                 if not input_widget.get_latex():
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese un valor para la configuración.")
+                    QMessageBox.warning(parent, "Error", "Por favor, ingrese un valor para la configuración.")
                     return
             
             # Obtener el valor ingresado (texto para QLineEdit, LaTeX para LatexEditor)
@@ -431,19 +459,19 @@ class Microbloque(QGraphicsItem):
             if tipo_seleccionado == TipoConfiguracion.NUMERICA:
                 # Asegurar que el valor sea numérico
                 if not valor or not valor.replace('.', '').isdigit():
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese un valor numérico válido.")
+                    QMessageBox.warning(parent, "Error", "Por favor, ingrese un valor numérico válido.")
                     return
             elif tipo_seleccionado == TipoConfiguracion.ENUMERADA:
                 # Asegurar que haya al menos dos valores separados por comas
                 valores = [v.strip() for v in valor.split(',') if v.strip()]
                 if len(valores) < 2:
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese al menos dos valores separados por comas.")
+                    QMessageBox.warning(parent, "Error", "Por favor, ingrese al menos dos valores separados por comas.")
                     return
                 valor = ','.join(valores)  # Reformatear el valor
             elif tipo_seleccionado == TipoConfiguracion.FUNCION:
                 # Asegurar que se haya ingresado una función LaTeX no vacía
                 if not valor.strip():
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese una función válida en LaTeX.")
+                    QMessageBox.warning(parent, "Error", "Por favor, ingrese una función válida en LaTeX.")
                     return
                 
                 # Buscar el combo de efecto:
@@ -451,7 +479,7 @@ class Microbloque(QGraphicsItem):
 
                 # Verificar que se haya seleccionado un efecto para la función
                 if efecto_combo.currentData() is None:
-                    QMessageBox.warning(self, "Error", "Por favor, seleccione un efecto para la función.")
+                    QMessageBox.warning(parent, "Error", "Por favor, seleccione un efecto para la función.")
                     return
                 efecto = efecto_combo.currentData()
         else:
@@ -476,8 +504,15 @@ class Microbloque(QGraphicsItem):
     def add_configuration(self, layout_del_dialog_principal):
         # Este método crea y muestra el diálogo para agregar una nueva configuración
 
+        # Obtener la ventana principal como el padre del diálogo
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+
         # Crear el diálogo
-        dialog = QDialog(self)
+        dialog = QDialog(parent)
         dialog.setWindowTitle("Agregar Configuración")
         dialog.setStyleSheet("background-color: #333; color: white;")
         config_layout = QVBoxLayout()
