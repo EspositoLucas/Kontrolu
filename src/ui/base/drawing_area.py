@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer,QSize
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from .funcion_transferencia import FuncionTransferencia
+from .add_button import AddButton
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
 from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
 from back.configuracion.configuracion import Configuracion, TipoConfiguracion,EfectoConfiguracion
@@ -15,6 +16,7 @@ MARGEN_VERTICAL = 50
 BUTTON_SIZE = 20
 RADIO = 40
 MARGEN_PARALELO = 20
+
 class DrawingArea(QGraphicsView):
     def __init__(self, macrobloque=None, ventana=None):
         super().__init__(ventana)
@@ -1088,23 +1090,23 @@ class DrawingArea(QGraphicsView):
 
     def show_add_buttons(self, microbloque):
         self.hide_add_buttons()
-        rect = microbloque.mapToScene(microbloque.boundingRect()).boundingRect()
+        rect = microbloque.boundingRect()
+        microbloque_pos = microbloque.scenePos()
+        button_width = BUTTON_SIZE
+        button_height = BUTTON_SIZE
         positions = [
-            ('arriba', QPointF(rect.center().x(), rect.top() - BUTTON_SIZE / 2)),
-            ('abajo', QPointF(rect.center().x(), rect.bottom() + BUTTON_SIZE / 2)),
-            ('izquierda', QPointF(rect.left() - BUTTON_SIZE / 2, rect.center().y())),
-            ('derecha', QPointF(rect.right() + BUTTON_SIZE / 2, rect.center().y()))
+            ('arriba', QPointF(rect.center().x() - button_width/2, rect.top() - button_height)),
+            ('abajo', QPointF(rect.center().x() - button_width/2, rect.bottom())),
+            ('izquierda', QPointF(rect.left() - button_width, rect.center().y() - button_height/2)),
+            ('derecha', QPointF(rect.right(), rect.center().y() - button_height/2))
         ]
         
         for direction, pos in positions:
-            button = QPushButton("+", self)
-            button.setStyleSheet("background-color: white; color: black; border: 2px solid black;")
-            button.setGeometry(int(pos.x() - BUTTON_SIZE/2), int(pos.y() - BUTTON_SIZE/2), BUTTON_SIZE, BUTTON_SIZE)
-            button.clicked.connect(lambda _, d=direction: self.show_add_menu(d))
-            button.show()
+            scene_pos = microbloque_pos + pos
+            button = AddButton(scene_pos.x(), scene_pos.y(), button_width, button_height, direction)
+            self.scene.addItem(button)
             self.add_buttons.append(button)
 
-            # Agregar tooltip
             tooltip_text = {
                 'arriba': "Agregar microbloque arriba",
                 'abajo': "Agregar microbloque abajo",
@@ -1112,13 +1114,14 @@ class DrawingArea(QGraphicsView):
                 'derecha': "Agregar microbloque a la derecha"
             }
             button.setToolTip(tooltip_text[direction])
-
+    
     def hide_add_buttons(self):
         for button in self.add_buttons:
-            button.hide()
+            if button.scene():
+                button.scene().removeItem(button)
         self.add_buttons.clear()
 
-    def show_add_menu(self, direction):
+    def show_add_menu(self, direction, pos):
         menu = QMenu(self)
         menu.setStyleSheet("""
             QMenu {
@@ -1127,23 +1130,21 @@ class DrawingArea(QGraphicsView):
         """)
         micro_back = self.selected_microbloque.elemento_back
         parent_structures = micro_back.get_parent_structures()
-        
         for parent in [[micro_back, 0]] + parent_structures:
             structure_name = self.get_structure_name(parent)
             action_text = self.get_descriptive_action_text(direction, structure_name)
             action = menu.addAction(action_text)
             
             # Usamos una función lambda que llama directamente a add_microbloque
-            action.triggered.connect(lambda checked, d=direction, s=parent[0]: 
-                QTimer.singleShot(0, lambda: self.add_microbloque(d, s)))
+            action.triggered.connect(lambda checked, m=self.selected_microbloque,d=direction, s=parent[0]: 
+                QTimer.singleShot(0, lambda: self.add_microbloque(m, d, s)))
             
             action.hovered.connect(lambda s=parent, d=direction: self.show_preview(d, s))
         
         menu.setMouseTracking(True)
         menu.leaveEvent = lambda event: self.hide_preview()
         
-        button = self.sender()
-        menu.exec_(button.mapToGlobal(button.rect().bottomLeft()))
+        menu.exec_(self.mapToGlobal(self.mapFromScene(pos))) # Usamos la posición pasada como argumento para mostrar el menú
 
     def show_preview(self, direction, structure):
         # Si ya existe un timer, lo detenemos
@@ -1290,7 +1291,7 @@ class DrawingArea(QGraphicsView):
             self.selected_microbloque.setSeleccionado(False)
             self.selected_microbloque = None
 
-    def add_microbloque(self, direction, estructura_de_referencia):
+    def add_microbloque(self, microbloque, direction, estructura_de_referencia):
         if estructura_de_referencia:
             if direction in ['arriba', 'abajo']:
                 relation = direction
@@ -1300,7 +1301,7 @@ class DrawingArea(QGraphicsView):
                 relation = 'despues'
             
             # Llamamos directamente a create_new_microbloque
-            self.create_new_microbloque(self.selected_microbloque.pos(), relation, estructura_de_referencia)
+            self.create_new_microbloque(microbloque.pos(), relation, estructura_de_referencia)
         
         self.hide_preview()
         
