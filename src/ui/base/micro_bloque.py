@@ -74,7 +74,8 @@ class Microbloque(QGraphicsItem):
         painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
 
     def mouseDoubleClickEvent(self, event):
-        self.edit_properties()
+        if event.button() == Qt.LeftButton:
+            self.edit_properties()
 
     def seleccion_tipo_configuracion_edit(self, edit_config_layout, type_combo):
         # paso 1: eliminar el input de valor (si existe en el edit_config_layout) --> seria el segundo QLineEdit del layout
