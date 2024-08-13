@@ -245,7 +245,6 @@ class DrawingArea(QGraphicsView):
 
         if start_point.x() < self.punto_salida_actual.x():
             end_x = self.punto_salida_actual.x()
-            print("punto de salida actual: ", self.punto_salida_actual)
         else:
             self.punto_salida_actual.setX(start_point.x() + MARGEN_HORIZONTAL)
             end_x = self.punto_salida_actual.x()
@@ -1284,6 +1283,10 @@ class DrawingArea(QGraphicsView):
         self.seleccion_multiple = valor # seteamos el valor
         if not valor: # si se deselecciona la opción de seleccionar varios
             self.limpiar_seleccion() # limpiamos la selección
+        else:
+            if self.selected_microbloque:
+                self.selected_microbloques.append(self.selected_microbloque)
+                self.selected_microbloque = None
         self.update()
 
     def limpiar_seleccion(self):
@@ -1293,6 +1296,7 @@ class DrawingArea(QGraphicsView):
         if self.selected_microbloque:
             self.selected_microbloque.setSeleccionado(False)
             self.selected_microbloque = None
+        self.update()
 
     def add_microbloque(self, microbloque, direction, estructura_de_referencia):
         if estructura_de_referencia:
@@ -1308,11 +1312,7 @@ class DrawingArea(QGraphicsView):
         
         self.hide_preview()
         
-    def encontrar_bloque_mas_a_la_derecha(self):
-        if not self.microbloques:
-            return None
-        return max(self.microbloques, key=lambda mb: mb.pos().x() + mb.width()) # retorna el que tenga mayor x
-
+    
     def print_topologia(self, topologia, indent=0):
         """
         Imprime el arbol del macrobloque por consola

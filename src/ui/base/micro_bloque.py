@@ -56,7 +56,7 @@ class Microbloque(QGraphicsItem):
     def paint(self, painter, option, widget):
         painter.setRenderHint(QPainter.Antialiasing)
         
-        if self.isSelected():
+        if self.esta_selecionado:
             painter.setPen(QPen(Qt.red, 3))
         else:
             painter.setPen(QPen(Qt.black, 2))
