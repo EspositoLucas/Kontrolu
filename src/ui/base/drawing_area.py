@@ -225,7 +225,6 @@ class DrawingArea(QGraphicsView):
         self.update()
     
     def dibujar_lo_demas(self):
-        self.draw_io_blocks()
         
         if not self.microbloques:
             self.draw_empty_connection()
@@ -234,6 +233,8 @@ class DrawingArea(QGraphicsView):
            punto_final = self.draw_connections(self.macrobloque.modelo.topologia, punto_inicial)
            self.draw_final_connection(punto_final) # punto_final es el punto de salida de la última conexión
            self.update()
+
+        self.draw_io_blocks()
 
     def draw_final_connection(self, start_point):
         if start_point is None:
@@ -244,6 +245,7 @@ class DrawingArea(QGraphicsView):
 
         if start_point.x() < self.punto_salida_actual.x():
             end_x = self.punto_salida_actual.x()
+            print("punto de salida actual: ", self.punto_salida_actual)
         else:
             self.punto_salida_actual.setX(start_point.x() + MARGEN_HORIZONTAL)
             end_x = self.punto_salida_actual.x()
@@ -303,7 +305,6 @@ class DrawingArea(QGraphicsView):
             centro_salida_x = self.width() - (130 + RADIO)
         else:
             centro_salida_x = self.punto_salida_actual.x() + RADIO
-            print("hay punto de salida: ", self.punto_salida_actual)
 
         if not self.microbloques:
             centro_salida_x = self.width() - (130 + RADIO)
@@ -416,6 +417,8 @@ class DrawingArea(QGraphicsView):
         else:
             #painter.drawEllipse(punto_de_reconexion, 5 , 5 )
             ellipse = QGraphicsEllipseItem(punto_de_reconexion.x() - 5, punto_de_reconexion.y() - 5, 10, 10)
+            ellipse.setBrush(QBrush(Qt.black))
+            self.scene.addItem(ellipse)
 
         # Punto de reconexión
         punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
