@@ -8,6 +8,8 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import Qt
+import ctypes
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('company.app.1')
 
 class MainWindow(QMainWindow):
     def __init__(self,sesion):
@@ -24,7 +26,8 @@ class MainWindow(QMainWindow):
         image_path = os.path.join(path, 'base/imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.setWindowIcon(icon)
+        # self.setWindowIcon(icon)
+        self.setWindowIcon(QtGui.QIcon(icon))
     
         menuBar = Menu(self)
         self.setMenuBar(menuBar)

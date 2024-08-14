@@ -1,5 +1,6 @@
 from __future__ import annotations
 from back.topologia.interfaz_topologia import InterfazTopologia
+from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
 from PyQt5.QtGui import QColor
 
 ANCHO = 150
@@ -87,12 +88,30 @@ class TopologiaSerie(InterfazTopologia):
         return "SERIE: " + str(list(map(lambda hijo: str(hijo),self.hijos)))
 
 class MicroBloque(InterfazTopologia):
-    def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, opciones_adicionales: dict=None, padre: TopologiaSerie=None) -> None:
+    def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None) -> None:
         self.padre = padre
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia
-        self.opciones_adicionales = opciones_adicionales
+        self.configuracion = configuracion
+
+    def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto):
+        self.configuracion.agregar_configuracion(nombre, tipo, valor_por_defecto, efecto)
+    
+    def set_configuracion(self, nombre, valor):
+        self.configuracion.set_configuracion(nombre, valor)
+
+    def get_configuraciones(self):
+        return self.configuracion.get_configuraciones()
+    
+    def get_configuracion(self, nombre):
+        return self.configuracion.get_configuracion(nombre)
+
+    def actualizar_configuracion(self, old_name, new_name, new_type, new_value, new_efecto):
+        self.configuracion.actualizar_configuracion(old_name, new_name, new_type, new_value, new_efecto)
+
+    def aplicar_efecto(self):
+        self.configuracion.aplicar_efecto(self.funcion_transferencia)
 
     def borrar_elemento(self):
         self.padre.borrar_elemento(self)
