@@ -399,45 +399,56 @@ class DrawingArea(QGraphicsView):
         punto_de_reconexion = QPointF(max_x, punto_inicial.y())  # punto de reconexión (es el punto más a la derecha de la estructura paralelo)
         
         if not self.connection_image.isNull():
-            # Escalamos la imagen según el factor de escala
             scaled_image = self.connection_image.scaled(
                 int(40), 
                 int(40), 
                 Qt.KeepAspectRatio, 
                 Qt.SmoothTransformation
             )
-            # Convertimos las coordenadas a enteros y ajustamos por el tamaño de la imagen
             x = int(punto_de_reconexion.x() - scaled_image.width() / 2)
             y = int(punto_de_reconexion.y() - scaled_image.height() / 2)
-            #painter.drawPixmap(x, y, scaled_image)
             image = QGraphicsPixmapItem(scaled_image)
             image.setPos(x, y)
             self.scene.addItem(image)
+            
+            # Calcular el centro y radio de la imagen del punto suma
+            imagen_centro = QPointF(x + scaled_image.width() / 2, y + scaled_image.height() / 2)
+            radio_imagen = scaled_image.width() / 2
+            
+            # Dibujar línea desde la rama superior al borde superior de la imagen
+            punto_superior = QPointF(imagen_centro.x(), imagen_centro.y() - radio_imagen)
+            line = QGraphicsLineItem(max_x, puntos_finales[0].y(), punto_superior.x(), punto_superior.y())
+            line.setPen(QPen(Qt.black, 2))
+            self.scene.addItem(line)
+            
+            # Dibujar línea desde la rama inferior al borde inferior de la imagen
+            punto_inferior = QPointF(imagen_centro.x(), imagen_centro.y() + radio_imagen)
+            line = QGraphicsLineItem(max_x, puntos_finales[-1].y(), punto_inferior.x(), punto_inferior.y())
+            line.setPen(QPen(Qt.black, 2))
+            self.scene.addItem(line)
+            
+            # Dibujar línea horizontal final desde el borde derecho de la imagen
+            punto_derecho = QPointF(imagen_centro.x() + radio_imagen, imagen_centro.y())
+            punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
+            line = QGraphicsLineItem(punto_derecho.x(), punto_derecho.y(), punto_mas_alejado.x(), punto_mas_alejado.y())
+            line.setPen(QPen(Qt.black, 2))
+            self.scene.addItem(line)
         else:
-            #painter.drawEllipse(punto_de_reconexion, 5 , 5 )
             ellipse = QGraphicsEllipseItem(punto_de_reconexion.x() - 5, punto_de_reconexion.y() - 5, 10, 10)
             ellipse.setBrush(QBrush(Qt.black))
             self.scene.addItem(ellipse)
+            
+            punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
+            
+            line = QGraphicsLineItem(max_x, puntos_finales[0].y(), max_x, puntos_finales[-1].y())
+            line.setPen(QPen(Qt.black, 2))
+            self.scene.addItem(line)
+            
+            line = QGraphicsLineItem(max_x, punto_inicial.y(), punto_mas_alejado.x(), punto_mas_alejado.y())
+            line.setPen(QPen(Qt.black, 2))
+            self.scene.addItem(line)
 
-        # Punto de reconexión
-        punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
-
-        # Dibujar líneas verticales para reconectar (En realidad es una unica linea desde una rama a la otra)
-        # QPointF(max_x + 20, puntos_finales[0].y()) --> es para la rama de arriba (indice 0 es el primer elemento de una lista)
-        # QPointF(max_x + 20, puntos_finales[-1].y()) --> es para la rama de abajo (indice -1 es el último elemento de una lista)
-        #painter.drawLine(QPointF(max_x, puntos_finales[0].y()), QPointF(max_x, puntos_finales[-1].y()))
-        line = QGraphicsLineItem(max_x, puntos_finales[0].y(), max_x, puntos_finales[-1].y())
-        line.setPen(QPen(Qt.black, 2))
-        self.scene.addItem(line)
-
-        # Dibujar línea horizontal final (para salir de la estructura paralelo)
-        #painter.drawLine(QPointF(max_x, punto_inicial.y()), punto_mas_alejado)
-        line = QGraphicsLineItem(max_x, punto_inicial.y(), punto_mas_alejado.x(), punto_mas_alejado.y())
-        line.setPen(QPen(Qt.black, 2))
-        self.scene.addItem(line)
-
-        # retorna el punto de reconexión porque es el punto "mas a la derecha" de la estructura paralelo
-        return punto_mas_alejado 
+        return punto_mas_alejado
     
     def draw_microbloque_connection(self, microbloque, punto_inicial, es_paralelo):
         # busca en la lista de microbloques de la drawing_area, el microbloque que queremos conectar
