@@ -1,28 +1,35 @@
-from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog,QComboBox,QHBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog,QComboBox,QHBoxLayout, QMessageBox, QGraphicsItem
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont
-from PyQt5.QtCore import Qt, QPointF
+from PyQt5.QtCore import Qt, QPointF, QRectF
 from .latex_editor import LatexEditor
 from back.configuracion.configuracion import Configuracion, TipoConfiguracion,EfectoConfiguracion
 from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
-class Microbloque(QWidget):
-    def __init__(self, parent=None, microbloque_back=None):
-        super().__init__(parent)
+class Microbloque(QGraphicsItem):
+    def __init__(self, microbloque_back=None):
+        super().__init__()
         self.elemento_back = microbloque_back
         self.nombre = microbloque_back.nombre
         self.color = microbloque_back.color or QColor(255, 255, 0)
         self.funcion_transferencia = microbloque_back.funcion_transferencia or ""
         self.configuracion_mb = microbloque_back.configuracion
         self.esta_selecionado = False
-        self.setFixedSize(microbloque_back.ancho(), microbloque_back.alto())
-        self.setAttribute(Qt.WA_StyledBackground, True)
+        #self.setFixedSize(microbloque_back.ancho(), microbloque_back.alto())
+        #self.setAttribute(Qt.WA_StyledBackground, True)
         color_texto = self.calcular_color(self.color)
-        self.setStyleSheet(f"""
-            font-weight: bold;
-            color: {color_texto};
-            font-family: Arial;  
-            background-color: {self.color.name()};
-        """)
+        
+        #self.setStyleSheet(f"""
+        #    font-weight: bold;
+        #    color: {color_texto};
+        #    font-family: Arial;  
+        #    background-color: {self.color.name()};
+        #""")
+        
+        self.setFlag(QGraphicsItem.ItemIsSelectable)
+        self.setZValue(1)
     
+    def boundingRect(self):
+        return QRectF(0, 0, self.elemento_back.ancho(), self.elemento_back.alto())
+
     def es_color_claro(self, color):
         r, g, b = color.red(), color.green(), color.blue()
         return r * 0.299 + g * 0.587 + b * 0.114 > 186
@@ -34,38 +41,41 @@ class Microbloque(QWidget):
         return color_texto
 
     def setPos(self, pos):
-        self.move(pos.toPoint())
+        super().setPos(pos)
+
+    def height(self):
+        return self.boundingRect().height()
+    
+    def width(self):
+        return self.boundingRect().width()
 
     def setSeleccionado(self, seleccionado):
         self.esta_selecionado = seleccionado
         self.update()
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
+    def paint(self, painter, option, widget):
         painter.setRenderHint(QPainter.Antialiasing)
         
-        # Dibuja el rectángulo
         if self.esta_selecionado:
-            painter.setPen(QPen(Qt.red, 3))  # Borde rojo y más grueso para seleccionados
+            painter.setPen(QPen(Qt.red, 3))
         else:
             painter.setPen(QPen(Qt.black, 2))
-        painter.setBrush(self.color)
-        painter.drawRect(self.rect().adjusted(1, 1, -1, -1))
         
-        # Configura la fuente
+        painter.setBrush(self.color)
+        painter.drawRect(self.boundingRect())
+        
         font = QFont("Arial", max(1, round(10)), QFont.Bold)
         painter.setFont(font)
-
-        # Configura el color del texto
+        
         color_texto = self.calcular_color(self.color)
         painter.setPen(QPen(QColor(color_texto)))
         
-        # Dibuja el texto
-        text_rect = self.rect().adjusted(5, 5, -5, -5)  # Margen para el texto
+        text_rect = self.boundingRect().adjusted(5, 5, -5, -5)
         painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
 
     def mouseDoubleClickEvent(self, event):
-        self.edit_properties()
+        if event.button() == Qt.LeftButton:
+            self.edit_properties()
 
     def seleccion_tipo_configuracion_edit(self, edit_config_layout, type_combo):
         # paso 1: eliminar el input de valor (si existe en el edit_config_layout) --> seria el segundo QLineEdit del layout
@@ -130,11 +140,18 @@ class Microbloque(QWidget):
         self.update()
 
     def edit_configuration(self, configuracion, layout):
+        # Obtener la ventana principal como el padre del diálogo
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+        
         if configuracion is None: # esto sería raro que pase
             QMessageBox.warning(self, "Error", f"No se encontró la configuración")
             return
         
-        dialog = QDialog(self)
+        dialog = QDialog(parent)
         dialog.setWindowTitle(f"Editar Configuración: {configuracion.nombre}")
         dialog.setStyleSheet("background-color: #333; color: white;")
         edit_config_layout = QVBoxLayout()
@@ -223,7 +240,14 @@ class Microbloque(QWidget):
         dialog.accept()
 
     def edit_properties(self):
-        dialog = QDialog(self)
+        # Obtener la ventana principal como el padre del diálogo
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+
+        dialog = QDialog(parent)
         dialog.setWindowTitle("Editar Microbloque")
         dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
@@ -330,11 +354,18 @@ class Microbloque(QWidget):
         self.update()
 
     def edit_configuracion(self, configuracion):
+        # Obtener la ventana principal como el padre del diálogo
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+                
         if configuracion is None: # esto sería raro que pase
             QMessageBox.warning(self, "Error", f"No se encontró la configuración")
             return
-        
-        dialog = QDialog(self)
+
+        dialog = QDialog(parent)
         dialog.setWindowTitle(f"Editar Configuración: {configuracion.nombre}")
         dialog.setStyleSheet("background-color: #333; color: white;")
         edit_config_layout = QHBoxLayout()
@@ -388,13 +419,20 @@ class Microbloque(QWidget):
     def guardar_configuracion(self, dialog, name_input, layout_del_dialog_principal, type_combo, config_layout):
         # Este método se llama cuando el usuario intenta guardar una configuración
 
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+
         # Obtener el nombre y tipo de la configuración
         nombre = name_input.text()
         tipo_seleccionado = type_combo.currentData()
 
         # Validar que se hayan completado los campos básicos
         if not nombre or tipo_seleccionado is None:
-            QMessageBox.warning(self, "Error", "Por favor, complete todos los campos.")
+            # Obtener la ventana principal como el padre del diálogo
+            QMessageBox.warning(parent, "Error", "Por favor, complete todos los campos.")
             return
         
         # buscar input_widget
@@ -407,7 +445,7 @@ class Microbloque(QWidget):
             if not input_widget:
                 input_widget = self.find_input_widget(config_layout, LatexEditor, 1)
                 if not input_widget.get_latex():
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese un valor para la configuración.")
+                    QMessageBox.warning(parent, "Error", "Por favor, ingrese un valor para la configuración.")
                     return
             
             # Obtener el valor ingresado (texto para QLineEdit, LaTeX para LatexEditor)
@@ -421,19 +459,19 @@ class Microbloque(QWidget):
             if tipo_seleccionado == TipoConfiguracion.NUMERICA:
                 # Asegurar que el valor sea numérico
                 if not valor or not valor.replace('.', '').isdigit():
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese un valor numérico válido.")
+                    QMessageBox.warning(parent, "Error", "Por favor, ingrese un valor numérico válido.")
                     return
             elif tipo_seleccionado == TipoConfiguracion.ENUMERADA:
                 # Asegurar que haya al menos dos valores separados por comas
                 valores = [v.strip() for v in valor.split(',') if v.strip()]
                 if len(valores) < 2:
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese al menos dos valores separados por comas.")
+                    QMessageBox.warning(parent, "Error", "Por favor, ingrese al menos dos valores separados por comas.")
                     return
                 valor = ','.join(valores)  # Reformatear el valor
             elif tipo_seleccionado == TipoConfiguracion.FUNCION:
                 # Asegurar que se haya ingresado una función LaTeX no vacía
                 if not valor.strip():
-                    QMessageBox.warning(self, "Error", "Por favor, ingrese una función válida en LaTeX.")
+                    QMessageBox.warning(parent, "Error", "Por favor, ingrese una función válida en LaTeX.")
                     return
                 
                 # Buscar el combo de efecto:
@@ -441,7 +479,7 @@ class Microbloque(QWidget):
 
                 # Verificar que se haya seleccionado un efecto para la función
                 if efecto_combo.currentData() is None:
-                    QMessageBox.warning(self, "Error", "Por favor, seleccione un efecto para la función.")
+                    QMessageBox.warning(parent, "Error", "Por favor, seleccione un efecto para la función.")
                     return
                 efecto = efecto_combo.currentData()
         else:
@@ -466,8 +504,15 @@ class Microbloque(QWidget):
     def add_configuration(self, layout_del_dialog_principal):
         # Este método crea y muestra el diálogo para agregar una nueva configuración
 
+        # Obtener la ventana principal como el padre del diálogo
+        parent = None
+        if self.scene():
+            views = self.scene().views()
+            if views:
+                parent = views[0].window()
+
         # Crear el diálogo
-        dialog = QDialog(self)
+        dialog = QDialog(parent)
         dialog.setWindowTitle("Agregar Configuración")
         dialog.setStyleSheet("background-color: #333; color: white;")
         config_layout = QVBoxLayout()
