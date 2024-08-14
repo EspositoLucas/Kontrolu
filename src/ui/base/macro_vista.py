@@ -87,6 +87,31 @@ class MacroVista(QPushButton):
         """)
         toolbar.addWidget(self.seleccion_multiple)
 
+        # Espaciador
+        spacer = QWidget()
+        spacer.setFixedSize(50, 5)  # Ajusta el tamaño del espaciador (ancho x alto)
+        spacer.setStyleSheet("background-color: #333;")  # Establece el color de fondo
+        toolbar.addWidget(spacer)
+
+        # Boton de ayuda
+        help_button = QPushButton('Ayuda', self)
+        help_button.clicked.connect(self.drawing_area.show_help)
+        help_button.setStyleSheet(button_style + """
+        QPushButton {
+                background-color: #808080; /* Color gris */
+                color: white;
+                font-size: 14px;
+                padding: 5px;
+                border-radius: 3px;
+            }
+
+            QPushButton:hover {
+                background-color: #696969; /* Un gris más oscuro para el hover */
+            }
+        """)
+        help_button.setToolTip("Mostrar ayuda")
+        toolbar.addWidget(help_button)
+
         toolbar.setStyleSheet("QToolBar { background-color: #333; }")  # Establece el color de fondo de la barra de herramientas
 
     def activar_seleccion_multiple(self, checked):
