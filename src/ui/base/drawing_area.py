@@ -1709,6 +1709,68 @@ class DrawingArea(QGraphicsView):
             elif choice == "Seleccionar Configuración Predeterminada":
                 self.select_preset_configuration(layout_del_dialog_principal)
     
+    def seleccion_tipo_configuracion(self):
+        # Este método se llama cuando el usuario selecciona un tipo de configuración en el combo box
+
+        # # Limpiar los widgets anteriores para evitar conflictos
+        # if hasattr(self, 'input_widget') and self.input_widget:
+        #     self.config_layout.removeWidget(self.input_widget)
+        #     self.input_widget.deleteLater()
+        #     self.input_widget = None
+        
+        # if hasattr(self, 'efecto_combo') and self.efecto_combo:
+        #     self.config_layout.removeWidget(self.efecto_combo)
+        #     self.efecto_combo.deleteLater()
+        #     self.efecto_combo = None
+        
+        # Limpiar los widgets anteriores de manera segura
+        if hasattr(self, 'input_widget'):
+            if self.input_widget is not None and not sip.isdeleted(self.input_widget):
+                self.config_layout.removeWidget(self.input_widget)
+                self.input_widget.deleteLater()
+            self.input_widget = None
+        
+        if hasattr(self, 'efecto_combo'):
+            if self.efecto_combo is not None and not sip.isdeleted(self.efecto_combo):
+                self.config_layout.removeWidget(self.efecto_combo)
+                self.efecto_combo.deleteLater()
+            self.efecto_combo = None
+
+        # Obtener el tipo de configuración seleccionado
+        tipo_seleccionado = self.type_combo.currentData()
+        if tipo_seleccionado is None:
+            return  # Si no hay tipo seleccionado, no hacemos nada
+
+        # Crear los widgets específicos según el tipo de configuración seleccionado
+        if tipo_seleccionado == TipoConfiguracion.NUMERICA:
+            # Para configuración numérica, se crea un campo de entrada de texto
+            self.input_widget = QLineEdit()
+            self.input_widget.setPlaceholderText("Ingrese un valor de tipo numérico")
+        elif tipo_seleccionado == TipoConfiguracion.FUNCION:
+            # Para configuración de función, se crea un campo de entrada y un combo box para el efecto
+            self.input_widget = LatexEditor()
+            # self.input_widget.validate_button.clicked.connect(self.input_widget.validar_funcion)
+            self.efecto_combo = QComboBox()
+            self.efecto_combo.addItem("Seleccione tipo de efecto", None)  # Opción por defecto
+            self.efecto_combo.addItem("DIRECTO", EfectoConfiguracion.DIRECTO)
+            self.efecto_combo.addItem("INDIRECTO", EfectoConfiguracion.INDIRECTO)
+            self.efecto_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+            
+        elif tipo_seleccionado == TipoConfiguracion.ENUMERADA:
+            # Para configuración enumerada, se crea un campo de entrada de texto
+            self.input_widget = QLineEdit()
+            self.input_widget.setPlaceholderText("Ingrese valores separados por comas")
+
+        # Aplicar estilo y agregar los widgets al layout
+        if hasattr(self, 'input_widget') and self.input_widget:
+            self.input_widget.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
+            self.config_layout.insertWidget(2, self.input_widget)
+        if hasattr(self, 'efecto_combo') and self.efecto_combo:
+            self.config_layout.insertWidget(3, self.efecto_combo)
+
+        # Actualizar la interfaz para reflejar los cambios
+        self.update()
+
     def create_new_configuration(self,layout_del_dialog_principal):
         # Este método crea y muestra el diálogo para agregar una nueva configuración
 
