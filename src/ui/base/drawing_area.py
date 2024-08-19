@@ -1020,7 +1020,7 @@ class DrawingArea(QGraphicsView):
         
          # vacia la lista de botones "+"
         for button in self.add_buttons:
-            button.deleteLater()
+            self.scene.removeItem(button)
         self.add_buttons.clear()
         self.macrobloque.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
         self.load_microbloques() # resetea la vista
