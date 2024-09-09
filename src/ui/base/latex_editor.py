@@ -336,7 +336,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel, QMessageBox
 from PyQt5.QtCore import pyqtSignal, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
-from sympy import sympify, Symbol, SympifyError
+from sympy import sympify, Symbol, SympifyError,Expr
 import re
 
 class LatexEditor(QWidget):
@@ -436,10 +436,23 @@ class LatexEditor(QWidget):
 
         # Add symbol selector
         symbol_layout = QHBoxLayout()
-        symbols = ["\\frac{}{}", "^2", "^3", "√", "∛", "∫", "log", "π", "θ", "∞", "∫", "≥", "≤", "⋅", "÷", "×", "∑", "∏", "()", "[]", "{}"]
+        symbols = ["\\frac{}{}", "^2", "^3", "\sqrt[n]{x}","\\frac{d}{dx}", "∫","\int_{inf}^{sup}", "log","ln", "e","\lim_{x \\to 0}","sin","cos","tan","cot","cst","sec","∞", "π", "θ", ">", "<", "≥", "≤", "⋅", "÷", "×", "∑", "∏", "()", "[]","\{  \}"]
         for symbol in symbols:
             button = QToolButton()
-            button.setText(symbol if symbol != "\\frac{}{}" else "a/b")
+            if symbol == "\\frac{}{}":
+                button.setText("a/b")
+            elif symbol == "\\sqrt[n]{x}":
+                button.setText("√ₙ(x)")
+            elif symbol == "\\int_{inf}^{sup}":
+                button.setText("∫ definida")
+            elif symbol == "\\frac{d}{dx}":
+                button.setText("d/dx")
+            elif symbol == "\lim_{x \\to 0}":
+                button.setText("lim")
+            elif symbol == "\{  \}":
+                button.setText("{}")
+            else:
+                button.setText(symbol)
             button.clicked.connect(lambda checked, s=symbol: self.insert_symbol(s))
             symbol_layout.addWidget(button)
         layout.addLayout(symbol_layout)
@@ -503,16 +516,27 @@ class LatexEditor(QWidget):
         if latex.replace('.', '').isdigit():
             return True
         
+        # Reemplazar símbolos problemáticos
         latex = latex.replace('\\frac', '')  # eliminar \frac
         latex = re.sub(r'\{([^}]*)\}\{([^}]*)\}', r'((\1)/(\2))', latex)  # convertir fracciones
         latex = latex.replace('^', '**')  # cambiar exponentes
+        latex = latex.replace('()', '(x)')  # reemplazar paréntesis vacíos
+        latex = latex.replace('[]', '[x]')  # reemplazar corchetes vacíos
+        latex = latex.replace('{}', '{x}')  # reemplazar llaves vacías
         
-        s = Symbol('s') # intentar parsear con SymPy
+        s = Symbol('s')
         try:
-            expr = sympify(latex)
+            expr = sympify(latex, locals={'s': s})
             
-            if 's' not in latex and not expr.is_constant(): # verificar que 's' está en la expresión o es un número constante
+            if isinstance(expr, (dict, list, tuple)):
                 return False
+            
+            if not isinstance(expr, Expr):
+                return False
+            
+            if 's' not in latex and not expr.is_constant():
+                return False
+            
             return True
         except (SympifyError, TypeError, ValueError):
             return False

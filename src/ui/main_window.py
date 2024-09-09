@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QFileDialog, QToolBar, QPushButton, QVBoxLayout, QDialog, QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox
 from PyQt5.QtCore import Qt
-from PyQt5 import QtGui 
+from PyQt5 import QtGui
+from PyQt5.QtGui import QIcon
 import os
 from .menu.archivo import Archivo
 from .menu.menu_bar import Menu
@@ -28,8 +29,7 @@ class MainWindow(QMainWindow):
         image_path = os.path.join(path, 'base/imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        # self.setWindowIcon(icon)
-        self.setWindowIcon(QtGui.QIcon(icon))
+        self.setWindowIcon(QIcon(icon))
     
         menuBar = Menu(self)
         self.setMenuBar(menuBar)
