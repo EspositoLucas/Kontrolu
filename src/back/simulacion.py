@@ -83,6 +83,8 @@ class Simulacion:
         num = np.asarray(num, dtype=np.float64)
         den = np.asarray(den, dtype=np.float64)
         
+        print(num)
+        print(den)
         # Crea el sistema de función de transferencia
         sys = control.TransferFunction(num, den)
         
@@ -91,6 +93,8 @@ class Simulacion:
         
         # Simula la respuesta del sistema usando control.forced_response
         T, yout = control.forced_response(sys, T=t, U=entrada * np.ones_like(t))
+        
+        print(yout)
         
         # Retorna el último valor de la salida
         return yout[-1]
