@@ -14,6 +14,7 @@ class Simulacion:
         self.actuador = actuador
         self.proceso = proceso
         self.medidor = medidor
+        self.contador_paso = 0
 
     def latex_to_tf(self, latex_expr):
         # Captura el latex y lo procesa
@@ -37,67 +38,73 @@ class Simulacion:
         num_coeffs = [float(coeff.evalf()) for coeff in num_poly.all_coeffs()]
         den_coeffs = [float(coeff.evalf()) for coeff in den_poly.all_coeffs()]
         
-        # Imprime los coeficientes obtenidos
-        print("Coeficientes del numerador: ", num_coeffs)
-        print("Coeficientes del denominador: ", den_coeffs)
-        
         return num_coeffs, den_coeffs
             
-    def simular_paso(self, t, dt, setpoint, y_actual, u_actual):
-        # Calcula el error
+    def simular_paso(self, t_inicio, t_fin, setpoint, y_actual):
+        # Calcula el error actual
         error = setpoint - y_actual
         
-        # Simula cada componente del sistema
-        y_proceso = self.simular_arbol(self.controlador.topologia, error)
-        y_proceso = self.simular_arbol(self.actuador.topologia, y_proceso)
-        y_proceso = self.simular_arbol(self.proceso.topologia, y_proceso)
+        print(f"Paso {self.contador_paso}: Error obtenido: {error} de hacer: setpoint ({setpoint}) - y_actual ({y_actual})")
+
+        # Crea un vector de tiempo para este paso
+        t = np.array([t_inicio, t_fin])
+        
+        # Crea un vector de entrada constante para este paso
+        # Usamos el error como entrada para el controlador
+        u = np.array([error, error])
+        
+        # Simula cada componente del sistema en secuencia
+        # Cada componente recibe el mismo vector de tiempo
+        y_controlador = self.simular_arbol(self.controlador.topologia, t, u)
+        print(f"Paso {self.contador_paso}: Salida del controlador: {y_controlador}")
+        
+        y_actuador = self.simular_arbol(self.actuador.topologia, t, y_controlador)
+        print(f"Paso {self.contador_paso}: Salida del actuador: {y_actuador}")
+
+        y_proceso = self.simular_arbol(self.proceso.topologia, t, y_actuador)
+        print(f"Paso {self.contador_paso}: Salida del proceso (SALIDA DEL SISTEMA): {y_proceso}")
         
         # Aplica el medidor
-        medicion = self.medidor.medir(y_proceso)
+        medicion = self.medidor.medir(setpoint, y_proceso)
+        print(f"Paso {self.contador_paso}: Salida del medidor: {medicion}")
         
-        return y_proceso, medicion
+        return y_proceso[-1], medicion
 
-    def simular_arbol(self, nodo, entrada):
+    def simular_arbol(self, nodo, t, entrada):
         # Caso base: MicroBloque
         if isinstance(nodo, MicroBloque):
-            return self.aplicar_tf(nodo.funcion_transferencia, entrada)
+            return self.aplicar_tf(nodo.funcion_transferencia, t, entrada)
         
         # Caso recursivo: TopologiaSerie o MacroControlador
         elif isinstance(nodo, (TopologiaSerie, MacroControlador)):
             for hijo in nodo.hijos:
-                entrada = self.simular_arbol(hijo, entrada)
+                # La salida de cada hijo es la entrada del siguiente
+                entrada = self.simular_arbol(hijo, t, entrada)
             return entrada
         
         # Caso recursivo: TopologiaParalelo
         elif isinstance(nodo, TopologiaParalelo):
-            salidas = [self.simular_arbol(hijo, entrada) for hijo in nodo.hijos]
+            # Simula todos los hijos con la misma entrada
+            salidas = [self.simular_arbol(hijo, t, entrada) for hijo in nodo.hijos]
+            # Suma las salidas de todos los hijos
             return sum(salidas)
         
         # Caso de error
         else:
             raise ValueError(f"Tipo de nodo desconocido: {type(nodo)}")
 
-    def aplicar_tf(self, tf, entrada):
-        # Extrae numerador y denominador de la función de transferencia 
+    def aplicar_tf(self, tf, t, entrada):
+        # Convierte la función de transferencia de LaTeX a coeficientes
         num, den = self.latex_to_tf(tf)
-        num = np.asarray(num, dtype=np.float64)
-        den = np.asarray(den, dtype=np.float64)
         
-        print(num)
-        print(den)
         # Crea el sistema de función de transferencia
         sys = control.TransferFunction(num, den)
         
-        # Crea un pequeño intervalo de tiempo para la simulación
-        t = np.linspace(0, 0.1, 10)
+        # Simula la respuesta del sistema
+        _, yout = control.forced_response(sys, T=t, U=entrada)
         
-        # Simula la respuesta del sistema usando control.forced_response
-        T, yout = control.forced_response(sys, T=t, U=entrada * np.ones_like(t))
-        
-        print(yout)
-        
-        # Retorna el último valor de la salida
-        return yout[-1]
+        # Retorna la salida del sistema
+        return yout
 
     def generar_entrada(self, entrada, t):
         if entrada == "impulso":
@@ -112,13 +119,9 @@ class Simulacion:
             u = np.full_like(t, entrada)
         return u
     
-    def simular_sistema_tiempo_real(self, entrada, t_total, dt, setpoint):
-        
-        # Genera un array de tiempos
+    def simular_sistema_tiempo_real(self, t_total, dt, setpoint):
+        # Crea un array de tiempos
         t = np.arange(0, t_total, dt)
-        
-        # Genera la señal de entrada
-        u = self.generar_entrada(entrada, t)
         
         # Inicializa arrays para almacenar las salidas
         y = np.zeros_like(t)
@@ -126,10 +129,12 @@ class Simulacion:
         
         # Simulación paso a paso
         for i in range(1, len(t)):
-            y[i], y_medido[i] = self.simular_paso(t[i], dt, setpoint, y_medido[i-1], u[i])
+            # Simula un paso desde t[i-1] hasta t[i]
+            y[i], y_medido[i] = self.simular_paso(t[i-1], t[i], setpoint, y_medido[i-1])
+            self.contador_paso += 1
         
-        return t, y, u
-
+        # Retorna los arrays de tiempo, salida del proceso y salida medida
+        return t, y, y_medido
         
     def init_animation(self):
         self.line.set_data([], [])
@@ -146,15 +151,16 @@ class Simulacion:
         self.fig, self.ax = plt.subplots(figsize=(10, 6))  # Aumentamos el tamaño de la figura
         self.line, = self.ax.plot([], [], 'b-', label='Salida del sistema')
         self.line_setpoint, = self.ax.plot([], [], 'r--', label='Valor esperado')
+        self.contador_paso = 0
         
         try:
-            t, y, _ = self.simular_sistema_tiempo_real(entrada, t_total, dt, setpoint)
+            t, y, valor_medido = self.simular_sistema_tiempo_real(t_total, dt, setpoint)
         except Exception as e:
             print(f"Error durante la simulación: {e}")
             return
         
         # Calculamos los límites del eje y
-        y_min, y_max = min(y), max(y)
+        y_min, y_max = min(valor_medido), max(valor_medido)
         y_range = y_max - y_min
         
         # Ajustamos los límites para que la gráfica ocupe el 80% del espacio vertical
@@ -180,12 +186,13 @@ class Simulacion:
 
         def update(frame):
             i = frame
-            self.line.set_data(t[:i], y[:i])
+            print("")
+            self.line.set_data(t[:i], valor_medido[:i])
             self.line_setpoint.set_data([0, t[i-1]], [setpoint, setpoint])
             
             # Ajuste dinámico de la escala
             if i > 1:
-                y_min, y_max = min(y[:i]), max(y[:i])
+                y_min, y_max = min(valor_medido[:i]), max(valor_medido[:i])
                 y_range = y_max - y_min
                 margin = y_range * 0.1
                 self.ax.set_ylim(min(y_min, setpoint) - margin, max(y_max, setpoint) + margin)
