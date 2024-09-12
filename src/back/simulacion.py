@@ -146,60 +146,67 @@ class Simulacion:
         self.ax.relim()
         self.ax.autoscale_view()
         return self.line,
-
+    
     def ejecutar_simulacion(self, entrada, t_total, dt, setpoint, velocidad):
-        self.fig, self.ax = plt.subplots(figsize=(10, 6))  # Aumentamos el tamaño de la figura
+        self.fig, self.ax = plt.subplots(figsize=(12, 8))
         self.line, = self.ax.plot([], [], 'b-', label='Salida del sistema')
-        self.line_setpoint, = self.ax.plot([], [], 'r--', label='Valor esperado')
+        self.line_setpoint, = self.ax.plot([], [], 'r--', label='Setpoint')
+        self.line_entrada, = self.ax.plot([], [], 'g-', label='Entrada')
         self.contador_paso = 0
         
-        try:
-            t, y, valor_medido = self.simular_sistema_tiempo_real(t_total, dt, setpoint)
-        except Exception as e:
-            print(f"Error durante la simulación: {e}")
-            return
+        t = np.arange(0, t_total, dt)
+        y = np.zeros_like(t)
+        y_medido = np.zeros_like(t)
+        u = self.generar_entrada(entrada, t)
         
-        # Calculamos los límites del eje y
-        y_min, y_max = min(valor_medido), max(valor_medido)
-        y_range = y_max - y_min
-        
-        # Ajustamos los límites para que la gráfica ocupe el 80% del espacio vertical
-        margin = y_range * 0.1
-        y_bottom = min(y_min, setpoint) - margin
-        y_top = max(y_max, setpoint) + margin
-        
+        # Ajustar la escala inicial
         self.ax.set_xlim(0, t_total)
-        self.ax.set_ylim(y_bottom, y_top)
+        y_max = max(setpoint * 1.2, max(u) * 1.2)  # 20% más que el setpoint o el máximo de la entrada
+        self.ax.set_ylim(0, y_max)
+        
+        # Ajustar las marcas del eje x
+        self.ax.set_xticks(np.linspace(0, t_total, 11))
+        
+        # Ajustar las marcas del eje y
+        y_ticks = np.linspace(0, y_max, 11)
+        self.ax.set_yticks(y_ticks)
+        self.ax.set_yticklabels([f"{tick:.1f}" for tick in y_ticks])
+
+        def update(frame):
+            i = frame
+            if i > 0:
+                y[i], y_medido[i] = self.simular_paso(t[i-1], t[i], setpoint, y_medido[i-1])
+            self.line.set_data(t[:i+1], y_medido[:i+1])
+            self.line_setpoint.set_data(t[:i+1], [setpoint] * (i+1))
+            self.line_entrada.set_data(t[:i+1], u[:i+1])
+            
+            # Ajuste dinámico de la escala y solo si es necesario
+            current_y_max = self.ax.get_ylim()[1]
+            new_y_max = max(max(y_medido[:i+1]), max(u[:i+1]), setpoint) * 1.2
+            if new_y_max > current_y_max:
+                self.ax.set_ylim(0, new_y_max)
+                y_ticks = np.linspace(0, new_y_max, 11)
+                self.ax.set_yticks(y_ticks)
+                self.ax.set_yticklabels([f"{tick:.1f}" for tick in y_ticks])
+            
+            return self.line, self.line_setpoint, self.line_entrada
+
+        velocidad = velocidad.lower().strip()
+        if 'rap' in velocidad:
+            interval = 1
+        elif 'lent' in velocidad:
+            interval = 50
+        else:
+            interval = 10  # velocidad normal por defecto
+
+        self.anim = FuncAnimation(self.fig, update, frames=len(t), interval=interval, blit=True, repeat=False)
         
         self.ax.set_xlabel('Tiempo (Segundos)')
         self.ax.set_ylabel('Amplitud')
         self.ax.set_title('Respuesta del Sistema')
         self.ax.legend()
         self.ax.grid(True)
-
-        if velocidad == 'rapida':
-            interval = 1
-        elif velocidad == 'lenta':
-            interval = 50
-        else:
-            interval = 10
-
-        def update(frame):
-            i = frame
-            print("")
-            self.line.set_data(t[:i], valor_medido[:i])
-            self.line_setpoint.set_data([0, t[i-1]], [setpoint, setpoint])
-            
-            # Ajuste dinámico de la escala
-            if i > 1:
-                y_min, y_max = min(valor_medido[:i]), max(valor_medido[:i])
-                y_range = y_max - y_min
-                margin = y_range * 0.1
-                self.ax.set_ylim(min(y_min, setpoint) - margin, max(y_max, setpoint) + margin)
-            
-            return self.line, self.line_setpoint
-
-        self.anim = FuncAnimation(self.fig, update, frames=len(t), interval=interval, blit=True)
+        
         plt.tight_layout()
         plt.show()
 
