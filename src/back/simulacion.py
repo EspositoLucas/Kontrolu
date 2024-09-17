@@ -1,20 +1,23 @@
 import numpy as np
-import control
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from sympy import sympify, Symbol, expand, Poly
-from scipy import signal
+from sympy import  Symbol, expand, Poly,inverse_laplace_transform, symbols,laplace_transform
 from sympy.parsing.latex import parse_latex
 from back.topologia.topologia_serie import *
 from back.macros.macro_controlador import MacroControlador
+from latex2sympy2 import latex2sympy
 
 class Simulacion:
-    def __init__(self, controlador, actuador, proceso, medidor):
+    def __init__(self, controlador, actuador, proceso, medidor, delta, ciclos, entrada = None):
+        # crear dataframe con las columnas tiempo, controlador, actuador, proceso, medidor, entrada
         self.controlador = controlador
         self.actuador = actuador
         self.proceso = proceso
         self.medidor = medidor
-        self.contador_paso = 0
+        self.entrada = entrada
+        self.delta = delta
+        self.ciclos = ciclos
+        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': []}
 
     def latex_to_tf(self, latex_expr):
         # Captura el latex y lo procesa
@@ -40,35 +43,41 @@ class Simulacion:
         
         return num_coeffs, den_coeffs
             
-    def simular_paso(self, t_inicio, t_fin, setpoint, y_actual):
-        # Calcula el error actual
-        error = setpoint - y_actual
-        
-        print(f"Paso {self.contador_paso}: Error obtenido: {error} de hacer: setpoint ({setpoint}) - y_actual ({y_actual})")
+    def simular_paso(self, y_actual, ciclo):
 
-        # Crea un vector de tiempo para este paso
-        t = np.array([t_inicio, t_fin])
-        
-        # Crea un vector de entrada constante para este paso
-        # Usamos el error como entrada para el controlador
-        u = np.array([error, error])
+        tiempo = ciclo * self.delta
+
+        y_medidor = self.simular_arbol(self.medidor.topologia, tiempo, y_actual)
+        print(f"Paso {ciclo}: Salida del medidor: {y_medidor}")
+        self.datos['medidor'].append(y_medidor)
+
+        y_entrada =  self.simular_arbol(self.entrada.topologia, tiempo, 1)
+        print(f"Paso {ciclo}: Salida de la entrada: {y_entrada}")
+        self.datos['entrada'].append(y_entrada)
+
+        # Calcula el error actual
+        error = y_entrada - y_medidor        
+        print(f"Paso {ciclo}: Error obtenido: {error}")
+        self.datos['error'].append(error)
         
         # Simula cada componente del sistema en secuencia
         # Cada componente recibe el mismo vector de tiempo
-        y_controlador = self.simular_arbol(self.controlador.topologia, t, u)
-        print(f"Paso {self.contador_paso}: Salida del controlador: {y_controlador}")
+        y_controlador = self.simular_arbol(self.controlador.topologia, tiempo, error)
+        print(f"Paso {ciclo}: Salida del controlador: {y_controlador}")
+        self.datos['controlador'].append(y_controlador)
         
-        y_actuador = self.simular_arbol(self.actuador.topologia, t, y_controlador)
-        print(f"Paso {self.contador_paso}: Salida del actuador: {y_actuador}")
+        y_actuador = self.simular_arbol(self.actuador.topologia, tiempo, y_controlador)
+        print(f"Paso {ciclo}: Salida del actuador: {y_actuador}")
+        self.datos['actuador'].append(y_actuador)
 
-        y_proceso = self.simular_arbol(self.proceso.topologia, t, y_actuador)
-        print(f"Paso {self.contador_paso}: Salida del proceso (SALIDA DEL SISTEMA): {y_proceso}")
-        
-        # Aplica el medidor
-        medicion = self.medidor.medir(setpoint, y_proceso)
-        print(f"Paso {self.contador_paso}: Salida del medidor: {medicion}")
-        
-        return y_proceso[-1], medicion
+        y_proceso = self.simular_arbol(self.proceso.topologia, tiempo, y_actuador)
+        print(f"Paso {ciclo}: Salida del proceso (SALIDA DEL SISTEMA): {y_proceso}")
+        self.datos['proceso'].append(y_proceso)
+
+        y_actual += y_proceso
+        self.datos['salida'].append(y_actual)
+
+        return y_actual
 
     def simular_arbol(self, nodo, t, entrada):
         # Caso base: MicroBloque
@@ -93,48 +102,35 @@ class Simulacion:
         else:
             raise ValueError(f"Tipo de nodo desconocido: {type(nodo)}")
 
-    def aplicar_tf(self, tf, t, entrada):
-        # Convierte la función de transferencia de LaTeX a coeficientes
-        num, den = self.latex_to_tf(tf)
-        
-        # Crea el sistema de función de transferencia
-        sys = control.TransferFunction(num, den)
-        
-        # Simula la respuesta del sistema
-        _, yout = control.forced_response(sys, T=t, U=entrada)
-        
-        # Retorna la salida del sistema
-        return yout
+    def aplicar_tf(self, tf, tiempo, entrada):
 
-    def generar_entrada(self, entrada, t):
-        if entrada == "impulso":
-            # Genera una señal de impulso
-            u = np.zeros_like(t)
-            u[0] = 1 / (t[1] - t[0])  # Aproximación del impulso
-        elif callable(entrada):
-            # Si la entrada es una función, la aplica a cada punto de tiempo
-            u = np.array([entrada(ti) for ti in t])
-        else:
-            # Si es un valor constante, crea un array con ese valor
-            u = np.full_like(t, entrada)
-        return u
+        s,t = symbols('s t')
+
+        tf_sympy = latex2sympy(tf)
+
+        entrada_micro_bloque = laplace_transform(entrada,t,s)[0]
+        operacion_laplace = entrada_micro_bloque * tf_sympy
+        operacion_tiempo = inverse_laplace_transform(operacion_laplace,s,t)
+        salida_micro_bloque = operacion_tiempo.subs(t,tiempo)
+
+        print(f"Entrada del microbloque: {entrada_micro_bloque}")
+        print(f"Operación de Laplace: {operacion_laplace}")
+        print(f"Operación de tiempo: {operacion_tiempo}")
+        print(f"Salida del microbloque: {salida_micro_bloque}")
+        
+        
+        return salida_micro_bloque
     
-    def simular_sistema_tiempo_real(self, t_total, dt, setpoint):
-        # Crea un array de tiempos
-        t = np.arange(0, t_total, dt)
-        
-        # Inicializa arrays para almacenar las salidas
-        y = np.zeros_like(t)
-        y_medido = np.zeros_like(t)
-        
+
+
+    def simular_sistema_tiempo_real(self):
+
         # Simulación paso a paso
-        for i in range(1, len(t)):
-            # Simula un paso desde t[i-1] hasta t[i]
-            y[i], y_medido[i] = self.simular_paso(t[i-1], t[i], setpoint, y_medido[i-1])
-            self.contador_paso += 1
+        for i in range(1, len(self.ciclos+1)):
+            y_salida = self.simular_paso(y_salida,i)
         
         # Retorna los arrays de tiempo, salida del proceso y salida medida
-        return t, y, y_medido
+        return self.datos
         
     def init_animation(self):
         self.line.set_data([], [])
@@ -152,16 +148,14 @@ class Simulacion:
         self.line, = self.ax.plot([], [], 'b-', label='Salida del sistema')
         self.line_setpoint, = self.ax.plot([], [], 'r--', label='Setpoint')
         self.line_entrada, = self.ax.plot([], [], 'g-', label='Entrada')
-        self.contador_paso = 0
         
         t = np.arange(0, t_total, dt)
         y = np.zeros_like(t)
         y_medido = np.zeros_like(t)
-        u = self.generar_entrada(entrada, t)
+        # u = self.generar_entrada(entrada, t)
         
         # Ajustar la escala inicial
         self.ax.set_xlim(0, t_total)
-        y_max = max(setpoint * 1.2, max(u) * 1.2)  # 20% más que el setpoint o el máximo de la entrada
         self.ax.set_ylim(0, y_max)
         
         # Ajustar las marcas del eje x
