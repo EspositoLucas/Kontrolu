@@ -18,30 +18,6 @@ class Simulacion:
         self.delta = delta
         self.ciclos = ciclos
         self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': []}
-
-    def latex_to_tf(self, latex_expr):
-        # Captura el latex y lo procesa
-        expr = parse_latex(latex_expr)
-        
-        # Define la variable matemática principal
-        s = Symbol('s')
-        
-        # Separa numerador y denominador
-        num, den = expr.as_numer_denom()
-        
-        # Expande numerador y denominador
-        num_expanded = expand(num)
-        den_expanded = expand(den)
-        
-        # Convierte a polinomios en función de 's'
-        num_poly = Poly(num_expanded, s)
-        den_poly = Poly(den_expanded, s)
-        
-        # Obtiene los coeficientes en forma de lista
-        num_coeffs = [float(coeff.evalf()) for coeff in num_poly.all_coeffs()]
-        den_coeffs = [float(coeff.evalf()) for coeff in den_poly.all_coeffs()]
-        
-        return num_coeffs, den_coeffs
             
     def simular_paso(self, y_actual, ciclo):
 
