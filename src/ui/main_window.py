@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QMainWindow, QFileDialog, QToolBar, QPushButton, QVBoxLayout, QDialog, QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox,QWidget,QStackedWidget
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QFileDialog, QPushButton, QVBoxLayout, QDialog, QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox,QWidget,QStackedWidget, QTextEdit, QToolBar, QAction, QTableWidgetItem, QTableWidget
+
 from PyQt5 import QtGui
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 import os
 from .menu.archivo import Archivo
 from .menu.menu_bar import Menu
@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import ctypes
 from back.simulacion import Simulacion
-import math
+from back.estabilidad import Estabilidad
 from ui.base.latex_editor import LatexEditor
 # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('company.app.1')
 
@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
     def __init__(self,sesion):
         super().__init__()
         self.sesion = sesion
+        self.estabilidad = Estabilidad(sesion)
         self.initUI()
         
 
@@ -31,17 +32,29 @@ class MainWindow(QMainWindow):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QIcon(icon))
-    
+
         menuBar = Menu(self)
         self.setMenuBar(menuBar)
 
+        # Barra de herramientas
+        toolbar = QToolBar("Barra de Herramientas")
+        self.addToolBar(toolbar)
+
+        # Botón de simulación
+        boton_simulacion = QAction("Iniciar Simulación", self)
+        boton_simulacion.triggered.connect(self.iniciar_simulacion)
+        toolbar.addAction(boton_simulacion)
+
+        # Botón de análisis de estabilidad
+        boton_estabilidad = QAction("Análisis de Estabilidad", self)
+        boton_estabilidad.triggered.connect(self.mostrar_analisis_estabilidad)
+        toolbar.addAction(boton_estabilidad)
+
         self.statusBar().showMessage('Listo')
-        
-        self.init_macrobloques() # Diagrama inicial de lazo cerrado
-        boton_simulacion = QPushButton('Iniciar Simulación', self)
-        boton_simulacion.clicked.connect(self.iniciar_simulacion)
-        
-        self.showMaximized() # se maximiza al final de todo, luego de cargar todos los elementos
+
+        self.init_macrobloques() 
+
+        self.showMaximized()
     
         
     def init_macrobloques(self):
@@ -187,3 +200,69 @@ class MainWindow(QMainWindow):
         # This is a placeholder. You'll need to implement proper LaTeX parsing.
         # For now, we'll assume the LaTeX is a valid Python expression
         return lambda t: eval(latex_func.replace('t', 'math.t'))
+
+
+    def mostrar_analisis_estabilidad(self):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Análisis de Estabilidad")
+        layout = QHBoxLayout()  # Cambiado a QHBoxLayout para tener dos columnas
+
+        # Columna izquierda: Función de transferencia
+        left_column = QVBoxLayout()
+        ft_label = QLabel("Función de Transferencia de Lazo Cerrado:")
+        left_column.addWidget(ft_label)
+        self.ft_text = QTextEdit()
+        self.ft_text.setPlainText(self.estabilidad.obtener_funcion_transferencia())
+        self.ft_text.setReadOnly(True)
+        left_column.addWidget(self.ft_text)
+
+        # Botón para calcular estabilidad
+        calcular_button = QPushButton("Calcular Estabilidad")
+        calcular_button.clicked.connect(self.calcular_y_mostrar_estabilidad)
+        left_column.addWidget(calcular_button)
+
+        layout.addLayout(left_column)
+
+        # Columna derecha: Matriz de Routh-Hurwitz
+        right_column = QVBoxLayout()
+        matrix_label = QLabel("Matriz de Routh-Hurwitz:")
+        right_column.addWidget(matrix_label)
+        self.matrix_table = QTableWidget()
+        self.matrix_table.setEditTriggers(QTableWidget.NoEditTriggers)
+        right_column.addWidget(self.matrix_table)
+
+        layout.addLayout(right_column)
+
+        dialog.setLayout(layout)
+        dialog.exec_()
+
+    def calcular_y_mostrar_estabilidad(self):
+        matriz_routh = self.estabilidad.calcular_estabilidad()
+        
+        # Configurar la tabla
+        rows = len(matriz_routh)
+        cols = len(matriz_routh[0])
+        self.matrix_table.setRowCount(rows)
+        self.matrix_table.setColumnCount(cols)
+
+        # Rellenar la tabla con los valores de la matriz
+        for i in range(rows):
+            for j in range(cols):
+                if matriz_routh[i][j] != 0:  # Solo mostrar valores no nulos
+                    item = QTableWidgetItem(str(matriz_routh[i][j]))
+                    self.matrix_table.setItem(i, j, item)
+
+        # Ajustar el tamaño de las celdas
+        self.matrix_table.resizeColumnsToContents()
+        self.matrix_table.resizeRowsToContents()
+
+        # Interpretar el resultado
+        es_estable = all(all(elem >= 0 for elem in fila) for fila in matriz_routh)
+        resultado = "El sistema es estable." if es_estable else "El sistema es inestable."
+        
+        # Mostrar el resultado en un QLabel debajo de la tabla
+        if hasattr(self, 'resultado_label'):
+            self.resultado_label.setText(resultado)
+        else:
+            self.resultado_label = QLabel(resultado)
+            self.matrix_table.parent().layout().addWidget(self.resultado_label)
