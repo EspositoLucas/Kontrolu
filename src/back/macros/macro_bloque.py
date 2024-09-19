@@ -46,3 +46,6 @@ class MacroBloque(InterfazTopologia):
                 ),
             padre=self
             )
+    
+    def simular(self, tiempo, entrada):
+        return self.topologia.simular(tiempo, entrada)

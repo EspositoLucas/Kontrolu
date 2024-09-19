@@ -1,23 +1,22 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from sympy import  Symbol, expand, Poly,inverse_laplace_transform, symbols,laplace_transform
-from sympy.parsing.latex import parse_latex
 from back.topologia.topologia_serie import *
 from back.macros.macro_controlador import MacroControlador
+from back.macros.macro_actuador import MacroActuador
+from back.macros.macro_proceso import MacroProceso
+from back.macros.macro_medidor import MacroMedidor
+from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
 from time import sleep
 
 class Simulacion:
     def __init__(self, controlador = None, actuador = None, proceso =None, medidor =None, delta =1, ciclos=10, entrada="",salida_cero=10):
         # crear dataframe con las columnas tiempo, controlador, actuador, proceso, medidor, entrada
-        self.controlador = controlador
-        self.actuador = actuador
-        self.proceso = proceso
-        self.medidor = medidor
+        self.controlador : MacroControlador = controlador
+        self.actuador : MacroActuador = actuador
+        self.proceso : MacroProceso = proceso
+        self.medidor : MacroMedidor = medidor
         self.delta = delta
         self.ciclos = ciclos
-        self.entrada = entrada
+        self.entrada : MicroBloque = MicroBloque("entrada",funcion_transferencia=entrada)
         self.salida_cero = salida_cero
         self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': []}
             
@@ -25,11 +24,11 @@ class Simulacion:
 
         tiempo = ciclo * self.delta
 
-        y_medidor = self.simular_arbol(self.medidor.topologia, tiempo, y_actual)
+        y_medidor = self.medidor.simular(tiempo, y_actual)
         print(f"Paso {ciclo}: Salida del medidor: {y_medidor}")
         self.datos['medidor'].append(y_medidor)
 
-        y_entrada =  self.aplicar_tf(self.entrada, tiempo)
+        y_entrada =  self.entrada.simular(tiempo)
         print(f"Mi entrada es {self.entrada}")
         print(f"Paso {ciclo}: Salida de la entrada: {y_entrada}")
         self.datos['entrada'].append(y_entrada)
@@ -41,15 +40,15 @@ class Simulacion:
         
         # Simula cada componente del sistema en secuencia
         # Cada componente recibe el mismo vector de tiempo
-        y_controlador = self.simular_arbol(self.controlador.topologia, tiempo, error)
+        y_controlador = self.controlador.simular(tiempo, error)
         print(f"Paso {ciclo}: Salida del controlador: {y_controlador}")
         self.datos['controlador'].append(y_controlador)
         
-        y_actuador = self.simular_arbol(self.actuador.topologia, tiempo, y_controlador)
+        y_actuador = self.actuador.simular(tiempo, y_controlador)
         print(f"Paso {ciclo}: Salida del actuador: {y_actuador}")
         self.datos['actuador'].append(y_actuador)
 
-        y_proceso = self.simular_arbol(self.proceso.topologia, tiempo, y_actuador)
+        y_proceso = self.proceso.simular(tiempo, y_actuador)
         print(f"Paso {ciclo}: Salida del proceso (SALIDA DEL SISTEMA): {y_proceso}")
         self.datos['proceso'].append(y_proceso)
 
@@ -58,52 +57,6 @@ class Simulacion:
 
         return y_actual
 
-    def simular_arbol(self, nodo, t, entrada):
-        # Caso base: MicroBloque
-        if isinstance(nodo, MicroBloque):
-            return self.aplicar_tf(nodo.funcion_transferencia, t, entrada)
-        
-        # Caso recursivo: TopologiaSerie o MacroControlador
-        elif isinstance(nodo, (TopologiaSerie, MacroControlador)):
-            for hijo in nodo.hijos:
-                # La salida de cada hijo es la entrada del siguiente
-                entrada = self.simular_arbol(hijo, t, entrada)
-            return entrada
-        
-        # Caso recursivo: TopologiaParalelo
-        elif isinstance(nodo, TopologiaParalelo):
-            # Simula todos los hijos con la misma entrada
-            salidas = [self.simular_arbol(hijo, t, entrada) for hijo in nodo.hijos]
-            # Suma las salidas de todos los hijos
-            return sum(salidas)
-        
-        # Caso de error
-        else:
-            raise ValueError(f"Tipo de nodo desconocido: {type(nodo)}")
-
-    def aplicar_tf(self, tf, tiempo, entrada=None):
-
-        s,t = symbols('s t')
-
-        tf_sympy = latex2sympy(tf)
-        print(f"La función de transferencia es: {tf_sympy}")
-
-        operacion_laplace = tf_sympy
-
-        if entrada:
-            entrada_micro_bloque = laplace_transform(entrada,t,s)[0]
-            print(f"La entrada es: {entrada_micro_bloque}")
-            operacion_laplace = entrada_micro_bloque * tf_sympy
-            print(f"La operación de Laplace es: {operacion_laplace}")
-        
-        operacion_tiempo = inverse_laplace_transform(operacion_laplace,s,t)
-        print(f"La operación en tiempo es: {operacion_tiempo}")
-        salida_micro_bloque = operacion_tiempo.subs(t,tiempo)
-        print(f"La salida en tiempo es: {salida_micro_bloque}")
-
-        
-        return salida_micro_bloque
-    
     
 
     def simular_sistema_tiempo_real(self):

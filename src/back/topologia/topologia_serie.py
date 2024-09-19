@@ -2,6 +2,9 @@ from __future__ import annotations
 from back.topologia.interfaz_topologia import InterfazTopologia
 from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
 from PyQt5.QtGui import QColor
+from sympy import  inverse_laplace_transform, symbols,laplace_transform
+from latex2sympy2 import latex2sympy
+
 
 ANCHO = 150
 ALTO = 80
@@ -86,6 +89,11 @@ class TopologiaSerie(InterfazTopologia):
 
     def __str__(self):
         return "SERIE: " + str(list(map(lambda hijo: str(hijo),self.hijos)))
+    
+    def simular(self, tiempo, entrada=None):
+        for hijo in self.hijos:
+                entrada = self.simular(hijo, tiempo, entrada)
+        return entrada
 
 class MicroBloque(InterfazTopologia):
     def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None) -> None:
@@ -172,7 +180,29 @@ class MicroBloque(InterfazTopologia):
             actual = actual.padre
             nivel += 1
         return parents
+    
+    def simular(self, tiempo, entrada=None):
 
+        s,t = symbols('s t')
+
+        tf_sympy = latex2sympy(self.funcion_transferencia)
+        print(f"La función de transferencia es: {tf_sympy}")
+
+        operacion_laplace = tf_sympy
+
+        if entrada:
+            entrada_micro_bloque = laplace_transform(entrada,t,s)[0]
+            print(f"La entrada es: {entrada_micro_bloque}")
+            operacion_laplace = entrada_micro_bloque * tf_sympy
+            print(f"La operación de Laplace es: {operacion_laplace}")
+        
+        operacion_tiempo = inverse_laplace_transform(operacion_laplace,s,t)
+        print(f"La operación en tiempo es: {operacion_tiempo}")
+        salida_micro_bloque = operacion_tiempo.subs(t,tiempo)
+        print(f"La salida en tiempo es: {salida_micro_bloque}")
+
+        
+        return salida_micro_bloque
     
 
 
@@ -223,3 +253,9 @@ class TopologiaParalelo(InterfazTopologia):
 
     def __str__(self):
         return "PARALELO: " + str(list(map(lambda hijo: hijo.__str__(),self.hijos)))
+    
+    def simular(self, tiempo, entrada=None):
+        # Simula todos los hijos con la misma entrada
+        salidas = [self.simular(hijo, tiempo, entrada) for hijo in self.hijos]
+        # Suma las salidas de todos los hijos
+        return sum(salidas)
