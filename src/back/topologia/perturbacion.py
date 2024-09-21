@@ -1,9 +1,11 @@
 from latex2sympy2 import latex2sympy
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
+from back.topologia.interfaz_topologia import InterfazTopologia
 
-class Perturbacion():
+class Perturbacion(InterfazTopologia):
 
     def __init__(self,responsable=None,ft="0",ciclos=0,estado=False):
+        super().__init__()
         self.responsable = responsable
         self.funcion_transferencia = ft
         self.ciclos = ciclos
@@ -51,3 +53,6 @@ class Perturbacion():
         self.estado = False
         self.ciclos = 0
         self.funcion_transferencia = "0"
+    
+    def radio(self) -> int:
+        return 20

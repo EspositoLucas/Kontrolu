@@ -1,4 +1,3 @@
-import numpy as np
 import sympy as sp
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque
 from latex2sympy2 import latex2sympy

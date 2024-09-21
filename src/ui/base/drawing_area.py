@@ -10,6 +10,7 @@ from .add_button import AddButton
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
 from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
 from back.configuracion.configuracion import Configuracion, TipoConfiguracion,EfectoConfiguracion
+from back.topologia.perturbacion import Perturbacion
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
@@ -155,6 +156,8 @@ class DrawingArea(QGraphicsView):
             return self.dibujar_paralelo(topologia, posicion_inicial)
         elif isinstance(topologia, MicroBloque):
             return self.create_microbloque(topologia, posicion_inicial)
+        elif isinstance(topologia, Perturbacion):
+            return self.draw_perturbacion(topologia, posicion_inicial)
         
     def dibujar_serie(self, serie, posicion_inicial):
         posicion_actual = posicion_inicial
@@ -450,6 +453,37 @@ class DrawingArea(QGraphicsView):
         
         # Si no se encuentra el microbloque, retornamos el punto de inicio --> Si no encuentra el microbloque en la lista, simplemente retorna el punto_inicial
         return punto_inicial
+
+    def create_perturbacion(self, pos, relation, reference_element):
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Nueva Perturbación")
+        dialog.setStyleSheet("background-color: #333; color: white;")
+        layout = QVBoxLayout()
+
+        # TODO: agregar inputs para datos necesarios
+
+        save_button = QPushButton("Guardar")
+        save_button.setStyleSheet("background-color: #444; color: white;")
+        save_button.clicked.connect(dialog.accept)
+        layout.addWidget(save_button)
+
+        dialog.setLayout(layout)
+
+        if dialog.exec_():
+            perturbacion = Perturbacion()
+            if relation == "antes":
+                reference_element.agregar_perturbacion_antes(perturbacion, reference_element)
+            else:  # despues
+                reference_element.agregar_perturbacion_despues(perturbacion, reference_element)
+
+            self.load_microbloques()
+
+    def draw_perturbacion(self, perturbacion, pos):
+        perturbacion_item = QGraphicsEllipseItem(pos.x(), pos.y(), perturbacion.radio(), perturbacion.radio())
+        perturbacion_item.setBrush(QBrush(Qt.yellow))
+        self.scene.addItem(perturbacion_item)
+        return perturbacion_item
+
 
     def create_new_microbloque(self, pos, relation=None, reference_structure=None):
         dialog = QDialog(self)
@@ -1109,8 +1143,12 @@ class DrawingArea(QGraphicsView):
     
     def hide_add_buttons(self):
         for button in self.add_buttons:
-            if button.scene():
-                button.scene().removeItem(button)
+            try:
+                if button.scene():
+                    button.scene().removeItem(button)
+            except RuntimeError:
+                # El objeto ya fue eliminado, continuar con el siguiente
+                pass
         self.add_buttons.clear()
 
     def show_add_menu(self, direction, pos):
@@ -1238,6 +1276,15 @@ class DrawingArea(QGraphicsView):
             delete_action = QAction("Eliminar microbloque", self) # definimos una opción: será la accion de eliminar el microbloque
             delete_action.triggered.connect(lambda: self.delete_microbloque(self.selected_microbloque)) # la funcion a la que se llama cuando se elige esa opción
             context_menu.addAction(delete_action) # agregamos la opción al menu
+
+            perturbacion_antes_action = QAction("Insertar perturbación antes", self)
+            perturbacion_antes_action.triggered.connect(lambda: self.create_perturbacion(self.selected_microbloque, "antes", self.selected_microbloque.elemento_back))
+            context_menu.addAction(perturbacion_antes_action)
+
+            perturbacion_despues_action = QAction("Insertar perturbación después", self)
+            perturbacion_despues_action.triggered.connect(lambda: self.create_perturbacion(self.selected_microbloque, "despues", self.selected_microbloque.elemento_back))
+            context_menu.addAction(perturbacion_despues_action)
+
         if context_menu.actions(): # si hay opciones en el menu
             context_menu.exec_(self.mapToGlobal(position)) # mostramos el menu en la posición del mouse
 

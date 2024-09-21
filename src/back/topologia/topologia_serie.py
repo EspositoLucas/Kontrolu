@@ -5,6 +5,7 @@ from PyQt5.QtGui import QColor
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
 from back.topologia.configuraciones import Configuracion
+from back.topologia.perturbacion import Perturbacion
 
 ANCHO = 150
 ALTO = 80
@@ -78,7 +79,17 @@ class TopologiaSerie(InterfazTopologia):
         self.padre.agregar_en_serie_fuera_de_paralela_antes(microbloque)
         
     def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque):
-        self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
+        self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)       
+
+    def agregar_perturbacion_antes(self, actual: MicroBloque, perturbacion: Perturbacion):
+        indice = self.hijos.index(actual)
+        perturbacion.cambiar_padre(self)
+        self.hijos.insert(indice, perturbacion)
+
+    def agregar_perturbacion_despues(self, actual: MicroBloque, perturbacion: Perturbacion):
+        indice = self.hijos.index(actual)
+        perturbacion.cambiar_padre(self)
+        self.hijos.insert(indice + 1, perturbacion)
 
     def alto(self) -> int:
         return max(map(lambda x: x.alto(),self.hijos))
@@ -177,6 +188,12 @@ class MicroBloque(InterfazTopologia):
         
     def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque):
         self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
+    
+    def agregar_perturbacion_antes(self, perturbacion: Perturbacion, microbloque: MicroBloque):
+        self.padre.agregar_perturbacion_antes(microbloque, perturbacion)
+    
+    def agregar_perturbacion_despues(self, perturbacion: Perturbacion, microbloque: MicroBloque):
+        self.padre.agregar_perturbacion_despues(microbloque, perturbacion)
     
     def get_parent_structures(self):
         parents = []
