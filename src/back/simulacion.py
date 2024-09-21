@@ -3,7 +3,7 @@ from back.macros.macro_controlador import MacroControlador
 from back.macros.macro_actuador import MacroActuador
 from back.macros.macro_proceso import MacroProceso
 from back.macros.macro_medidor import MacroMedidor
-from topologia.carga import Carga
+from back.topologia.carga import Carga
 from time import sleep
 
 class Simulacion:

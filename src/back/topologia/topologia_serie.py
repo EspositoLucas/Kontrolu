@@ -4,7 +4,7 @@ from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloqu
 from PyQt5.QtGui import QColor
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
-from configuraciones import Configuracion
+from back.topologia.configuraciones import Configuracion
 
 ANCHO = 150
 ALTO = 80
