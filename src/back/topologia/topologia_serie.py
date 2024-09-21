@@ -4,7 +4,7 @@ from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloqu
 from PyQt5.QtGui import QColor
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
-
+from configuraciones import Configuracion
 
 ANCHO = 150
 ALTO = 80
@@ -102,11 +102,13 @@ class TopologiaSerie(InterfazTopologia):
         return salida_perturbada
 
 class MicroBloque(InterfazTopologia):
-    def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None) -> None:
+    def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia
         self.configuracion = configuracion
+        self.configuracion_entrada = configuracion_entrada
+        self.configuracion_salida = configuracion_salida
         super().__init__(padre)
 
     def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto):
@@ -199,7 +201,9 @@ class MicroBloque(InterfazTopologia):
         if entrada:
             entrada_perturbada = self.alterar_entrada(entrada,tiempo)
 
-            entrada_micro_bloque = laplace_transform(entrada_perturbada,t,s)[0]
+            entrada_con_error = self.configuracion_entrada.actualizar(entrada_perturbada,tiempo)
+
+            entrada_micro_bloque = laplace_transform(entrada_con_error,t,s)[0]
             print(f"La entrada es: {entrada_micro_bloque}")
             operacion_laplace = entrada_micro_bloque * tf_sympy
             print(f"La operación de Laplace es: {operacion_laplace}")
@@ -209,8 +213,9 @@ class MicroBloque(InterfazTopologia):
         salida_micro_bloque = operacion_tiempo.subs(t,tiempo)
         print(f"La salida en tiempo es: {salida_micro_bloque}")
 
+        salida_con_error = self.configuracion_salida.actualizar(salida_micro_bloque,tiempo)
 
-        salida_perturbada = self.alterar_salida(salida_micro_bloque,tiempo)
+        salida_perturbada = self.alterar_salida(salida_con_error,tiempo)
 
         return salida_perturbada
     
@@ -267,7 +272,7 @@ class TopologiaParalelo(InterfazTopologia):
         return "PARALELO: " + str(list(map(lambda hijo: hijo.__str__(),self.hijos)))
     
     def simular(self, tiempo, entrada=None):
-        
+
         self.alterar_entrada(entrada,tiempo)
         # Simula todos los hijos con la misma entrada
         salidas = [self.simular(hijo, tiempo, entrada) for hijo in self.hijos]
