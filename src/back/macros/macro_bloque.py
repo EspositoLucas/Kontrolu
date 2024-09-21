@@ -7,6 +7,7 @@ class MacroBloque(InterfazTopologia):
     def __init__(self):
         self.topologia = TopologiaSerie(padre=self)
         self.nombre = "MacroBloque"
+        super().__init__()
 
     def __str__(self):
         return f"{self.nombre}: {str(self.topologia)}"

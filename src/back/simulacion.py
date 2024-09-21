@@ -3,8 +3,6 @@ from back.macros.macro_controlador import MacroControlador
 from back.macros.macro_actuador import MacroActuador
 from back.macros.macro_proceso import MacroProceso
 from back.macros.macro_medidor import MacroMedidor
-from sympy import  inverse_laplace_transform, symbols,laplace_transform
-from latex2sympy2 import latex2sympy
 from time import sleep
 
 class Simulacion:

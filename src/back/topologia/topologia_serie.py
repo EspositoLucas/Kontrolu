@@ -12,7 +12,6 @@ ALTO = 80
 class TopologiaSerie(InterfazTopologia):
     
     def __init__(self,micro: TopologiaParalelo | MicroBloque = None,lista_micros: list=None,padre: InterfazTopologia = None):
-        self.padre = padre
         self.hijos: list[InterfazTopologia] = []
         if micro:
             micro.cambiar_padre(self)
@@ -21,6 +20,7 @@ class TopologiaSerie(InterfazTopologia):
             for micro in lista_micros:
                 micro.cambiar_padre(self)
             self.hijos.extend(lista_micros)
+        super().__init__(padre)
 
     def agregar_serie_arriba(self,microbloque:MicroBloque):
         self.padre.agregar_arriba_de(microbloque,self)
@@ -91,17 +91,23 @@ class TopologiaSerie(InterfazTopologia):
         return "SERIE: " + str(list(map(lambda hijo: str(hijo),self.hijos)))
     
     def simular(self, tiempo, entrada=None):
+
+        entrada_perturbada = self.alterar_entrada(entrada,tiempo)
+
         for hijo in self.hijos:
-                entrada = self.simular(hijo, tiempo, entrada)
-        return entrada
+                entrada_perturbada = self.simular(hijo, tiempo, entrada_perturbada)
+        
+        salida_perturbada = self.alterar_salida(entrada_perturbada,tiempo)
+
+        return salida_perturbada
 
 class MicroBloque(InterfazTopologia):
     def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None) -> None:
-        self.padre = padre
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia
         self.configuracion = configuracion
+        super().__init__(padre)
 
     def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto):
         self.configuracion.agregar_configuracion(nombre, tipo, valor_por_defecto, efecto)
@@ -191,7 +197,9 @@ class MicroBloque(InterfazTopologia):
         operacion_laplace = tf_sympy
 
         if entrada:
-            entrada_micro_bloque = laplace_transform(entrada,t,s)[0]
+            entrada_perturbada = self.alterar_entrada(entrada,tiempo)
+
+            entrada_micro_bloque = laplace_transform(entrada_perturbada,t,s)[0]
             print(f"La entrada es: {entrada_micro_bloque}")
             operacion_laplace = entrada_micro_bloque * tf_sympy
             print(f"La operación de Laplace es: {operacion_laplace}")
@@ -201,8 +209,12 @@ class MicroBloque(InterfazTopologia):
         salida_micro_bloque = operacion_tiempo.subs(t,tiempo)
         print(f"La salida en tiempo es: {salida_micro_bloque}")
 
-        
-        return salida_micro_bloque
+
+        salida_perturbada = self.alterar_salida(salida_micro_bloque,tiempo)
+
+        return salida_perturbada
+    
+
     
 
 
@@ -212,13 +224,13 @@ class TopologiaParalelo(InterfazTopologia):
     
     
     def __init__(self,microbloqueNuevo,microbloque2:MicroBloque=None,serie:TopologiaSerie=None,arriba=True,padre:TopologiaSerie=None):
-        self.padre = padre
         nuevaSerie = TopologiaSerie(micro=microbloqueNuevo,padre=self)
         if(serie):  nuevo = serie
         if(microbloque2): nuevo = TopologiaSerie(micro=microbloque2,padre=self)
         nuevo.cambiar_padre(self)
         if(arriba): self.hijos = [nuevaSerie,nuevo]
         else: self.hijos = [nuevo,nuevaSerie]
+        super().__init__(padre)
     
     def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque):
         self.padre.agregar_antes_de(microbloque,self)
@@ -255,7 +267,13 @@ class TopologiaParalelo(InterfazTopologia):
         return "PARALELO: " + str(list(map(lambda hijo: hijo.__str__(),self.hijos)))
     
     def simular(self, tiempo, entrada=None):
+        
+        self.alterar_entrada(entrada,tiempo)
         # Simula todos los hijos con la misma entrada
         salidas = [self.simular(hijo, tiempo, entrada) for hijo in self.hijos]
         # Suma las salidas de todos los hijos
-        return sum(salidas)
+        salida =  sum(salidas)
+
+        salida_perturbada = self.alterar_salida(salida,tiempo)
+        
+        return salida_perturbada
