@@ -288,6 +288,7 @@ from back.simulacion import Simulacion
 from back.estabilidad import Estabilidad
 from ui.base.latex_editor import LatexEditor
 from PyQt5.QtWebEngineWidgets import QWebEngineView
+import sympy as sp
 # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('company.app.1')
 
 class MainWindow(QMainWindow):
@@ -538,14 +539,14 @@ class MainWindow(QMainWindow):
         
         # Configurar la tabla
         rows = len(matriz_routh)
-        cols = len(matriz_routh[0])
+        cols = max(len(row) for row in matriz_routh)
         self.matrix_table.setRowCount(rows)
         self.matrix_table.setColumnCount(cols)
 
         # Rellenar la tabla con los valores de la matriz
         for i in range(rows):
             for j in range(cols):
-                if matriz_routh[i][j] != 0:  # Solo mostrar valores no nulos
+                if j < len(matriz_routh[i]):
                     item = QTableWidgetItem(str(matriz_routh[i][j]))
                     self.matrix_table.setItem(i, j, item)
 
@@ -554,11 +555,11 @@ class MainWindow(QMainWindow):
         self.matrix_table.resizeRowsToContents()
 
         # Interpretar el resultado
-        es_estable = all(matriz_routh[i][0] > 0 for i in range(rows))
+        es_estable = all(sp.sympify(matriz_routh[i][0]).is_positive for i in range(rows))
         resultado = "El sistema es estable." if es_estable else "El sistema es inestable."
         self.resultado_label.setText(resultado)
         self.resultado_label.setStyleSheet("font-weight: bold; font-size: 14px; color: green;" if es_estable else "font-weight: bold; font-size: 14px; color: red;")
-
+        
     def calcular_y_mostrar_error_estado_estable(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Error en Estado Estable")

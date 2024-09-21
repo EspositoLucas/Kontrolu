@@ -226,25 +226,38 @@ class Estabilidad:
         
         s = sp.Symbol('s')
         den = sp.fraction(G_cl)[1]
-        print("el denominador es: ", den)
         coeficientes = sp.Poly(den, s).all_coeffs()
         
         n = len(coeficientes) - 1
-        matriz_routh = [[0 for j in range(2)] for i in range(n+1)]
+        cols = (n + 1) // 2
+        matriz_routh = [[0 for j in range(cols)] for i in range(n+1)]
         
-        for i in range(n+1):
-            if i < len(coeficientes):
-                matriz_routh[i][0] = coeficientes[i]
-            if i+1 < len(coeficientes):
-                matriz_routh[i][1] = coeficientes[i+1]
+        # Llenar las dos primeras filas
+        for i in range(2):
+            for j in range(cols):
+                if i + 2*j < len(coeficientes):
+                    matriz_routh[i][j] = coeficientes[i + 2*j]
+                else:
+                    matriz_routh[i][j] = 0
         
+        # Calcular el resto de las filas
         for i in range(2, n+1):
             if matriz_routh[i-1][0] == 0:
-                epsilon = sp.Symbol('ε')
-                matriz_routh[i-1][0] = epsilon
-            matriz_routh[i][0] = (matriz_routh[i-1][0] * matriz_routh[i-2][1] - 
-                                  matriz_routh[i-2][0] * matriz_routh[i-1][1]) / matriz_routh[i-1][0]
-            matriz_routh[i][1] = 0  # La segunda columna siempre será 0 para filas calculadas
+                # Manejar el caso de fila cero
+                grado = n - i + 2
+                coefs_aux = [c for c in matriz_routh[i-2] if c != 0]
+                poli_aux = sum(c * s**(grado-2*j) for j, c in enumerate(coefs_aux))
+                derivada = sp.diff(poli_aux, s)
+                coefs_derivada = sp.Poly(derivada, s).all_coeffs()
+                matriz_routh[i-1] = coefs_derivada + [0] * (cols - len(coefs_derivada))
+            
+            for j in range(cols - 1):
+                if matriz_routh[i-1][0] != 0:
+                    det = (matriz_routh[i-1][0] * matriz_routh[i-2][j+1] - 
+                           matriz_routh[i-2][0] * matriz_routh[i-1][j+1])
+                    matriz_routh[i][j] = det / matriz_routh[i-1][0]
+                else:
+                    matriz_routh[i][j] = 0
         
         return matriz_routh
 
