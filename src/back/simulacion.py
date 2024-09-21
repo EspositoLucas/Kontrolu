@@ -8,7 +8,7 @@ from time import sleep
 
 class Simulacion:
     def __init__(self, controlador = None, actuador = None, proceso =None, medidor =None, delta =1, ciclos=10, entrada="",salida_cero=10,carga = Carga("")):
-        # crear dataframe con las columnas tiempo, controlador, actuador, proceso, medidor, entrada
+        
         self.controlador : MacroControlador = controlador
         self.actuador : MacroActuador = actuador
         self.proceso : MacroProceso = proceso
