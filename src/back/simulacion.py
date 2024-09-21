@@ -3,10 +3,11 @@ from back.macros.macro_controlador import MacroControlador
 from back.macros.macro_actuador import MacroActuador
 from back.macros.macro_proceso import MacroProceso
 from back.macros.macro_medidor import MacroMedidor
+from topologia.carga import Carga
 from time import sleep
 
 class Simulacion:
-    def __init__(self, controlador = None, actuador = None, proceso =None, medidor =None, delta =1, ciclos=10, entrada="",salida_cero=10):
+    def __init__(self, controlador = None, actuador = None, proceso =None, medidor =None, delta =1, ciclos=10, entrada="",salida_cero=10,carga = Carga("")):
         # crear dataframe con las columnas tiempo, controlador, actuador, proceso, medidor, entrada
         self.controlador : MacroControlador = controlador
         self.actuador : MacroActuador = actuador
@@ -16,7 +17,8 @@ class Simulacion:
         self.ciclos = ciclos
         self.entrada : MicroBloque = MicroBloque("entrada",funcion_transferencia=entrada)
         self.salida_cero = salida_cero
-        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': []}
+        self.carga = carga
+        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
             
     def simular_paso(self, y_actual, ciclo):
 
@@ -52,6 +54,10 @@ class Simulacion:
 
         y_actual += y_proceso
         self.datos['salida'].append(y_actual)
+
+        estado = self.carga.simular(tiempo, y_actual)
+        print(f"Paso {ciclo}: Estado de la carga: {estado}")
+        self.datos['carga'].append(estado)
 
         return y_actual
 
