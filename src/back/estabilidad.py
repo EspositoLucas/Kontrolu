@@ -67,8 +67,14 @@ class Estabilidad:
         den = sp.fraction(G_cl)[1]
         coeficientes = sp.Poly(den, s).all_coeffs()
         
+        # Manejar el caso de función de transferencia constante
+        if len(coeficientes) == 1:
+            # Si es una constante, el sistema es estable si es positiva
+            es_estable = sp.sympify(coeficientes[0]).is_positive
+            return [[coeficientes[0]]], es_estable
+
         n = len(coeficientes) - 1
-        cols = (n + 1) // 2
+        cols = n // 2 + 1
         matriz_routh = [[0 for j in range(cols)] for i in range(n+1)]
         
         # Llenar las dos primeras filas
@@ -93,13 +99,20 @@ class Estabilidad:
             for j in range(cols - 1):
                 if matriz_routh[i-1][0] != 0:
                     det = (matriz_routh[i-1][0] * matriz_routh[i-2][j+1] - 
-                           matriz_routh[i-2][0] * matriz_routh[i-1][j+1])
+                        matriz_routh[i-2][0] * matriz_routh[i-1][j+1])
                     matriz_routh[i][j] = det / matriz_routh[i-1][0]
                 else:
                     matriz_routh[i][j] = 0
         
-        return matriz_routh
-
+        # Asegurar que el último elemento sea el último coeficiente del polinomio si todos los demás son 0
+        if all(matriz_routh[-1][j] == 0 for j in range(cols - 1)):
+            matriz_routh[-1][0] = coeficientes[-1]
+        
+        # Verificar estabilidad considerando todas las columnas
+        es_estable = all(sp.sympify(matriz_routh[i][0]).is_positive for i in range(n+1) if matriz_routh[i][0] != 0)
+        
+        return matriz_routh, es_estable
+    
     def calcular_error_estado_estable(self, tipo_entrada):
         G_ol_latex = self.obtener_funcion_transferencia_lazo_abierto()
         G_ol = self.parse_latex_to_sympy(G_ol_latex)

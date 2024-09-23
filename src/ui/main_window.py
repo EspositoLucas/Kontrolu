@@ -265,31 +265,37 @@ class MainWindow(QMainWindow):
         dialog.exec_()
 
     def calcular_y_mostrar_estabilidad(self):
-        matriz_routh = self.estabilidad.calcular_estabilidad()
+        matriz_routh, es_estable = self.estabilidad.calcular_estabilidad()
         
         # Configurar la tabla
         rows = len(matriz_routh)
-        cols = max(len(row) for row in matriz_routh)
+        cols = len(matriz_routh[0])
         self.matrix_table.setRowCount(rows)
         self.matrix_table.setColumnCount(cols)
 
         # Rellenar la tabla con los valores de la matriz
         for i in range(rows):
             for j in range(cols):
-                if j < len(matriz_routh[i]):
-                    item = QTableWidgetItem(str(matriz_routh[i][j]))
-                    self.matrix_table.setItem(i, j, item)
+                valor = matriz_routh[i][j]
+                if isinstance(valor, sp.Expr):
+                    valor = sp.simplify(valor)
+                item = QTableWidgetItem(str(valor))
+                self.matrix_table.setItem(i, j, item)
 
         # Ajustar el tamaño de las celdas
         self.matrix_table.resizeColumnsToContents()
         self.matrix_table.resizeRowsToContents()
 
         # Interpretar el resultado
-        es_estable = all(sp.sympify(matriz_routh[i][0]).is_positive for i in range(rows))
-        resultado = "El sistema es estable." if es_estable else "El sistema es inestable."
+        if rows == 1 and cols == 1:
+            resultado = f"La función de transferencia es una constante: {matriz_routh[0][0]}. "
+            resultado += "El sistema es estable." if es_estable else "El sistema es inestable."
+        else:
+            resultado = "El sistema es estable." if es_estable else "El sistema es inestable."
+        
         self.resultado_label.setText(resultado)
         self.resultado_label.setStyleSheet("font-weight: bold; font-size: 14px; color: green;" if es_estable else "font-weight: bold; font-size: 14px; color: red;")
-        
+    
     def calcular_y_mostrar_error_estado_estable(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Error en Estado Estable")
