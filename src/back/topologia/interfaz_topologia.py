@@ -1,13 +1,15 @@
 from __future__ import annotations
-from .perturbacion import Perturbacion
 from typing import Tuple
 import itertools
+# from back.topologia.perturbacion import Perturbacion
 
 class InterfazTopologia():
+
     def __init__(self,padre=None) -> None:
         self.padre = padre
-        self.perturbacion_entrada = Perturbacion()
-        self.perturbacion_salida = Perturbacion(padre=self)
+        # self.perturbacion_entrada = Perturbacion()
+        # self.perturbacion_salida = Perturbacion(padre=self)
+        
 
     def ancho(self) -> int:
         pass

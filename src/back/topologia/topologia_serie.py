@@ -1,11 +1,11 @@
 from __future__ import annotations
 from back.topologia.interfaz_topologia import InterfazTopologia
+from back.topologia.perturbacion import Perturbacion
 from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
 from PyQt5.QtGui import QColor
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
 from back.topologia.configuraciones import Configuracion
-from back.topologia.perturbacion import Perturbacion
 
 ANCHO = 150
 ALTO = 80

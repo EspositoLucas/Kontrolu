@@ -8,16 +8,16 @@ class TipoError(Enum):
     PROPORCIONAL = "proporcional"
     NINGUNO = "ninguno"
 class Configuracion:
-    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf,limite_por_ciclo=inf,error_maximo=inf,proporcion=0,tipo=TipoError.NINGUNO,ultimo_valor=0,propabilidad=0):
+    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf,limite_por_ciclo=inf,error_maximo=inf,proporcion=0,tipo=TipoError.NINGUNO,ultimo_valor=0,probabilidad=0):
         self.nombre = nombre
         self.limite_inferior = limite_inferior
         self.limite_superior = limite_superior
         self.limite_por_ciclo = limite_por_ciclo
         self.error_maximo = error_maximo
         self.proporcion = proporcion
-        self.tipo = tipo
+        self.tipo = tipo 
         self.ultimo_valor = ultimo_valor
-        self.probablidad = propabilidad
+        self.probabilidad = probabilidad
         self.datos = {'tiempo': [], 'valor_original': [], 'error_base': [], 'error_limite': [], 'error_total':[],'resultado': []}
     
     def calcular_error(self,valor):
@@ -103,7 +103,6 @@ class Configuracion:
         self.ultimo_valor = valor
         if valor is None: self.ultimo_valor = 0
     
-
     def actualizar(self,valor,tiempo):
         error = self.calcular_error(valor)
         nuevo = self.calcular_limite(valor+error)
