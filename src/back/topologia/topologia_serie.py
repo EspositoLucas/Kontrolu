@@ -111,6 +111,13 @@ class TopologiaSerie(InterfazTopologia):
         salida_perturbada = self.alterar_salida(entrada_perturbada,tiempo)
 
         return salida_perturbada
+    
+    def agregar_perturbacion_antes_de_paralela(self,ft,ciclos):
+        self.padre.generar_perturbacion_entrada(ft,ciclos)
+
+    def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
+        self.padre.generar_perturbacion_salida(ft,ciclos)
+    
 
 class MicroBloque(InterfazTopologia):
     def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
@@ -189,12 +196,13 @@ class MicroBloque(InterfazTopologia):
     def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque):
         self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
     
-    def agregar_perturbacion_antes(self, perturbacion: Perturbacion, microbloque: MicroBloque):
-        self.padre.agregar_perturbacion_antes(microbloque, perturbacion)
-    
-    def agregar_perturbacion_despues(self, perturbacion: Perturbacion, microbloque: MicroBloque):
-        self.padre.agregar_perturbacion_despues(microbloque, perturbacion)
-    
+    def agregar_perturbacion_antes_de_paralela(self,ft,ciclos):
+        self.padre.agregar_perturbacion_antes_de_paralela(ft,ciclos)
+
+    def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
+        self.padre.agregar_perturbacion_despues_de_paralela(ft,ciclos)
+
+
     def get_parent_structures(self):
         parents = []
         actual = self.padre
@@ -299,3 +307,11 @@ class TopologiaParalelo(InterfazTopologia):
         salida_perturbada = self.alterar_salida(salida,tiempo)
         
         return salida_perturbada
+    
+    def agregar_perturbacion_antes_de_paralela(self,ft,ciclos):
+        self.padre.agregar_perturbacion_antes_de_paralela(ft,ciclos)
+
+    def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
+        self.padre.agregar_perturbacion_despues_de_paralela(ft,ciclos)
+    
+    

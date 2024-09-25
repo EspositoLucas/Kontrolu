@@ -12,10 +12,9 @@ class Perturbacion(InterfazTopologia):
         self.estado = estado
         self.datos = {'tiempo': [], 'valor_original': [], 'perturbacion': [], 'resultado': []}
     
-    def matar(self):
-        self.ciclos = 0
     
     def alterar(self,entrada,tiempo):
+        
         if not self.estado: return entrada
 
         s,t = symbols('s t')

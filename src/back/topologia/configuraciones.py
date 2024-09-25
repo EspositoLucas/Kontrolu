@@ -1,7 +1,7 @@
 import numpy as np
 from math import inf
 class Configuracion:
-    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf,limite_por_ciclo=inf,error_maximo=inf,proporcion=0,tipo="ninguno",ultimo_valor=0):
+    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf,limite_por_ciclo=inf,error_maximo=inf,proporcion=0,tipo="ninguno",ultimo_valor=0,propabilidad=0):
         self.nombre = nombre
         self.limite_inferior = limite_inferior
         self.limite_superior = limite_superior
@@ -10,9 +10,12 @@ class Configuracion:
         self.proporcion = proporcion
         self.tipo = tipo
         self.ultimo_valor = ultimo_valor
+        self.probablidad = propabilidad
         self.datos = {'tiempo': [], 'valor_original': [], 'error_base': [], 'error_limite': [], 'error_total':[],'resultado': []}
     
     def calcular_error(self,valor):
+        if np.random.uniform(0,1) < self.probablidad: return 0
+        
         if self.tipo == "gauss":
             error =  np.random.normal(0,valor*self.proporcion)
         elif self.tipo == "aleatorio":

@@ -13,17 +13,7 @@ class Microbloque(QGraphicsItem):
         self.funcion_transferencia = microbloque_back.funcion_transferencia or ""
         self.configuracion_mb = microbloque_back.configuracion
         self.esta_selecionado = False
-        #self.setFixedSize(microbloque_back.ancho(), microbloque_back.alto())
-        #self.setAttribute(Qt.WA_StyledBackground, True)
-        color_texto = self.calcular_color(self.color)
-        
-        #self.setStyleSheet(f"""
-        #    font-weight: bold;
-        #    color: {color_texto};
-        #    font-family: Arial;  
-        #    background-color: {self.color.name()};
-        #""")
-        
+
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(1)
     

@@ -1,12 +1,13 @@
 from __future__ import annotations
+from .perturbacion import Perturbacion
 from typing import Tuple
 import itertools
 
 class InterfazTopologia():
     def __init__(self,padre=None) -> None:
         self.padre = padre
-        #self.perturbacion_entrada = Perturbacion(padre=self)
-        #self.perturbacion_salida = Perturbacion(padre=self)
+        self.perturbacion_entrada = Perturbacion()
+        self.perturbacion_salida = Perturbacion(padre=self)
 
     def ancho(self) -> int:
         pass
@@ -65,4 +66,15 @@ class InterfazTopologia():
     
     def cancelar_perturbacion_salida(self):
         self.perturbacion_salida.cancelar_perturbacion()
-        
+
+    def estado_perturbacion_entrada(self):
+        return self.perturbacion_entrada.activa()
+    
+    def estado_perturbacion_salida(self):
+        return self.perturbacion_salida.activa()
+    
+    def agregar_perturbacion_antes_de_paralela(self,ft,ciclos):
+        pass
+
+    def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
+        pass
