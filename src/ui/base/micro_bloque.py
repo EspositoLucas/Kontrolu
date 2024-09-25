@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog,QComboBox,QHBoxLayout, QMessageBox, QGraphicsItem
+from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog,QComboBox,QHBoxLayout, QMessageBox, QGraphicsItem,QTabWidget
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF
 from .latex_editor import LatexEditor
@@ -67,51 +67,81 @@ class Microbloque(QGraphicsItem):
             self.edit_properties()
 
 
-    def edit_configuration(self, configuracion, layout):
+    def edit_configuration(self, configuracion, tipo):
         dialog = QDialog(self.scene().views()[0].window())
-        dialog.setWindowTitle(f"Editar Configuración: {configuracion.nombre}")
+        dialog.setWindowTitle(f"Editar Configuración de {tipo.capitalize()}")
         dialog.setStyleSheet("background-color: #333; color: white;")
-        edit_config_layout = QVBoxLayout()
-
-        name_input = QLineEdit(configuracion.nombre)
-        name_input.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
-        edit_config_layout.addWidget(name_input)
+        layout = QVBoxLayout()
 
         fields = [
-            ("Límite inferior", "limite_inferior", self.format_limit(configuracion.limite_inferior)),
-            ("Límite superior", "limite_superior", self.format_limit(configuracion.limite_superior)),
-            ("Límite por ciclo", "limite_por_ciclo", self.format_limit(configuracion.limite_por_ciclo)),
-            ("Error máximo", "error_maximo", self.format_error(configuracion.error_maximo)),
-            ("Proporción", "proporcion", str(configuracion.proporcion)),
-            ("Último valor", "ultimo_valor", str(configuracion.ultimo_valor)),
-            ("Probabilidad", "probabilidad", str(configuracion.probabilidad))
+            ("Límite inferior", "limite_inferior"),
+            ("Límite superior", "limite_superior"),
+            ("Límite por ciclo", "limite_por_ciclo"),
+            ("Error máximo", "error_maximo"),
+            ("Proporción", "proporcion"),
+            ("Último valor", "ultimo_valor"),
+            ("Probabilidad", "probabilidad")
         ]
 
-        for label, attr, value in fields:
+        for label, attr in fields:
             row = QHBoxLayout()
             lbl = QLabel(label)
             lbl.setStyleSheet("color: white;")
-            input_field = QLineEdit(value)
-            input_field.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
+            input_field = QLineEdit(str(getattr(configuracion, attr)))
+            input_field.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
             row.addWidget(lbl)
             row.addWidget(input_field)
-            edit_config_layout.addLayout(row)
+            layout.addLayout(row)
 
         tipo_error_combo = QComboBox()
         tipo_error_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         for error_type in TipoError:
             tipo_error_combo.addItem(error_type.value)
         tipo_error_combo.setCurrentText(configuracion.tipo.value)
-        edit_config_layout.addWidget(QLabel("Tipo de error"))
-        edit_config_layout.addWidget(tipo_error_combo)
+        layout.addWidget(QLabel("Tipo de error"))
+        layout.addWidget(tipo_error_combo)
 
         save_button = QPushButton("Guardar cambios")
         save_button.setStyleSheet("background-color: #444; color: white;")
-        save_button.clicked.connect(lambda: self.save_edited_configuration(dialog, configuracion, name_input, edit_config_layout, tipo_error_combo))
-        edit_config_layout.addWidget(save_button)
+        save_button.clicked.connect(lambda: self.save_configuration(dialog, configuracion, layout, tipo_error_combo))
+        layout.addWidget(save_button)
 
-        dialog.setLayout(edit_config_layout)
+        dialog.setLayout(layout)
         dialog.exec_()
+
+    def save_configuration(self, dialog, configuracion, layout, tipo_error_combo):
+        for i in range(layout.count() - 2):  # -2 para ignorar el QComboBox y el botón de guardar
+            row = layout.itemAt(i)
+            if isinstance(row, QHBoxLayout):
+                label = row.itemAt(0).widget().text()
+                value = row.itemAt(1).widget().text()
+                attr = self.get_attr_from_label(label)
+                if attr:
+                    try:
+                        if value.lower() == "inf":
+                            setattr(configuracion, attr, float('inf'))
+                        elif value.lower() == "-inf":
+                            setattr(configuracion, attr, float('-inf'))
+                        else:
+                            setattr(configuracion, attr, float(value))
+                    except ValueError:
+                        QMessageBox.warning(dialog, "Error", f"Valor inválido para {label}")
+                        return
+
+        configuracion.tipo = TipoError(tipo_error_combo.currentText())
+        dialog.accept()
+
+    def get_attr_from_label(self, label):
+        attr_map = {
+            "Límite inferior": "limite_inferior",
+            "Límite superior": "limite_superior",
+            "Límite por ciclo": "limite_por_ciclo",
+            "Error máximo": "error_maximo",
+            "Proporción": "proporcion",
+            "Último valor": "ultimo_valor",
+            "Probabilidad": "probabilidad"
+        }
+        return attr_map.get(label, "")
 
     def format_limit(self, value):
         return "Sin límite" if value in [float('inf'), float('-inf')] else str(value)
@@ -161,27 +191,8 @@ class Microbloque(QGraphicsItem):
 
         dialog.accept()
 
-    def get_attr_from_label(self, label):
-        attr_map = {
-            "Límite inferior": "limite_inferior",
-            "Límite superior": "limite_superior",
-            "Límite por ciclo": "limite_por_ciclo",
-            "Error máximo": "error_maximo",
-            "Proporción": "proporcion",
-            "Último valor": "ultimo_valor",
-            "Probabilidad": "probabilidad"
-        }
-        return attr_map.get(label, "")
-
     def edit_properties(self):
-        # Obtener la ventana principal como el padre del diálogo
-        parent = None
-        if self.scene():
-            views = self.scene().views()
-            if views:
-                parent = views[0].window()
-
-        dialog = QDialog(parent)
+        dialog = QDialog(self.scene().views()[0].window())
         dialog.setWindowTitle("Editar Microbloque")
         dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
@@ -203,20 +214,57 @@ class Microbloque(QGraphicsItem):
         layout.addWidget(transfer_label)
         layout.addWidget(latex_editor)
         
-        config_label = QLabel("Configuraciones:")
-        config_label.setStyleSheet("color: white;")
-        layout.addWidget(config_label)
+        config_tab = QTabWidget()
+        config_tab.setStyleSheet("""
+            QTabWidget::pane { 
+                border: 1px solid #555; 
+                background-color: #333;
+            }
+            QTabBar::tab { 
+                background-color: #444; 
+                color: white; 
+                padding: 5px;
+            }
+            QTabBar::tab:selected { 
+                background-color: #555;
+            }
+        """)
+        
+        config_content = QWidget()
+        config_layout = QVBoxLayout(config_content)
 
-        config_button = QPushButton(self.configuracion.nombre)
-        config_button.setStyleSheet("background-color: #444; color: white;")
-        config_button.clicked.connect(lambda: self.edit_configuration(self.configuracion, layout))
-        layout.addWidget(config_button)
+        # Fila para el nombre de la configuración y botones
+        config_row = QHBoxLayout()
+        config_name_input = QLineEdit(self.configuracion.nombre)
+        config_name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        config_row.addWidget(config_name_input, 3)
 
+        input_button = QPushButton("Configurar Entrada")
+        input_button.setStyleSheet("background-color: #444; color: white;")
+        input_button.clicked.connect(lambda: self.edit_configuration(self.configuracion, "entrada"))
+        config_row.addWidget(input_button, 1)
+
+        output_button = QPushButton("Configurar Salida")
+        output_button.setStyleSheet("background-color: #444; color: white;")
+        output_button.clicked.connect(lambda: self.edit_configuration(self.configuracion, "salida"))
+        config_row.addWidget(output_button, 1)
+
+        delete_button = QPushButton("Eliminar")
+        delete_button.setStyleSheet("background-color: #444; color: white;")
+        delete_button.clicked.connect(lambda: self.delete_configuration(config_row, config_layout))
+        config_row.addWidget(delete_button, 1)
+
+        config_layout.addLayout(config_row)
+
+        # Botón para agregar configuración
         add_config_button = QPushButton("Agregar Configuración")
         add_config_button.setStyleSheet("background-color: #444; color: white;")
-        add_config_button.clicked.connect(lambda: self.add_configuration(layout))
-        layout.addWidget(add_config_button)
+        add_config_button.clicked.connect(lambda:self.add_configuration(config_layout))
+        config_layout.addWidget(add_config_button)
         
+        config_tab.addTab(config_content, "Configuraciones")
+        layout.addWidget(config_tab)
+
         save_button = QPushButton("Guardar")
         save_button.setStyleSheet("background-color: #444; color: white;")
         save_button.clicked.connect(dialog.accept)
@@ -230,54 +278,60 @@ class Microbloque(QGraphicsItem):
             self.nombre = name_input.text()
             nueva_funcion = latex_editor.get_latex()
             self.elemento_back.funcion_transferencia = nueva_funcion
-            self.funcion_transferencia = nueva_funcion      
+            self.funcion_transferencia = nueva_funcion
+
+            # Obtener el nombre de la configuración
+            config_name = config_name_input.text().strip() if config_name_input.text() else "Default"
+            
+            # Si el nombre está vacío, usar "Default"
+            if not config_name:
+                config_name = "Default"
+            
+            # Actualizar el nombre de la configuración
+            self.configuracion.nombre = config_name
+            
             self.update()
-
+            
     def add_configuration(self, layout):
-        dialog = QDialog(self.scene().views()[0].window())
-        dialog.setWindowTitle("Agregar Configuración")
-        dialog.setStyleSheet("background-color: #333; color: white;")
-        config_layout = QVBoxLayout()
-
+        config_row = QHBoxLayout()
+        
         name_input = QLineEdit()
         name_input.setPlaceholderText("Nombre de la configuración")
-        name_input.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
-        config_layout.addWidget(name_input)
-
-        fields = [
-            ("Límite inferior", "-inf"),
-            ("Límite superior", "inf"),
-            ("Límite por ciclo", "inf"),
-            ("Error máximo", "inf"),
-            ("Proporción", "0"),
-            ("Último valor", "0"),
-            ("Probabilidad", "0")
-        ]
-
-        for label, default_value in fields:
-            row = QHBoxLayout()
-            lbl = QLabel(label)
-            lbl.setStyleSheet("color: white;")
-            input_field = QLineEdit(default_value)
-            input_field.setStyleSheet("background-color: white; color: black; border: 1px solid #555;")
-            row.addWidget(lbl)
-            row.addWidget(input_field)
-            config_layout.addLayout(row)
-
-        tipo_error_combo = QComboBox()
-        tipo_error_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-        for error_type in TipoError:
-            tipo_error_combo.addItem(error_type.value)
-        config_layout.addWidget(QLabel("Tipo de error"))
-        config_layout.addWidget(tipo_error_combo)
-
-        save_button = QPushButton("Guardar")
-        save_button.clicked.connect(lambda: self.save_new_configuration(dialog, name_input, config_layout, tipo_error_combo, layout))
-        save_button.setStyleSheet("background-color: #444; color: white;")
-        config_layout.addWidget(save_button)
-
-        dialog.setLayout(config_layout)
-        dialog.exec_()
+        name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        
+        input_config = Configuracion("Entrada")
+        output_config = Configuracion("Salida")
+        
+        input_button = QPushButton("Configurar Entrada")
+        input_button.setStyleSheet("background-color: #444; color: white;")
+        input_button.clicked.connect(lambda: self.edit_configuration(input_config, "entrada"))
+        
+        output_button = QPushButton("Configurar Salida")
+        output_button.setStyleSheet("background-color: #444; color: white;")
+        output_button.clicked.connect(lambda: self.edit_configuration(output_config, "salida"))
+        
+        delete_button = QPushButton("Eliminar")
+        delete_button.setStyleSheet("background-color: #444; color: white;")
+        delete_button.clicked.connect(lambda: self.delete_configuration(config_row, layout))
+        
+        config_row.addWidget(name_input)
+        config_row.addWidget(input_button)
+        config_row.addWidget(output_button)
+        config_row.addWidget(delete_button)
+        
+        layout.insertLayout(layout.count() - 1, config_row)
+    
+    def delete_configuration(self, config_row, layout):
+        for i in range(layout.count()):
+            if layout.itemAt(i) == config_row:
+                while config_row.count():
+                    item = config_row.takeAt(0)
+                    widget = item.widget()
+                    if widget:
+                        widget.deleteLater()
+                layout.removeItem(config_row)
+                break
+        self.update()
     
     def save_new_configuration(self, dialog, name_input, config_layout, tipo_error_combo, main_layout):
         nombre = name_input.text()
