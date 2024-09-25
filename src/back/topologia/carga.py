@@ -2,6 +2,15 @@
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
 import numpy as np
+from enum import Enum
+
+class TipoCarga(Enum):
+    INTEGRAL = "integral"
+    FINAL = "final"
+    ERROR = "error"
+    INTEGRAL_PROPORCIONAL = "integral_proporcional"
+    ERROR_PROPORCIONAL = "error_proporcional"
+
 
 estados = [
     {
@@ -32,7 +41,7 @@ estados = [
 ]
 
 class Carga:
-    def __init__(self,funcion_de_trasnferencia,tipo_carga="final",estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0):
+    def __init__(self,funcion_de_trasnferencia,tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0):
         self.funcion_de_transferencia = funcion_de_trasnferencia
         self.tipo_carga = tipo_carga
         self.escalamiento_sigmoide = escalamiento_sigmoide
@@ -98,15 +107,15 @@ class Carga:
     def simular(self,tiempo,salida_real):
         valor_esperado = self.salida_esperada(tiempo)
 
-        if self.tipo_carga == "integral":
+        if self.tipo_carga == TipoCarga.INTEGRAL:
             carga = self.salida_integral(salida_real,valor_esperado)
-        elif self.tipo_carga == "final":
+        elif self.tipo_carga == TipoCarga.FINAL:
             carga = self.salida_final(salida_real,valor_esperado)
-        elif self.tipo_carga == "error":
+        elif self.tipo_carga == TipoCarga.ERROR:
             carga = self.salida_error(salida_real,valor_esperado)
-        elif self.tipo_carga == "integral_proporcional":
+        elif self.tipo_carga == TipoCarga.INTEGRAL_PROPORCIONAL:
             carga = self.salida_integral_proporcional(salida_real,valor_esperado)
-        elif self.tipo_carga == "error_proporcional":
+        elif self.tipo_carga == TipoCarga.ERROR_PROPORCIONAL:
             carga = self.salida_error_proporcional(salida_real,valor_esperado)
         else:
             carga = 0
