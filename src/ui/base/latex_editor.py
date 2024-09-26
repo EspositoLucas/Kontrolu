@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel, QMessageBox, QPushButton, QHBoxLayout, QToolButton
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QTextEdit, QLabel, QHBoxLayout, QToolButton
 from PyQt5.QtCore import pyqtSignal, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
