@@ -41,7 +41,7 @@ estados = [
 ]
 
 class Carga:
-    def __init__(self,funcion_de_trasnferencia,tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0):
+    def __init__(self,funcion_de_trasnferencia="",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0):
         self.funcion_de_transferencia = funcion_de_trasnferencia
         self.tipo_carga = tipo_carga
         self.escalamiento_sigmoide = escalamiento_sigmoide

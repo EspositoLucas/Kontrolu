@@ -7,7 +7,7 @@ from back.topologia.carga import Carga
 from time import sleep
 
 class Simulacion:
-    def __init__(self, controlador = None, actuador = None, proceso =None, medidor =None, delta =1, ciclos=10, entrada="",salida_cero=10,carga = Carga("")):
+    def __init__(self, controlador :MacroControlador= None, actuador:MacroActuador = None, proceso:MacroProceso =None, medidor:MacroMedidor =None, delta =1, ciclos=10, entrada:MicroBloque=None,salida_cero=10,carga:MicroBloque= None):
         
         self.controlador : MacroControlador = controlador
         self.actuador : MacroActuador = actuador
@@ -15,9 +15,9 @@ class Simulacion:
         self.medidor : MacroMedidor = medidor
         self.delta = delta
         self.ciclos = ciclos
-        self.entrada : MicroBloque = MicroBloque("entrada",funcion_transferencia=entrada)
+        self.entrada : MicroBloque = entrada
         self.salida_cero = salida_cero
-        self.carga = carga
+        self.carga :Carga = carga
         self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
             
     def simular_paso(self, y_actual, ciclo):

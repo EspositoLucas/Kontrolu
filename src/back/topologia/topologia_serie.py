@@ -120,7 +120,7 @@ class TopologiaSerie(InterfazTopologia):
     
 
 class MicroBloque(InterfazTopologia):
-    def __init__(self, nombre: str, color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
+    def __init__(self, nombre: str="", color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia
