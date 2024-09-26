@@ -168,9 +168,9 @@ class MainWindow(QMainWindow):
         if dialog.exec_():
 
             # coef = float(self.coef_edit.text())
-            # t_total = float(tiempo_edit.text())
-            # dt = float(dt_edit.text())
-            # y_salida = float(salida_edit.text())
+            t_total = float(tiempo_edit.text())
+            dt = float(dt_edit.text())
+            y_salida = float(salida_edit.text())
             # velocidad = velocidad_combo.currentText().lower()
 
 
