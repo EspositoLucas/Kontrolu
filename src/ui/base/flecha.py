@@ -1,19 +1,8 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import math
 
-#  draw an arrow like this
-#                           |\
-#                ___   _____| \
-#    length_width |   |        \  _____
-#                _|_  |_____   /    |
-#                           | /     | arrow_width
-#                           |/    __|__
-#
-#                           |<->|
-#                        arrow_height 
-
 class Flecha(QtWidgets.QGraphicsItem):
-    def __init__(self, source: QtCore.QPointF, destination: QtCore.QPointF, arrow_height=15, arrow_width=10, length_width=5, arrow=True, *args, **kwargs):
+    def __init__(self, source: QtCore.QPointF, destination: QtCore.QPointF, arrow_height=15, arrow_width=10, length_width=5, arrow=True, color=QtGui.QColor(0, 0, 0),*args, **kwargs):
         super(Flecha, self).__init__(*args, **kwargs)
         self._sourcePoint = source
         self._destinationPoint = destination
@@ -23,6 +12,15 @@ class Flecha(QtWidgets.QGraphicsItem):
         self.arrow = arrow
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, False)
         self.setAcceptHoverEvents(True)
+        self.color = color
+        self.default_color = QtGui.QColor(0, 0, 0)  # Color negro por defecto
+        self.hover_color = QtGui.QColor(0, 0, 0)    # Color de hover, se establecerá en las subclases en macro_diagrama.py
+        self.current_color = self.default_color
+        self.setAcceptHoverEvents(True)
+    
+    def set_color(self, color):
+        self.color = color
+        self.update()
 
     def boundingRect(self):
         extra = 10
@@ -36,7 +34,7 @@ class Flecha(QtWidgets.QGraphicsItem):
         my_pen = QtGui.QPen()
         my_pen.setWidth(2)
         my_pen.setCosmetic(False)
-        my_pen.setColor(QtGui.QColor(0, 0, 0))
+        my_pen.setColor(self.current_color)
         painter.setPen(my_pen)
 
         points = [self._sourcePoint, self._destinationPoint]
@@ -106,6 +104,20 @@ class Flecha(QtWidgets.QGraphicsItem):
 
     def hoverEnterEvent(self, event):
         self.setCursor(QtCore.Qt.CrossCursor)
+        self.is_hovering = True
+        self.current_color = self.hover_color
+        self.update()
+        super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
         self.setCursor(QtCore.Qt.ArrowCursor)
+        self.is_hovering = False
+        self.current_color = self.default_color
+        self.update()
+        super().hoverLeaveEvent(event)
+
+    def shape(self):
+        path = QtGui.QPainterPath()
+        path.moveTo(self._sourcePoint)
+        path.lineTo(self._destinationPoint)
+        return path

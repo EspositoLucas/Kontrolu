@@ -89,11 +89,31 @@ class MacroDiagrama(QtWidgets.QWidget):
 class FlechaEntrada(Flecha):
     def __init__(self, start, end, width, height, arrow_size):
         super().__init__(start, end, width, height, arrow_size)
-        self.setAcceptHoverEvents(True)
+        self.hover_color = QtGui.QColor(0, 128, 255)  # Azul claro para hover
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.tipo_entrada_actual = "Escalón"  # Valor por defecto
         self.funcion_personalizada = "s"  # Nuevo atributo para almacenar la función personalizada
         self.setToolTip("Haz click para configurar la entrada del sistema")
+    
+    def paint(self, painter, option, widget):
+        super().paint(painter, option, widget)
+        # Dibujar un pequeño triángulo en el punto de inicio
+        triangle = QtGui.QPolygonF()
+        triangle.append(self._sourcePoint)
+        triangle.append(self._sourcePoint + QtCore.QPointF(-10, -5))
+        triangle.append(self._sourcePoint + QtCore.QPointF(-10, 5))
+        painter.setBrush(self.current_color)
+        painter.drawPolygon(triangle)
+
+    def shape(self):
+        path = super().shape()
+        triangle = QtGui.QPolygonF()
+        triangle.append(self._sourcePoint)
+        triangle.append(self._sourcePoint + QtCore.QPointF(-10, -5))
+        triangle.append(self._sourcePoint + QtCore.QPointF(-10, 5))
+        path.addPolygon(triangle)
+        return path
+
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
@@ -177,14 +197,33 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
 class FlechaSalida(Flecha):
     def __init__(self, start, end, width, height, arrow_size):
         super().__init__(start, end, width, height, arrow_size)
-        self.setAcceptHoverEvents(True)
+        self.hover_color = QtGui.QColor(57, 255, 20)  # verde para hover
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.tipo_carga_actual = TipoCarga.FINAL
         self.funcion_transferencia = "1/s"
         self.escalamiento_sigmoide = 1
         self.desplazamiento_sigmoide = 0
         self.setToolTip("Haz click para configurar la carga del sistema")
+    
+    def paint(self, painter, option, widget):
+        super().paint(painter, option, widget)
+        # Dibujar un pequeño triángulo en el punto final
+        triangle = QtGui.QPolygonF()
+        triangle.append(self._destinationPoint)
+        triangle.append(self._destinationPoint + QtCore.QPointF(10, -5))
+        triangle.append(self._destinationPoint + QtCore.QPointF(10, 5))
+        painter.setBrush(self.current_color)
+        painter.drawPolygon(triangle)
 
+    def shape(self):
+        path = super().shape()
+        triangle = QtGui.QPolygonF()
+        triangle.append(self._destinationPoint)
+        triangle.append(self._destinationPoint + QtCore.QPointF(10, -5))
+        triangle.append(self._destinationPoint + QtCore.QPointF(10, 5))
+        path.addPolygon(triangle)
+        return path
+        
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             self.mostrar_configuracion_carga()
@@ -199,7 +238,6 @@ class FlechaSalida(Flecha):
             self.escalamiento_sigmoide = float(dialog.escalamiento_sigmoide_input.text())
             self.desplazamiento_sigmoide = float(dialog.desplazamiento_sigmoide_input.text())
 
-# Agregar esta nueva clase después de la clase ConfiguracionEntradaDialog
 class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, tipo_carga_actual=TipoCarga.FINAL, 
                  funcion_transferencia="\\frac{1}{s}", escalamiento_sigmoide=1, 
@@ -229,7 +267,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         ft_layout.addWidget(QtWidgets.QLabel("Función de transferencia:"))
         self.latex_editor = LatexEditor()
         self.latex_editor.set_latex(self.funcion_transferencia)
-        self.latex_editor.setFixedHeight(220)  # Ajusta este valor para controlar la altura
+        self.latex_editor.setFixedHeight(220) 
         ft_layout.addWidget(self.latex_editor)
         layout.addLayout(ft_layout)
 
@@ -256,6 +294,5 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.setLayout(layout)
         
     def accept(self):
-        # Asegúrate de actualizar la función de transferencia al aceptar
         self.funcion_transferencia = self.latex_editor.get_latex()
         super().accept()
