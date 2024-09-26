@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import Tuple
 import itertools
-# from back.topologia.perturbacion import Perturbacion
+from back.topologia.perturbacion import Perturbacion
 
 class InterfazTopologia():
 
     def __init__(self,padre=None) -> None:
         self.padre = padre
-        # self.perturbacion_entrada = Perturbacion()
-        # self.perturbacion_salida = Perturbacion(padre=self)
+        self.perturbacion_entrada = Perturbacion()
+        self.perturbacion_salida = Perturbacion()
         
 
     def ancho(self) -> int:
@@ -57,6 +57,12 @@ class InterfazTopologia():
     def alterar_salida(self,salida,tiempo):
         return self.perturbacion_salida.alterar(salida,tiempo)
     
+    def agregar_perturbacion(self,ft,ciclos,posicion):
+        if posicion == "antes":
+            self.generar_perturbacion_entrada(ft,ciclos)
+        else:
+            self.generar_perturbacion_salida(ft,ciclos)
+
     def generar_perturbacion_entrada(self,ft,ciclos):
         self.perturbacion_entrada.generar_perturbacion(ft,ciclos)
     

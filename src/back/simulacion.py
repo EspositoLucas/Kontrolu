@@ -5,6 +5,7 @@ from back.macros.macro_proceso import MacroProceso
 from back.macros.macro_medidor import MacroMedidor
 from back.topologia.carga import Carga
 from time import sleep
+from globals import ESTA_SIMULANDO
 
 class Simulacion:
     def __init__(self, controlador = None, actuador = None, proceso =None, medidor =None, delta =1, ciclos=10, entrada="",salida_cero=10,carga = Carga("")):
@@ -87,7 +88,10 @@ class Simulacion:
         return self.line,
     
     def ejecutar_simulacion(self):
+        global ESTA_SIMULANDO
+        ESTA_SIMULANDO = True
         self.simular_sistema_tiempo_real()
+        ESTA_SIMULANDO = False
         # self.fig, self.ax = plt.subplots(figsize=(12, 8))
         # self.line, = self.ax.plot([], [], 'b-', label='Salida del sistema')
         # self.line_setpoint, = self.ax.plot([], [], 'r--', label='Setpoint')
