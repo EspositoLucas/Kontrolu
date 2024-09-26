@@ -6,6 +6,7 @@ from .base.elemento_medicion import ElementoMedicion
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
 from .base.latex_editor import LatexEditor
+from back.topologia.carga import TipoCarga
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 class MacroDiagrama(QtWidgets.QWidget):
@@ -20,6 +21,10 @@ class MacroDiagrama(QtWidgets.QWidget):
         # Modificar la creación de la flecha de entrada
         self.flecha_entrada = FlechaEntrada(QtCore.QPointF(110, 230), QtCore.QPointF(141, 230), 2, 2, 4)
         self.scene.addItem(self.flecha_entrada)
+        
+        # Modificar la creación de la flecha de salida
+        self.flecha_salida = FlechaSalida(QtCore.QPointF(641,230), QtCore.QPointF(720, 230), 2, 2, 4)
+        self.scene.addItem(self.flecha_salida)
         
         # CONTROLADOR
         controlador = ElementoControl(mainWindow.sesion.controlador)
@@ -87,6 +92,7 @@ class FlechaEntrada(Flecha):
         self.setAcceptHoverEvents(True)
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.tipo_entrada_actual = "Escalón"  # Valor por defecto
+        self.funcion_personalizada = "s"  # Nuevo atributo para almacenar la función personalizada
         self.setToolTip("Haz click para configurar la entrada del sistema")
 
     def mousePressEvent(self, event):
@@ -94,15 +100,19 @@ class FlechaEntrada(Flecha):
             self.mostrar_configuracion_entrada()
 
     def mostrar_configuracion_entrada(self):
-        dialog = ConfiguracionEntradaDialog(self.scene().views()[0], self.tipo_entrada_actual)
+        dialog = ConfiguracionEntradaDialog(self.scene().views()[0], 
+                                            self.tipo_entrada_actual, 
+                                            self.funcion_personalizada)
         if dialog.exec_():
-            self.tipo_entrada_actual = dialog.entrada_combo.currentText()
+            self.tipo_entrada_actual = dialog.tipo_entrada_actual
+            self.funcion_personalizada = dialog.funcion_personalizada
 
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
-        def __init__(self, parent=None, tipo_entrada_actual="Escalón"):
+        def __init__(self, parent=None, tipo_entrada_actual="Escalón", funcion_personalizada="s"):
             super().__init__(parent)
             self.setWindowTitle("Parámetros de Entrada")
             self.tipo_entrada_actual = tipo_entrada_actual
+            self.funcion_personalizada = funcion_personalizada
             self.initUI()
 
         def initUI(self):
@@ -118,7 +128,6 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
             entrada_layout.addWidget(self.entrada_combo)
             layout.addLayout(entrada_layout)
             
-
             # Stacked widget para alternar entre nada y editor LaTeX
             self.input_stack = QtWidgets.QStackedWidget()
             
@@ -130,6 +139,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
             self.latex_widget = QtWidgets.QWidget()
             latex_layout = QtWidgets.QVBoxLayout(self.latex_widget)
             self.latex_editor = LatexEditor()
+            self.latex_editor.set_latex(self.funcion_personalizada)  # Establecer el valor guardado
             latex_layout.addWidget(self.latex_editor)
             self.input_stack.addWidget(self.latex_widget)
             layout.addWidget(self.latex_widget)
@@ -138,6 +148,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
 
             layout.addWidget(self.input_stack)
 
+            
             # Botones OK y Cancelar
             button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
             button_box.accepted.connect(self.accept)
@@ -156,3 +167,95 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
             else:
                 self.input_stack.setCurrentIndex(0)
                 self.latex_widget.hide()
+
+        def accept(self):
+            self.tipo_entrada_actual = self.entrada_combo.currentText()
+            if self.tipo_entrada_actual == "Personalizada":
+                self.funcion_personalizada = self.latex_editor.get_latex()
+            super().accept()
+
+class FlechaSalida(Flecha):
+    def __init__(self, start, end, width, height, arrow_size):
+        super().__init__(start, end, width, height, arrow_size)
+        self.setAcceptHoverEvents(True)
+        self.setCursor(QtCore.Qt.PointingHandCursor)
+        self.tipo_carga_actual = TipoCarga.FINAL
+        self.funcion_transferencia = "1/s"
+        self.escalamiento_sigmoide = 1
+        self.desplazamiento_sigmoide = 0
+        self.setToolTip("Haz click para configurar la carga del sistema")
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            self.mostrar_configuracion_carga()
+
+    def mostrar_configuracion_carga(self):
+        dialog = ConfiguracionCargaDialog(self.scene().views()[0], self.tipo_carga_actual, 
+                                          self.funcion_transferencia, self.escalamiento_sigmoide, 
+                                          self.desplazamiento_sigmoide)
+        if dialog.exec_():
+            self.tipo_carga_actual = TipoCarga(dialog.tipo_carga_combo.currentText())
+            self.funcion_transferencia = dialog.funcion_transferencia
+            self.escalamiento_sigmoide = float(dialog.escalamiento_sigmoide_input.text())
+            self.desplazamiento_sigmoide = float(dialog.desplazamiento_sigmoide_input.text())
+
+# Agregar esta nueva clase después de la clase ConfiguracionEntradaDialog
+class ConfiguracionCargaDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None, tipo_carga_actual=TipoCarga.FINAL, 
+                 funcion_transferencia="\\frac{1}{s}", escalamiento_sigmoide=1, 
+                 desplazamiento_sigmoide=0):
+        super().__init__(parent)
+        self.setWindowTitle("Configuración de Carga")
+        self.tipo_carga_actual = tipo_carga_actual
+        self.funcion_transferencia = funcion_transferencia
+        self.escalamiento_sigmoide = escalamiento_sigmoide
+        self.desplazamiento_sigmoide = desplazamiento_sigmoide
+        self.initUI()
+
+    def initUI(self):
+        layout = QtWidgets.QVBoxLayout()
+
+        # Tipo de carga
+        tipo_carga_layout = QtWidgets.QHBoxLayout()
+        tipo_carga_layout.addWidget(QtWidgets.QLabel("Tipo de carga:"))
+        self.tipo_carga_combo = QtWidgets.QComboBox()
+        self.tipo_carga_combo.addItems([tipo.value for tipo in TipoCarga])
+        self.tipo_carga_combo.setCurrentText(self.tipo_carga_actual.value)
+        tipo_carga_layout.addWidget(self.tipo_carga_combo)
+        layout.addLayout(tipo_carga_layout)
+
+        # Función de transferencia con editor LaTeX
+        ft_layout = QtWidgets.QVBoxLayout()
+        ft_layout.addWidget(QtWidgets.QLabel("Función de transferencia:"))
+        self.latex_editor = LatexEditor()
+        self.latex_editor.set_latex(self.funcion_transferencia)
+        self.latex_editor.setFixedHeight(220)  # Ajusta este valor para controlar la altura
+        ft_layout.addWidget(self.latex_editor)
+        layout.addLayout(ft_layout)
+
+        # Escalamiento sigmoide
+        es_layout = QtWidgets.QHBoxLayout()
+        es_layout.addWidget(QtWidgets.QLabel("Escalamiento sigmoide:"))
+        self.escalamiento_sigmoide_input = QtWidgets.QLineEdit(str(self.escalamiento_sigmoide))
+        es_layout.addWidget(self.escalamiento_sigmoide_input)
+        layout.addLayout(es_layout)
+
+        # Desplazamiento sigmoide
+        ds_layout = QtWidgets.QHBoxLayout()
+        ds_layout.addWidget(QtWidgets.QLabel("Desplazamiento sigmoide:"))
+        self.desplazamiento_sigmoide_input = QtWidgets.QLineEdit(str(self.desplazamiento_sigmoide))
+        ds_layout.addWidget(self.desplazamiento_sigmoide_input)
+        layout.addLayout(ds_layout)
+
+        # Botones OK y Cancelar
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        layout.addWidget(button_box)
+
+        self.setLayout(layout)
+        
+    def accept(self):
+        # Asegúrate de actualizar la función de transferencia al aceptar
+        self.funcion_transferencia = self.latex_editor.get_latex()
+        super().accept()
