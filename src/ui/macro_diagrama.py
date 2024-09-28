@@ -22,11 +22,11 @@ class MacroDiagrama(QtWidgets.QWidget):
         
         # ENTRADA
         entrada = ElementoEntrada(mainWindow.sesion.entrada)
-        self.scene.addItem(entrada)
+        self.scene.addWidget(entrada)
         
         #CARGA
         carga = ElementoCarga(mainWindow.sesion.carga)
-        self.scene.addItem(carga)
+        self.scene.addWidget(carga)
         
         # CONTROLADOR
         controlador = ElementoControl(mainWindow.sesion.controlador)

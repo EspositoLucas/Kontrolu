@@ -21,7 +21,7 @@ class Configuracion:
         self.datos = {'tiempo': [], 'valor_original': [], 'error_base': [], 'error_limite': [], 'error_total':[],'resultado': []}
     
     def calcular_error(self,valor):
-        if np.random.uniform(0,1) < self.probablidad: return 0
+        if np.random.uniform(0,1) < self.probabilidad: return 0
 
         if self.tipo == TipoError.GAUSS:
             error =  np.random.normal(0,valor*self.proporcion)

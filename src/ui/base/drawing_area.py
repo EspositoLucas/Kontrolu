@@ -11,6 +11,7 @@ from globals import ESTA_SIMULANDO
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
+MARGEN_PERTURBACION = 200
 BUTTON_SIZE = 20
 RADIO = 40
 RADIO_PERTURBACION = 10
@@ -186,26 +187,28 @@ class DrawingArea(QGraphicsView):
         self.microbloques.append(microbloque)
         self.scene.addItem(microbloque)
 
-        # Verificar y dibujar perturbación de entrada
+        pos_perturbacion = None
         if microbloque_back.perturbacion_entrada.activa():
-            self.dibujar_circulo_perturbacion(pos, "entrada")
+            pos_perturbacion = self.dibujar_circulo_perturbacion(pos, "entrada")
 
-        # Verificar y dibujar perturbación de salida
         if microbloque_back.perturbacion_salida.activa():
-            self.dibujar_circulo_perturbacion(pos, "salida")
+            pos_perturbacion = self.dibujar_circulo_perturbacion(pos, "salida")
 
-        return pos
+        if pos_perturbacion and pos_perturbacion.x() > pos.x():
+            return pos_perturbacion # se queda con el valor más a la derecha
+        return pos # si no hay perturbaciones o si la perturbación está a la izquierda, retorna la posición del microbloque
     
     def dibujar_circulo_perturbacion(self, pos, tipo):
         if tipo == "entrada":
-            centro = QPointF(pos.x() - ANCHO/2 - RADIO_PERTURBACION, pos.y())
+            centro = QPointF(pos.x() - ANCHO/2 - MARGEN_PERTURBACION, pos.y() + ALTO/2)
         else:  # salida
-            centro = QPointF(pos.x() + ANCHO/2 + RADIO_PERTURBACION, pos.y())
+            centro = QPointF(pos.x() + ANCHO/2 + MARGEN_PERTURBACION, pos.y() + ALTO/2)
 
         circulo = QGraphicsEllipseItem(centro.x() - RADIO_PERTURBACION, centro.y() - RADIO_PERTURBACION, RADIO_PERTURBACION * 2, RADIO_PERTURBACION * 2)
         circulo.setBrush(QBrush(QColor(255, 0, 0))) 
         circulo.setZValue(1) 
         self.scene.addItem(circulo)
+        return centro
 
     def clear_all(self):
         if self.microbloques:
@@ -459,24 +462,50 @@ class DrawingArea(QGraphicsView):
                 
                 # punto_final seria el punto en donde va a llegar la flecha que proviene del microbloque anterior (punto medio izquierdo del microbloque actual)
 
-                if punto_inicial is not None and punto_final is not None:
-                    # dibujar la linea desde el punto_inicial hasta el punto_final
+                if microbloque.perturbacion_entrada.activa():
+                    centro_perturbacion = QPointF(mb.pos().x() - ANCHO/2 - MARGEN_PERTURBACION, mb.pos().y() + ALTO/2)
+                    
+                    # Línea desde punto_inicial hasta la perturbación
+                    line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), centro_perturbacion.x(), centro_perturbacion.y())
+                    line.setPen(QPen(Qt.black, 2))
+                    self.scene.addItem(line)
+                    
+                    # Línea desde la perturbación hasta el microbloque
+                    line = QGraphicsLineItem(centro_perturbacion.x(), centro_perturbacion.y(), punto_final.x(), punto_final.y())
+                    line.setPen(QPen(Qt.black, 2))
+                    self.scene.addItem(line)
+                elif punto_inicial is not None and punto_final is not None:
+                    # Conexión directa si no hay perturbación de entrada
                     line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), punto_final.x(), punto_final.y())
                     line.setPen(QPen(Qt.black, 2))
                     self.scene.addItem(line)
-                
-                return mb.pos() + QPointF(mb.width(), mb.height() / 2) # retorna un punto que representa la mitad del lado derecho del microbloque. Este punto se usará como punto de inicio para la siguiente conexión.
-        
-        # Si no se encuentra el microbloque, retornamos el punto de inicio --> Si no encuentra el microbloque en la lista, simplemente retorna el punto_inicial
+
+                punto_salida = mb.pos() + QPointF(mb.width(), mb.height() / 2)
+
+                if microbloque.perturbacion_salida.activa():
+                    centro_perturbacion = QPointF(mb.pos().x() + ANCHO/2 + MARGEN_PERTURBACION, mb.pos().y() + ALTO/2)
+                    
+                    # Línea desde el microbloque hasta la perturbación
+                    line = QGraphicsLineItem(punto_salida.x(), punto_salida.y(), centro_perturbacion.x(), centro_perturbacion.y())
+                    line.setPen(QPen(Qt.black, 2))
+                    self.scene.addItem(line)
+                    
+                    # La perturbación se convierte en el nuevo punto de salida
+                    punto_salida = centro_perturbacion
+
+                return punto_salida
         return punto_inicial
 
     def create_new_microbloque(self, pos, relation=None, reference_structure=None):
+        new_microbloque = MicroBloque(nombre=f"Microbloque {len(self.microbloques) + 1}",color=QColor(255, 255, 255))
+        
+
         dialog = QDialog(self)
         dialog.setWindowTitle("Nuevo Microbloque")
         dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
 
-        name_input = QLineEdit()
+        name_input = QLineEdit(new_microbloque.nombre)
         name_input.setPlaceholderText("Nombre del microbloque")
         name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(name_input)
@@ -488,7 +517,7 @@ class DrawingArea(QGraphicsView):
 
         transfer_label = QLabel("Función de Transferencia:")
         transfer_label.setStyleSheet("color: white;")
-        latex_editor = LatexEditor()
+        latex_editor = LatexEditor(new_microbloque.funcion_transferencia)
         latex_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(transfer_label)
         layout.addWidget(latex_editor)
@@ -501,12 +530,13 @@ class DrawingArea(QGraphicsView):
         dialog.setLayout(layout)
 
         if dialog.exec_():
-            nombre = name_input.text() or f"Microbloque {len(self.microbloques) + 1}"
-            color = color_button.property("selected_color") or QColor(255, 255, 255)
+            nombre = name_input.text()
+            color = color_button.property("selected_color")
             funcion_transferencia = latex_editor.get_latex()
             
-            new_microbloque = MicroBloque(nombre, color, funcion_transferencia, self.lista_configuraciones, self.macrobloque.modelo.topologia)
-            self.lista_configuraciones = None
+            new_microbloque.nombre = nombre
+            new_microbloque.color = color
+            new_microbloque.funcion_transferencia = funcion_transferencia
             
             if isinstance(reference_structure, MicroBloque):
                 self.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)
@@ -659,12 +689,18 @@ class DrawingArea(QGraphicsView):
         """)
         micro_back = self.selected_microbloque.elemento_back
         parent_structures = micro_back.get_parent_structures()
+        
+        if direction in ['izquierda', 'derecha']:
+            perturb_direction = 'antes' if direction == 'izquierda' else 'despues'
+            perturb_action = menu.addAction(f"Agregar perturbación {perturb_direction}")
+            perturb_action.triggered.connect(lambda checked, m=self.selected_microbloque, d=perturb_direction: 
+                self.agregar_perturbacion(m, d))
+        
         for parent in [[micro_back, 0]] + parent_structures:
             structure_name = self.get_structure_name(parent)
             action_text = self.get_descriptive_action_text(direction, structure_name)
             action = menu.addAction(action_text)
             
-            # Usamos una función lambda que llama directamente a add_microbloque
             action.triggered.connect(lambda checked, m=self.selected_microbloque,d=direction, s=parent[0]: 
                 QTimer.singleShot(0, lambda: self.add_microbloque(m, d, s)))
             
@@ -673,7 +709,7 @@ class DrawingArea(QGraphicsView):
         menu.setMouseTracking(True)
         menu.leaveEvent = lambda event: self.hide_preview()
         
-        menu.exec_(self.mapToGlobal(self.mapFromScene(pos))) # Usamos la posición pasada como argumento para mostrar el menú
+        menu.exec_(self.mapToGlobal(self.mapFromScene(pos)))
 
     def show_preview(self, direction, structure):
         # Si ya existe un timer, lo detenemos
@@ -767,15 +803,6 @@ class DrawingArea(QGraphicsView):
                 border: 2px solid black;  /* Agrega un borde negro */
             }
         """)
-
-        if ESTA_SIMULANDO and self.selected_microbloque:
-            agregar_perturbacion_antes = QAction("Agregar perturbación antes", self)
-            agregar_perturbacion_antes.triggered.connect(lambda: self.agregar_perturbacion(self.selected_microbloque, "antes"))
-            context_menu.addAction(agregar_perturbacion_antes)
-
-            agregar_perturbacion_despues = QAction("Agregar perturbación después", self)
-            agregar_perturbacion_despues.triggered.connect(lambda: self.agregar_perturbacion(self.selected_microbloque, "despues"))
-            context_menu.addAction(agregar_perturbacion_despues)
 
         if self.seleccion_multiple and len(self.selected_microbloques) > 0: # si está activa la seleccion multiple y hay microbloques seleccionados
             delete_action = QAction("Eliminar microbloques", self) # definimos una opción: será la accion de eliminar los microbloques seleccionados

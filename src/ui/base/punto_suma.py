@@ -7,7 +7,7 @@ import os
 
 class PuntoSuma(MacroVista):
     def __init__(self, parent=None):
-        super(PuntoSuma, self).__init__(parent, QtCore.QRect(140, 206, 51, 51))
+        super(PuntoSuma, self).__init__(parent, (140, 206), (51, 51))
         self.setText("")
         self.setDisabled(True)
         self.setStyleSheet("background-color: transparent;")

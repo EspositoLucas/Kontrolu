@@ -5,11 +5,12 @@ from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QWidget
 from .drawing_area import DrawingArea
 
 class MacroVista(QPushButton):
-    def __init__(self, elementoBack, geometria):
+    def __init__(self, elementoBack, posicion, tamano):
         super().__init__()
         self.modelo = elementoBack
         self.setText(self.modelo.nombre)
-        self.setGeometry(geometria)
+        self.move(*posicion)
+        self.setFixedSize(*tamano)
         self.clicked.connect(self.click)
         self.setStyleSheet("""
             background-color: #0072BB;;  /* Color de fondo azul /

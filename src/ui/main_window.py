@@ -93,38 +93,6 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
 
 
-        # # Función de entrada
-        # entrada_layout = QHBoxLayout()
-        # entrada_layout.addWidget(QLabel("Función de entrada:"))
-        # self.entrada_combo = QComboBox()
-        # self.entrada_combo.addItems(["Escalón", "Rampa", "Parábola", "Senoidal", "Impulso", "Personalizada"])
-        # self.entrada_combo.currentIndexChanged.connect(self.toggle_input_method)
-        # entrada_layout.addWidget(self.entrada_combo)
-        # layout.addLayout(entrada_layout)
-
-        # # Stacked widget para alternar entre combo box y editor LaTeX
-        # self.input_stack = QStackedWidget()
-        
-        # # Widget para el combo box
-        # combo_widget = QWidget()
-        # combo_layout = QHBoxLayout(combo_widget)
-        # self.coef_label = QLabel("Coeficiente:")
-        # self.coef_edit = QLineEdit()
-        # self.coef_edit.setText("1")
-        # combo_layout.addWidget(self.coef_label)
-        # combo_layout.addWidget(self.coef_edit)
-        # self.input_stack.addWidget(combo_widget)
-    
-        # # Widget para el editor LaTeX
-        # latex_widget = QWidget()
-        # latex_layout = QVBoxLayout(latex_widget)
-        # self.latex_editor = LatexEditor()
-        # latex_layout.addWidget(self.latex_editor)
-        # self.input_stack.addWidget(latex_widget)
-
-        # layout.addWidget(self.input_stack)
-
-
         # Tiempo total
         tiempo_layout = QHBoxLayout()
         tiempo_layout.addWidget(QLabel("Tiempo total (s):"))
@@ -149,12 +117,12 @@ class MainWindow(QMainWindow):
         dt_layout.addWidget(dt_edit)
         layout.addLayout(dt_layout)
 
-        # Velocidad de animación
+        # Velocidad de simulacion
         velocidad_layout = QHBoxLayout()
-        velocidad_layout.addWidget(QLabel("Velocidad de animación:"))
-        velocidad_combo = QComboBox()
-        velocidad_combo.addItems(["Lenta", "Normal", "Rápida"])
-        velocidad_layout.addWidget(velocidad_combo)
+        velocidad_layout.addWidget(QLabel("Duracion de simulacion de cada ciclo (segundos reales):"))
+        velocidad_edit = QLineEdit()
+        velocidad_edit.setText("2")
+        velocidad_layout.addWidget(velocidad_edit)
         layout.addLayout(velocidad_layout)
 
         # Botones OK y Cancelar
@@ -167,35 +135,14 @@ class MainWindow(QMainWindow):
 
         if dialog.exec_():
 
-            # coef = float(self.coef_edit.text())
             t_total = float(tiempo_edit.text())
             dt = float(dt_edit.text())
+            velocidad = float(velocidad_edit.text())
             y_salida = float(salida_edit.text())
-            # velocidad = velocidad_combo.currentText().lower()
-
-
-            # entrada_tipo = self.entrada_combo.currentText()
-            # if entrada_tipo == "Escalón":
-            #     # Transformada de Laplace de u(t) es 1/s
-            #     entrada_latex = f"\\frac{{{coef}}}{{s}}"
-            # elif entrada_tipo == "Rampa":
-            #     # Transformada de Laplace de t es 1/s^2
-            #     entrada_latex = f"\\frac{{{coef}}}{{s^2}}"
-            # elif entrada_tipo == "Parábola":
-            #     # Transformada de Laplace de 0.5 * t^2 es 1/s^3
-            #     entrada_latex = f"\\frac{{{coef}}}{{s^3}}"
-            # elif entrada_tipo == "Senoidal":
-            #     # Transformada de Laplace de sin(t) es 1/(s^2 + 1)
-            #     entrada_latex = f"\\frac{{{coef}}}{{s^2 + 1}}"
-            # elif entrada_tipo == "Impulso":
-            #     # Transformada de Laplace de delta(t) es 1
-            #     entrada_latex = f"{coef}"
-            # else:
-            #     entrada_latex = f"\\frac{{{coef}}}{{s}}"
 
             
             simulacion = Simulacion(controlador=self.sesion.controlador,actuador=self.sesion.actuador,proceso=self.sesion.proceso,medidor=self.sesion.medidor, delta=dt, ciclos=int(t_total/dt),entrada=self.sesion.entrada,salida_cero=y_salida,carga=self.sesion.carga)
-            simulacion.ejecutar_simulacion()
+            simulacion.ejecutar_simulacion(velocidad)
             self.statusBar().showMessage('Simulación completada')
             
     def toggle_input_method(self, index):

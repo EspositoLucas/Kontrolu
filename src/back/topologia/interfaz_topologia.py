@@ -86,3 +86,6 @@ class InterfazTopologia():
 
     def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
         pass
+
+    def simular(self,tiempo,entrada):
+        pass

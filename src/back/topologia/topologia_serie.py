@@ -106,7 +106,7 @@ class TopologiaSerie(InterfazTopologia):
         entrada_perturbada = self.alterar_entrada(entrada,tiempo)
 
         for hijo in self.hijos:
-                entrada_perturbada = self.simular(hijo, tiempo, entrada_perturbada)
+                entrada_perturbada = hijo.simular(tiempo, entrada_perturbada)
         
         salida_perturbada = self.alterar_salida(entrada_perturbada,tiempo)
 
@@ -120,7 +120,7 @@ class TopologiaSerie(InterfazTopologia):
     
 
 class MicroBloque(InterfazTopologia):
-    def __init__(self, nombre: str="Entrada", color: QColor=None, funcion_transferencia: str=None, configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
+    def __init__(self, nombre: str= "Microbloque", color: QColor=None, funcion_transferencia: str="1", configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia

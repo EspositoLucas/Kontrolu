@@ -41,7 +41,8 @@ estados = [
 ]
 
 class Carga:
-    def __init__(self,funcion_de_trasnferencia="",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0):
+    def __init__(self,funcion_de_trasnferencia="1",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga"):
+        self.nombre = nombre
         self.funcion_de_transferencia = funcion_de_trasnferencia
         self.tipo_carga = tipo_carga
         self.escalamiento_sigmoide = escalamiento_sigmoide
@@ -60,23 +61,35 @@ class Carga:
         x_norm = self.basic(x, x_min, x_max)
         
         # Aplicar la función sigmoide ajustada
-        return 1 / (1 + np.exp(-k * (x_norm - x_0)))
+        resultado = 0 if np.exp(-k * (x_norm - x_0)) == -1 else (1 / (1 + np.exp(-k * (x_norm - x_0))))
+        
+        return resultado
     
     def basic(self,x, x_min, x_max):
-        return (x - x_min) / (x_max - x_min)
+        ba = 0 if x_max == x_min else (x - x_min) / (x_max - x_min)
+        return ba
     
     def normalizar(self,valor, minimo, maximo):
-        if((valor<minimo) or (valor>maximo)): return 0
-        if(self.desplazamiento_sigmoide): return self.sigmoide(valor, minimo, maximo)
-        return self.basic(valor, minimo, maximo)
+        if((valor<minimo) or (valor>maximo)): 
+            return 0
+        if(self.desplazamiento_sigmoide): 
+            sigmo = self.sigmoide(valor, minimo, maximo)
+            return sigmo
+        otro = self.basic(valor, minimo, maximo)
+        return otro
 
     def obtener_estado(self,valor_normal):
-        return max(filter(lambda x: x["minimo"] <= valor_normal, self.estados),key=lambda x: x["minimo"])
+        posibles = filter(lambda x: x["minimo"] <= valor_normal, self.estados)
+        if not list(posibles): posibles = [{"minimo":0,"nombre":"ESTADO NO CONTEMPLADO","prioridad":0}]
+        return max(posibles,key=lambda x: x["minimo"])
 
 
     def salida_final(self,salida_real,valor_esperado):
-        if(salida_real<valor_esperado): return self.normalizar(valor_esperado,0,salida_real)
-        return self.normalizar(valor_esperado,salida_real,salida_real*2)
+        if(salida_real<valor_esperado): 
+            carga = self.normalizar(valor_esperado,0,salida_real)
+            return carga
+        carga = self.normalizar(valor_esperado,salida_real,salida_real*2)
+        return carga
 
     def salida_integral(self,salida_real,valor_esperado):
         self.total += abs(valor_esperado)

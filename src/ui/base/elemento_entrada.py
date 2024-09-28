@@ -3,25 +3,28 @@ from back.topologia.topologia_serie import MicroBloque
 from PyQt5 import QtWidgets, QtCore
 from .latex_editor import LatexEditor
 from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtWidgets import QPushButton
 import os
 
 
-class ElementoEntrada(QtWidgets.QGraphicsRectItem):
+class ElementoEntrada(QPushButton):
     def __init__(self, entrada):
-        super().__init__(0, 0, 120, 60)
+        super().__init__()
         self.entrada = entrada
-        self.setPos(0, 200)
-        self.setBrush(QtGui.QBrush(QtGui.QColor(0, 114, 187)))
-        self.setPen(QtGui.QPen(QtCore.Qt.black))
-        self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
-        self.setCursor(QtCore.Qt.CrossCursor)
-        self.texto = QtWidgets.QGraphicsTextItem(self.entrada.nombre, self)
-        self.texto.setPos(25, 12)
-        font = QtGui.QFont("Arial", 13)
-        font.setBold(True)
-        self.texto.setFont(font)
-        self.texto.setDefaultTextColor(QtGui.QColor(255, 255, 255))  # Color blanc
-    
+        
+        self.setText(self.entrada.nombre)
+        self.move(0, 210)
+        self.setFixedSize(121, 41)
+        self.clicked.connect(self.mousePressEvent)
+        self.setStyleSheet("""
+            background-color: #0072BB;;  /* Color de fondo azul /
+            font-weight: bold;          /* Texto en negrita */
+            font-weight: bold;          /* Texto en negrita */
+            color: white;               /* Color de texto blanco */
+            font-size: 15px;            /* Tamaño de fuente */
+            font-family: Arial;  
+        """)
+      
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             self.mostrar_configuracion_entrada()        

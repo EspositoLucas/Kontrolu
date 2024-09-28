@@ -7,7 +7,7 @@ from .topologia.topologia_serie import MicroBloque
 from .topologia.carga import Carga
 class Sesion():
     def __init__(self):
-        self.entrada = MicroBloque()
+        self.entrada = MicroBloque(nombre="Entrada")
         self.controlador = MacroControlador()
         self.actuador = MacroActuador()
         self.proceso = MacroProceso()
