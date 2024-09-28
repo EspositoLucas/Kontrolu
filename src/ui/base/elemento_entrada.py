@@ -3,6 +3,7 @@ from back.topologia.topologia_serie import MicroBloque
 from PyQt5 import QtWidgets, QtCore
 from .latex_editor import LatexEditor
 from PyQt5 import QtWidgets, QtGui, QtCore
+import os
 
 
 class ElementoEntrada(QtWidgets.QGraphicsRectItem):
@@ -39,14 +40,17 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.initUI()
 
     def initUI(self):
-        layout = QtWidgets.QVBoxLayout()
+        # Configurar el estilo de la ventana
+        self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
 
-        # Nombre de la entrada
-        nombre_layout = QtWidgets.QHBoxLayout()
-        nombre_layout.addWidget(QtWidgets.QLabel("Nombre:"))
-        self.nombre_input = QtWidgets.QLineEdit(self.entrada.nombre)
-        nombre_layout.addWidget(self.nombre_input)
-        layout.addLayout(nombre_layout)
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(QtGui.QIcon(icon))
+
+        layout = QtWidgets.QVBoxLayout()
 
         # Función de transferencia con editor LaTeX
         ft_layout = QtWidgets.QVBoxLayout()
@@ -73,6 +77,5 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
 
     def accept(self):
         # Actualizamos los valores de la entrada con los nuevos datos
-        self.entrada.nombre = self.nombre_input.text()
         self.entrada.funcion_transferencia = self.latex_editor.get_latex()
         super().accept()

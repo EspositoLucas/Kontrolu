@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 from .latex_editor import LatexEditor
 from back.topologia.carga import Carga,TipoCarga
 from PyQt5 import QtWidgets, QtGui, QtCore
+import os
 
 
 class ElementoCarga(QtWidgets.QGraphicsRectItem):
@@ -13,7 +14,7 @@ class ElementoCarga(QtWidgets.QGraphicsRectItem):
         self.setPen(QtGui.QPen(QtCore.Qt.black))
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
         self.setCursor(QtCore.Qt.CrossCursor)
-        self.texto = QtWidgets.QGraphicsTextItem(self.carga.nombre, self)
+        self.texto = QtWidgets.QGraphicsTextItem("Carga", self)
         self.texto.setPos(33, 12)
         font = QtGui.QFont("Arial", 13)
         font.setBold(True)
@@ -28,7 +29,6 @@ class ElementoCarga(QtWidgets.QGraphicsRectItem):
         dialog = ConfiguracionCargaDialog(None, self.carga)
         if dialog.exec_():
             self.carga = dialog.carga
-            self.texto.setPlainText(self.carga.nombre)
 
 class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, carga=None):
@@ -38,6 +38,17 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.initUI()
 
     def initUI(self):
+        
+        # Configurar el estilo de la ventana
+        self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(QtGui.QIcon(icon))
+        
         layout = QtWidgets.QVBoxLayout()
 
         # Tipo de carga
