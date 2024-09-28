@@ -64,7 +64,8 @@ class MainWindow(QMainWindow):
     
         
     def init_macrobloques(self):
-        self.diagrama = MacroDiagrama(self)
+        self.diagrama = MacroDiagrama()
+        self.diagrama.setupUi(self)
         self.setCentralWidget(self.diagrama)
         self.diagrama.mostrarElementos()
         self.diagrama.zoom_in()
