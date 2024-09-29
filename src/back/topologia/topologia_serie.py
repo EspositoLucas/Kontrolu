@@ -1,7 +1,6 @@
 from __future__ import annotations
 from back.topologia.interfaz_topologia import InterfazTopologia
 from back.topologia.perturbacion import Perturbacion
-from back.configuracion.configuracion_microbloque import ConfiguracionMicrobloque
 from PyQt5.QtGui import QColor
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
@@ -120,32 +119,15 @@ class TopologiaSerie(InterfazTopologia):
     
 
 class MicroBloque(InterfazTopologia):
-    def __init__(self, nombre: str= "Microbloque", color: QColor=None, funcion_transferencia: str="1", configuracion: ConfiguracionMicrobloque=None, padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
+    def __init__(self, nombre: str= "Microbloque", color: QColor=None, funcion_transferencia: str="1", padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia
-        self.configuracion = configuracion
         self.configuracion_entrada = configuracion_entrada
         self.configuracion_salida = configuracion_salida
         super().__init__(padre)
 
-    def agregar_configuracion(self, nombre, tipo, valor_por_defecto, efecto):
-        self.configuracion.agregar_configuracion(nombre, tipo, valor_por_defecto, efecto)
-    
-    def set_configuracion(self, nombre, valor):
-        self.configuracion.set_configuracion(nombre, valor)
 
-    def get_configuraciones(self):
-        return self.configuracion.get_configuraciones()
-    
-    def get_configuracion(self, nombre):
-        return self.configuracion.get_configuracion(nombre)
-
-    def actualizar_configuracion(self, old_name, new_name, new_type, new_value, new_efecto):
-        self.configuracion.actualizar_configuracion(old_name, new_name, new_type, new_value, new_efecto)
-
-    def aplicar_efecto(self):
-        self.configuracion.aplicar_efecto(self.funcion_transferencia)
 
     def borrar_elemento(self):
         self.padre.borrar_elemento(self)
@@ -248,7 +230,7 @@ class MicroBloque(InterfazTopologia):
     
 
 
-
+    
 
 class TopologiaParalelo(InterfazTopologia):
     
