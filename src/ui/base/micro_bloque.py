@@ -106,35 +106,29 @@ class Microbloque(QGraphicsItem):
 
         save_button = QPushButton("Guardar cambios")
         save_button.setStyleSheet("background-color: #444; color: white;")
-        save_button.clicked.connect(lambda: self.save_configuration(dialog, configuracion, input_fields, tipo_error_combo, tipo))
+        save_button.clicked.connect(lambda: self.save_configuration(dialog, configuracion, input_fields, tipo_error_combo))
         layout.addWidget(save_button)
 
         dialog.setLayout(layout)
         dialog.exec_()
 
-    def save_configuration(self, dialog, configuracion, input_fields, tipo_error_combo, tipo):
+    def save_configuration(self, dialog, configuracion, input_fields, tipo_error_combo):
         # Creamos una nueva instancia de Configuracion para guardar los cambios
-        new_config = Configuracion(configuracion.nombre)
 
         for attr, input_field in input_fields.items():
             value = input_field.text()
             try:
                 if value.lower() == "inf":
-                    setattr(new_config, attr, float('inf'))
+                    setattr(configuracion, attr, float('inf'))
                 elif value.lower() == "-inf":
-                    setattr(new_config, attr, float('-inf'))
+                    setattr(configuracion, attr, float('-inf'))
                 else:
-                    setattr(new_config, attr, float(value))
+                    setattr(configuracion, attr, float(value))
             except ValueError:
                 QMessageBox.warning(dialog, "Error", f"Valor inválido para {attr}")
                 return
 
-        new_config.tipo = TipoError(tipo_error_combo.currentText())
-        
-        if tipo == "entrada":
-            self.configuracion_entrada = new_config
-        else:
-            self.configuracion_salida = new_config
+        configuracion.tipo = TipoError(tipo_error_combo.currentText())
         
         dialog.accept()
         

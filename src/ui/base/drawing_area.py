@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QComboBox, QMessageBox, QHBoxLayout, QInputDialog, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem, QSpinBox
+from PyQt5.QtWidgets import QWidget ,QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QComboBox, QMessageBox, QHBoxLayout, QInputDialog, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem, QSpinBox, QTabWidget, QGridLayout
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
@@ -8,6 +8,7 @@ from .add_button import AddButton
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
 from back.topologia.perturbacion import Perturbacion
 from globals import ESTA_SIMULANDO
+from back.topologia.configuraciones import Configuracion, TipoError
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
@@ -522,6 +523,62 @@ class DrawingArea(QGraphicsView):
         layout.addWidget(transfer_label)
         layout.addWidget(latex_editor)
 
+
+
+
+
+
+
+        config_tab = QTabWidget()
+        config_tab.setStyleSheet("""
+            QTabWidget::pane { 
+                border: 1px solid #555; 
+                background-color: #333;
+            }
+            QTabBar::tab { 
+                background-color: #444; 
+                color: white; 
+                padding: 5px;
+            }
+            QTabBar::tab:selected { 
+                background-color: #555;
+            }
+        """)
+        
+
+
+
+
+
+        config_content = QWidget()
+        config_layout = QGridLayout(config_content)
+
+        # Configuración de entrada
+        entrada_name_input = QLineEdit(new_microbloque.configuracion_entrada.nombre)
+        entrada_name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        config_layout.addWidget(QLabel("Nombre de la configuración de entrada:"), 0, 0)
+        config_layout.addWidget(entrada_name_input, 0, 1)
+
+        input_button = QPushButton("Configurar Entrada")
+        input_button.setStyleSheet("background-color: #444; color: white;")
+        input_button.clicked.connect(lambda: self.edit_configuration(new_microbloque.configuracion_entrada, "entrada"))
+        config_layout.addWidget(input_button, 0, 2)
+
+        # Configuración de salida
+        salida_name_input = QLineEdit(new_microbloque.configuracion_salida.nombre)
+        salida_name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        config_layout.addWidget(QLabel("Nombre de la configuración de salida:"), 1, 0)
+        config_layout.addWidget(salida_name_input, 1, 1)
+
+        output_button = QPushButton("Configurar Salida")
+        output_button.setStyleSheet("background-color: #444; color: white;")
+        output_button.clicked.connect(lambda: self.edit_configuration(new_microbloque.configuracion_salida, "salida"))
+        config_layout.addWidget(output_button, 1, 2)
+
+        config_tab.addTab(config_content, "Configuraciones")
+        layout.addWidget(config_tab)
+
+
         save_button = QPushButton("Guardar")
         save_button.setStyleSheet("background-color: #444; color: white;")
         save_button.clicked.connect(dialog.accept)
@@ -533,10 +590,14 @@ class DrawingArea(QGraphicsView):
             nombre = name_input.text()
             color = color_button.property("selected_color")
             funcion_transferencia = latex_editor.get_latex()
+            nombre_entrada = entrada_name_input.text()
+            nombre_salida = salida_name_input.text()
             
             new_microbloque.nombre = nombre
             new_microbloque.color = color
             new_microbloque.funcion_transferencia = funcion_transferencia
+            new_microbloque.configuracion_entrada = nombre_entrada
+            new_microbloque.configuracion_salida = nombre_salida
             
             if isinstance(reference_structure, MicroBloque):
                 self.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)
@@ -550,7 +611,85 @@ class DrawingArea(QGraphicsView):
             self.load_microbloques()  # recargo todos los microbloques
             self.update()
             self.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
+
+
+    def edit_configuration(self, configuracion, tipo):
+        dialog = QDialog()
+        dialog.setWindowTitle(f"Editar Configuración de {tipo.capitalize()}")
+        dialog.setStyleSheet("background-color: #333; color: white;")
+        layout = QVBoxLayout()
+
+        fields = [
+            ("Límite inferior", "limite_inferior"),
+            ("Límite superior", "limite_superior"),
+            ("Límite por ciclo", "limite_por_ciclo"),
+            ("Error máximo", "error_maximo"),
+            ("Proporción", "proporcion"),
+            ("Último valor", "ultimo_valor"),
+            ("Probabilidad", "probabilidad")
+        ]
+
+        input_fields = {}
+        for label, attr in fields:
+            row = QHBoxLayout()
+            lbl = QLabel(label)
+            lbl.setStyleSheet("color: white;")
+            input_field = QLineEdit(str(getattr(configuracion, attr)))
+            input_field.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+            row.addWidget(lbl)
+            row.addWidget(input_field)
+            layout.addLayout(row)
+            input_fields[attr] = input_field
+
+        tipo_error_combo = QComboBox()
+        tipo_error_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        for error_type in TipoError:
+            tipo_error_combo.addItem(error_type.value)
+        tipo_error_combo.setCurrentText(configuracion.tipo.value)
+        layout.addWidget(QLabel("Tipo de error"))
+        layout.addWidget(tipo_error_combo)
+
+        save_button = QPushButton("Guardar cambios")
+        save_button.setStyleSheet("background-color: #444; color: white;")
+        save_button.clicked.connect(lambda: self.save_configuration(dialog, configuracion, input_fields, tipo_error_combo))
+        layout.addWidget(save_button)
+
+        dialog.setLayout(layout)
+        dialog.exec_()
     
+    def save_configuration(self, dialog, configuracion, input_fields, tipo_error_combo):
+        # Creamos una nueva instancia de Configuracion para guardar los cambios
+
+        for attr, input_field in input_fields.items():
+            value = input_field.text()
+            try:
+                if value.lower() == "inf":
+                    setattr(configuracion, attr, float('inf'))
+                elif value.lower() == "-inf":
+                    setattr(configuracion, attr, float('-inf'))
+                else:
+                    setattr(configuracion, attr, float(value))
+            except ValueError:
+                QMessageBox.warning(dialog, "Error", f"Valor inválido para {attr}")
+                return
+
+        configuracion.tipo = TipoError(tipo_error_combo.currentText())
+
+        
+        dialog.accept()
+        
+    def get_attr_from_label(self, label):
+        attr_map = {
+            "Límite inferior": "limite_inferior",
+            "Límite superior": "limite_superior",
+            "Límite por ciclo": "limite_por_ciclo",
+            "Error máximo": "error_maximo",
+            "Proporción": "proporcion",
+            "Último valor": "ultimo_valor",
+            "Probabilidad": "probabilidad"
+        }
+        return attr_map.get(label, "")
+
     def agregar_respecto_microbloque(self, new_microbloque, relation, reference_microbloque):
         if relation == "arriba":
             reference_microbloque.agregar_arriba(new_microbloque) # agrega el nuevo microbloque arriba del microbloque de referencia
