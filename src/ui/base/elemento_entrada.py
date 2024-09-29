@@ -11,6 +11,7 @@ class ElementoEntrada(QPushButton):
     def __init__(self, entrada):
         super().__init__()
         self.entrada = entrada
+        self.tipo_entrada = "Personalizada"  # Añadimos este atributo
         
         self.setText(self.entrada.nombre)
         self.move(0, 210)
@@ -30,15 +31,18 @@ class ElementoEntrada(QPushButton):
             self.mostrar_configuracion_entrada()        
 
     def mostrar_configuracion_entrada(self):
-        dialog = ConfiguracionEntradaDialog(None, self.entrada)
+        dialog = ConfiguracionEntradaDialog(None, self.entrada, self.tipo_entrada)
         if dialog.exec_():
             self.entrada = dialog.entrada
+            self.tipo_entrada = dialog.tipo_entrada  # Guardamos el tipo de entrada
+            # self.setText(self.entrada.nombre)  # Actualizamos el texto del botón
             
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, entrada=None):
+    def __init__(self, parent=None, entrada=None, tipo_entrada="Personalizada"):
         super().__init__(parent)
         self.setWindowTitle("Configuración de Entrada")
         self.entrada = entrada if entrada else MicroBloque()
+        self.tipo_entrada = tipo_entrada
         self.initUI()
 
     def initUI(self):
@@ -54,6 +58,23 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
 
         layout = QtWidgets.QVBoxLayout()
 
+        # Campo para el nombre
+        nombre_layout = QtWidgets.QHBoxLayout()
+        nombre_layout.addWidget(QtWidgets.QLabel("Nombre:"))
+        self.nombre_input = QtWidgets.QLineEdit(self.entrada.nombre)
+        nombre_layout.addWidget(self.nombre_input)
+        layout.addLayout(nombre_layout)
+
+        # Tipo de entrada
+        tipo_entrada_layout = QtWidgets.QHBoxLayout()
+        tipo_entrada_layout.addWidget(QtWidgets.QLabel("Tipo de entrada:"))
+        self.tipo_entrada_combo = QtWidgets.QComboBox()
+        self.tipo_entrada_combo.addItems(["Personalizada", "Escalón", "Rampa", "Parábola"])
+        self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
+        self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_funcion_transferencia)
+        tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
+        layout.addLayout(tipo_entrada_layout)
+
         # Función de transferencia con editor LaTeX
         ft_layout = QtWidgets.QVBoxLayout()
         ft_layout.addWidget(QtWidgets.QLabel("Función de transferencia:"))
@@ -61,7 +82,6 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.latex_editor.set_latex(self.entrada.funcion_transferencia or "")
         ft_layout.addWidget(self.latex_editor)
         layout.addLayout(ft_layout)
-
 
         # Botones OK y Cancelar
         button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
@@ -71,13 +91,19 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
 
         self.setLayout(layout)
 
-    def choose_color(self):
-        color = QtWidgets.QColorDialog.getColor()
-        if color.isValid():
-            self.color_button.setStyleSheet(f"background-color: {color.name()}")
-            self.entrada.color = color
+    def actualizar_funcion_transferencia(self):
+        tipo_entrada = self.tipo_entrada_combo.currentText()
+        if tipo_entrada == "Escalón":
+            self.latex_editor.set_latex("\\frac{1}{s}")
+        elif tipo_entrada == "Rampa":
+            self.latex_editor.set_latex("\\frac{1}{s^2}")
+        elif tipo_entrada == "Parábola":
+            self.latex_editor.set_latex("\\frac{1}{s^3}")
+        self.latex_editor.setEnabled(tipo_entrada == "Personalizada")
 
     def accept(self):
         # Actualizamos los valores de la entrada con los nuevos datos
+        self.entrada.nombre = self.nombre_input.text()
         self.entrada.funcion_transferencia = self.latex_editor.get_latex()
+        self.tipo_entrada = self.tipo_entrada_combo.currentText()  # Guardamos el tipo de entrada
         super().accept()
