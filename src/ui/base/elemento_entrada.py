@@ -33,7 +33,6 @@ class ElementoEntrada(QPushButton):
         dialog = ConfiguracionEntradaDialog(None, self.entrada)
         if dialog.exec_():
             self.entrada = dialog.entrada
-            self.texto.setPlainText(self.entrada.nombre)
             
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, entrada=None):
