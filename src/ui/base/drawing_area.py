@@ -559,10 +559,15 @@ class DrawingArea(QGraphicsView):
         config_layout.addWidget(QLabel("Nombre de la configuración de entrada:"), 0, 0)
         config_layout.addWidget(entrada_name_input, 0, 1)
 
+        entrada_unidad_input = QLineEdit(new_microbloque.configuracion_entrada.unidad)
+        entrada_unidad_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        config_layout.addWidget(QLabel("Unidad de entrada:"), 0, 2)
+        config_layout.addWidget(entrada_unidad_input, 0, 3)
+
         input_button = QPushButton("Configurar Entrada")
         input_button.setStyleSheet("background-color: #444; color: white;")
         input_button.clicked.connect(lambda: self.edit_configuration(new_microbloque.configuracion_entrada, "entrada"))
-        config_layout.addWidget(input_button, 0, 2)
+        config_layout.addWidget(input_button, 0, 4)
 
         # Configuración de salida
         salida_name_input = QLineEdit(new_microbloque.configuracion_salida.nombre)
@@ -570,10 +575,15 @@ class DrawingArea(QGraphicsView):
         config_layout.addWidget(QLabel("Nombre de la configuración de salida:"), 1, 0)
         config_layout.addWidget(salida_name_input, 1, 1)
 
+        salida_unidad_input = QLineEdit(new_microbloque.configuracion_salida.unidad)
+        salida_unidad_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        config_layout.addWidget(QLabel("Unidad de salida:"), 1, 2)
+        config_layout.addWidget(salida_unidad_input, 1, 3)
+
         output_button = QPushButton("Configurar Salida")
         output_button.setStyleSheet("background-color: #444; color: white;")
         output_button.clicked.connect(lambda: self.edit_configuration(new_microbloque.configuracion_salida, "salida"))
-        config_layout.addWidget(output_button, 1, 2)
+        config_layout.addWidget(output_button, 1, 4)
 
         config_tab.addTab(config_content, "Configuraciones")
         layout.addWidget(config_tab)
@@ -592,12 +602,16 @@ class DrawingArea(QGraphicsView):
             funcion_transferencia = latex_editor.get_latex()
             nombre_entrada = entrada_name_input.text()
             nombre_salida = salida_name_input.text()
+            unidad_entrada = entrada_unidad_input.text()
+            unidad_salida = salida_unidad_input.text()
             
             new_microbloque.nombre = nombre
             new_microbloque.color = color
             new_microbloque.funcion_transferencia = funcion_transferencia
-            new_microbloque.configuracion_entrada = nombre_entrada
-            new_microbloque.configuracion_salida = nombre_salida
+            new_microbloque.configuracion_entrada.nombre = nombre_entrada
+            new_microbloque.configuracion_salida.nombre = nombre_salida
+            new_microbloque.configuracion_entrada.unidad = unidad_entrada
+            new_microbloque.configuracion_salida.unidad = unidad_salida   
             
             if isinstance(reference_structure, MicroBloque):
                 self.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)

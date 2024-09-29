@@ -8,7 +8,8 @@ class TipoError(Enum):
     PROPORCIONAL = "proporcional"
     NINGUNO = "ninguno"
 class Configuracion:
-    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf,limite_por_ciclo=inf,error_maximo=inf,proporcion=0,tipo=TipoError.NINGUNO,ultimo_valor=0,probabilidad=0):
+    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf,limite_por_ciclo=inf,error_maximo=inf,proporcion=0,tipo=TipoError.NINGUNO,ultimo_valor=0,probabilidad=0,unidad="V"):
+        self.unidad = unidad
         self.nombre = nombre
         self.limite_inferior = limite_inferior
         self.limite_superior = limite_superior

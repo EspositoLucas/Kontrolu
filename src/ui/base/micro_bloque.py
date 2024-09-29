@@ -192,10 +192,16 @@ class Microbloque(QGraphicsItem):
         config_layout.addWidget(QLabel("Nombre de la configuración de entrada:"), 0, 0)
         config_layout.addWidget(entrada_name_input, 0, 1)
 
+        
+        entrada_unidad_input = QLineEdit(self.configuracion_entrada.unidad)
+        entrada_unidad_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        config_layout.addWidget(QLabel("Unidad de entrada:"), 0, 2)
+        config_layout.addWidget(entrada_unidad_input, 0, 3)
+
         input_button = QPushButton("Configurar Entrada")
         input_button.setStyleSheet("background-color: #444; color: white;")
         input_button.clicked.connect(lambda: self.edit_configuration(self.configuracion_entrada, "entrada"))
-        config_layout.addWidget(input_button, 0, 2)
+        config_layout.addWidget(input_button, 0, 4)
 
         # Configuración de salida
         salida_name_input = QLineEdit(self.configuracion_salida.nombre)
@@ -203,10 +209,16 @@ class Microbloque(QGraphicsItem):
         config_layout.addWidget(QLabel("Nombre de la configuración de salida:"), 1, 0)
         config_layout.addWidget(salida_name_input, 1, 1)
 
+        salida_unidad_input = QLineEdit(self.configuracion_salida.unidad)
+        salida_unidad_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        config_layout.addWidget(QLabel("Unidad de salida:"), 1, 2)
+        config_layout.addWidget(salida_unidad_input, 1, 3)
+
+
         output_button = QPushButton("Configurar Salida")
         output_button.setStyleSheet("background-color: #444; color: white;")
         output_button.clicked.connect(lambda: self.edit_configuration(self.configuracion_salida, "salida"))
-        config_layout.addWidget(output_button, 1, 2)
+        config_layout.addWidget(output_button, 1, 4)
 
         config_tab.addTab(config_content, "Configuraciones")
         layout.addWidget(config_tab)
@@ -224,6 +236,9 @@ class Microbloque(QGraphicsItem):
             self.elemento_back.color = self.color
             self.nombre = name_input.text()
             nueva_funcion = latex_editor.get_latex()
+            unidad_entrada = entrada_unidad_input.text()
+            unidad_salida = salida_unidad_input.text()
+
             self.elemento_back.funcion_transferencia = nueva_funcion
             self.funcion_transferencia = nueva_funcion
 
@@ -234,6 +249,8 @@ class Microbloque(QGraphicsItem):
             # Actualizar las configuraciones en el elemento_back
             self.elemento_back.configuracion_entrada = self.configuracion_entrada
             self.elemento_back.configuracion_salida = self.configuracion_salida
+            self.configuracion_entrada.unidad = unidad_entrada
+            self.configuracion_salida.unidad = unidad_salida
             
             self.update()
     
