@@ -52,7 +52,8 @@ class Microbloque(QGraphicsItem):
             painter.setPen(QPen(Qt.black, 2))
         
         painter.setBrush(self.color)
-        painter.drawRect(self.boundingRect())
+        rect = self.boundingRect()
+        painter.drawRect(rect)
         
         font = QFont("Arial", max(1, round(10)), QFont.Bold)
         painter.setFont(font)
@@ -60,8 +61,58 @@ class Microbloque(QGraphicsItem):
         color_texto = self.calcular_color(self.color)
         painter.setPen(QPen(QColor(color_texto)))
         
-        text_rect = self.boundingRect().adjusted(5, 5, -5, -5)
+        text_rect = rect.adjusted(5, 5, -5, -5)
         painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
+
+        # Dibujar unidades
+        small_font = QFont("Arial", max(1, round(8)))
+        painter.setFont(small_font)
+        painter.setPen(QPen(Qt.red))  # Color rojo para las unidades
+        
+    def paint(self, painter, option, widget):
+        painter.setRenderHint(QPainter.Antialiasing)
+        
+        if self.esta_selecionado:
+            painter.setPen(QPen(Qt.red, 3))
+        else:
+            painter.setPen(QPen(Qt.black, 2))
+        
+        painter.setBrush(self.color)
+        rect = self.boundingRect()
+        painter.drawRect(rect)
+        
+        font = QFont("Arial", max(1, round(10)), QFont.Bold)
+        painter.setFont(font)
+        
+        color_texto = self.calcular_color(self.color)
+        painter.setPen(QPen(QColor(color_texto)))
+        
+        text_rect = rect.adjusted(5, 5, -5, -5)
+        painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
+
+        # Dibujar unidades
+        units_font = QFont("Arial", max(1, round(12)), QFont.Bold)  # Fuente más grande y en negrita
+        painter.setFont(units_font)
+        painter.setPen(QPen(Qt.red, 2))  # Color rojo y línea más gruesa para las unidades
+
+        # Unidad de entrada
+        entrada_text = f"({self.configuracion_entrada.unidad})"
+        entrada_rect = painter.fontMetrics().boundingRect(entrada_text)
+        painter.drawText(QPointF(rect.left(), rect.top() - entrada_rect.height() / 2), entrada_text)
+
+        # Unidad de salida
+        salida_text = f"({self.configuracion_salida.unidad})"
+        salida_rect = painter.fontMetrics().boundingRect(salida_text)
+        painter.drawText(QPointF(rect.right() - salida_rect.width(), rect.top() - salida_rect.height() / 2), salida_text)
+
+        # Añadir un contorno blanco para resaltar
+        painter.setPen(QPen(Qt.white, 3))
+        painter.drawText(QPointF(rect.left(), rect.top() - entrada_rect.height() / 2), entrada_text)
+        painter.drawText(QPointF(rect.right() - salida_rect.width(), rect.top() - salida_rect.height() / 2), salida_text)
+        
+        painter.setPen(QPen(Qt.red, 2))
+        painter.drawText(QPointF(rect.left(), rect.top() - entrada_rect.height() / 2), entrada_text)
+        painter.drawText(QPointF(rect.right() - salida_rect.width(), rect.top() - salida_rect.height() / 2), salida_text)
 
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
