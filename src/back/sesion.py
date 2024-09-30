@@ -15,3 +15,5 @@ class Sesion():
         self.punto_suma = MacroPuntoSuma()
         self.carga = Carga()
     
+    def validar_unidades(self):
+        pass

@@ -116,15 +116,25 @@ class TopologiaSerie(InterfazTopologia):
 
     def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
         self.padre.generar_perturbacion_salida(ft,ciclos)
+
+    def validar_unidades(self):
+        for hijo in self.hijos:
+            hijo.unidad_salida()
+
+    def unidad_entrada(self):
+        return self.hijos[0].unidad_entrada()
+    
+    def unidad_salida(self):
+        return self.hijos[-1].unidad_salida()
     
 
 class MicroBloque(InterfazTopologia):
-    def __init__(self, nombre: str= "Microbloque", color: QColor=None, funcion_transferencia: str="1", padre: TopologiaSerie=None,configuracion_entrada=Configuracion(),configuracion_salida=Configuracion()) -> None:
+    def __init__(self, nombre: str= "Microbloque", color: QColor=None, funcion_transferencia: str="1", padre: TopologiaSerie=None) -> None:
         self.nombre = nombre
         self.color = color
         self.funcion_transferencia = funcion_transferencia
-        self.configuracion_entrada = configuracion_entrada
-        self.configuracion_salida = configuracion_salida
+        self.configuracion_entrada = Configuracion(nombre="Configuracion Entrada")
+        self.configuracion_salida = Configuracion(nombre="Configuracion Salida")
         super().__init__(padre)
 
 
@@ -226,6 +236,14 @@ class MicroBloque(InterfazTopologia):
 
         return salida_perturbada
     
+    def validar_unidades(self):
+        return True
+    
+    def unidad_entrada(self):
+        return self.configuracion_entrada.unidad
+    
+    def unidad_salida(self):
+        return self.configuracion_salida.unidad
 
     
 
@@ -296,4 +314,13 @@ class TopologiaParalelo(InterfazTopologia):
     def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
         self.padre.agregar_perturbacion_despues_de_paralela(ft,ciclos)
     
+    def validar_unidades(self):
+        for hijo in self.hijos:
+            hijo.validar_unidades()
     
+    def unidad_entrada(self):
+        posible_unidad = self.hijos[0].unidad_entrada()
+        if all(map(lambda x: x.unidad_entrada()==  posible_unidad ,self.hijos)): return posible_unidad
+
+    def unidad_salida(self):
+        map(lambda x: x.unidad_salida(),self.hijos)

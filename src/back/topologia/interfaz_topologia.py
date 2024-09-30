@@ -89,3 +89,13 @@ class InterfazTopologia():
 
     def simular(self,tiempo,entrada):
         pass
+
+    def validar_unidades(self):
+        pass
+
+    def unidad_entrada(self):
+        pass
+
+    def unidad_salida(self):
+        pass
+    

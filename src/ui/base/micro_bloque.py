@@ -10,8 +10,8 @@ class Microbloque(QGraphicsItem):
         self.nombre = microbloque_back.nombre
         self.color = microbloque_back.color or QColor(255, 255, 0)
         self.funcion_transferencia = microbloque_back.funcion_transferencia or ""
-        self.configuracion_entrada = microbloque_back.configuracion_entrada or Configuracion(f"{self.nombre}_entrada")
-        self.configuracion_salida = microbloque_back.configuracion_salida or Configuracion(f"{self.nombre}_salida")
+        self.configuracion_entrada = microbloque_back.configuracion_entrada
+        self.configuracion_salida = microbloque_back.configuracion_salida
         self.esta_selecionado = False
         
         self.entrada_unidad_color = Qt.black

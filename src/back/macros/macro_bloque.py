@@ -53,3 +53,12 @@ class MacroBloque(InterfazTopologia):
         salida =  self.topologia.simular(tiempo, entrada_alterada)
         salida_alterada = self.alterar_salida(salida, tiempo)
         return salida_alterada
+    
+    def validar_unidades(self):
+        self.topologia.validar_unidades()
+
+    def unidad_entrada(self):
+        return self.topologia.unidad_entrada()
+    
+    def unidad_salida(self):
+        return self.topologia.unidad_salida()
