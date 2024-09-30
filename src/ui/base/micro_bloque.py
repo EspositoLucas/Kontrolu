@@ -42,32 +42,6 @@ class Microbloque(QGraphicsItem):
     def setSeleccionado(self, seleccionado):
         self.esta_selecionado = seleccionado
         self.update()
-
-    def paint(self, painter, option, widget):
-        painter.setRenderHint(QPainter.Antialiasing)
-        
-        if self.esta_selecionado:
-            painter.setPen(QPen(Qt.red, 3))
-        else:
-            painter.setPen(QPen(Qt.black, 2))
-        
-        painter.setBrush(self.color)
-        rect = self.boundingRect()
-        painter.drawRect(rect)
-        
-        font = QFont("Arial", max(1, round(10)), QFont.Bold)
-        painter.setFont(font)
-        
-        color_texto = self.calcular_color(self.color)
-        painter.setPen(QPen(QColor(color_texto)))
-        
-        text_rect = rect.adjusted(5, 5, -5, -5)
-        painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
-
-        # Dibujar unidades
-        small_font = QFont("Arial", max(1, round(8)))
-        painter.setFont(small_font)
-        painter.setPen(QPen(Qt.red))  # Color rojo para las unidades
         
     def paint(self, painter, option, widget):
         painter.setRenderHint(QPainter.Antialiasing)
