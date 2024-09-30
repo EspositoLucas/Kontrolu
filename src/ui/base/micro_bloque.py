@@ -13,6 +13,9 @@ class Microbloque(QGraphicsItem):
         self.configuracion_entrada = microbloque_back.configuracion_entrada or Configuracion(f"{self.nombre}_entrada")
         self.configuracion_salida = microbloque_back.configuracion_salida or Configuracion(f"{self.nombre}_salida")
         self.esta_selecionado = False
+        
+        self.entrada_unidad_color = Qt.black
+        self.salida_unidad_color = Qt.black
 
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(1)
@@ -65,33 +68,24 @@ class Microbloque(QGraphicsItem):
         painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
 
         # Dibujar unidades
-        units_font = QFont("Arial", max(1, round(12)), QFont.Bold)  # Fuente más grande y en negrita
+        units_font = QFont("Arial", max(1, round(12)), QFont.Bold)
         painter.setFont(units_font)
-        painter.setPen(QPen(Qt.red, 2))  # Color rojo y línea más gruesa para las unidades
 
         # Unidad de entrada
         entrada_text = f"({self.configuracion_entrada.unidad})"
         entrada_rect = painter.fontMetrics().boundingRect(entrada_text)
+        painter.setPen(QPen(self.entrada_unidad_color, 2))
         painter.drawText(QPointF(rect.left(), rect.top() - entrada_rect.height() / 2), entrada_text)
 
         # Unidad de salida
         salida_text = f"({self.configuracion_salida.unidad})"
         salida_rect = painter.fontMetrics().boundingRect(salida_text)
-        painter.drawText(QPointF(rect.right() - salida_rect.width(), rect.top() - salida_rect.height() / 2), salida_text)
-
-        # Añadir un contorno blanco para resaltar
-        painter.setPen(QPen(Qt.white, 3))
-        painter.drawText(QPointF(rect.left(), rect.top() - entrada_rect.height() / 2), entrada_text)
-        painter.drawText(QPointF(rect.right() - salida_rect.width(), rect.top() - salida_rect.height() / 2), salida_text)
-        
-        painter.setPen(QPen(Qt.red, 2))
-        painter.drawText(QPointF(rect.left(), rect.top() - entrada_rect.height() / 2), entrada_text)
+        painter.setPen(QPen(self.salida_unidad_color, 2))
         painter.drawText(QPointF(rect.right() - salida_rect.width(), rect.top() - salida_rect.height() / 2), salida_text)
 
     def mouseDoubleClickEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.edit_properties()
-
 
     def edit_configuration(self, configuracion, tipo):
         dialog = QDialog(self.scene().views()[0].window())
@@ -277,6 +271,13 @@ class Microbloque(QGraphicsItem):
             self.configuracion_entrada.unidad = unidad_entrada
             self.configuracion_salida.unidad = unidad_salida
             
+            # # Actualizar las unidades
+            # self.configuracion_entrada.unidad = entrada_unidad_input.text()
+            # self.configuracion_salida.unidad = salida_unidad_input.text()
+
+            # Solicitar al DrawingArea que actualice los colores
+            self.scene().parent().actualizar_colores_unidades()
+            
             self.update()
     
     def select_color(self, button):
@@ -297,3 +298,4 @@ class Microbloque(QGraphicsItem):
 
     def __repr__(self):
         return self.__str__()
+
