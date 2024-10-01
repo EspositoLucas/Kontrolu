@@ -7,7 +7,7 @@ class MacroBloque(InterfazTopologia):
     def __init__(self,nombre="",sesion=None):
         self.sesion = sesion
         self.topologia = TopologiaSerie(padre=self)
-        self.nombre = "MacroBloque"
+        self.nombre = nombre
         super().__init__()
 
     def __str__(self):
