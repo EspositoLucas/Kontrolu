@@ -23,6 +23,8 @@ class Simulacion:
             
     def simular_paso(self, y_actual, ciclo):
 
+        datos_paso = {}
+
         tiempo = ciclo * self.delta
 
         y_medidor = self.medidor.simular(tiempo, y_actual)
@@ -60,6 +62,18 @@ class Simulacion:
         print(f"Paso {ciclo}: Estado de la carga: {estado}")
         self.datos['carga'].append(estado)
         
+
+        datos_paso['tiempo'] = tiempo
+        datos_paso['controlador'] = y_controlador
+        datos_paso['actuador'] = y_actuador
+        datos_paso['proceso'] = y_proceso
+        datos_paso['medidor'] = y_medidor
+        datos_paso['entrada'] = y_entrada
+        datos_paso['error'] = error
+        datos_paso['salida'] = y_actual
+        datos_paso['carga'] = estado
+
+        #self.graficadora.agregar_datos(datos_paso)
 
         return y_actual
 
