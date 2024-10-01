@@ -319,7 +319,7 @@ class TopologiaParalelo(InterfazTopologia):
 
         self.alterar_entrada(entrada,tiempo)
         # Simula todos los hijos con la misma entrada
-        salidas = [self.simular(hijo, tiempo, entrada) for hijo in self.hijos]
+        salidas = [hijo.simular(tiempo, entrada) for hijo in self.hijos]
         # Suma las salidas de todos los hijos
         salida =  sum(salidas)
 
