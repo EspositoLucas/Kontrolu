@@ -1,0 +1,22 @@
+{
+    "dominios": [
+        "SISTEMAS",
+        "ELECTRONICA"
+    ],
+    "MACROS.CONTROLADOR": {
+        "SISTEMAS": {},
+        "ELECTRONICA": {}
+    },
+    "MACROS.ACTUADOR": {
+        "SISTEMAS": {},
+        "ELECTRONICA": {}
+    },
+    "MACROS.PROCESO": {
+        "SISTEMAS": {},
+        "ELECTRONICA": {}
+    },
+    "MACROS.MEDIDOR": {
+        "SISTEMAS": {},
+        "ELECTRONICA": {}
+    }
+}

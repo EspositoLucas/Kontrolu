@@ -1,6 +1,8 @@
 import json
-from dtos import MicroBloqueDto, TipoMicroBloqueDto, DominioDto
+from .dtos import MicroBloqueDto, TipoMicroBloqueDto, DominioDto
 from enum import Enum
+
+file = "datos.json"
 
 class MACROS(Enum):
     CONTROLADOR = "controlador"
@@ -14,7 +16,7 @@ def crear_json_para_dominios(dominios: list[str] = ["SISTEMAS","ELECTRONICA"]) -
     """
 
 
-    with open("datos.json", "w") as json_file:
+    with open(file, "w") as json_file:
 
         json_data = {
             "dominios": dominios,
@@ -35,7 +37,7 @@ def agregar_dominios(dominios: list[str] = None, dominio: str = None) -> None:
     if dominios:
         doms.extend(dominios)
 
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
@@ -47,7 +49,7 @@ def agregar_dominios(dominios: list[str] = None, dominio: str = None) -> None:
             json_data[str(MACROS.PROCESO)][dominio] = {}
             json_data[str(MACROS.MEDIDOR)][dominio] = {}
 
-    with open("datos.json", "w") as json_file:
+    with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
 
 
@@ -61,7 +63,7 @@ def borrar_dominios(dominios: list[str] = None, dominio: str = None) -> None:
     if dominios:
         doms.extend(dominios)
 
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
@@ -73,14 +75,14 @@ def borrar_dominios(dominios: list[str] = None, dominio: str = None) -> None:
             del json_data[str(MACROS.PROCESO)][dominio]
             del json_data[str(MACROS.MEDIDOR)][dominio]
 
-    with open("datos.json", "w") as json_file:
+    with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
 
 def obtener_dominios() -> list[str]:
     """
     Obtiene los dominios guardados en el archivo json
     """
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
@@ -90,7 +92,7 @@ def crear_tipo(tipo: str, dominio: str, macro: MACROS, descripcion: str = "") ->
     """
     Crea un tipo en el archivo json
     """
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
@@ -99,27 +101,27 @@ def crear_tipo(tipo: str, dominio: str, macro: MACROS, descripcion: str = "") ->
         "micro_bloques": []
     }
 
-    with open("datos.json", "w") as json_file:
+    with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
 
 def agregar_microbloque(microbloque: MicroBloqueDto, tipo: str, dominio: str, macro: MACROS) -> None:
     """
     Agrega un microbloque a un tipo en el archivo json
     """
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
     json_data[str(macro)][dominio][tipo]["micro_bloques"][microbloque.nombre] = microbloque.__dict__
 
-    with open("datos.json", "w") as json_file:
+    with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
 
 def obtener_microbloques_de_un_dominio(dominio: str, macro: MACROS) -> list[TipoMicroBloqueDto]:
     """
     Obtiene los tipos de un dominio en el archivo json
     """
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
@@ -137,7 +139,7 @@ def obtener_micorbloques_de_un_tipo(tipo: str, dominio: str, macro: MACROS) -> T
     """
     Obtiene un tipo de un dominio en el archivo json
     """
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
@@ -151,26 +153,26 @@ def borrar_tipo(tipo: str, dominio: str, macro: MACROS) -> None:
     """
     Borra un tipo de un dominio en el archivo json
     """
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
     del json_data[str(macro)][dominio][tipo]
 
-    with open("datos.json", "w") as json_file:
+    with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
 
 def borrar_micro_bloque(tipo: str, dominio: str, macro: MACROS, microbloque: MicroBloqueDto) -> None:
     """
     Borra un microbloque de un tipo en el archivo json
     """
-    with open("datos.json", "r") as json_file:
+    with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
 
     del json_data[str(macro)][dominio][tipo]["micro_bloques"][microbloque.nombre]
 
-    with open("datos.json", "w") as json_file:
+    with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
 
 

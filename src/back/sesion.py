@@ -5,6 +5,8 @@ from .macros.macro_proceso import MacroProceso
 from .macros.macro_punto_suma import MacroPuntoSuma
 from .topologia.topologia_serie import MicroBloque
 from .topologia.carga import Carga
+from .json_manager import json_manager
+
 class Sesion():
     def __init__(self):
         self.entrada = MicroBloque(nombre="Entrada")
