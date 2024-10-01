@@ -14,8 +14,15 @@ class Microbloque(QGraphicsItem):
         self.configuracion_salida = microbloque_back.configuracion_salida
         self.esta_selecionado = False
         
-        self.entrada_unidad_color = Qt.black
-        self.salida_unidad_color = Qt.black
+        self.entrada_unidad_color = Qt.red
+        self.salida_unidad_color = Qt.red
+        
+        if microbloque_back.validar_entrada():
+            self.entrada_unidad_color = Qt.green
+        if microbloque_back.validar_salida():
+            self.salida_unidad_color = Qt.green
+        
+        
 
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(1)
@@ -255,8 +262,10 @@ class Microbloque(QGraphicsItem):
             self.elemento_back.color = self.color
             self.nombre = name_input.text()
             nueva_funcion = latex_editor.get_latex()
+
             unidad_entrada = entrada_unidad_input.text()
             unidad_salida = salida_unidad_input.text()
+
 
             self.elemento_back.funcion_transferencia = nueva_funcion
             self.funcion_transferencia = nueva_funcion
@@ -265,19 +274,30 @@ class Microbloque(QGraphicsItem):
             self.configuracion_entrada.nombre = entrada_name_input.text()
             self.configuracion_salida.nombre = salida_name_input.text()
 
-            # Actualizar las configuraciones en el elemento_back
+            unidad_entrada_vieja = self.configuracion_entrada.unidad
+            unidad_salida_vieja = self.configuracion_salida.unidad
+
             self.elemento_back.configuracion_entrada = self.configuracion_entrada
             self.elemento_back.configuracion_salida = self.configuracion_salida
             self.configuracion_entrada.unidad = unidad_entrada
             self.configuracion_salida.unidad = unidad_salida
+
+            print("Unidades",unidad_entrada_vieja,unidad_entrada,unidad_salida_vieja,unidad_salida)
+            if unidad_entrada_vieja != unidad_entrada or unidad_salida_vieja != unidad_salida:
+                print("Unidades cambiadas")
+                self.scene().parent().actualizar_colores_unidades()
+
+            # Actualizar las configuraciones en el elemento_back
+
             
             # # Actualizar las unidades
             # self.configuracion_entrada.unidad = entrada_unidad_input.text()
             # self.configuracion_salida.unidad = salida_unidad_input.text()
 
             # Solicitar al DrawingArea que actualice los colores
-            self.scene().parent().actualizar_colores_unidades()
-            
+
+                
+                
             self.update()
     
     def select_color(self, button):
@@ -298,4 +318,17 @@ class Microbloque(QGraphicsItem):
 
     def __repr__(self):
         return self.__str__()
+    
+    def actualizar_color_unidades(self):
+        color_entrada = Qt.red
+        color_salida = Qt.red
 
+        if self.elemento_back.validar_entrada():
+            color_entrada = Qt.green
+        if self.elemento_back.validar_salida():
+            color_salida = Qt.green
+        
+        if self.entrada_unidad_color != color_entrada or self.salida_unidad_color != color_salida:
+            self.entrada_unidad_color = color_entrada
+            self.salida_unidad_color = color_salida
+            self.update()

@@ -117,14 +117,30 @@ class TopologiaSerie(InterfazTopologia):
     def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
         self.padre.generar_perturbacion_salida(ft,ciclos)
 
-    def validar_unidades(self):
-        for hijo in self.hijos:
-            hijo.unidad_salida()
+    def validar_entrada(self, hijo: InterfazTopologia, unidad: str)-> bool:
+        pos = self.hijos.index(hijo)
+        if pos == 0:
+            return self.padre.validar_entrada(unidad)
+        else:
+            unidad_real = self.hijos[pos-1].unidad_salida()
+            return unidad == unidad_real
+        
+    def validar_salida(self, hijo: InterfazTopologia, unidad: str)-> bool:
+        pos = self.hijos.index(hijo)
+        if pos == len(self.hijos) - 1:
+            return self.padre.validar_salida(unidad)
+        else:
+            unidad_real = self.hijos[pos+1].unidad_entrada()
+            return unidad == unidad_real
 
     def unidad_entrada(self):
+        if len(self.hijos) == 0:
+            return self.padre.proxima_entrada()
         return self.hijos[0].unidad_entrada()
     
     def unidad_salida(self):
+        if len(self.hijos) == 0:
+            return self.padre.proxima_salida()
         return self.hijos[-1].unidad_salida()
     
 
@@ -236,9 +252,12 @@ class MicroBloque(InterfazTopologia):
 
         return salida_perturbada
     
-    def validar_unidades(self):
-        return True
+    def validar_entrada(self):
+        return self.padre.validar_entrada(self,self.unidad_entrada())
     
+    def validar_salida(self):
+        return self.padre.validar_salida(self,self.unidad_salida())
+
     def unidad_entrada(self):
         return self.configuracion_entrada.unidad
     
@@ -314,13 +333,14 @@ class TopologiaParalelo(InterfazTopologia):
     def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
         self.padre.agregar_perturbacion_despues_de_paralela(ft,ciclos)
     
-    def validar_unidades(self):
-        for hijo in self.hijos:
-            hijo.validar_unidades()
+    def validar_entrada(self, unidad) -> bool:
+        return self.padre.validar_entrada(self, unidad)
     
-    def unidad_entrada(self):
-        posible_unidad = self.hijos[0].unidad_entrada()
-        if all(map(lambda x: x.unidad_entrada()==  posible_unidad ,self.hijos)): return posible_unidad
+    def validar_salida(self, unidad) -> bool:
+        return self.padre.validar_salida(self, unidad)
+    
+    def unidad_entrada(self)-> str:
+        return self.hijos[0].unidad_entrada()
 
-    def unidad_salida(self):
-        map(lambda x: x.unidad_salida(),self.hijos)
+    def unidad_salida(self)-> str:
+        return self.hijos[-1].unidad_salida()

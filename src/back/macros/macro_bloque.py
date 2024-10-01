@@ -4,7 +4,8 @@ from back.topologia.topologia_serie import TopologiaParalelo
 from back.topologia.interfaz_topologia import InterfazTopologia
 
 class MacroBloque(InterfazTopologia):
-    def __init__(self):
+    def __init__(self,nombre="",sesion=None):
+        self.sesion = sesion
         self.topologia = TopologiaSerie(padre=self)
         self.nombre = "MacroBloque"
         super().__init__()
@@ -56,6 +57,12 @@ class MacroBloque(InterfazTopologia):
     
     def validar_unidades(self):
         self.topologia.validar_unidades()
+
+
+    def validar_entrada(self, unidad: str)-> bool:
+        pass
+    def validar_salida(self, unidad: str)-> bool:
+        pass
 
     def unidad_entrada(self):
         return self.topologia.unidad_entrada()

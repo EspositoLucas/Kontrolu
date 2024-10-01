@@ -87,12 +87,15 @@ class DrawingArea(QGraphicsView):
         self.dibujar_lo_demas()
         # self.print_topologia(self.macrobloque.modelo.topologia)
         self.update_scene_rect(self.scene.itemsBoundingRect()) # actualiza el rectangulo de la escena en funcion de lo dibujado
-        self.actualizar_colores_unidades()
+        #self.actualizar_colores_unidades()
         self.update()
     
     def actualizar_colores_unidades(self):
-        for i, microbloque in enumerate(self.microbloques):
-            microbloque_anterior = self.microbloques[i-1] if i > 0 else None
+        for microbloque in self.microbloques:
+            microbloque.actualizar_color_unidades()
+
+
+        """            microbloque_anterior = self.microbloques[i-1] if i > 0 else None
             microbloque_posterior = self.microbloques[i+1] if i < len(self.microbloques) - 1 else None
 
             # Validar unidad de entrada
@@ -112,8 +115,8 @@ class DrawingArea(QGraphicsView):
                     microbloque.salida_unidad_color = Qt.red
             else:
                 microbloque.salida_unidad_color = Qt.black
-
-            microbloque.update()
+        """
+            
 
     def load_preview_images(self):
         current_dir = os.path.dirname(os.path.abspath(__file__)) # obtiene la ruta actual del archivo actual
@@ -190,7 +193,7 @@ class DrawingArea(QGraphicsView):
             punto_final = self.dibujar_topologia(hijo, posicion_actual)
             posicion_actual = QPointF(punto_final.x() + MARGEN_HORIZONTAL, posicion_inicial.y())
             
-        self.actualizar_colores_unidades()
+        #self.actualizar_colores_unidades()
         return punto_final
 
     def dibujar_paralelo(self, paralelo, posicion_inicial):
@@ -208,7 +211,7 @@ class DrawingArea(QGraphicsView):
                 punto_final_max = punto_final
             y_actual += hijo.alto() + MARGEN_VERTICAL
         
-        self.actualizar_colores_unidades()
+        #self.actualizar_colores_unidades()
 
         return QPointF(punto_final_max.x() + MARGEN_PARALELO, posicion_inicial.y())
 
