@@ -5,6 +5,7 @@ from PyQt5.QtGui import QColor
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
 from back.topologia.configuraciones import Configuracion
+from .perturbacion import Perturbacion
 
 ANCHO = 150
 ALTO = 80
@@ -118,20 +119,25 @@ class TopologiaSerie(InterfazTopologia):
         self.padre.generar_perturbacion_salida(ft,ciclos)
 
     def validar_entrada(self, hijo: InterfazTopologia, unidad: str)-> bool:
-        pos = self.hijos.index(hijo)
-        if pos == 0:
-            return self.padre.validar_entrada(unidad)
-        else:
-            unidad_real = self.hijos[pos-1].unidad_salida()
-            return unidad == unidad_real
+        return self.unidad_entrante(hijo) == unidad
         
     def validar_salida(self, hijo: InterfazTopologia, unidad: str)-> bool:
+        return self.unidad_saliente(hijo) == unidad
+        
+    def unidad_entrante(self, hijo: InterfazTopologia)-> str:
+        pos = self.hijos.index(hijo)
+        if pos == 0:
+            return self.padre.proxima_entrada()
+        else:
+            return self.hijos[pos-1].unidad_salida()
+        
+    def unidad_saliente(self, hijo: InterfazTopologia)-> str:
         pos = self.hijos.index(hijo)
         if pos == len(self.hijos) - 1:
-            return self.padre.validar_salida(unidad)
+            return self.padre.proxima_salida()
         else:
-            unidad_real = self.hijos[pos+1].unidad_entrada()
-            return unidad == unidad_real
+            return self.hijos[pos+1].unidad_entrada()
+
 
     def unidad_entrada(self):
         if len(self.hijos) == 0:
@@ -165,10 +171,10 @@ class MicroBloque(InterfazTopologia):
     def agregar_abajo(self,microbloque:MicroBloque):
         self.padre.agregar_abajo_de(microbloque,self)
     
-    def agregar_antes(self,microbloque:MicroBloque):
+    def agregar_antes(self,microbloque:MicroBloque|Perturbacion):
         self.padre.agregar_antes_de(microbloque,self)
     
-    def agregar_despues(self,microbloque:MicroBloque):
+    def agregar_despues(self,microbloque:MicroBloque|Perturbacion):
         self.padre.agregar_despues_de(microbloque,self)
     
     def alto(self) -> int:
@@ -185,12 +191,6 @@ class MicroBloque(InterfazTopologia):
     
     def set_funcion_transferencia(self, funcion):
         self.funcion_transferencia = funcion
-
-    def set_opcion_adicional(self, clave, valor):
-        self.opciones_adicionales[clave] = valor
-
-    def get_opcion_adicional(self, clave):
-        return self.opciones_adicionales.get(clave)
     
     def agregar_en_paralela_en_padre_arriba(self,microbloque:MicroBloque):
         self.padre.agregar_serie_arriba(microbloque)
@@ -198,17 +198,12 @@ class MicroBloque(InterfazTopologia):
     def agregar_en_paralela_en_padre_abajo(self,microbloque:MicroBloque):
         self.padre.agregar_serie_abajo(microbloque)
 
-    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque):
+    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque|Perturbacion):
         self.padre.agregar_en_serie_fuera_de_paralela_antes(microbloque)
         
-    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque):
+    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque|Perturbacion):
         self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
     
-    def agregar_perturbacion_antes_de_paralela(self,ft,ciclos):
-        self.padre.agregar_perturbacion_antes_de_paralela(ft,ciclos)
-
-    def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
-        self.padre.agregar_perturbacion_despues_de_paralela(ft,ciclos)
 
 
     def get_parent_structures(self):
@@ -232,9 +227,9 @@ class MicroBloque(InterfazTopologia):
         operacion_laplace = tf_sympy
 
         if entrada:
-            entrada_perturbada = self.alterar_entrada(entrada,tiempo)
 
-            entrada_con_error = self.configuracion_entrada.actualizar(entrada_perturbada,tiempo)
+
+            entrada_con_error = self.configuracion_entrada.actualizar(entrada,tiempo)
 
             entrada_micro_bloque = laplace_transform(entrada_con_error,t,s)[0]
             print(f"La entrada es: {entrada_micro_bloque}")
@@ -248,9 +243,8 @@ class MicroBloque(InterfazTopologia):
 
         salida_con_error = self.configuracion_salida.actualizar(salida_micro_bloque,tiempo)
 
-        salida_perturbada = self.alterar_salida(salida_con_error,tiempo)
 
-        return salida_perturbada
+        return salida_con_error
     
     def validar_entrada(self):
         return self.padre.validar_entrada(self,self.unidad_entrada())
@@ -278,13 +272,13 @@ class TopologiaParalelo(InterfazTopologia):
         if(microbloque2): nuevo = TopologiaSerie(micro=microbloque2,padre=self)
         nuevo.cambiar_padre(self)
         if(arriba): self.hijos = [nuevaSerie,nuevo]
-        else: self.hijos = [nuevo,nuevaSerie]
+        else: self.hijos :list[InterfazTopologia] = [nuevo,nuevaSerie]
         super().__init__(padre)
     
-    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque):
+    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque|Perturbacion):
         self.padre.agregar_antes_de(microbloque,self)
 
-    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque):
+    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque|Perturbacion):
         self.padre.agregar_despues_de(microbloque,self)
 
     def agregar_abajo_de(self,microbloque,actual):
@@ -317,21 +311,13 @@ class TopologiaParalelo(InterfazTopologia):
     
     def simular(self, tiempo, entrada=None):
 
-        self.alterar_entrada(entrada,tiempo)
         # Simula todos los hijos con la misma entrada
         salidas = [hijo.simular(tiempo, entrada) for hijo in self.hijos]
         # Suma las salidas de todos los hijos
         salida =  sum(salidas)
-
-        salida_perturbada = self.alterar_salida(salida,tiempo)
         
-        return salida_perturbada
+        return salida
     
-    def agregar_perturbacion_antes_de_paralela(self,ft,ciclos):
-        self.padre.agregar_perturbacion_antes_de_paralela(ft,ciclos)
-
-    def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
-        self.padre.agregar_perturbacion_despues_de_paralela(ft,ciclos)
     
     def validar_entrada(self, unidad) -> bool:
         return self.padre.validar_entrada(self, unidad)

@@ -1,17 +1,17 @@
 from latex2sympy2 import latex2sympy
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
+from .interfaz_topologia import InterfazTopologia
 
-class Perturbacion():
+class Perturbacion(InterfazTopologia):
 
-    def __init__(self,responsable=None,ft="0",ciclos=0,estado=False):
-        self.responsable = responsable
-        self.funcion_transferencia = ft
+    def __init__(self,funcion_transferencia:str="1",ciclos=0,estado=False):
+        self.funcion_transferencia = funcion_transferencia
         self.ciclos = ciclos
         self.estado = estado
         self.datos = {'tiempo': [], 'valor_original': [], 'perturbacion': [], 'resultado': []}
     
     
-    def alterar(self,entrada,tiempo):
+    def simular(self,entrada,tiempo):
         
         if not self.estado: return entrada
 
@@ -53,3 +53,54 @@ class Perturbacion():
     
     def radio(self) -> int:
         return 20
+
+    def borrar_elemento(self):
+        self.padre.borrar_elemento(self)
+        self.padre = None
+
+
+    def agregar_antes(self,microbloque:MicroBloque|Perturbacion):
+        self.padre.agregar_antes_de(microbloque,self)
+    
+    def agregar_despues(self,microbloque:MicroBloque|Perturbacion):
+        self.padre.agregar_despues_de(microbloque,self)
+    
+    def obtener_micros(self):
+        return [self]
+    
+    def set_funcion_transferencia(self, funcion):
+        self.funcion_transferencia = funcion
+
+    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque|Perturbacion):
+        self.padre.agregar_en_serie_fuera_de_paralela_antes(microbloque)
+        
+    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque|Perturbacion):
+        self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
+    
+
+
+    def get_parent_structures(self):
+        parents = []
+        actual = self.padre
+        nivel = 0
+        while actual and "Macro" not in actual.__class__.__name__: # "Macro" not in actual.__class__.__name__ esta condicion es para que no se incluya el macrobloque en la lista de padres 
+            # seguir hasta llegar al macrobloque --> esto porque el padre de la serie principal es el macrobloque
+            parents.append([actual, nivel])
+            actual = actual.padre
+            nivel += 1
+        return parents
+    
+    
+    def validar_entrada(self):
+        return self.padre.validar_entrada(self,self.unidad_entrada())
+    
+    def validar_salida(self):
+        return self.padre.validar_salida(self,self.unidad_salida())
+
+    def unidad_entrada(self):
+        return self.padre.unidad_entrante(self)
+    
+    def unidad_salida(self):
+        return self.padre.unidad_saliente(self)
+
+    
