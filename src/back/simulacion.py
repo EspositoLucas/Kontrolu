@@ -59,6 +59,7 @@ class Simulacion:
         estado = self.carga.simular(tiempo, y_actual)
         print(f"Paso {ciclo}: Estado de la carga: {estado}")
         self.datos['carga'].append(estado)
+        
 
         return y_actual
 
