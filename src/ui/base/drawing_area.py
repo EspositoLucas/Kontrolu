@@ -9,6 +9,7 @@ from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, Mi
 from back.topologia.perturbacion import Perturbacion
 from globals import ESTA_SIMULANDO
 from back.topologia.configuraciones import Configuracion, TipoError
+from .perturbacion_visual import PerturbacionVisual
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
@@ -223,26 +224,19 @@ class DrawingArea(QGraphicsView):
 
         pos_perturbacion = None
         if microbloque_back.perturbacion_entrada.activa():
-            pos_perturbacion = self.dibujar_circulo_perturbacion(pos, "entrada")
+            pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "entrada")
 
         if microbloque_back.perturbacion_salida.activa():
-            pos_perturbacion = self.dibujar_circulo_perturbacion(pos, "salida")
+            pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "salida")
 
         if pos_perturbacion and pos_perturbacion.x() > pos.x():
             return pos_perturbacion # se queda con el valor más a la derecha
         return pos # si no hay perturbaciones o si la perturbación está a la izquierda, retorna la posición del microbloque
     
-    def dibujar_circulo_perturbacion(self, pos, tipo):
-        if tipo == "entrada":
-            centro = QPointF(pos.x() - ANCHO/2 - MARGEN_PERTURBACION, pos.y() + ALTO/2)
-        else:  # salida
-            centro = QPointF(pos.x() + ANCHO/2 + MARGEN_PERTURBACION, pos.y() + ALTO/2)
-
-        circulo = QGraphicsEllipseItem(centro.x() - RADIO_PERTURBACION, centro.y() - RADIO_PERTURBACION, RADIO_PERTURBACION * 2, RADIO_PERTURBACION * 2)
-        circulo.setBrush(QBrush(QColor(255, 0, 0))) 
-        circulo.setZValue(1) 
-        self.scene.addItem(circulo)
-        return centro
+    def dibujar_circulo_perturbacion(self, microbloque, pos, tipo):
+        perturbacion_visual = PerturbacionVisual(microbloque, pos, tipo, self)
+        self.scene.addItem(perturbacion_visual)
+        return perturbacion_visual.centro
 
     def clear_all(self):
         if self.microbloques:
