@@ -35,21 +35,21 @@ class Sesion():
     def validar_salida_medidor(self, unidad: str)-> bool:
         return self.controlador.unidad_entrada() == unidad
     
-    def proxima_salida_controlador(self)-> str:
+    def unidad_recibida_controlador(self)-> str:
         return self.medidor.unidad_salida()
-    def proxima_salida_actuador(self)-> str:
+    def unidad_recibida_actuador(self)-> str:
         return self.controlador.unidad_salida()
-    def proxima_salida_proceso(self)-> str:
+    def unidad_recibida_proceso(self)-> str:
         return self.actuador.unidad_salida()
-    def proxima_salida_medidor(self)-> str:
+    def unidad_recibida_medidor(self)-> str:
         return self.proceso.unidad_salida()
     
-    def proxima_entrada_controlador(self)-> str:
+    def unidad_esperada_controlador(self)-> str:
         return self.actuador.unidad_entrada()
-    def proxima_entrada_actuador(self)-> str:
+    def unidad_esperada_actuador(self)-> str:
         return self.proceso.unidad_entrada()
-    def proxima_entrada_proceso(self)-> str:
+    def unidad_esperada_proceso(self)-> str:
         return self.medidor.unidad_entrada()
-    def proxima_entrada_medidor(self)-> str:
+    def unidad_esperada_medidor(self)-> str:
         return self.controlador.unidad_entrada()
     

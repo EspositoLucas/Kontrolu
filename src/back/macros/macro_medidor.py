@@ -9,8 +9,8 @@ class MacroMedidor(MacroBloque):
     def validar_salida(self, unidad: str)-> bool:
         return self.sesion.validar_salida_medidor(unidad)
     
-    def proxima_salida(self)-> str:
-        return self.sesion.proxima_salida_medidor()
+    def unidad_saliente(self)-> str:
+        return self.sesion.unidad_esperada_medidor()
     
-    def proxima_entrada(self)-> str:    
-        return self.sesion.proxima_entrada_medidor()
+    def unidad_entrante(self)-> str:    
+        return self.sesion.unidad_recibida_medidor()

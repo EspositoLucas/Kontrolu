@@ -9,8 +9,8 @@ class MacroProceso(MacroBloque):
     def validar_salida(self, unidad: str)-> bool:
         return self.sesion.validar_salida_proceso(unidad)
     
-    def proxima_salida(self)-> str:
-        return self.sesion.proxima_salida_proceso()
+    def unidad_saliente(self)-> str:
+        return self.sesion.unidad_esperada_proceso()
     
-    def proxima_entrada(self)-> str:   
-        return self.sesion.proxima_entrada_proceso()
+    def unidad_entrante(self)-> str:   
+        return self.sesion.unidad_recibida_proceso()

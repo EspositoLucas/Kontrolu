@@ -112,11 +112,6 @@ class TopologiaSerie(InterfazTopologia):
 
         return salida_perturbada
     
-    def agregar_perturbacion_antes_de_paralela(self,ft,ciclos):
-        self.padre.generar_perturbacion_entrada(ft,ciclos)
-
-    def agregar_perturbacion_despues_de_paralela(self,ft,ciclos):
-        self.padre.generar_perturbacion_salida(ft,ciclos)
 
     def validar_entrada(self, hijo: InterfazTopologia, unidad: str)-> bool:
         return self.unidad_entrante(hijo) == unidad
@@ -127,26 +122,26 @@ class TopologiaSerie(InterfazTopologia):
     def unidad_entrante(self, hijo: InterfazTopologia)-> str:
         pos = self.hijos.index(hijo)
         if pos == 0:
-            return self.padre.proxima_entrada()
+            return self.padre.unidad_entrante()
         else:
             return self.hijos[pos-1].unidad_salida()
         
     def unidad_saliente(self, hijo: InterfazTopologia)-> str:
         pos = self.hijos.index(hijo)
         if pos == len(self.hijos) - 1:
-            return self.padre.proxima_salida()
+            return self.padre.unidad_saliente()
         else:
             return self.hijos[pos+1].unidad_entrada()
 
 
     def unidad_entrada(self):
         if len(self.hijos) == 0:
-            return self.padre.proxima_entrada()
+            return self.padre.unidad_saliente()
         return self.hijos[0].unidad_entrada()
     
     def unidad_salida(self):
         if len(self.hijos) == 0:
-            return self.padre.proxima_salida()
+            return self.padre.unidad_entrante()
         return self.hijos[-1].unidad_salida()
     
 
@@ -257,7 +252,7 @@ class MicroBloque(InterfazTopologia):
     
     def unidad_salida(self):
         return self.configuracion_salida.unidad
-
+    
     
 
 
@@ -330,3 +325,9 @@ class TopologiaParalelo(InterfazTopologia):
 
     def unidad_salida(self)-> str:
         return self.hijos[-1].unidad_salida()
+    
+    def unidad_entrante(self)-> str:
+        return self.padre.unidad_entrante(self)
+    
+    def unidad_saliente(self)-> str:
+        return self.padre.unidad_saliente(self)

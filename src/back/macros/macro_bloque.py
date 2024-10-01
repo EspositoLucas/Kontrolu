@@ -69,3 +69,9 @@ class MacroBloque(InterfazTopologia):
     
     def unidad_salida(self):
         return self.topologia.unidad_salida()
+    
+    def unidad_entrante(self):
+        pass
+
+    def unidad_saliente(self):
+        pass

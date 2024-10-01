@@ -1,3 +1,4 @@
+from __future__ import annotations
 from latex2sympy2 import latex2sympy
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from .interfaz_topologia import InterfazTopologia
@@ -59,10 +60,10 @@ class Perturbacion(InterfazTopologia):
         self.padre = None
 
 
-    def agregar_antes(self,microbloque:MicroBloque|Perturbacion):
+    def agregar_antes(self,microbloque:InterfazTopologia):
         self.padre.agregar_antes_de(microbloque,self)
     
-    def agregar_despues(self,microbloque:MicroBloque|Perturbacion):
+    def agregar_despues(self,microbloque:InterfazTopologia):
         self.padre.agregar_despues_de(microbloque,self)
     
     def obtener_micros(self):
@@ -71,10 +72,10 @@ class Perturbacion(InterfazTopologia):
     def set_funcion_transferencia(self, funcion):
         self.funcion_transferencia = funcion
 
-    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:MicroBloque|Perturbacion):
+    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:InterfazTopologia):
         self.padre.agregar_en_serie_fuera_de_paralela_antes(microbloque)
         
-    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:MicroBloque|Perturbacion):
+    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:InterfazTopologia):
         self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
     
 

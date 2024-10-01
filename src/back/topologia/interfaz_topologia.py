@@ -1,8 +1,6 @@
 from __future__ import annotations
 from typing import Tuple
 import itertools
-from back.topologia.perturbacion import Perturbacion
-
 class InterfazTopologia():
 
     def __init__(self,padre:InterfazTopologia=None) -> None:

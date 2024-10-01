@@ -222,18 +222,18 @@ class DrawingArea(QGraphicsView):
         self.microbloques.append(microbloque)
         self.scene.addItem(microbloque)
 
-        pos_perturbacion = None
-        if microbloque_back.perturbacion_entrada.activa(): # si la perturbacion de entrada está activa
-            pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "entrada") # dibujo la perturbación en el lugar donde está actualmente el microbloque
-            microbloque.setX(pos.x() + MARGEN_PERTURBACION) # desplazo al microbloque hacia la derecha para que no se superponga con la perturbación 
+        #pos_perturbacion = None
+        #if microbloque_back.perturbacion_entrada.activa(): # si la perturbacion de entrada está activa
+        #    pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "entrada") # dibujo la perturbación en el lugar donde está actualmente el microbloque
+        #    microbloque.setX(pos.x() + MARGEN_PERTURBACION) # desplazo al microbloque hacia la derecha para que no se superponga con la perturbación 
 
-        if microbloque_back.perturbacion_salida.activa(): # si la perturbacion de salida está activa
-            if pos_perturbacion: # si dibujé la perturbación de entrada porque también estaba activa
-                pos = QPointF(pos.x() + MARGEN_PERTURBACION, pos.y()) # actualizo "pos" con la posicion real actual del microbloque
-            pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "salida") # dibujo la perturbación a la derecha del microbloque
+        #if microbloque_back.perturbacion_salida.activa(): # si la perturbacion de salida está activa
+        #    if pos_perturbacion: # si dibujé la perturbación de entrada porque también estaba activa
+        #        pos = QPointF(pos.x() + MARGEN_PERTURBACION, pos.y()) # actualizo "pos" con la posicion real actual del microbloque
+        #    pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "salida") # dibujo la perturbación a la derecha del microbloque
 
-        if pos_perturbacion and pos_perturbacion.x() > pos.x():
-            return pos_perturbacion # se queda con el valor más a la derecha
+        #if pos_perturbacion and pos_perturbacion.x() > pos.x():
+        #    return pos_perturbacion # se queda con el valor más a la derecha
         return pos # si no hay perturbaciones o si la perturbación está a la izquierda, retorna la posición del microbloque
     
     def dibujar_circulo_perturbacion(self, microbloque, pos, tipo):
@@ -493,7 +493,7 @@ class DrawingArea(QGraphicsView):
                 
                 # punto_final seria el punto en donde va a llegar la flecha que proviene del microbloque anterior (punto medio izquierdo del microbloque actual)
 
-                if microbloque.perturbacion_entrada.activa():
+                if False:
                     centro_perturbacion = QPointF(mb.pos().x() - ANCHO/2 - MARGEN_PERTURBACION, mb.pos().y() + ALTO/2)
                     
                     # Línea desde punto_inicial hasta la perturbación
@@ -505,7 +505,7 @@ class DrawingArea(QGraphicsView):
                     line = QGraphicsLineItem(centro_perturbacion.x(), centro_perturbacion.y(), punto_final.x(), punto_final.y())
                     line.setPen(QPen(Qt.black, 2))
                     self.scene.addItem(line)
-                elif punto_inicial is not None and punto_final is not None:
+                if punto_inicial is not None and punto_final is not None:
                     # Conexión directa si no hay perturbación de entrada
                     line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), punto_final.x(), punto_final.y())
                     line.setPen(QPen(Qt.black, 2))
@@ -513,7 +513,7 @@ class DrawingArea(QGraphicsView):
 
                 punto_salida = mb.pos() + QPointF(mb.width(), mb.height() / 2)
 
-                if microbloque.perturbacion_salida.activa():
+                if False:
                     centro_perturbacion = QPointF(mb.pos().x() + ANCHO/2 + MARGEN_PERTURBACION, mb.pos().y() + ALTO/2)
                     
                     # Línea desde el microbloque hasta la perturbación
