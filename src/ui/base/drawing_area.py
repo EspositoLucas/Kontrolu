@@ -218,16 +218,19 @@ class DrawingArea(QGraphicsView):
 
     def create_microbloque(self, microbloque_back, pos):
         microbloque = Microbloque(microbloque_back)
-        microbloque.setPos(pos)
+        microbloque.setPos(pos) # ubico al microbloque
         self.microbloques.append(microbloque)
         self.scene.addItem(microbloque)
 
         pos_perturbacion = None
-        if microbloque_back.perturbacion_entrada.activa():
-            pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "entrada")
+        if microbloque_back.perturbacion_entrada.activa(): # si la perturbacion de entrada está activa
+            pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "entrada") # dibujo la perturbación en el lugar donde está actualmente el microbloque
+            microbloque.setX(pos.x() + MARGEN_PERTURBACION) # desplazo al microbloque hacia la derecha para que no se superponga con la perturbación 
 
-        if microbloque_back.perturbacion_salida.activa():
-            pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "salida")
+        if microbloque_back.perturbacion_salida.activa(): # si la perturbacion de salida está activa
+            if pos_perturbacion: # si dibujé la perturbación de entrada porque también estaba activa
+                pos = QPointF(pos.x() + MARGEN_PERTURBACION, pos.y()) # actualizo "pos" con la posicion real actual del microbloque
+            pos_perturbacion = self.dibujar_circulo_perturbacion(microbloque_back, pos, "salida") # dibujo la perturbación a la derecha del microbloque
 
         if pos_perturbacion and pos_perturbacion.x() > pos.x():
             return pos_perturbacion # se queda con el valor más a la derecha

@@ -25,10 +25,10 @@ class PerturbacionVisual(QGraphicsEllipseItem):
         
     def setup_apariencia(self):
         if self.tipo == "entrada":
-            centro = QPointF(self.posicion.x() - ANCHO/2 - MARGEN_PERTURBACION, 
+            centro = QPointF(self.posicion.x() - ANCHO/2 + MARGEN_PERTURBACION, 
                             self.posicion.y() + ALTO/2)
         else:  # salida
-            centro = QPointF(self.posicion.x() + ANCHO/2 + MARGEN_PERTURBACION, 
+            centro = QPointF(self.posicion.x() + ANCHO/2 + MARGEN_PERTURBACION - 50, 
                             self.posicion.y() + ALTO/2)
         self.centro = centro
         self.setRect(centro.x() - RADIO_PERTURBACION, 
