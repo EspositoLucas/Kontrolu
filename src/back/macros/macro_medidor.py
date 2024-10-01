@@ -1,5 +1,4 @@
 from .macro_bloque import MacroBloque
-import numpy as np
 
 class MacroMedidor(MacroBloque):
     def __init__(self,sesion=None) -> None:
