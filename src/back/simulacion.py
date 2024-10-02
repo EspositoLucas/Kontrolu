@@ -88,6 +88,19 @@ class Simulacion(QObject):
         if self.graficadora:
             self.graficadora.agregar_datos(datos_paso)
             self.graficadora.procesar_eventos()
+        
+        # Añadir impresión detallada de los valores
+        print(f"\nCiclo {ciclo}:")
+        print(f"Tiempo: {tiempo}")
+        print(f"Entrada: {y_entrada}")
+        print(f"Medidor: {y_medidor}")
+        print(f"Error: {error}")
+        print(f"Controlador: {y_controlador}")
+        print(f"Actuador: {y_actuador}")
+        print(f"Proceso: {y_proceso}")
+        print(f"Salida actual: {y_actual}")
+        print(f"Estado de la carga: {estado}")
+        print("-" * 30)
 
         return y_actual
     
@@ -107,7 +120,7 @@ class Simulacion(QObject):
         else:
             event.ignore()
 
-    def simular_sistema_tiempo_real(self, velocidad=5):
+    def simular_sistema_tiempo_real(self, velocidad=5000):
         y_salida = self.salida_cero
 
         for i in range(1, self.ciclos+1):
