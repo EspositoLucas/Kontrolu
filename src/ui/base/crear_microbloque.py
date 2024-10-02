@@ -14,10 +14,10 @@ class CrearMicroBloque(QDialog):
         self.reference_structure = reference_structure
         self.setWindowTitle("Nuevo Micro Bloque")
         self.setStyleSheet("background-color: #333; color: white;")
-        self.init_ui()
+        self.create_new_microbloque()
 
 
-    def create_new_microbloque(self, pos, relation=None, reference_structure=None):
+    def create_new_microbloque(self):
         """
         Función principal para crear un nuevo microbloque o seleccionar un preset.
         """
@@ -82,56 +82,19 @@ class CrearMicroBloque(QDialog):
             new_microbloque.configuracion_entrada.unidad = unidad_entrada
             new_microbloque.configuracion_salida.unidad = unidad_salida   
             
-            if isinstance(reference_structure, MicroBloque):
-                self.parent.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)
-            elif isinstance(reference_structure, TopologiaSerie):
-                self.parent.agregar_respecto_serie(new_microbloque, relation, reference_structure)
-            elif isinstance(reference_structure, TopologiaParalelo):
-                self.parent.agregar_respecto_paralelo(new_microbloque, relation, reference_structure)
+            if isinstance(self.reference_structure, MicroBloque):
+                self.parent.agregar_respecto_microbloque(new_microbloque, self.relation, self.reference_structure)
+            elif isinstance(self.reference_structure, TopologiaSerie):
+                self.parent.agregar_respecto_serie(new_microbloque, self.relation, self.reference_structure)
+            elif isinstance(self.reference_structure, TopologiaParalelo):
+                self.parent.agregar_respecto_paralelo(new_microbloque, self.relation, self.reference_structure)
             else:
-                self.macrobloque.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
+                self.parent.macrobloque.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
 
             self.parent.load_microbloques()  # recargo todos los microbloques
-            self.update()
+            self.parent.update()
             self.parent.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
 
-    def init_ui(self):
-        layout = QVBoxLayout()
-
-        # Crear el tab principal para "Nuevo Microbloque" y "Presets"
-        self.main_tab = QTabWidget()
-        self.main_tab.setStyleSheet("""
-            QTabWidget::pane { 
-                border: 1px solid #555; 
-                background-color: #333;
-            }
-            QTabBar::tab { 
-                background-color: #444; 
-                color: white; 
-                padding: 5px;
-            }
-            QTabBar::tab:selected { 
-                background-color: #555;
-            }
-        """)
-
-        # Crear la pestaña "Presets"
-        presets_tab = self.create_presets_tab()
-        self.main_tab.addTab(presets_tab, "Presets")
-
-        # Crear la pestaña "Nuevo Microbloque"
-        new_microbloque_tab, self.name_input, self.color_button, self.latex_editor, self.entrada_name_input, self.salida_name_input, self.entrada_unidad_input, self.salida_unidad_input = self.create_new_microbloque_tab()
-        self.main_tab.addTab(new_microbloque_tab, "Nuevo Microbloque")
-
-        # Añadir el tab principal al layout
-        layout.addWidget(self.main_tab)
-
-        save_button = QPushButton("Guardar")
-        save_button.setStyleSheet("background-color: #444; color: white;")
-        save_button.clicked.connect(self.accept)
-        layout.addWidget(save_button)
-
-        self.setLayout(layout)
 
     def create_presets_tab(self):
         """
