@@ -41,16 +41,16 @@ class Graficadora(QMainWindow):
             if clave not in self.datos:
                 self.datos[clave] = []
                 self.lineas[clave], = self.ax.plot([], [], label=clave)
-                self.checkboxes[clave] = QCheckBox(clave)
-                self.checkboxes[clave].setChecked(True)
-                self.checkboxes[clave].stateChanged.connect(self.actualizar_grafico)
-                self.controls_layout.addWidget(self.checkboxes[clave])
+                if clave != 'tiempo':  # No crear checkbox para 'tiempo'
+                    self.checkboxes[clave] = QCheckBox(clave)
+                    self.checkboxes[clave].setChecked(True)
+                    self.checkboxes[clave].stateChanged.connect(self.actualizar_grafico)
+                    self.controls_layout.addWidget(self.checkboxes[clave])
             
             valor_numerico = self.convertir_a_numerico(valor)
             self.datos[clave].append(valor_numerico)
 
         self.actualizar_grafico()
-
 
     def convertir_a_numerico(self, valor):
         if isinstance(valor, (int, float)):
@@ -69,14 +69,15 @@ class Graficadora(QMainWindow):
     def actualizar_grafico(self):
         self.ax.clear()  # Limpiar el gráfico antes de actualizarlo
         for clave, linea in self.lineas.items():
-            if clave != 'tiempo' and self.checkboxes[clave].isChecked():
-                self.ax.plot(self.datos['tiempo'], self.datos[clave], label=clave)
+            if clave != 'tiempo':
+                if self.checkboxes[clave].isChecked():
+                    self.ax.plot(self.datos['tiempo'], self.datos[clave], label=clave)
 
         self.ax.legend()
         self.ax.set_xlabel('Tiempo')
         self.ax.set_ylabel('Valor')
         self.canvas.draw()
-
+        
     def closeEvent(self, event):
         event.ignore()  # Ignora el evento de cierre
         self.hide()  # Oculta la ventana en lugar de cerrarla
