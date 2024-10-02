@@ -1,4 +1,4 @@
-from back.topologia.topologia_serie import *
+from back.topologia.microbloque import MicroBloque
 from back.macros.macro_controlador import MacroControlador
 from back.macros.macro_actuador import MacroActuador
 from back.macros.macro_proceso import MacroProceso

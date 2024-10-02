@@ -1,24 +1,27 @@
 from __future__ import annotations
 from latex2sympy2 import latex2sympy
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
-from .interfaz_topologia import InterfazTopologia
+from .hoja import Hoja
 
-class Perturbacion(InterfazTopologia):
+class Perturbacion(Hoja):
 
-    def __init__(self,funcion_transferencia:str="1",ciclos=0,estado=False):
-        self.funcion_transferencia = funcion_transferencia
+    def __init__(self,funcion_transferencia:str="0",ciclos=0,dentro_de=0):
         self.ciclos = ciclos
-        self.estado = estado
+        self.dentro_de = dentro_de
         self.datos = {'tiempo': [], 'valor_original': [], 'perturbacion': [], 'resultado': []}
+        super().__init__(funcion_transferencia=funcion_transferencia,nombre="Perturbacion")
     
     
     def simular(self,entrada,tiempo):
-        
-        if not self.estado: return entrada
 
-        s,t = symbols('s t')
+        self.dentro_de -= 1
+        
+        if not self.get_estado(): return entrada
 
         self.ciclos -= 1
+
+
+        s,t = symbols('s t')
         
         if self.ciclos <= 0: self.estado = False
 
@@ -27,8 +30,6 @@ class Perturbacion(InterfazTopologia):
         perturbacion_tiempo = inverse_laplace_transform(perturbacion_laplace,s,t)
 
         perturbado = perturbacion_tiempo.subs(t,tiempo)
-
-
 
         nuevo_valor = perturbado + entrada
 
@@ -42,61 +43,29 @@ class Perturbacion(InterfazTopologia):
     def activa(self):
         return self.estado
 
-    def generar_perturbacion(self,ft,ciclos):
+    def generar_perturbacion(self,ft,ciclos,dentro_de=0):
         self.funcion_transferencia = ft
         self.ciclos = ciclos
-        self.estado = True
+        self.dentro_de = dentro_de
     
+    def reactivar_perturbacion(self,ciclos,dentro_de=0):
+        self.ciclos = ciclos
+        self.dentro_de = dentro_de
+    
+
+    def get_estado(self):
+        if (self.ciclos > 0) and (self.dentro_de < 0):
+            self.estado = True
+        else:
+            self.estado = False
+
     def cancelar_perturbacion(self):
-        self.estado = False
         self.ciclos = 0
-        self.funcion_transferencia = "0"
+        self.dentro_de = 0
     
     def radio(self) -> int:
         return 20
-
-    def borrar_elemento(self):
-        self.padre.borrar_elemento(self)
-        self.padre = None
-
-
-    def agregar_antes(self,microbloque:InterfazTopologia):
-        self.padre.agregar_antes_de(microbloque,self)
     
-    def agregar_despues(self,microbloque:InterfazTopologia):
-        self.padre.agregar_despues_de(microbloque,self)
-    
-    def obtener_micros(self):
-        return [self]
-    
-    def set_funcion_transferencia(self, funcion):
-        self.funcion_transferencia = funcion
-
-    def agregar_en_serie_fuera_de_paralela_antes(self,microbloque:InterfazTopologia):
-        self.padre.agregar_en_serie_fuera_de_paralela_antes(microbloque)
-        
-    def agregar_en_serie_fuera_de_paralela_despues(self,microbloque:InterfazTopologia):
-        self.padre.agregar_en_serie_fuera_de_paralela_despues(microbloque)
-    
-
-
-    def get_parent_structures(self):
-        parents = []
-        actual = self.padre
-        nivel = 0
-        while actual and "Macro" not in actual.__class__.__name__: # "Macro" not in actual.__class__.__name__ esta condicion es para que no se incluya el macrobloque en la lista de padres 
-            # seguir hasta llegar al macrobloque --> esto porque el padre de la serie principal es el macrobloque
-            parents.append([actual, nivel])
-            actual = actual.padre
-            nivel += 1
-        return parents
-    
-    
-    def validar_entrada(self):
-        return self.padre.validar_entrada(self,self.unidad_entrada())
-    
-    def validar_salida(self):
-        return self.padre.validar_salida(self,self.unidad_salida())
 
     def unidad_entrada(self):
         return self.padre.unidad_entrante(self)

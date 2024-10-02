@@ -5,10 +5,10 @@ from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from .add_button import AddButton
-from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
-from back.topologia.perturbacion import Perturbacion
+from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo,  ANCHO, ALTO
+from back.topologia.microbloque import MicroBloque
 from globals import ESTA_SIMULANDO
-from back.topologia.configuraciones import Configuracion, TipoError
+from back.topologia.configuraciones import  TipoError
 from .perturbacion_visual import PerturbacionVisual
 
 MARGEN_HORIZONTAL = 200

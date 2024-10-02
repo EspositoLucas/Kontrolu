@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
-from back.topologia.topologia_serie import MicroBloque
+from back.topologia.microbloque import MicroBloque
 from PyQt5 import QtWidgets, QtCore
 from .latex_editor import LatexEditor
 from PyQt5 import QtWidgets, QtGui, QtCore
