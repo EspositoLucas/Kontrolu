@@ -23,9 +23,7 @@ class CrearMicroBloque(QDialog):
         Función principal para crear un nuevo microbloque o seleccionar un preset.
         """
         
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Crear Microbloque o Seleccionar Preset")
-        dialog.setStyleSheet("background-color: #333; color: white;")
+
         layout = QVBoxLayout()
 
         # Crear el tab principal para "Nuevo Microbloque" y "Presets"
@@ -57,8 +55,8 @@ class CrearMicroBloque(QDialog):
         # Añadir el tab principal al layout
         layout.addWidget(main_tab)
 
-        dialog.setLayout(layout)
-        dialog.exec_()
+        self.setLayout(layout)
+        self.exec_()
 
 
 
@@ -218,6 +216,9 @@ class CrearMicroBloque(QDialog):
         self.parent.load_microbloques()  # recargo todos los microbloques
         self.parent.update()
         self.parent.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
+
+        print("Microbloque creado")
+        self.accept()
         
     def create_config_tab(self):
         """
