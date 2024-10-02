@@ -7,6 +7,7 @@ from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, Mi
 class CrearMicroBloque(QDialog):
     def __init__(self, parent, pos, relation, reference_structure,numero):
         super().__init__(parent)
+        self.new_microbloque = MicroBloque(nombre=f"Microbloque {numero}", color=QColor(255, 255, 255))
         self.numero = numero
         self.parent = parent
         self.pos = pos
@@ -21,7 +22,6 @@ class CrearMicroBloque(QDialog):
         """
         Función principal para crear un nuevo microbloque o seleccionar un preset.
         """
-        new_microbloque = MicroBloque(nombre=f"Microbloque {self.numero}", color=QColor(255, 255, 255))
         
         dialog = QDialog(self)
         dialog.setWindowTitle("Crear Microbloque o Seleccionar Preset")
@@ -44,56 +44,22 @@ class CrearMicroBloque(QDialog):
                 background-color: #555;
             }
         """)
+        self.tabs = main_tab
 
         # Crear la pestaña "Presets"
         presets_tab = self.create_presets_tab()
         main_tab.addTab(presets_tab, "Presets")
 
         # Crear la pestaña "Nuevo Microbloque"
-        new_microbloque_tab , name_input, color_button, latex_editor, entrada_name_input, salida_name_input,  entrada_unidad_input, salida_unidad_input= self.create_new_microbloque_tab(new_microbloque)
+        new_microbloque_tab = self.create_new_microbloque_tab()
         main_tab.addTab(new_microbloque_tab, "Nuevo Microbloque")
 
         # Añadir el tab principal al layout
         layout.addWidget(main_tab)
 
-
-
-        save_button = QPushButton("Guardar")
-        save_button.setStyleSheet("background-color: #444; color: white;")
-        save_button.clicked.connect(dialog.accept)
-        layout.addWidget(save_button)
-
         dialog.setLayout(layout)
+        dialog.exec_()
 
-        if dialog.exec_():
-            nombre = name_input.text()
-            color = color_button.property("selected_color")
-            funcion_transferencia = latex_editor.get_latex()
-            nombre_entrada = entrada_name_input.text()
-            nombre_salida = salida_name_input.text()
-            unidad_entrada = entrada_unidad_input.text()
-            unidad_salida = salida_unidad_input.text()
-            
-            new_microbloque.nombre = nombre
-            new_microbloque.color = color
-            new_microbloque.funcion_transferencia = funcion_transferencia
-            new_microbloque.configuracion_entrada.nombre = nombre_entrada
-            new_microbloque.configuracion_salida.nombre = nombre_salida
-            new_microbloque.configuracion_entrada.unidad = unidad_entrada
-            new_microbloque.configuracion_salida.unidad = unidad_salida   
-            
-            if isinstance(self.reference_structure, MicroBloque):
-                self.parent.agregar_respecto_microbloque(new_microbloque, self.relation, self.reference_structure)
-            elif isinstance(self.reference_structure, TopologiaSerie):
-                self.parent.agregar_respecto_serie(new_microbloque, self.relation, self.reference_structure)
-            elif isinstance(self.reference_structure, TopologiaParalelo):
-                self.parent.agregar_respecto_paralelo(new_microbloque, self.relation, self.reference_structure)
-            else:
-                self.parent.macrobloque.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
-
-            self.parent.load_microbloques()  # recargo todos los microbloques
-            self.parent.update()
-            self.parent.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
 
 
     def create_presets_tab(self):
@@ -148,7 +114,7 @@ class CrearMicroBloque(QDialog):
         """
         Cambia a la pestaña 'Nuevo Microbloque' en el QTabWidget.
         """
-        self.tabs.setCurrentIndex(0)
+        self.tabs.setCurrentIndex(1)
 
 
     def populate_presets_tree(self, tree_widget, presets):
@@ -181,8 +147,8 @@ class CrearMicroBloque(QDialog):
         """
         print(f"Preset seleccionado: {preset_name}")
 
-    def create_new_microbloque_tab(self,new_microbloque=None):
-        new_microbloque = MicroBloque(nombre=f"Microbloque {self.numero}", color=QColor(255, 255, 255))
+    def create_new_microbloque_tab(self):
+
         """
         Crea la pestaña para la creación de un nuevo microbloque.
         """
@@ -190,32 +156,70 @@ class CrearMicroBloque(QDialog):
         new_microbloque_layout = QVBoxLayout(new_microbloque_tab)
 
         # Nombre del microbloque
-        name_input = QLineEdit(new_microbloque.nombre)
+        name_input = QLineEdit(self.new_microbloque.nombre)
         name_input.setPlaceholderText("Nombre del microbloque")
         name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         new_microbloque_layout.addWidget(name_input)
+        self.name_input = name_input
 
         # Botón para seleccionar color
         color_button = QPushButton("Seleccionar Color")
         color_button.setStyleSheet("background-color: #444; color: white;")
         color_button.clicked.connect(lambda: self.select_color(color_button))
         new_microbloque_layout.addWidget(color_button)
+        self.color_button = color_button
 
         # Función de transferencia
         transfer_label = QLabel("Función de Transferencia:")
         transfer_label.setStyleSheet("color: white;")
-        latex_editor = LatexEditor(new_microbloque.funcion_transferencia)
+        latex_editor = LatexEditor(self.new_microbloque.funcion_transferencia)
         latex_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         new_microbloque_layout.addWidget(transfer_label)
         new_microbloque_layout.addWidget(latex_editor)
+        self.latex_editor = latex_editor
 
         # Pestaña de configuraciones
-        config_tab ,entrada_name_input, salida_name_input,  entrada_unidad_input, salida_unidad_input= self.create_config_tab(new_microbloque)
+        config_tab = self.create_config_tab()
         new_microbloque_layout.addWidget(config_tab)
+
+        create_button = QPushButton("Crear Microbloque")
+        create_button.setStyleSheet("background-color: #444; color: white;")
+        create_button.clicked.connect(self.crear_microbloque_nuevo)  # Conectar el botón a la función que cambia la pestaña
+        new_microbloque_layout.addWidget(create_button)
         
-        return new_microbloque_tab , name_input, color_button, latex_editor, entrada_name_input, salida_name_input,  entrada_unidad_input, salida_unidad_input
+        return new_microbloque_tab
     
-    def create_config_tab(self, new_microbloque):
+    def crear_microbloque_nuevo(self):
+        nombre = self.name_input.text()
+        color = self.color_button.property("selected_color")
+        funcion_transferencia = self.latex_editor.get_latex()
+        nombre_entrada = self.entrada_name_input.text()
+        nombre_salida = self.salida_name_input.text()
+        unidad_entrada = self.entrada_unidad_input.text()
+        unidad_salida = self.salida_unidad_input.text()
+        
+        self.new_microbloque.nombre = nombre
+        self.new_microbloque.color = color
+        self.new_microbloque.funcion_transferencia = funcion_transferencia
+        self.new_microbloque.configuracion_entrada.nombre = nombre_entrada
+        self.new_microbloque.configuracion_salida.nombre = nombre_salida
+        self.new_microbloque.configuracion_entrada.unidad = unidad_entrada
+        self.new_microbloque.configuracion_salida.unidad = unidad_salida   
+        
+        if isinstance(self.reference_structure, MicroBloque):
+            self.parent.agregar_respecto_microbloque(self.new_microbloque, self.relation, self.reference_structure)
+        elif isinstance(self.reference_structure, TopologiaSerie):
+            self.parent.agregar_respecto_serie(self.new_microbloque, self.relation, self.reference_structure)
+        elif isinstance(self.reference_structure, TopologiaParalelo):
+            self.parent.agregar_respecto_paralelo(self.new_microbloque, self.relation, self.reference_structure)
+        else:
+            self.parent.macrobloque.modelo.topologia.agregar_elemento(self.new_microbloque) # sería el primer microbloque
+
+        self.parent.load_microbloques()  # recargo todos los microbloques
+        self.parent.update()
+        self.parent.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
+        
+    def create_config_tab(self):
         """
         Crea la pestaña interna de configuraciones para entrada y salida.
         """
@@ -240,40 +244,45 @@ class CrearMicroBloque(QDialog):
         config_layout = QGridLayout(config_content)
 
         # Configuración de entrada
-        entrada_name_input = QLineEdit(new_microbloque.configuracion_entrada.nombre)
+        entrada_name_input = QLineEdit(self.new_microbloque.configuracion_entrada.nombre)
         entrada_name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         config_layout.addWidget(QLabel("Nombre de la configuración de entrada:"), 0, 0)
         config_layout.addWidget(entrada_name_input, 0, 1)
+        self.entrada_name_input = entrada_name_input
 
-        entrada_unidad_input = QLineEdit(new_microbloque.configuracion_entrada.unidad)
+        entrada_unidad_input = QLineEdit(self.new_microbloque.configuracion_entrada.unidad)
         entrada_unidad_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         config_layout.addWidget(QLabel("Unidad de entrada:"), 0, 2)
         config_layout.addWidget(entrada_unidad_input, 0, 3)
+        self.entrada_unidad_input = entrada_unidad_input
 
         input_button = QPushButton("Configurar Entrada")
         input_button.setStyleSheet("background-color: #444; color: white;")
-        input_button.clicked.connect(lambda: self.edit_configuration(new_microbloque.configuracion_entrada, "entrada"))
+        input_button.clicked.connect(lambda: self.edit_configuration(self.new_microbloque.configuracion_entrada, "entrada"))
         config_layout.addWidget(input_button, 0, 4)
+        self.input_button = input_button
 
         # Configuración de salida
-        salida_name_input = QLineEdit(new_microbloque.configuracion_salida.nombre)
+        salida_name_input = QLineEdit(self.new_microbloque.configuracion_salida.nombre)
         salida_name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         config_layout.addWidget(QLabel("Nombre de la configuración de salida:"), 1, 0)
         config_layout.addWidget(salida_name_input, 1, 1)
+        self.salida_name_input = salida_name_input
 
-        salida_unidad_input = QLineEdit(new_microbloque.configuracion_salida.unidad)
+        salida_unidad_input = QLineEdit(self.new_microbloque.configuracion_salida.unidad)
         salida_unidad_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         config_layout.addWidget(QLabel("Unidad de salida:"), 1, 2)
         config_layout.addWidget(salida_unidad_input, 1, 3)
+        self.salida_unidad_input = salida_unidad_input
 
         output_button = QPushButton("Configurar Salida")
         output_button.setStyleSheet("background-color: #444; color: white;")
-        output_button.clicked.connect(lambda: self.edit_configuration(new_microbloque.configuracion_salida, "salida"))
+        output_button.clicked.connect(lambda: self.edit_configuration(self.new_microbloque.configuracion_salida, "salida"))
         config_layout.addWidget(output_button, 1, 4)
 
         config_tab.addTab(config_content, "Configuraciones")
 
-        return config_tab, entrada_name_input, salida_name_input,  entrada_unidad_input, salida_unidad_input
+        return config_tab
 
 
 
