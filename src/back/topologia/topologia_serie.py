@@ -88,6 +88,7 @@ class TopologiaSerie(InterfazTopologia):
         perturbacion.cambiar_padre(self)
         self.hijos.insert(indice + 1, perturbacion)
 
+
     def alto(self) -> int:
         return max(map(lambda x: x.alto(),self.hijos))
     

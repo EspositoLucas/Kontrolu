@@ -10,6 +10,11 @@ class Hoja(InterfazTopologia):
         self.funcion_transferencia = funcion_transferencia
         self.padre = padre
 
+    def agregar_perturbacion_antes(self, actual: Hoja, perturbacion):
+        self.padre.agregar_perturbacion_antes(actual, perturbacion)
+
+    def agregar_perturbacion_despues(self, actual: Hoja, perturbacion):
+        self.padre.agregar_perturbacion_despues(actual, perturbacion)
 
     def borrar_elemento(self):
         self.padre.borrar_elemento(self)

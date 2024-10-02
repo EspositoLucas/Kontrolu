@@ -64,7 +64,13 @@ class Perturbacion(Hoja):
         self.dentro_de = 0
     
     def radio(self) -> int:
-        return 20
+        return 10
+    
+    def alto(self) -> int:
+        return 2 * self.radio()
+    
+    def ancho(self) -> int:
+        return 2 * self.radio()
     
 
     def unidad_entrada(self):
