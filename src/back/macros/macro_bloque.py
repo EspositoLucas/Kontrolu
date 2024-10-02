@@ -2,9 +2,11 @@ from back.topologia.topologia_serie import TopologiaSerie
 from back.topologia.topologia_serie import TopologiaParalelo
 
 from back.topologia.interfaz_topologia import InterfazTopologia
+from .tipos_macro import MACROS
 
 class MacroBloque(InterfazTopologia):
-    def __init__(self,nombre="",sesion=None):
+    def __init__(self,nombre="",sesion=None, tipo:MACROS=None) -> None:
+        self.tipo = tipo
         self.sesion = sesion
         self.topologia = TopologiaSerie(padre=self)
         self.nombre = "MacroBloque"

@@ -1,14 +1,11 @@
 import json
-from .dtos import MicroBloqueDto, TipoMicroBloqueDto, DominioDto
-from enum import Enum
+from back.macros.macro_bloque import MACROS
+from back.json_manager.dtos import DominioDto, MicroBloqueDto, TipoMicroBloqueDto
+
 
 file = "datos.json"
 
-class MACROS(Enum):
-    CONTROLADOR = "controlador"
-    ACTUADOR = "actuador"
-    PROCESO = "proceso"
-    MEDIDOR = "medidor"
+
 
 def crear_json_para_dominios(dominios: list[str] = ["SISTEMAS","ELECTRONICA"]) -> None:
     """
@@ -98,7 +95,7 @@ def crear_tipo(tipo: str, dominio: str, macro: MACROS, descripcion: str = "") ->
 
     json_data[str(macro)][dominio][tipo] = {
         "descripcion": descripcion,
-        "micro_bloques": []
+        "micro_bloques": {}
     }
 
     with open(file, "w") as json_file:
@@ -116,6 +113,25 @@ def agregar_microbloque(microbloque: MicroBloqueDto, tipo: str, dominio: str, ma
 
     with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
+
+def obtener_microbloques_de_una_macro(macro: MACROS) -> list[DominioDto]:
+    """
+    Obtiene los dominios de una macro en el archivo json
+    """
+    with open(file, "r") as json_file:
+        json_data = json.load(json_file)
+        json_file.close()
+
+    dominios = []
+    for dominio in json_data[str(macro)].keys():
+        tipos = []
+        for tipo in json_data[str(macro)][dominio].keys():
+            microbloques = []
+            for microbloque in json_data[str(macro)][dominio][tipo]["micro_bloques"].values():
+                microbloques.append(MicroBloqueDto(**microbloque))
+            tipos.append(TipoMicroBloqueDto(nombre_tipo=tipo,descripcion_tipo= json_data[str(macro)][dominio][tipo]["descripcion"],micro_bloques=microbloques))
+        dominios.append(DominioDto(nombre=dominio, tipos=tipos))
+    return dominios
 
 def obtener_microbloques_de_un_dominio(dominio: str, macro: MACROS) -> list[TipoMicroBloqueDto]:
     """
@@ -174,9 +190,51 @@ def borrar_micro_bloque(tipo: str, dominio: str, macro: MACROS, microbloque: Mic
 
     with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
+"""
 
+#Populame el json
+crear_json_para_dominios()
+#creame tipos en distintos dominios en distintas macros
+crear_tipo("tipo1", "SISTEMAS", MACROS.CONTROLADOR, "descripcion")
+crear_tipo("tipo2", "SISTEMAS", MACROS.CONTROLADOR, "descripcion")
+crear_tipo("tipo3", "SISTEMAS", MACROS.CONTROLADOR, "descripcion")
 
+crear_tipo("tipo1", "SISTEMAS", MACROS.ACTUADOR, "descripcion")
+crear_tipo("tipo2", "SISTEMAS", MACROS.ACTUADOR, "descripcion")
+
+crear_tipo("tipo1", "SISTEMAS", MACROS.PROCESO, "descripcion")
+crear_tipo("tipo2", "SISTEMAS", MACROS.PROCESO, "descripcion")
+
+crear_tipo("tipo1", "SISTEMAS", MACROS.MEDIDOR, "descripcion")
+crear_tipo("tipo2", "SISTEMAS", MACROS.MEDIDOR, "descripcion")
+#agregame microbloques a los tipos
+agregar_microbloque(MicroBloqueDto("one", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo2", "SISTEMAS", MACROS.CONTROLADOR)
+agregar_microbloque(MicroBloqueDto("two", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo1", "SISTEMAS", MACROS.CONTROLADOR)
+#mas microbloques
+agregar_microbloque(MicroBloqueDto("three", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo2", "SISTEMAS", MACROS.MEDIDOR)
+agregar_microbloque(MicroBloqueDto("four", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo1", "SISTEMAS", MACROS.ACTUADOR)
+#mas microbloques
+agregar_microbloque(MicroBloqueDto("five", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo2", "SISTEMAS", MACROS.PROCESO)
+agregar_microbloque(MicroBloqueDto("six", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo1", "SISTEMAS", MACROS.PROCESO)
+# haceme todo esto para el dominio de electronica
+crear_tipo("tipo1", "ELECTRONICA", MACROS.CONTROLADOR, "descripcion")
+crear_tipo("tipo2", "ELECTRONICA", MACROS.CONTROLADOR, "descripcion")
+crear_tipo("tipo3", "ELECTRONICA", MACROS.CONTROLADOR, "descripcion")
+
+crear_tipo("tipo1", "ELECTRONICA", MACROS.ACTUADOR, "descripcion")
+crear_tipo("tipo2", "ELECTRONICA", MACROS.ACTUADOR, "descripcion")
+
+crear_tipo("tipo1", "ELECTRONICA", MACROS.PROCESO, "descripcion")
+crear_tipo("tipo2", "ELECTRONICA", MACROS.PROCESO, "descripcion")
+
+crear_tipo("tipo1", "ELECTRONICA", MACROS.MEDIDOR, "descripcion")
+crear_tipo("tipo2", "ELECTRONICA", MACROS.MEDIDOR, "descripcion")
+#agregame microbloques a los tipos
+agregar_microbloque(MicroBloqueDto("one", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo2", "ELECTRONICA", MACROS.CONTROLADOR)
+agregar_microbloque(MicroBloqueDto("two", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo1", "ELECTRONICA", MACROS.CONTROLADOR)
+#mas microbloques
+agregar_microbloque(MicroBloqueDto("three", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo2", "ELECTRONICA", MACROS.MEDIDOR)
 #agregar_microbloque(MicroBloqueDto("one", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo2", "SISTEMAS", MACROS.CONTROLADOR)
 #agregar_microbloque(MicroBloqueDto("two", "descripcion", "fdt", 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, 1.0, 2.0, 3.0, 4.0, 5.0, "tipo", 6.0, 7.0, "unidad", "unidad"), "tipo1", "SISTEMAS", MACROS.CONTROLADOR)
 #print(obtener_micorbloques_de_un_tipo("tipo2", "SISTEMAS", MACROS.CONTROLADOR))
-#crear_tipo("tipo2", "SISTEMAS", MACROS.CONTROLADOR, "descripcion")
+#crear_tipo("tipo2", "SISTEMAS", MACROS.CONTROLADOR, "descripcion")"""

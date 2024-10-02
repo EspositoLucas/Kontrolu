@@ -3,7 +3,7 @@ from PyQt5.QtGui import QColor
 from .latex_editor import LatexEditor
 from back.topologia.configuraciones import Configuracion, TipoError
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque
-
+from back.json_manager.json_manager import obtener_microbloques_de_una_macro
 class CrearMicroBloque(QDialog):
     def __init__(self, parent, pos, relation, reference_structure,numero):
         super().__init__(parent)
@@ -77,26 +77,9 @@ class CrearMicroBloque(QDialog):
         presets_tree.setHeaderLabels(["Preset", "Seleccionar"])
         presets_tree.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
 
-        # Ejemplo de diccionario de presets
-        presets = {
-            "Preset 1": {
-                "Subnivel 1": {
-                    "Opción 1.1": "Info 1.1",
-                    "Opción 1.2": "Info 1.2"
-                },
-                "Subnivel 2": {
-                    "Opción 2.1": "Info 2.1"
-                }
-            },
-            "Preset 2": {
-                "Subnivel 1": {
-                    "Opción 1.1": "Info 1.1"
-                }
-            }
-        }
 
         # Añadir elementos del diccionario al QTreeWidget
-        self.populate_presets_tree(presets_tree, presets)
+        self.populate_presets_tree(presets_tree)
 
         presets_layout.addWidget(presets_tree)
         
@@ -115,27 +98,29 @@ class CrearMicroBloque(QDialog):
         self.tabs.setCurrentIndex(1)
 
 
-    def populate_presets_tree(self, tree_widget, presets):
+    def populate_presets_tree(self, tree_widget):
         """
         Función para agregar los elementos del diccionario de presets a un QTreeWidget.
         """
-        for key, sub_presets in presets.items():
-            parent_item = QTreeWidgetItem([key])
+        presets = obtener_microbloques_de_una_macro(self.parent.modelo.tipo)
+
+        for dominio in presets:
+            parent_item = QTreeWidgetItem([dominio.nombre])
             tree_widget.addTopLevelItem(parent_item)
             parent_item.setExpanded(True)
             
-            for subkey, options in sub_presets.items():
-                sub_item = QTreeWidgetItem([subkey])
+            for tipo in dominio.tipos:
+                sub_item = QTreeWidgetItem([tipo.nombre_tipo])
                 parent_item.addChild(sub_item)
                 sub_item.setExpanded(True)
                 
-                for option_key, option_value in options.items():
-                    option_item = QTreeWidgetItem([option_key])
+                for microbloque in tipo.micro_bloques:
+                    option_item = QTreeWidgetItem([microbloque.nombre])
                     sub_item.addChild(option_item)
                     
                     # Botón "Seleccionar" al final de cada opción
                     select_button = QPushButton("+")
-                    select_button.clicked.connect(lambda _, k=option_key: self.select_preset(k))
+                    select_button.clicked.connect(lambda _, k=microbloque: self.select_preset(k))
                     tree_widget.setItemWidget(option_item, 1, select_button)
 
 

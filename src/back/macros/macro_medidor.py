@@ -1,8 +1,9 @@
 from .macro_bloque import MacroBloque
+from .tipos_macro import MACROS
 
 class MacroMedidor(MacroBloque):
     def __init__(self,sesion=None) -> None:
-        super().__init__(nombre="Medidor",sesion=sesion)
+        super().__init__(nombre="Medidor",sesion=sesion, tipo=MACROS.MEDIDOR)
 
     def validar_entrada(self, unidad: str)-> bool:
         return self.sesion.validar_entrada_medidor(unidad)

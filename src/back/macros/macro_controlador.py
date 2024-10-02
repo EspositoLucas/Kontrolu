@@ -1,8 +1,10 @@
 from .macro_bloque import MacroBloque
+from .tipos_macro import MACROS
+
 
 class MacroControlador(MacroBloque):
     def __init__(self,sesion=None) -> None:
-        super().__init__(nombre="Controlador",sesion=sesion)
+        super().__init__(nombre="Controlador",sesion=sesion, tipo=MACROS.CONTROLADOR)
 
     def validar_entrada(self, unidad: str)-> bool:
         return self.sesion.validar_entrada_controlador(unidad)
