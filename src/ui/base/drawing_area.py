@@ -15,7 +15,6 @@ from .crear_microbloque import CrearMicroBloque
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
-MARGEN_PERTURBACION = 200
 BUTTON_SIZE = 20
 RADIO = 40
 MARGEN_PARALELO = 20
@@ -208,7 +207,7 @@ class DrawingArea(QGraphicsView):
     
     def dibujar_perturbacion(self, perturbacion, pos):
         pos = QPointF(pos.x(), pos.y() + ALTO/2 - RADIO_PERTURBACION)
-        perturbacion_visual = PerturbacionVisual(perturbacion)
+        perturbacion_visual = PerturbacionVisual(perturbacion, self)
         perturbacion_visual.setPos(pos)
         self.perturbaciones.append(perturbacion_visual)
         self.scene.addItem(perturbacion_visual)
@@ -914,10 +913,16 @@ class DrawingArea(QGraphicsView):
         ciclos_editor = QSpinBox()
         ciclos_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         ciclos_editor.setMinimum(1)
-
         layout.addWidget(ciclos)
         layout.addWidget(ciclos_editor)
 
+        dentro_de_label = QLabel("Activar dentro de (ciclos):")
+        dentro_de_editor = QSpinBox()
+        dentro_de_editor.setMinimum(0)
+        dentro_de_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        layout.addWidget(dentro_de_label)
+        layout.addWidget(dentro_de_editor)
+        
         buttons = QHBoxLayout()
         ok_button = QPushButton("Aceptar")
         cancel_button = QPushButton("Cancelar")
@@ -933,7 +938,8 @@ class DrawingArea(QGraphicsView):
         if dialog.exec_() == QDialog.Accepted:
             funcion_transferencia = ft_editor.get_latex()
             ciclos = ciclos_editor.value()
-            perturbacion_nueva = Perturbacion(funcion_transferencia=funcion_transferencia, ciclos=ciclos)
+            dentro_de = dentro_de_editor.value()
+            perturbacion_nueva = Perturbacion(funcion_transferencia=funcion_transferencia, ciclos=ciclos, dentro_de=dentro_de)
             if posicion == 'antes':
                 microbloque.elemento_back.agregar_perturbacion_antes(microbloque.elemento_back, perturbacion_nueva)
             else:
