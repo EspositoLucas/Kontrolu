@@ -20,6 +20,9 @@ class MacroVista(QPushButton):
             font-size: 15px;            /* Tamaño de fuente */
             font-family: Arial;  
         """)
+
+    def update_nombre(self):
+        self.setText(self.modelo.nombre)
     
     def click(self):
         self.ventana = QMainWindow()

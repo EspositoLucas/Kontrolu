@@ -16,6 +16,7 @@ class Sesion():
         self.medidor = MacroMedidor(sesion=self)
         self.punto_suma = MacroPuntoSuma()
         self.carga = Carga()
+        self.nombre = "Sistema de Control"
     
     def validar_entrada_controlador(self, unidad: str)-> bool:
         return self.medidor.unidad_salida() == unidad

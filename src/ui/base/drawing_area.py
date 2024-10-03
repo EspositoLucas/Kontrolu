@@ -1,6 +1,7 @@
 import os
-from PyQt5.QtWidgets import QTreeWidgetItem,QTreeWidget, QWidget ,QColorDialog, QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QComboBox, QMessageBox, QHBoxLayout, QInputDialog, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem, QSpinBox, QTabWidget, QGridLayout
+from PyQt5.QtWidgets import QTreeWidgetItem,QTreeWidget, QWidget ,QColorDialog , QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QComboBox, QMessageBox, QHBoxLayout, QInputDialog, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem, QSpinBox, QTabWidget, QGridLayout
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
+from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
@@ -29,6 +30,9 @@ class DrawingArea(QGraphicsView):
         self.initial_rect = QRectF(0, 0, 1000, 1000)
         self.scene.setSceneRect(self.initial_rect)
 
+
+
+
         self.microbloques = []
         self.perturbaciones = []
         self.grid_lines = []
@@ -56,6 +60,7 @@ class DrawingArea(QGraphicsView):
         self.setFocusPolicy(Qt.StrongFocus) # sirve para permitir que el teclado de la compu interactue con la ventana
         self.setContextMenuPolicy(Qt.CustomContextMenu) # sirve para poder mostrar un menu contextual (por ejemplo, cuando hago click derecho)
         self.customContextMenuRequested.connect(self.mostrar_menu_contextual) # permite agregar nuestro propio menu contextual
+
 
     def update_scene_rect(self, item_rect):
         current_rect = self.scene.sceneRect() # obtiene el rectangulo actual de la escena
@@ -91,7 +96,37 @@ class DrawingArea(QGraphicsView):
         self.update_scene_rect(self.scene.itemsBoundingRect()) # actualiza el rectangulo de la escena en funcion de lo dibujado
         #self.actualizar_colores_unidades()
         self.update()
+        self.draw_title()
+
+        
+    def draw_title(self):
+        self.title_item = QGraphicsTextItem(self.modelo.nombre)
+
+        
+
+        self.title_item.setTextInteractionFlags(Qt.TextEditable)
+        font = QtGui.QFont("Arial", 60)
+        self.title_item.setFont(font)
+        text_rect = self.title_item.boundingRect()
+
+        self.title_item.setPos((self.scene.width()-text_rect.width())/2,5)
+        self.title_item.focusOutEvent = self.update_model_title
+
+        self.scene.addItem(self.title_item)
     
+    def update_model_title(self, event):
+
+        new_title = self.title_item.toPlainText()  # Obtener el texto actualizado del título
+        self.modelo.nombre = new_title  # Actualizar el nombre en self.modelo
+        # Reposicionar el título después de editar si cambió el ancho
+        text_rect = self.title_item.boundingRect()
+
+        title_x = (self.scene.width()-text_rect.width())/2  # Recalcular la posición central
+        self.title_item.setPos(title_x, 5)  # Mantener la posición vertical
+
+        self.macrobloque.update_nombre()
+        
+
     def actualizar_colores_unidades(self):
         for microbloque in self.microbloques:
             microbloque.actualizar_color_unidades()
@@ -207,6 +242,8 @@ class DrawingArea(QGraphicsView):
     
     def dibujar_perturbacion(self, perturbacion, pos):
         pos = QPointF(pos.x(), pos.y() + ALTO/2 - RADIO_PERTURBACION)
+
+
         perturbacion_visual = PerturbacionVisual(perturbacion, self)
         perturbacion_visual.setPos(pos)
         self.perturbaciones.append(perturbacion_visual)
@@ -895,6 +932,8 @@ class DrawingArea(QGraphicsView):
         self.selected_microbloque = None
         self.selected_microbloques.clear()
         self.hide_add_buttons()
+
+  
         self.update()
     
     def agregar_perturbacion(self, microbloque, posicion):

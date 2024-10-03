@@ -1,3 +1,4 @@
+
 from back.topologia.microbloque import MicroBloque
 from back.macros.macro_controlador import MacroControlador
 from back.macros.macro_actuador import MacroActuador
@@ -12,7 +13,6 @@ from PyQt5.QtWidgets import QApplication
 
 class Simulacion(QObject):
     
-    simulacion_terminada = pyqtSignal()
     def __init__(self, controlador :MacroControlador= None, actuador:MacroActuador = None, proceso:MacroProceso =None, medidor:MacroMedidor =None, delta =1, ciclos=10, entrada:MicroBloque=None,salida_cero=10,carga:MicroBloque= None,graficadora =None):
         
         self.controlador : MacroControlador = controlador
@@ -127,7 +127,6 @@ class Simulacion(QObject):
             if not self.continuar_simulacion:
                 break
             y_salida = self.simular_paso(y_salida, i)
-            QApplication.processEvents()  # Procesa eventos de la interfaz gráfica
             sleep(velocidad / 1000)  # Convierte la velocidad a segundos
             
         if self.continuar_simulacion and self.graficadora and not self.cerrando:
