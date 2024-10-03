@@ -9,6 +9,8 @@ from .base.elemento_carga import ElementoCarga
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
 from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtWidgets import QGraphicsTextItem
+from PyQt5.QtCore import Qt
 
 class MacroDiagrama(QtWidgets.QWidget):
         
@@ -19,33 +21,34 @@ class MacroDiagrama(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.view)
         self.setLayout(layout)
+        self.sesion = mainWindow.sesion
         
         # ENTRADA
-        entrada = ElementoEntrada(mainWindow.sesion.entrada)
+        entrada = ElementoEntrada(self.sesion.entrada)
         self.scene.addWidget(entrada)
         
         #CARGA
-        carga = ElementoCarga(mainWindow.sesion.carga)
+        carga = ElementoCarga(self.sesion.carga)
         self.scene.addWidget(carga)
         
         # CONTROLADOR
-        controlador = ElementoControl(mainWindow.sesion.controlador)
+        controlador = ElementoControl(self.sesion.controlador)
         self.scene.addWidget(controlador)
 
         # ACTUADOR
-        actuador = ElementoActuador(mainWindow.sesion.actuador)
+        actuador = ElementoActuador(self.sesion.actuador)
         self.scene.addWidget(actuador)
 
         # PROCESO
-        proceso = ElementoProceso(mainWindow.sesion.proceso)
+        proceso = ElementoProceso(self.sesion.proceso)
         self.scene.addWidget(proceso)
 
         # MEDIDOR
-        medidor = ElementoMedicion(mainWindow.sesion.medidor)
+        medidor = ElementoMedicion(self.sesion.medidor)
         self.scene.addWidget(medidor)
 
         # PUNTO SUMA
-        puntoSuma = PuntoSuma(mainWindow.sesion.punto_suma)
+        puntoSuma = PuntoSuma(self.sesion.punto_suma)
         self.scene.addWidget(puntoSuma)
 
         # LINEAS: 
@@ -76,9 +79,36 @@ class MacroDiagrama(QtWidgets.QWidget):
         self.line_8 = Flecha(QtCore.QPointF(120, 230), QtCore.QPointF(141, 230), 2, 2, 4) # entrada a punto suma
         self.scene.addItem(self.line_8)
 
+        self.draw_title()
+
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
+    def draw_title(self):
+
+        self.title_item = QGraphicsTextItem(self.sesion.nombre)
+
+        self.title_item.setTextInteractionFlags(Qt.TextEditable)
+        font = QtGui.QFont("Arial", 20)
+        self.title_item.setFont(font)
+        text_rect = self.title_item.boundingRect()
+
+        self.title_item.setPos(430.5 - (text_rect.width()/2),1)
+
+        self.title_item.focusOutEvent = self.update_model_title
+
+        self.scene.addItem(self.title_item)
     
+    def update_model_title(self, event):
+
+        new_title = self.title_item.toPlainText()  # Obtener el texto actualizado del título
+        self.sesion.nombre = new_title  # Actualizar el nombre en self.modelo
+        # Reposicionar el título después de editar si cambió el ancho
+        text_rect = self.title_item.boundingRect()
+        title_x = 430.5 - (text_rect.width()/2) # Recalcular la posición central
+        self.title_item.setPos(title_x, 1)  # Mantener la posición vertical
+        
+
+
     def mostrarElementos(self):
         for item in self.scene.items():
             if isinstance(item, QtWidgets.QWidget):
