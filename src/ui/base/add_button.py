@@ -3,9 +3,10 @@ from PyQt5.QtGui import QBrush, QFont, QPen, QColor
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsTextItem
 
 class AddButton(QGraphicsRectItem):
-    def __init__(self, x, y, width, height, direction, parent=None):
+    def __init__(self, x, y, width, height, direction, microbloque, parent=None):
         super().__init__(x, y, width, height, parent)
         self.direction = direction
+        self.microbloque = microbloque
         self.setBrush(QBrush(Qt.white))
         self.setPen(QPen(Qt.black, 2))
         self.setZValue(2)
@@ -28,4 +29,4 @@ class AddButton(QGraphicsRectItem):
 
     def mousePressEvent(self, event):
         drawing_area = self.scene().views()[0]
-        drawing_area.show_add_menu(self.direction, event.scenePos())
+        drawing_area.show_add_menu(self.direction, event.scenePos(), self.microbloque)
