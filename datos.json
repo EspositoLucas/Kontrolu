@@ -58,6 +58,29 @@
                         "salida_propabilidad": 7.0,
                         "unidad_entrada": "unidad",
                         "unidad_salida": "unidad"
+                    },
+                    "two": {
+                        "nombre": "two",
+                        "descripcion": "descripcion",
+                        "fdt": "fdt",
+                        "entrada_limite_inferior": 1.0,
+                        "entrada_limite_superior": 2.0,
+                        "entrada_limite_por_ciclo": 3.0,
+                        "entrada_error_maximo": 4.0,
+                        "entrada_proporcion": 5.0,
+                        "entrada_tipo": "tipo",
+                        "entrada_ultimo_valor": 6.0,
+                        "entrada_propabilidad": 7.0,
+                        "salida_limite_inferior": 1.0,
+                        "salida_limite_superior": 2.0,
+                        "salida_limite_por_ciclo": 3.0,
+                        "salida_error_maximo": 4.0,
+                        "salida_proporcion": 5.0,
+                        "salida_tipo": "tipo",
+                        "salida_ultimo_valor": 6.0,
+                        "salida_propabilidad": 7.0,
+                        "unidad_entrada": "unidad",
+                        "unidad_salida": "unidad"
                     }
                 }
             },

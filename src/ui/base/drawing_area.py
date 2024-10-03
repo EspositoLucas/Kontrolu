@@ -501,7 +501,24 @@ class DrawingArea(QGraphicsView):
         """
         Función principal para crear un nuevo microbloque o seleccionar un preset.
         """
-        CrearMicroBloque(self, pos, relation, reference_structure,len(self.microbloques)+1)
+        nuevo_microbloque = MicroBloque(nombre="Microbloque " + str(len(self.microbloques)+1))
+        micro = CrearMicroBloque(nuevo_microbloque, self.modelo.tipo, self)
+        result = micro.exec_()
+
+        if result == QDialog.Accepted:
+            new_microbloque = micro.new_microbloque
+            if isinstance(reference_structure, MicroBloque):
+                self.agregar_respecto_microbloque(new_microbloque, relation, reference_structure)
+            elif isinstance(reference_structure, TopologiaSerie):
+                self.agregar_respecto_serie(new_microbloque, relation, reference_structure)
+            elif isinstance(reference_structure, TopologiaParalelo):
+                self.agregar_respecto_paralelo(new_microbloque, relation, reference_structure)
+            else:
+                self.macrobloque.modelo.topologia.agregar_elemento(new_microbloque) # sería el primer microbloque
+
+            self.load_microbloques()  # recargo todos los microbloques
+            self.update()
+            self.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
 
 
     

@@ -1,25 +1,26 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QWidget, QTreeWidget, QTreeWidgetItem, QComboBox, QMessageBox, QHBoxLayout
 from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QSpacerItem, QSizePolicy, QHeaderView
 from .latex_editor import LatexEditor
 from back.topologia.configuraciones import Configuracion, TipoError
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo
 from back.topologia.microbloque import MicroBloque
 from back.json_manager.json_manager import obtener_microbloques_de_una_macro
+
+
+
 class CrearMicroBloque(QDialog):
-    def __init__(self, parent, pos, relation, reference_structure,numero):
+    def __init__(self, micro_bloque, tipo, parent=None,tab=0):
         super().__init__(parent)
-        self.new_microbloque = MicroBloque(nombre=f"Microbloque {numero}", color=QColor(255, 255, 255))
-        self.numero = numero
+        self.tipo = tipo
+        self.new_microbloque = micro_bloque
         self.parent = parent
-        self.pos = pos
-        self.relation = relation
-        self.reference_structure = reference_structure
         self.setWindowTitle("Nuevo Micro Bloque")
         self.setStyleSheet("background-color: #333; color: white;")
-        self.create_new_microbloque()
+        self.create_new_microbloque(tab)
 
 
-    def create_new_microbloque(self):
+    def create_new_microbloque(self,tab):
         """
         Función principal para crear un nuevo microbloque o seleccionar un preset.
         """
@@ -52,12 +53,13 @@ class CrearMicroBloque(QDialog):
         # Crear la pestaña "Nuevo Microbloque"
         new_microbloque_tab = self.create_new_microbloque_tab()
         main_tab.addTab(new_microbloque_tab, "Nuevo Microbloque")
+        self.tabs.setCurrentIndex(tab)
 
         # Añadir el tab principal al layout
         layout.addWidget(main_tab)
 
         self.setLayout(layout)
-        self.exec_()
+
 
 
 
@@ -85,7 +87,7 @@ class CrearMicroBloque(QDialog):
         presets_layout.addWidget(presets_tree)
         
         # Botón "Crear Microbloque"
-        create_button = QPushButton("Crear Microbloque")
+        create_button = QPushButton("Crear Microbloque Desde 0")
         create_button.setStyleSheet("background-color: #444; color: white;")
         create_button.clicked.connect(self.go_to_create_microbloque_tab)  # Conectar el botón a la función que cambia la pestaña
         presets_layout.addWidget(create_button)
@@ -99,11 +101,18 @@ class CrearMicroBloque(QDialog):
         self.tabs.setCurrentIndex(1)
 
 
+
     def populate_presets_tree(self, tree_widget):
         """
         Función para agregar los elementos del diccionario de presets a un QTreeWidget.
         """
-        presets = obtener_microbloques_de_una_macro(self.parent.modelo.tipo)
+        # Obtener los microbloques (el método que estás usando)
+        tree_widget.setHeaderHidden(True)
+        presets = obtener_microbloques_de_una_macro(self.tipo)
+
+        # Asegurarse de que el texto se ajuste a la columna automáticamente
+        tree_widget.header().setStretchLastSection(False)
+        tree_widget.header().setSectionResizeMode(0, QHeaderView.ResizeToContents)
 
         for dominio in presets:
             parent_item = QTreeWidgetItem([dominio.nombre])
@@ -116,20 +125,44 @@ class CrearMicroBloque(QDialog):
                 sub_item.setExpanded(True)
                 
                 for microbloque in tipo.micro_bloques:
-                    option_item = QTreeWidgetItem([microbloque.nombre])
-                    sub_item.addChild(option_item)
+                    # Crear el texto con el nombre y la descripción
+                    button_text = microbloque.nombre
+                    if microbloque.descripcion:
+                        button_text += f" - {microbloque.descripcion}"
                     
-                    # Botón "Seleccionar" al final de cada opción
-                    select_button = QPushButton("+")
-                    select_button.clicked.connect(lambda _, k=microbloque: self.select_preset(k))
-                    tree_widget.setItemWidget(option_item, 1, select_button)
+                    # Crear el QTreeWidgetItem relacionado con el sub_item
+                    option_item = QTreeWidgetItem([button_text])  
+                    sub_item.addChild(option_item)
+
+                    # Conectar el evento de selección de este item a la función select_preset
+                    option_item.microbloque = microbloque  # Guardar el microbloque como atributo del item
+                    tree_widget.itemClicked.connect(self.on_item_clicked)
+
+    def on_item_clicked(self, item, column):
+        """
+        Método que se ejecuta al hacer clic en un elemento del árbol.
+        """
+        if hasattr(item, 'microbloque'):
+            # Llama al método select_preset pasando el microbloque del item clickeado
+            self.select_preset(item.microbloque)
 
 
-    def select_preset(self, preset_name):
+
+    def select_preset(self, mi_preset):
         """
-        Función que se ejecuta al seleccionar un preset.
+        Selecciona un preset para crear un nuevo microbloque.
         """
-        print(f"Preset seleccionado: {preset_name}")
+        self.new_microbloque.set_dto(mi_preset)
+
+        self.entrada_name_input.setText(self.new_microbloque.configuracion_entrada.nombre)
+        self.entrada_unidad_input.setText(self.new_microbloque.configuracion_entrada.unidad)
+        self.salida_name_input.setText(self.new_microbloque.configuracion_salida.nombre)
+        self.salida_unidad_input.setText(self.new_microbloque.configuracion_salida.unidad)
+        self.latex_editor.set_latex(self.new_microbloque.funcion_transferencia)
+        self.name_input.setText(self.new_microbloque.nombre)
+        self.color_button.setProperty("selected_color", self.new_microbloque.color)
+
+        self.go_to_create_microbloque_tab()
 
     def create_new_microbloque_tab(self):
 
@@ -166,7 +199,7 @@ class CrearMicroBloque(QDialog):
         config_tab = self.create_config_tab()
         new_microbloque_layout.addWidget(config_tab)
 
-        create_button = QPushButton("Crear Microbloque")
+        create_button = QPushButton("Aplicar")
         create_button.setStyleSheet("background-color: #444; color: white;")
         create_button.clicked.connect(self.crear_microbloque_nuevo)  # Conectar el botón a la función que cambia la pestaña
         new_microbloque_layout.addWidget(create_button)
@@ -190,19 +223,6 @@ class CrearMicroBloque(QDialog):
         self.new_microbloque.configuracion_entrada.unidad = unidad_entrada
         self.new_microbloque.configuracion_salida.unidad = unidad_salida   
         
-        if isinstance(self.reference_structure, MicroBloque):
-            self.parent.agregar_respecto_microbloque(self.new_microbloque, self.relation, self.reference_structure)
-        elif isinstance(self.reference_structure, TopologiaSerie):
-            self.parent.agregar_respecto_serie(self.new_microbloque, self.relation, self.reference_structure)
-        elif isinstance(self.reference_structure, TopologiaParalelo):
-            self.parent.agregar_respecto_paralelo(self.new_microbloque, self.relation, self.reference_structure)
-        else:
-            self.parent.macrobloque.modelo.topologia.agregar_elemento(self.new_microbloque) # sería el primer microbloque
-
-        self.parent.load_microbloques()  # recargo todos los microbloques
-        self.parent.update()
-        self.parent.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
-
         print("Microbloque creado")
         self.accept()
         
