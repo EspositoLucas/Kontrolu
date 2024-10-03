@@ -1,11 +1,12 @@
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QWidget, QTreeWidget, QTreeWidgetItem, QComboBox, QMessageBox, QHBoxLayout
+from PyQt5.QtWidgets import QMenu,QDialog, QVBoxLayout, QTabWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QWidget, QTreeWidget, QTreeWidgetItem, QComboBox, QMessageBox, QHBoxLayout
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy, QHeaderView
+from PyQt5.QtCore import Qt
 from .latex_editor import LatexEditor
 from back.topologia.configuraciones import Configuracion, TipoError
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo
 from back.topologia.microbloque import MicroBloque
-from back.json_manager.json_manager import obtener_microbloques_de_una_macro
+from back.json_manager.json_manager import obtener_microbloques_de_una_macro, agregar_microbloque, borrar_micro_bloque
 
 
 
@@ -136,7 +137,50 @@ class CrearMicroBloque(QDialog):
 
                     # Conectar el evento de selección de este item a la función select_preset
                     option_item.microbloque = microbloque  # Guardar el microbloque como atributo del item
+                    option_item.dominio = dominio
+                    option_item.tipo = tipo
                     tree_widget.itemClicked.connect(self.on_item_clicked)
+
+                    tree_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+                    tree_widget.customContextMenuRequested.connect(self.show_context_menu)
+        self.tree_widget = tree_widget
+
+    def show_context_menu(self, pos):
+        """
+        Muestra un menú contextual al hacer clic derecho en el QTreeWidget.
+        """
+        item = self.tree_widget.itemAt(pos)
+        if item is not None:
+            # Crear el menú contextual
+            context_menu = QMenu(self)
+
+            # Agregar acciones al menú
+            action_delete = context_menu.addAction("Eliminar Preset")
+
+            # Conectar las acciones a los métodos correspondientes
+            action_delete.triggered.connect(lambda: self.delete_preset(item))
+
+            # Mostrar el menú en la posición del clic
+            context_menu.exec_(self.tree_widget.viewport().mapToGlobal(pos))
+
+    def delete_preset(self, item):
+        """
+        Método para eliminar el preset y actualizar la pestaña.
+        """
+        borrar_micro_bloque(item.tipo.nombre_tipo, item.dominio.nombre, self.tipo, item.microbloque)
+        
+        # Crear una nueva pestaña de presets
+        new_presets_tab = self.create_presets_tab()
+        
+        # Eliminar la pestaña antigua
+        self.tabs.removeTab(0)
+        
+        # Insertar la nueva pestaña en el mismo índice
+        self.tabs.insertTab(0, new_presets_tab, "Presets")
+        
+        # Establecer la pestaña actualizada como la actual
+        self.tabs.setCurrentIndex(0)
+
 
     def on_item_clicked(self, item, column):
         """
@@ -199,6 +243,11 @@ class CrearMicroBloque(QDialog):
         config_tab = self.create_config_tab()
         new_microbloque_layout.addWidget(config_tab)
 
+        guardar_preset = QPushButton("Guardar Preset")
+        guardar_preset.setStyleSheet("background-color: #444; color: white;")
+        guardar_preset.clicked.connect(self.guardar_preset)  # Conectar el botón a la función que cambia la pestaña
+        new_microbloque_layout.addWidget(guardar_preset)
+
         create_button = QPushButton("Aplicar")
         create_button.setStyleSheet("background-color: #444; color: white;")
         create_button.clicked.connect(self.crear_microbloque_nuevo)  # Conectar el botón a la función que cambia la pestaña
@@ -206,6 +255,68 @@ class CrearMicroBloque(QDialog):
         
         return new_microbloque_tab
     
+    def guardar_preset(self):
+
+        presets = obtener_microbloques_de_una_macro(self.tipo)
+
+        dialog = QDialog()
+        dialog.setWindowTitle(f"Guardar preset de {self.new_microbloque.nombre}")
+        dialog.setStyleSheet("background-color: #333; color: white;")
+        layout = QVBoxLayout()
+
+         # Primer desplegable: Dominio
+        dominio_combo = QComboBox()
+        dominio_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        dominio_combo.addItems(list(map(lambda x: x.nombre, presets)))  # Añadir los dominios existentes
+        dominio_combo.setEditable(True)  # Permitir escribir uno nuevo
+
+        
+        layout.addWidget(QLabel("Dominio"))
+        layout.addWidget(dominio_combo)
+
+        # Segundo desplegable: Tipo
+        tipo_combo = QComboBox()
+        tipo_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        tipo_combo.setEditable(True)  # Permitir escribir uno nuevo
+        layout.addWidget(QLabel("Tipo"))
+        layout.addWidget(tipo_combo)
+
+        dominio_combo.currentTextChanged.connect(lambda:self.update_tipo_combo(tipo_combo,dominio_combo.currentText(),presets))  # Conectar cambio de texto
+
+        # Botón para guardar el preset
+        save_button = QPushButton("Guardar Preset")
+        save_button.setStyleSheet("background-color: #444; color: white;")
+        save_button.clicked.connect(lambda: self.save_preset(tipo_combo.currentText(),dominio_combo.currentText(),dialog))  # Conectar el botón a la función que cambia la pestaña
+        layout.addWidget(save_button)
+
+        dialog.setLayout(layout)
+        
+        # Llenar el combobox de tipos basado en el primer dominio por defecto
+        self.update_tipo_combo(tipo_combo,dominio_combo.currentText(),presets)
+        dialog.exec_()
+    
+    def save_preset(self,tipo,dominio,dialog):
+        agregar_microbloque(self.new_microbloque.get_dto(),tipo,dominio,self.tipo)
+        # Crear una nueva pestaña de presets
+        new_presets_tab = self.create_presets_tab()
+        
+        # Eliminar la pestaña antigua
+        self.tabs.removeTab(0)
+        
+        # Insertar la nueva pestaña en el mismo índice
+        self.tabs.insertTab(0, new_presets_tab, "Presets")
+        dialog.accept()
+        
+
+    def update_tipo_combo(self, tipo_combo, dominio, presets):
+        tipo_combo.clear()  # Limpiar las opciones actuales
+
+        for preset in presets:
+            if preset.nombre == dominio:
+                tipo_combo.addItems(list(map(lambda x: x.nombre_tipo, preset.tipos)))
+
+
+
     def crear_microbloque_nuevo(self):
         nombre = self.name_input.text()
         color = self.color_button.property("selected_color")

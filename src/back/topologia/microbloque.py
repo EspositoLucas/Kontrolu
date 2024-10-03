@@ -2,7 +2,7 @@
 from PyQt5.QtGui import QColor
 from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
-from back.topologia.configuraciones import Configuracion
+from back.topologia.configuraciones import Configuracion,TipoError
 from .hoja import Hoja
 from back.json_manager.dtos import MicroBloqueDto
 
@@ -15,54 +15,71 @@ class MicroBloque(Hoja):
         super().__init__(nombre=nombre, funcion_transferencia=funcion_transferencia)
         if datos:
             self.set_dto(datos)
-
     def set_dto(self, datos: MicroBloqueDto):
         self.funcion_transferencia = datos.fdt
         self.nombre = datos.nombre
         self.descripcion = datos.descripcion
         self.configuracion_entrada.unidad = datos.unidad_entrada
         self.configuracion_salida.unidad = datos.unidad_salida
-        self.configuracion_entrada.error_maximo = datos.entrada_error_maximo
-        self.configuracion_salida.error_maximo = datos.salida_error_maximo
-        self.configuracion_entrada.limite_inferior = datos.entrada_limite_inferior
-        self.configuracion_salida.limite_inferior = datos.salida_limite_inferior
-        self.configuracion_entrada.limite_superior = datos.entrada_limite_superior
-        self.configuracion_salida.limite_superior = datos.salida_limite_superior
-        self.configuracion_entrada.limite_por_ciclo = datos.entrada_limite_por_ciclo
-        self.configuracion_salida.limite_por_ciclo = datos.salida_limite_por_ciclo
-        self.configuracion_entrada.proporcion = datos.entrada_proporcion
-        self.configuracion_salida.proporcion = datos.salida_proporcion
-        self.configuracion_entrada.probabilidad = datos.entrada_propabilidad
-        self.configuracion_salida.probabilidad = datos.salida_propabilidad
-        self.configuracion_entrada.tipo = datos.entrada_tipo
-        self.configuracion_salida.tipo = datos.salida_tipo
-        self.configuracion_entrada.ultimo_valor = datos.entrada_ultimo_valor
-        self.configuracion_salida.ultimo_valor = datos.salida_ultimo_valor
-
+        self.configuracion_entrada.error_maximo = self._convert_to_float(datos.entrada_error_maximo)
+        self.configuracion_salida.error_maximo = self._convert_to_float(datos.salida_error_maximo)
+        self.configuracion_entrada.limite_inferior = self._convert_to_float(datos.entrada_limite_inferior)
+        self.configuracion_salida.limite_inferior = self._convert_to_float(datos.salida_limite_inferior)
+        self.configuracion_entrada.limite_superior = self._convert_to_float(datos.entrada_limite_superior)
+        self.configuracion_salida.limite_superior = self._convert_to_float(datos.salida_limite_superior)
+        self.configuracion_entrada.limite_por_ciclo = self._convert_to_float(datos.entrada_limite_por_ciclo)
+        self.configuracion_salida.limite_por_ciclo = self._convert_to_float(datos.salida_limite_por_ciclo)
+        self.configuracion_entrada.proporcion = self._convert_to_float(datos.entrada_proporcion)
+        self.configuracion_salida.proporcion = self._convert_to_float(datos.salida_proporcion)
+        self.configuracion_entrada.probabilidad = self._convert_to_float(datos.entrada_propabilidad)
+        self.configuracion_salida.probabilidad = self._convert_to_float(datos.salida_propabilidad)
+        self.configuracion_entrada.tipo = TipoError(datos.entrada_tipo)
+        self.configuracion_salida.tipo = TipoError(datos.salida_tipo)
+        self.configuracion_entrada.ultimo_valor = self._convert_to_float(datos.entrada_ultimo_valor)
+        self.configuracion_salida.ultimo_valor = self._convert_to_float(datos.salida_ultimo_valor)
     def get_dto(self) -> MicroBloqueDto:
+
         return MicroBloqueDto(
             nombre=self.nombre,
             descripcion=self.descripcion,
             fdt=self.funcion_transferencia,
-            entrada_limite_inferior=self.configuracion_entrada.limite_inferior,
-            entrada_limite_superior=self.configuracion_entrada.limite_superior,
-            entrada_limite_por_ciclo=self.configuracion_entrada.limite_por_ciclo,
-            entrada_error_maximo=self.configuracion_entrada.error_maximo,
-            entrada_proporcion=self.configuracion_entrada.proporcion,
-            entrada_tipo=self.configuracion_entrada.tipo,
-            entrada_ultimo_valor=self.configuracion_entrada.ultimo_valor,
-            entrada_propabilidad=self.configuracion_entrada.probabilidad,
-            salida_limite_inferior=self.configuracion_salida.limite_inferior,
-            salida_limite_superior=self.configuracion_salida.limite_superior,
-            salida_limite_por_ciclo=self.configuracion_salida.limite_por_ciclo,
-            salida_error_maximo=self.configuracion_salida.error_maximo,
-            salida_proporcion=self.configuracion_salida.proporcion,
-            salida_tipo=self.configuracion_salida.tipo,
-            salida_ultimo_valor=self.configuracion_salida.ultimo_valor,
-            salida_propabilidad=self.configuracion_salida.probabilidad,
+            entrada_limite_inferior=self._check_infinite(self.configuracion_entrada.limite_inferior),
+            entrada_limite_superior=self._check_infinite(self.configuracion_entrada.limite_superior),
+            entrada_limite_por_ciclo=self._check_infinite(self.configuracion_entrada.limite_por_ciclo),
+            entrada_error_maximo=self._check_infinite(self.configuracion_entrada.error_maximo),
+            entrada_proporcion=self._check_infinite(self.configuracion_entrada.proporcion),
+            entrada_tipo=self.configuracion_entrada.tipo.value,
+            entrada_ultimo_valor=self._check_infinite(self.configuracion_entrada.ultimo_valor),
+            entrada_propabilidad=self._check_infinite(self.configuracion_entrada.probabilidad),
+            salida_limite_inferior=self._check_infinite(self.configuracion_salida.limite_inferior),
+            salida_limite_superior=self._check_infinite(self.configuracion_salida.limite_superior),
+            salida_limite_por_ciclo=self._check_infinite(self.configuracion_salida.limite_por_ciclo),
+            salida_error_maximo=self._check_infinite(self.configuracion_salida.error_maximo),
+            salida_proporcion=self._check_infinite(self.configuracion_salida.proporcion),
+            salida_tipo=self.configuracion_salida.tipo.value,
+            salida_ultimo_valor=self._check_infinite(self.configuracion_salida.ultimo_valor),
+            salida_propabilidad=self._check_infinite(self.configuracion_salida.probabilidad),
             unidad_entrada=self.configuracion_entrada.unidad,
             unidad_salida=self.configuracion_salida.unidad
         )
+
+    def _convert_to_float(self, value):
+        if value == 'inf':
+            return float('inf')
+        elif value == '-inf':
+            return float('-inf')
+        elif value == '-Infinity':
+            return float('-inf')
+        elif value == 'Infinity':
+            return float('inf')
+        return value
+
+    def _check_infinite(self, value):
+        if value == float('inf'):
+            return 'inf'
+        elif value == float('-inf'):
+            return '-inf'
+        return value
 
     def alto(self) -> int:
         return 80

@@ -24,6 +24,17 @@ def crear_json_para_dominios(dominios: list[str] = ["SISTEMAS","ELECTRONICA"]) -
         }
         json.dump(json_data, json_file, indent=4)
 
+def __agregar_dominio(dominio: str,json) -> json:
+    """
+    Agrega un dominio al json
+    """
+    json["dominios"].append(dominio)
+    json[str(MACROS.CONTROLADOR)][dominio] = {}
+    json[str(MACROS.ACTUADOR)][dominio] = {}
+    json[str(MACROS.PROCESO)][dominio] = {}
+    json[str(MACROS.MEDIDOR)][dominio] = {}
+    return json
+
 def agregar_dominios(dominios: list[str] = None, dominio: str = None) -> None:
     """
     Agrega dominios al archivo json
@@ -40,14 +51,12 @@ def agregar_dominios(dominios: list[str] = None, dominio: str = None) -> None:
 
     for dominio in doms:
         if dominio not in json_data["dominios"]:
-            json_data["dominios"].append(dominio)
-            json_data[str(MACROS.CONTROLADOR)][dominio] = {}
-            json_data[str(MACROS.ACTUADOR)][dominio] = {}
-            json_data[str(MACROS.PROCESO)][dominio] = {}
-            json_data[str(MACROS.MEDIDOR)][dominio] = {}
+            json_data = __agregar_dominio(dominio,json_data)
 
     with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
+
+
 
 
 def borrar_dominios(dominios: list[str] = None, dominio: str = None) -> None:
@@ -85,6 +94,17 @@ def obtener_dominios() -> list[str]:
 
     return json_data["dominios"]
 
+def __crear_tipo(tipo: str, dominio: str, macro: MACROS, json_data, descripcion: str = "") -> json:
+    """
+    Crea un tipo en el archivo json
+    """
+    json_data[str(macro)][dominio][tipo] = {
+        "descripcion": descripcion,
+        "micro_bloques": {}
+    }
+    return json_data
+
+
 def crear_tipo(tipo: str, dominio: str, macro: MACROS, descripcion: str = "") -> None:
     """
     Crea un tipo en el archivo json
@@ -108,7 +128,13 @@ def agregar_microbloque(microbloque: MicroBloqueDto, tipo: str, dominio: str, ma
     with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
-
+    #check if dominio exist, if not create, check if tipo exist, if not create
+    if dominio not in json_data["dominios"]:
+        json_data = __agregar_dominio(dominio,json_data)
+    
+    if tipo not in json_data[str(macro)][dominio]:
+        json_data = __crear_tipo(tipo, dominio, macro,json_data)
+         
     json_data[str(macro)][dominio][tipo]["micro_bloques"][microbloque.nombre] = microbloque.__dict__
 
     with open(file, "w") as json_file:
