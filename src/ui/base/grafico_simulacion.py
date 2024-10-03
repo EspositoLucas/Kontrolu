@@ -4,8 +4,11 @@ from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QChe
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+from PyQt5.QtWidgets import QDialog, QTextEdit, QVBoxLayout
 import numpy as np
 import csv
+
 
 class Graficadora(QMainWindow):
     def __init__(self):
@@ -44,6 +47,23 @@ class Graficadora(QMainWindow):
         export_button = QPushButton("Exportar Datos")
         export_button.clicked.connect(self.export_manager.export_data)
         self.controls_layout.addWidget(export_button)
+
+        export_pdf_button = QPushButton("Exportar a PDF")
+        export_pdf_button.clicked.connect(self.export_to_pdf)
+        self.controls_layout.addWidget(export_pdf_button)
+        interpret_button = QPushButton("Interpretar Datos")
+        interpret_button.clicked.connect(self.mostrar_interpretacion)
+        self.controls_layout.addWidget(interpret_button)
+
+    def mostrar_interpretacion(self):
+        interpretacion = InterpretacionDatos(self.datos)
+        interpretacion.exec_()
+
+    def export_to_pdf(self):
+        filename, _ = QFileDialog.getSaveFileName(self, "Guardar PDF", "", "PDF Files (*.pdf)")
+        if filename:
+            with PdfPages(filename) as pdf:
+                pdf.savefig(self.fig)
 
     def agregar_datos(self, nuevos_datos):
         for clave, valor in nuevos_datos.items():
@@ -117,3 +137,37 @@ class ExportManager:
                 for i in range(len(self.graficadora.datos['tiempo'])):
                     row = [self.graficadora.datos[key][i] for key in self.graficadora.datos.keys()]
                     writer.writerow(row)
+
+
+class InterpretacionDatos(QDialog):
+    def __init__(self, datos):
+        super().__init__()
+        self.setWindowTitle("Interpretación de Datos")
+        self.setGeometry(200, 200, 600, 400)
+
+        layout = QVBoxLayout()
+        self.text_edit = QTextEdit()
+        self.text_edit.setReadOnly(True)
+        layout.addWidget(self.text_edit)
+        self.setLayout(layout)
+
+        self.interpretar_datos(datos)
+
+    def interpretar_datos(self, datos):
+        interpretacion = "Interpretación de los datos de la simulación:\n\n"
+
+        # Ejemplo de interpretación básica
+        tiempo_total = datos['tiempo'][-1] - datos['tiempo'][0]
+        interpretacion += f"Tiempo total de simulación: {tiempo_total:.2f} unidades\n"
+
+        for key in datos:
+            if key != 'tiempo':
+                promedio = sum(datos[key]) / len(datos[key])
+                maximo = max(datos[key])
+                minimo = min(datos[key])
+                interpretacion += f"\n{key.capitalize()}:\n"
+                interpretacion += f"  Promedio: {promedio:.2f}\n"
+                interpretacion += f"  Máximo: {maximo:.2f}\n"
+                interpretacion += f"  Mínimo: {minimo:.2f}\n"
+
+        self.text_edit.setText(interpretacion)
