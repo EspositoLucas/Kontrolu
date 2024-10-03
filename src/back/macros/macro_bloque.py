@@ -9,7 +9,7 @@ class MacroBloque(InterfazTopologia):
         self.tipo = tipo
         self.sesion = sesion
         self.topologia = TopologiaSerie(padre=self)
-        self.nombre = "MacroBloque"
+        self.nombre = nombre
         super().__init__()
 
     def __str__(self):
@@ -71,3 +71,9 @@ class MacroBloque(InterfazTopologia):
     
     def unidad_salida(self):
         return self.topologia.unidad_salida()
+    
+    def unidad_entrante(self):
+        pass
+
+    def unidad_saliente(self):
+        pass

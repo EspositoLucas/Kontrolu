@@ -2,7 +2,8 @@ from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTabWidget, QPushButton, QLine
 from PyQt5.QtGui import QColor
 from .latex_editor import LatexEditor
 from back.topologia.configuraciones import Configuracion, TipoError
-from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque
+from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo
+from back.topologia.microbloque import MicroBloque
 from back.json_manager.json_manager import obtener_microbloques_de_una_macro
 class CrearMicroBloque(QDialog):
     def __init__(self, parent, pos, relation, reference_structure,numero):

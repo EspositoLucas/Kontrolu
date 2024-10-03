@@ -2,7 +2,7 @@
 
 import unittest
 from src.back.macros.macro_bloque import MacroBloque
-from src.back.topologia.topologia_serie import MicroBloque
+from src.back.topologia.microbloque import MicroBloque
 
 class TestMacroBloque(unittest.TestCase):
 

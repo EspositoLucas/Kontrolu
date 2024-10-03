@@ -17,6 +17,7 @@ import ctypes
 from back.simulacion import Simulacion
 from back.estabilidad import Estabilidad
 from ui.base.latex_editor import LatexEditor
+from ui.base.grafico_simulacion import Graficadora
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 import sympy as sp
 # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('company.app.1')
@@ -134,14 +135,24 @@ class MainWindow(QMainWindow):
         dialog.setLayout(layout)
 
         if dialog.exec_():
-
             t_total = float(tiempo_edit.text())
             dt = float(dt_edit.text())
             velocidad = float(velocidad_edit.text())
             y_salida = float(salida_edit.text())
-
             
-            simulacion = Simulacion(controlador=self.sesion.controlador,actuador=self.sesion.actuador,proceso=self.sesion.proceso,medidor=self.sesion.medidor, delta=dt, ciclos=int(t_total/dt),entrada=self.sesion.entrada,salida_cero=y_salida,carga=self.sesion.carga)
+            graficadora = Graficadora() # se instancia la clase Graficadora
+            graficadora.show()
+            
+            simulacion = Simulacion(controlador=self.sesion.controlador, 
+                                    actuador=self.sesion.actuador,
+                                    proceso=self.sesion.proceso,
+                                    medidor=self.sesion.medidor,
+                                    delta=dt,
+                                    ciclos=int(t_total/dt),
+                                    entrada=self.sesion.entrada,
+                                    salida_cero=y_salida,
+                                    carga=self.sesion.carga,
+                                    graficadora=graficadora) # se la pasa como parametro a la clase Simulacion
             simulacion.ejecutar_simulacion(velocidad)
             self.statusBar().showMessage('Simulación completada')
             

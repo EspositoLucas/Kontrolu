@@ -5,10 +5,12 @@ from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
 from .latex_editor import LatexEditor
 from .add_button import AddButton
-from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque, ANCHO, ALTO
+from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo,  ANCHO, ALTO
+from back.topologia.microbloque import MicroBloque
 from back.topologia.perturbacion import Perturbacion
 from globals import ESTA_SIMULANDO
-from back.topologia.configuraciones import Configuracion, TipoError
+from back.topologia.configuraciones import  TipoError
+from .perturbacion_visual import PerturbacionVisual, RADIO_PERTURBACION
 from .crear_microbloque import CrearMicroBloque
 
 MARGEN_HORIZONTAL = 200
@@ -16,7 +18,6 @@ MARGEN_VERTICAL = 50
 MARGEN_PERTURBACION = 200
 BUTTON_SIZE = 20
 RADIO = 40
-RADIO_PERTURBACION = 10
 MARGEN_PARALELO = 20
 
 class DrawingArea(QGraphicsView):
@@ -30,6 +31,7 @@ class DrawingArea(QGraphicsView):
         self.scene.setSceneRect(self.initial_rect)
 
         self.microbloques = []
+        self.perturbaciones = []
         self.grid_lines = []
         self.selected_microbloque = None
         self.macrobloque = macrobloque
@@ -164,6 +166,8 @@ class DrawingArea(QGraphicsView):
             return self.dibujar_paralelo(topologia, posicion_inicial)
         elif isinstance(topologia, MicroBloque):
             return self.create_microbloque(topologia, posicion_inicial)
+        elif isinstance(topologia, Perturbacion):
+            return self.dibujar_perturbacion(topologia, posicion_inicial)
         
     def dibujar_serie(self, serie, posicion_inicial):
         posicion_actual = posicion_inicial
@@ -196,32 +200,20 @@ class DrawingArea(QGraphicsView):
 
     def create_microbloque(self, microbloque_back, pos):
         microbloque = Microbloque(microbloque_back)
-        microbloque.setPos(pos)
+        microbloque.setPos(pos) # ubico al microbloque
         self.microbloques.append(microbloque)
         self.scene.addItem(microbloque)
 
-        pos_perturbacion = None
-        if microbloque_back.perturbacion_entrada.activa():
-            pos_perturbacion = self.dibujar_circulo_perturbacion(pos, "entrada")
-
-        if microbloque_back.perturbacion_salida.activa():
-            pos_perturbacion = self.dibujar_circulo_perturbacion(pos, "salida")
-
-        if pos_perturbacion and pos_perturbacion.x() > pos.x():
-            return pos_perturbacion # se queda con el valor más a la derecha
-        return pos # si no hay perturbaciones o si la perturbación está a la izquierda, retorna la posición del microbloque
+        return pos
     
-    def dibujar_circulo_perturbacion(self, pos, tipo):
-        if tipo == "entrada":
-            centro = QPointF(pos.x() - ANCHO/2 - MARGEN_PERTURBACION, pos.y() + ALTO/2)
-        else:  # salida
-            centro = QPointF(pos.x() + ANCHO/2 + MARGEN_PERTURBACION, pos.y() + ALTO/2)
+    def dibujar_perturbacion(self, perturbacion, pos):
+        pos = QPointF(pos.x(), pos.y() + ALTO/2 - RADIO_PERTURBACION)
+        perturbacion_visual = PerturbacionVisual(perturbacion)
+        perturbacion_visual.setPos(pos)
+        self.perturbaciones.append(perturbacion_visual)
+        self.scene.addItem(perturbacion_visual)
 
-        circulo = QGraphicsEllipseItem(centro.x() - RADIO_PERTURBACION, centro.y() - RADIO_PERTURBACION, RADIO_PERTURBACION * 2, RADIO_PERTURBACION * 2)
-        circulo.setBrush(QBrush(QColor(255, 0, 0))) 
-        circulo.setZValue(1) 
-        self.scene.addItem(circulo)
-        return centro
+        return pos
 
     def clear_all(self):
         if self.microbloques:
@@ -348,6 +340,8 @@ class DrawingArea(QGraphicsView):
             return self.draw_paralelo_connections(topologia, punto_de_partida)
         elif isinstance(topologia, MicroBloque):
             return self.draw_microbloque_connection(topologia, punto_de_partida, is_parallel)
+        elif isinstance(topologia, Perturbacion):
+            return self.draw_perturbacion_connection(topologia, punto_de_partida)
         else:
             return punto_de_partida
         
@@ -475,38 +469,30 @@ class DrawingArea(QGraphicsView):
                 
                 # punto_final seria el punto en donde va a llegar la flecha que proviene del microbloque anterior (punto medio izquierdo del microbloque actual)
 
-                if microbloque.perturbacion_entrada.activa():
-                    centro_perturbacion = QPointF(mb.pos().x() - ANCHO/2 - MARGEN_PERTURBACION, mb.pos().y() + ALTO/2)
-                    
-                    # Línea desde punto_inicial hasta la perturbación
-                    line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), centro_perturbacion.x(), centro_perturbacion.y())
-                    line.setPen(QPen(Qt.black, 2))
-                    self.scene.addItem(line)
-                    
-                    # Línea desde la perturbación hasta el microbloque
-                    line = QGraphicsLineItem(centro_perturbacion.x(), centro_perturbacion.y(), punto_final.x(), punto_final.y())
-                    line.setPen(QPen(Qt.black, 2))
-                    self.scene.addItem(line)
-                elif punto_inicial is not None and punto_final is not None:
-                    # Conexión directa si no hay perturbación de entrada
+                if punto_inicial is not None and punto_final is not None:
+                    # dibujar la linea desde el punto_inicial hasta el punto_final
                     line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), punto_final.x(), punto_final.y())
                     line.setPen(QPen(Qt.black, 2))
                     self.scene.addItem(line)
+                
+                return mb.pos() + QPointF(mb.width(), mb.height() / 2) # retorna un punto que representa la mitad del lado derecho del microbloque. Este punto se usará como punto de inicio para la siguiente conexión.
+        
+        # Si no se encuentra el microbloque, retornamos el punto de inicio --> Si no encuentra el microbloque en la lista, simplemente retorna el punto_inicial
+        return punto_inicial
 
-                punto_salida = mb.pos() + QPointF(mb.width(), mb.height() / 2)
-
-                if microbloque.perturbacion_salida.activa():
-                    centro_perturbacion = QPointF(mb.pos().x() + ANCHO/2 + MARGEN_PERTURBACION, mb.pos().y() + ALTO/2)
-                    
-                    # Línea desde el microbloque hasta la perturbación
-                    line = QGraphicsLineItem(punto_salida.x(), punto_salida.y(), centro_perturbacion.x(), centro_perturbacion.y())
+    def draw_perturbacion_connection(self, perturbacion, punto_inicial):
+        for perturbacion_visual in self.perturbaciones: # busca en la lista de perturbaciones de la drawing_area, la perturbacion que queremos conectar
+            if perturbacion_visual.perturbacion_back == perturbacion: # compara su perturbacion back
+                # La PerturbacionVisual es un circulo con radio RADIO_PERTURBACION
+                punto_final = perturbacion_visual.pos() + QPointF(RADIO_PERTURBACION, RADIO_PERTURBACION) # punto_final es el punto medio derecho de la perturbacion
+                if punto_inicial is not None and punto_final is not None:
+                    # dibujar la linea desde el punto_inicial hasta el punto_final
+                    line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), punto_final.x(), punto_final.y())
                     line.setPen(QPen(Qt.black, 2))
                     self.scene.addItem(line)
-                    
-                    # La perturbación se convierte en el nuevo punto de salida
-                    punto_salida = centro_perturbacion
-
-                return punto_salida
+                
+                return perturbacion_visual.pos() + QPointF(RADIO_PERTURBACION, RADIO_PERTURBACION) # retorna un punto que representa la mitad del lado derecho de la perturbacion. Este punto se usará como punto de inicio para la siguiente conexión.
+        
         return punto_inicial
     
 
@@ -887,6 +873,7 @@ class DrawingArea(QGraphicsView):
         self.scene.clear()
         self.grid_lines.clear()
         self.microbloques.clear()
+        self.perturbaciones.clear()
         self.selected_microbloque = None
         self.selected_microbloques.clear()
         self.hide_add_buttons()
@@ -929,7 +916,11 @@ class DrawingArea(QGraphicsView):
         if dialog.exec_() == QDialog.Accepted:
             funcion_transferencia = ft_editor.get_latex()
             ciclos = ciclos_editor.value()
-            microbloque.elemento_back.agregar_perturbacion(funcion_transferencia, ciclos, posicion)
+            perturbacion_nueva = Perturbacion(funcion_transferencia=funcion_transferencia, ciclos=ciclos)
+            if posicion == 'antes':
+                microbloque.elemento_back.agregar_perturbacion_antes(microbloque.elemento_back, perturbacion_nueva)
+            else:
+                microbloque.elemento_back.agregar_perturbacion_despues(microbloque.elemento_back, perturbacion_nueva)
             
             self.load_microbloques() 
             self.update()

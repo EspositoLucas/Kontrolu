@@ -1,5 +1,6 @@
 import sympy as sp
-from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo, MicroBloque
+from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo
+from back.topologia.microbloque import MicroBloque
 from latex2sympy2 import latex2sympy
 
 class Estabilidad:

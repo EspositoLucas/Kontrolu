@@ -11,8 +11,10 @@ class MacroActuador(MacroBloque):
     def validar_salida(self, unidad: str)-> bool:
         return self.sesion.validar_salida_actuador(unidad) 
     
-    def proxima_salida(self)-> str:
-        return self.sesion.proxima_salida_actuador() 
+    def unidad_saliente(self)-> str:
+        print("Unidad esperada en actuador: ", self.sesion.unidad_esperada_actuador())
+        return self.sesion.unidad_esperada_actuador() 
     
-    def proxima_entrada(self)-> str:
-        return self.sesion.proxima_entrada_actuador()
+    def unidad_entrante(self)-> str:
+        print("Unidad recibida en actuador: ", self.sesion.unidad_recibida_actuador())
+        return self.sesion.unidad_recibida_actuador()
