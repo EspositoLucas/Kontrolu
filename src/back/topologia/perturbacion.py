@@ -74,9 +74,9 @@ class Perturbacion(Hoja):
     
 
     def unidad_entrada(self):
-        return self.padre.unidad_entrante(self)
+        return self.padre.unidad_saliente(self)
     
     def unidad_salida(self):
-        return self.padre.unidad_saliente(self)
+        return self.padre.unidad_entrante(self)
 
     
