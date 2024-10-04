@@ -103,6 +103,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
         self.setLayout(layout)
+        
         # Actualizamos la interfaz según el tipo de entrada inicial
         self.actualizar_interfaz()
 
