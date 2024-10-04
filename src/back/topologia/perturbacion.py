@@ -12,24 +12,25 @@ class Perturbacion(Hoja):
         super().__init__(funcion_transferencia=funcion_transferencia,nombre="Perturbacion")
     
     
-    def simular(self,entrada,tiempo):
+    def simular(self,tiempo,entrada):
 
         self.dentro_de -= 1
         
-        if not self.get_estado(): return entrada
+
+        if (not self.get_estado()): return entrada
+
 
         self.ciclos -= 1
 
 
         s,t = symbols('s t')
-        
-        if self.ciclos <= 0: self.estado = False
 
         perturbacion_laplace = latex2sympy(self.funcion_transferencia)
 
         perturbacion_tiempo = inverse_laplace_transform(perturbacion_laplace,s,t)
 
         perturbado = perturbacion_tiempo.subs(t,tiempo)
+
 
         nuevo_valor = perturbado + entrada
 
@@ -38,10 +39,9 @@ class Perturbacion(Hoja):
         self.datos['perturbacion'].append(perturbado)
         self.datos['resultado'].append(nuevo_valor)
 
+
         return nuevo_valor
     
-    def activa(self):
-        return self.estado
 
     def generar_perturbacion(self,ft,ciclos,dentro_de=0):
         self.funcion_transferencia = ft
@@ -55,9 +55,9 @@ class Perturbacion(Hoja):
 
     def get_estado(self):
         if (self.ciclos > 0) and (self.dentro_de < 0):
-            self.estado = True
+            return True
         else:
-            self.estado = False
+            return False
 
     def cancelar_perturbacion(self):
         self.ciclos = 0
