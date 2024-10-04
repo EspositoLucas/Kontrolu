@@ -945,6 +945,7 @@ class DrawingArea(QGraphicsView):
         ft_label = QLabel("Función de Transferencia:")
         ft_label.setStyleSheet("color: white;")
         ft_editor = LatexEditor()
+        ft_editor.set_latex("1")
         ft_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(ft_label)
         layout.addWidget(ft_editor)
@@ -970,6 +971,7 @@ class DrawingArea(QGraphicsView):
         buttons.addWidget(ok_button)
         buttons.addWidget(cancel_button)
         layout.addLayout(buttons)
+        dialog.setStyleSheet("background-color: #333; color: white;")
 
         dialog.setLayout(layout)
 
