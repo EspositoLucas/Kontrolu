@@ -665,7 +665,7 @@ class DrawingArea(QGraphicsView):
         
         for direction, pos in positions:
             scene_pos = microbloque_pos + pos
-            button = AddButton(scene_pos.x(), scene_pos.y(), button_width, button_height, direction)
+            button = AddButton(scene_pos.x(), scene_pos.y(), button_width, button_height, direction, microbloque)
             self.scene.addItem(button)
             self.add_buttons.append(button)
 
@@ -687,20 +687,21 @@ class DrawingArea(QGraphicsView):
                 pass
         self.add_buttons.clear()
 
-    def show_add_menu(self, direction, pos):
+    def show_add_menu(self, direction, pos, microbloque):
         menu = QMenu(self)
         menu.setStyleSheet("""
             QMenu {
                 border: 2px solid black;
             }
         """)
-        micro_back = self.selected_microbloque.elemento_back
+
+        micro_back = microbloque.elemento_back
         parent_structures = micro_back.get_parent_structures()
         
         if direction in ['izquierda', 'derecha']:
             perturb_direction = 'antes' if direction == 'izquierda' else 'despues'
             perturb_action = menu.addAction(f"Agregar perturbación {perturb_direction}")
-            perturb_action.triggered.connect(lambda checked, m=self.selected_microbloque, d=perturb_direction: 
+            perturb_action.triggered.connect(lambda checked, m=microbloque, d=perturb_direction: 
                 self.agregar_perturbacion(m, d))
         
         for parent in [[micro_back, 0]] + parent_structures:
@@ -708,7 +709,7 @@ class DrawingArea(QGraphicsView):
             action_text = self.get_descriptive_action_text(direction, structure_name)
             action = menu.addAction(action_text)
             
-            action.triggered.connect(lambda checked, m=self.selected_microbloque,d=direction, s=parent[0]: 
+            action.triggered.connect(lambda checked, m=microbloque,d=direction, s=parent[0]: 
                 QTimer.singleShot(0, lambda: self.add_microbloque(m, d, s)))
             
             action.hovered.connect(lambda s=parent, d=direction: self.show_preview(d, s))
@@ -880,6 +881,7 @@ class DrawingArea(QGraphicsView):
                 relation = 'despues'
             
             # Llamamos directamente a create_new_microbloque
+            self.selected_microbloque = microbloque
             self.create_new_microbloque(microbloque.pos(), relation, estructura_de_referencia)
         
         self.hide_preview()
