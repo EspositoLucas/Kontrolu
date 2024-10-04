@@ -37,7 +37,7 @@ class ElementoCarga(QPushButton):
             self.carga = dialog.carga
             self.tipo_entrada = dialog.tipo_entrada
             self.estado_seleccionado = dialog.estado_seleccionado
-            # self.setText(self.carga.nombre)
+            self.setText(self.carga.nombre)
 
 class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, carga=None, tipo_entrada="Personalizada", estado_seleccionado=None):
@@ -98,23 +98,27 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
 
         # Estados
         estados_layout = QtWidgets.QVBoxLayout()
-        estados_layout.addWidget(QtWidgets.QLabel("Estado:"))
-        self.estado_combo = QtWidgets.QComboBox()
-        for estado in self.carga.estados:
-            self.estado_combo.addItem(estado["nombre"])
-        if self.estado_seleccionado:
-            index = self.estado_combo.findText(self.estado_seleccionado)
-            if index >= 0:
-                self.estado_combo.setCurrentIndex(index)
-        self.estado_combo.currentIndexChanged.connect(self.actualizar_info_estado)
-        estados_layout.addWidget(self.estado_combo)
+        estados_layout.addWidget(QtWidgets.QLabel("Estados:"))
+        self.estados_list = QtWidgets.QListWidget()
+        self.actualizar_lista_estados()
+        estados_layout.addWidget(self.estados_list)
 
-        self.info_estado_label = QtWidgets.QLabel()
-        estados_layout.addWidget(self.info_estado_label)
+        # Botones para manejar estados
+        botones_estados_layout = QtWidgets.QHBoxLayout()
+        self.btn_agregar_estado = QtWidgets.QPushButton("Agregar Estado")
+        self.btn_editar_estado = QtWidgets.QPushButton("Editar Estado")
+        self.btn_eliminar_estado = QtWidgets.QPushButton("Eliminar Estado")
+        
+        self.btn_agregar_estado.clicked.connect(self.agregar_estado)
+        self.btn_editar_estado.clicked.connect(self.editar_estado)
+        self.btn_eliminar_estado.clicked.connect(self.eliminar_estado)
+        
+        botones_estados_layout.addWidget(self.btn_agregar_estado)
+        botones_estados_layout.addWidget(self.btn_editar_estado)
+        botones_estados_layout.addWidget(self.btn_eliminar_estado)
+        
+        estados_layout.addLayout(botones_estados_layout)
         layout.addLayout(estados_layout)
-
-        # Inicializamos la información del estado
-        self.actualizar_info_estado()
 
         # Escalamiento sigmoide
         es_layout = QtWidgets.QHBoxLayout()
@@ -137,6 +141,42 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
         self.setLayout(layout)
+    
+    def actualizar_lista_estados(self):
+        self.estados_list.clear()
+        for estado in self.carga.estados:
+            item = QtWidgets.QListWidgetItem(f"{estado['nombre']} - Mín: {estado['minimo']}, Prioridad: {estado['prioridad']}")
+            self.estados_list.addItem(item)
+
+    def agregar_estado(self):
+        dialog = EditarEstadoDialog(self)
+        if dialog.exec_():
+            nuevo_estado = {
+                "nombre": dialog.nombre_input.text(),
+                "minimo": float(dialog.minimo_input.text()),
+                "prioridad": int(dialog.prioridad_input.text())
+            }
+            self.carga.estados.append(nuevo_estado)
+            self.actualizar_lista_estados()
+
+    def editar_estado(self):
+        current_item = self.estados_list.currentItem()
+        if current_item:
+            index = self.estados_list.row(current_item)
+            estado_actual = self.carga.estados[index]
+            dialog = EditarEstadoDialog(self, estado_actual)
+            if dialog.exec_():
+                estado_actual["nombre"] = dialog.nombre_input.text()
+                estado_actual["minimo"] = float(dialog.minimo_input.text())
+                estado_actual["prioridad"] = int(dialog.prioridad_input.text())
+                self.actualizar_lista_estados()
+
+    def eliminar_estado(self):
+        current_item = self.estados_list.currentItem()
+        if current_item:
+            index = self.estados_list.row(current_item)
+            del self.carga.estados[index]
+            self.actualizar_lista_estados()
 
     def actualizar_funcion_transferencia(self):
         tipo_entrada = self.tipo_entrada_combo.currentText()
@@ -163,6 +203,50 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.tipo_entrada = self.tipo_entrada_combo.currentText()
         
         # Guardamos el estado seleccionado
-        self.estado_seleccionado = self.estado_combo.currentText()
-        
+        current_item = self.estados_list.currentItem()
+        if current_item:
+            self.estado_seleccionado = current_item.text().split(' - ')[0]  # Obtenemos solo el nombre del estado
+        else:
+            self.estado_seleccionado = None  # O podrías establecer un valor predeterminado
+
         super().accept()
+        
+        
+class EditarEstadoDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None, estado=None):
+        super().__init__(parent)
+        self.setWindowTitle("Editar Estado" if estado else "Agregar Estado")
+        self.estado = estado
+        self.initUI()
+
+    def initUI(self):
+        layout = QtWidgets.QVBoxLayout()
+
+        # Nombre del estado
+        nombre_layout = QtWidgets.QHBoxLayout()
+        nombre_layout.addWidget(QtWidgets.QLabel("Nombre:"))
+        self.nombre_input = QtWidgets.QLineEdit(self.estado["nombre"] if self.estado else "")
+        nombre_layout.addWidget(self.nombre_input)
+        layout.addLayout(nombre_layout)
+
+        # Mínimo
+        minimo_layout = QtWidgets.QHBoxLayout()
+        minimo_layout.addWidget(QtWidgets.QLabel("Mínimo:"))
+        self.minimo_input = QtWidgets.QLineEdit(str(self.estado["minimo"]) if self.estado else "")
+        minimo_layout.addWidget(self.minimo_input)
+        layout.addLayout(minimo_layout)
+
+        # Prioridad
+        prioridad_layout = QtWidgets.QHBoxLayout()
+        prioridad_layout.addWidget(QtWidgets.QLabel("Prioridad:"))
+        self.prioridad_input = QtWidgets.QLineEdit(str(self.estado["prioridad"]) if self.estado else "")
+        prioridad_layout.addWidget(self.prioridad_input)
+        layout.addLayout(prioridad_layout)
+
+        # Botones OK y Cancelar
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+        layout.addWidget(button_box)
+
+        self.setLayout(layout)

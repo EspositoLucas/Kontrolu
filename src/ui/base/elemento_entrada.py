@@ -12,6 +12,7 @@ class ElementoEntrada(QPushButton):
         super().__init__()
         self.entrada = entrada
         self.tipo_entrada = "Personalizada"  # Añadimos este atributo
+        self.coeficiente = "1"  # Añadimos este atributo
         
         self.setText(self.entrada.nombre)
         self.move(0, 210)
@@ -31,18 +32,20 @@ class ElementoEntrada(QPushButton):
             self.mostrar_configuracion_entrada()        
 
     def mostrar_configuracion_entrada(self):
-        dialog = ConfiguracionEntradaDialog(None, self.entrada, self.tipo_entrada)
+        dialog = ConfiguracionEntradaDialog(None, self.entrada, self.tipo_entrada, self.coeficiente)
         if dialog.exec_():
             self.entrada = dialog.entrada
-            self.tipo_entrada = dialog.tipo_entrada  # Guardamos el tipo de entrada
-            # self.setText(self.entrada.nombre)  # Actualizamos el texto del botón
+            self.tipo_entrada = dialog.tipo_entrada
+            self.coeficiente = dialog.coeficiente  # Guardamos el coeficiente
+            self.setText(self.entrada.nombre)
             
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, entrada=None, tipo_entrada="Personalizada"):
+    def __init__(self, parent=None, entrada=None, tipo_entrada="Personalizada",coeficiente="1"):
         super().__init__(parent)
         self.setWindowTitle("Configuración de Entrada")
         self.entrada = entrada if entrada else MicroBloque()
         self.tipo_entrada = tipo_entrada
+        self.coeficiente = coeficiente
         self.initUI()
 
     def initUI(self):
@@ -71,15 +74,25 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.tipo_entrada_combo = QtWidgets.QComboBox()
         self.tipo_entrada_combo.addItems(["Personalizada", "Escalón", "Rampa", "Parábola"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
-        self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_funcion_transferencia)
+        self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
         layout.addLayout(tipo_entrada_layout)
+
+        # Nuevo campo para el coeficiente
+        coeficiente_layout = QtWidgets.QHBoxLayout()
+        coeficiente_layout.addWidget(QtWidgets.QLabel("Coeficiente:"))
+        self.coeficiente_input = QtWidgets.QLineEdit(self.coeficiente)
+        self.coeficiente_input.setValidator(QtGui.QDoubleValidator())
+        self.coeficiente_input.textChanged.connect(self.actualizar_funcion_transferencia)
+        coeficiente_layout.addWidget(self.coeficiente_input)
+        layout.addLayout(coeficiente_layout)
 
         # Función de transferencia con editor LaTeX
         ft_layout = QtWidgets.QVBoxLayout()
         ft_layout.addWidget(QtWidgets.QLabel("Función de transferencia:"))
         self.latex_editor = LatexEditor()
         self.latex_editor.set_latex(self.entrada.funcion_transferencia or "")
+        self.latex_editor.setEnabled(self.tipo_entrada == "Personalizada")
         ft_layout.addWidget(self.latex_editor)
         layout.addLayout(ft_layout)
 
@@ -90,20 +103,48 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
         self.setLayout(layout)
+        # Actualizamos la interfaz según el tipo de entrada inicial
+        self.actualizar_interfaz()
+
+    def actualizar_interfaz(self):
+        tipo_entrada = self.tipo_entrada_combo.currentText()
+        es_personalizada = tipo_entrada == "Personalizada"
+        
+        self.latex_editor.setEnabled(es_personalizada)
+        self.coeficiente_input.setEnabled(not es_personalizada)
+        
+        if not es_personalizada:
+            self.actualizar_funcion_transferencia()
+        else:
+            self.latex_editor.set_latex(self.entrada.funcion_transferencia)
 
     def actualizar_funcion_transferencia(self):
         tipo_entrada = self.tipo_entrada_combo.currentText()
+        coeficiente = self.coeficiente_input.text()
+        
+        if not coeficiente:
+            coeficiente = "1"
+        
         if tipo_entrada == "Escalón":
-            self.latex_editor.set_latex("\\frac{1}{s}")
+            latex = f"\\frac{{{coeficiente}}}{{s}}"
         elif tipo_entrada == "Rampa":
-            self.latex_editor.set_latex("\\frac{1}{s^2}")
+            latex = f"\\frac{{{coeficiente}}}{{s^2}}"
         elif tipo_entrada == "Parábola":
-            self.latex_editor.set_latex("\\frac{1}{s^3}")
-        self.latex_editor.setEnabled(tipo_entrada == "Personalizada")
-
+            latex = f"\\frac{{{coeficiente}}}{{s^3}}"
+        else:
+            return  # No actualizamos para entrada personalizada
+        
+        self.latex_editor.set_latex(latex)
+        
     def accept(self):
-        # Actualizamos los valores de la entrada con los nuevos datos
         self.entrada.nombre = self.nombre_input.text()
-        self.entrada.funcion_transferencia = self.latex_editor.get_latex()
-        self.tipo_entrada = self.tipo_entrada_combo.currentText()  # Guardamos el tipo de entrada
+        self.tipo_entrada = self.tipo_entrada_combo.currentText()
+        
+        if self.tipo_entrada == "Personalizada":
+            self.entrada.funcion_transferencia = self.latex_editor.get_latex()
+            self.coeficiente = "1"
+        else:
+            self.coeficiente = self.coeficiente_input.text() or "1"
+            self.entrada.funcion_transferencia = self.latex_editor.get_latex()
+        
         super().accept()
