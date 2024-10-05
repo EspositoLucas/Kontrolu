@@ -108,7 +108,6 @@ class PerturbacionVisual(QGraphicsItemGroup):
         dialog.setWindowTitle("Editar Perturbación")
         layout = QVBoxLayout()
 
-        # Tengo que cargar dos cosas: la función de transferencia y la cantidad de ciclos de simulación que va a durar la perturbación
         ft_label = QLabel("Función de Transferencia:")
         ft_label.setStyleSheet("color: white;")
         ft_editor = LatexEditor(self.perturbacion_back.funcion_transferencia)

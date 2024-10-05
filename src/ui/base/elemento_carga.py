@@ -52,9 +52,6 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
 
     def initUI(self):
         
-        # Configurar el estilo de la ventana
-        self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
-        
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
@@ -151,6 +148,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
 
+        self.setStyleSheet("background-color: #333; color: white;")
         self.setLayout(layout)
         
         # Actualizamos la interfaz según el tipo de entrada inicial

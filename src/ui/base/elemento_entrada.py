@@ -50,8 +50,6 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.initUI()
 
     def initUI(self):
-        # Configurar el estilo de la ventana
-        self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
 
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
@@ -104,6 +102,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
         self.setLayout(layout)
+        self.setStyleSheet("background-color: #333; color: white;")
         
         # Actualizamos la interfaz según el tipo de entrada inicial
         self.actualizar_interfaz()

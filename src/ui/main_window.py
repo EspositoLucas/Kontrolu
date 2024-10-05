@@ -56,7 +56,7 @@ class MainWindow(QMainWindow):
         boton_estabilidad = QAction("Análisis de Estabilidad", self)
         boton_estabilidad.triggered.connect(self.mostrar_analisis_estabilidad)
         toolbar.addAction(boton_estabilidad)
-
+        toolbar.setStyleSheet("background-color: #333; color: white;")
         self.statusBar().showMessage('Listo')
 
         self.init_macrobloques() 
