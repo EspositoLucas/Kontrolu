@@ -296,6 +296,22 @@ class CrearMicroBloque(QDialog):
         dialog.exec_()
     
     def save_preset(self,tipo,dominio,dialog):
+        nombre = self.name_input.text()
+        color = self.color_button.property("selected_color")
+        funcion_transferencia = self.latex_editor.get_latex()
+        nombre_entrada = self.entrada_name_input.text()
+        nombre_salida = self.salida_name_input.text()
+        unidad_entrada = self.entrada_unidad_input.text()
+        unidad_salida = self.salida_unidad_input.text()
+        
+        self.new_microbloque.nombre = nombre
+        self.new_microbloque.color = color
+        self.new_microbloque.funcion_transferencia = funcion_transferencia
+        self.new_microbloque.configuracion_entrada.nombre = nombre_entrada
+        self.new_microbloque.configuracion_salida.nombre = nombre_salida
+        self.new_microbloque.configuracion_entrada.unidad = unidad_entrada
+        self.new_microbloque.configuracion_salida.unidad = unidad_salida   
+        
         agregar_microbloque(self.new_microbloque.get_dto(),tipo,dominio,self.tipo)
         # Crear una nueva pestaña de presets
         new_presets_tab = self.create_presets_tab()
