@@ -1,4 +1,3 @@
-
 from back.topologia.microbloque import MicroBloque
 from back.macros.macro_controlador import MacroControlador
 from back.macros.macro_actuador import MacroActuador
@@ -68,27 +67,26 @@ class Simulacion(QObject):
         y_actual += y_proceso
         self.datos['salida'].append(y_actual)
 
-        estado = self.carga.simular(tiempo, y_actual)
-        print(f"Paso {ciclo}: Estado de la carga: {estado}")
-        self.datos['carga'].append(estado)
-        
+        estado_carga = self.carga.simular(tiempo, y_actual)
+        print(f"Paso {ciclo}: Estado de la carga: {estado_carga}")
+        self.datos['carga'].append(estado_carga)
 
         datos_paso = {
-                'tiempo': tiempo,
-                'controlador': y_controlador,
-                'actuador': y_actuador,
-                'proceso': y_proceso,
-                'medidor': y_medidor,
-                'entrada': y_entrada,
-                'error': error,
-                'salida': y_actual,
-                'carga': estado
-            }
+            'tiempo': tiempo,
+            'controlador': y_controlador,
+            'actuador': y_actuador,
+            'proceso': y_proceso,
+            'medidor': y_medidor,
+            'entrada': y_entrada,
+            'error': error,
+            'salida': y_actual,
+            'carga': estado_carga  # Añadimos el estado de la carga
+        }
 
         if self.graficadora:
             self.graficadora.agregar_datos(datos_paso)
             self.graficadora.procesar_eventos()
-        
+            
         # Añadir impresión detallada de los valores
         print(f"\nCiclo {ciclo}:")
         print(f"Tiempo: {tiempo}")
@@ -99,7 +97,7 @@ class Simulacion(QObject):
         print(f"Actuador: {y_actuador}")
         print(f"Proceso: {y_proceso}")
         print(f"Salida actual: {y_actual}")
-        print(f"Estado de la carga: {estado}")
+        print(f"Estado de la carga: {estado_carga}")
         print("-" * 30)
 
         return y_actual
@@ -124,6 +122,10 @@ class Simulacion(QObject):
         y_salida = self.salida_cero
 
         for i in range(1, self.ciclos+1):
+            if not self.continuar_simulacion or (self.graficadora and self.graficadora.is_paused):
+                while self.graficadora and self.graficadora.is_paused:
+                    self.graficadora.procesar_eventos()
+                    sleep(0.1)
             if not self.continuar_simulacion:
                 break
             y_salida = self.simular_paso(y_salida, i)

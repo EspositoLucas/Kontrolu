@@ -8,6 +8,7 @@ import os
 
 
 class ElementoEntrada(QPushButton):
+    
     def __init__(self, entrada):
         super().__init__()
         self.entrada = entrada
@@ -36,7 +37,7 @@ class ElementoEntrada(QPushButton):
         if dialog.exec_():
             self.entrada = dialog.entrada
             self.tipo_entrada = dialog.tipo_entrada
-            self.coeficiente = dialog.coeficiente  # Guardamos el coeficiente
+            self.coeficiente = dialog.coeficiente
             self.setText(self.entrada.nombre)
             
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):

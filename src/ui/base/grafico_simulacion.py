@@ -1,9 +1,12 @@
-
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QCheckBox, QPushButton, QFileDialog
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import (QApplication, QLabel,QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QCheckBox, 
+                             QPushButton, QFileDialog, QTabWidget, QTableWidget, 
+                             QTableWidgetItem, QLabel,QListWidget,QScrollArea)
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QColor
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from PyQt5.QtWidgets import QDialog, QTextEdit, QVBoxLayout
@@ -15,25 +18,83 @@ class Graficadora(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setAttribute(Qt.WA_DeleteOnClose, False)
-        self.setWindowTitle("Gráfico de Simulación en Tiempo Real")
+        self.setWindowTitle("Gráfico y Datos de Simulación en Tiempo Real")
         self.setGeometry(100, 100, 1200, 800)
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-        self.layout = QHBoxLayout(self.central_widget)
+        self.layout = QVBoxLayout(self.central_widget)
+
+        # Crear pestañas
+        self.tabs = QTabWidget()
+        self.layout.addWidget(self.tabs)
+
+        # Pestaña del gráfico
+        self.graph_widget = QWidget()
+        self.graph_layout = QHBoxLayout(self.graph_widget)  # Cambiado a QHBoxLayout
+        self.tabs.addTab(self.graph_widget, "Gráfico")
+        
+        # Panel izquierdo para controles y checkboxes
+        self.left_panel = QWidget()
+        self.left_panel_layout = QVBoxLayout(self.left_panel)
+        self.graph_layout.addWidget(self.left_panel, 1)
+        
+        # Área de desplazamiento para checkboxes
+        self.checkbox_scroll = QScrollArea()
+        self.checkbox_scroll.setWidgetResizable(True)
+        self.checkbox_widget = QWidget()
+        self.checkbox_layout = QVBoxLayout(self.checkbox_widget)
+        self.checkbox_scroll.setWidget(self.checkbox_widget)
+        self.left_panel_layout.addWidget(self.checkbox_scroll)
+        
+        # Panel derecho para el gráfico
+        self.right_panel = QWidget()
+        self.right_panel_layout = QVBoxLayout(self.right_panel)
+        self.graph_layout.addWidget(self.right_panel, 3)
 
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
         self.toolbar = NavigationToolbar(self.canvas, self)
+        
+        self.right_panel_layout.addWidget(self.toolbar)
+        self.right_panel_layout.addWidget(self.canvas)
 
-        graph_layout = QVBoxLayout()
-        graph_layout.addWidget(self.toolbar)
-        graph_layout.addWidget(self.canvas)
-        self.layout.addLayout(graph_layout, 3)
+        # Controles y estado de carga
+        controls_and_state = QHBoxLayout()
+        self.graph_layout.addLayout(controls_and_state)
 
         self.controls_layout = QVBoxLayout()
-        self.layout.addLayout(self.controls_layout, 1)
+        controls_and_state.addLayout(self.controls_layout, 1)
+
+        self.state_layout = QVBoxLayout()
+        controls_and_state.addLayout(self.state_layout)
+
+        # Indicador de estado de carga
+        self.state_layout = QHBoxLayout()
+        self.right_panel_layout.addLayout(self.state_layout)
+        self.state_indicator = QLabel()
+        self.state_indicator.setFixedSize(50, 50)
+        self.state_indicator.setStyleSheet("border: 1px solid black;")
+        self.state_layout.addWidget(self.state_indicator)
+
+        self.state_label = QLabel("Estado: ")
+        self.state_layout.addWidget(self.state_label)
+
+        # Pestaña de la tabla
+        self.table_widget = QWidget()
+        self.table_layout = QHBoxLayout(self.table_widget)
+        self.tabs.addTab(self.table_widget, "Datos")
+
+        # Lista de selección de columnas
+        self.column_list = QListWidget()
+        self.column_list.setSelectionMode(QListWidget.MultiSelection)
+        self.column_list.itemSelectionChanged.connect(self.actualizar_tabla)
+        self.table_layout.addWidget(self.column_list, 1)
+        
+        # Tabla de datos
+        self.data_table = QTableWidget()
+        self.table_layout.addWidget(self.data_table, 3)
 
         self.datos = {}
         self.lineas = {}
@@ -44,17 +105,36 @@ class Graficadora(QMainWindow):
 
         self.setup_controls()
 
+        # Temporizador para actualizar la tabla
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.actualizar_tabla)
+        self.timer.start(1000)  # Actualizar cada segundo
+
+
     def setup_controls(self):
         export_button = QPushButton("Exportar Datos")
         export_button.clicked.connect(self.export_manager.export_data)
         self.controls_layout.addWidget(export_button)
-
-        export_pdf_button = QPushButton("Exportar a PDF")
-        export_pdf_button.clicked.connect(self.export_to_pdf)
-        self.controls_layout.addWidget(export_pdf_button)
+        
         interpret_button = QPushButton("Interpretar Datos")
         interpret_button.clicked.connect(self.mostrar_interpretacion)
         self.controls_layout.addWidget(interpret_button)
+        
+        self.pause_button = QPushButton("Pausar Simulacion")
+        self.pause_button.clicked.connect(self.toggle_pause)
+        self.controls_layout.addWidget(self.pause_button)
+
+        self.is_paused = False
+    
+    def toggle_pause(self):
+        self.is_paused = not self.is_paused
+        self.pause_button.setText("Reanudar" if self.is_paused else "Pausar")
+        if self.is_paused:
+            self.timer.stop()
+        else:
+            self.timer.start(1000)
+        self.actualizar_tabla()  # Actualizar la tabla inmediatamente al pausar/reanudar
+
 
     def mostrar_interpretacion(self):
         interpretacion = InterpretacionDatos(self.datos)
@@ -77,12 +157,56 @@ class Graficadora(QMainWindow):
                     self.checkboxes[clave].setChecked(True)
                     self.checkboxes[clave].stateChanged.connect(self.actualizar_grafico)
                     self.controls_layout.addWidget(self.checkboxes[clave])
+                
+                # Agregar clave a la lista de selección de columnas
+                self.column_list.addItem(clave)
             
             valor_numerico = self.convertir_a_numerico(valor)
             self.datos[clave].append(valor_numerico)
 
-        self.actualizar_grafico()
+        if not self.is_paused:
+            self.actualizar_grafico()
+            self.actualizar_estado_carga(nuevos_datos.get('carga', None))
+            self.actualizar_tabla()
+    
+    def actualizar_estado_carga(self, estado):
+        if estado is not None:
+            nombre_estado = estado.get('nombre', 'Desconocido').lower()
+            color = self.obtener_color_estado(nombre_estado)
+            self.state_indicator.setStyleSheet(f"background-color: {color.name()}; border: 1px solid black;")
+            self.state_label.setText(f"Estado: {estado.get('nombre', 'Desconocido')}")
 
+    def obtener_color_estado(self, nombre_estado):
+        colores_estado = {
+            'Excelente': QColor(0, 255, 0),  # Verde brillante fuerte
+            'Bueno': QColor(144, 238, 144),  # Verde claro apenas notorio
+            'Regular': QColor(255, 255, 0),  # Amarillo
+            'Mal': QColor(255, 99, 71),  # Rojo claro
+            'Pesimo': QColor(255, 0, 0)  # Rojo fuerte
+        }
+        return colores_estado.get(nombre_estado, QColor(255, 255, 255))  # Blanco por defecto
+
+    def actualizar_tabla(self):
+        # Obtener las columnas seleccionadas
+        columnas_seleccionadas = [item.text() for item in self.column_list.selectedItems()]
+        if not columnas_seleccionadas:
+            columnas_seleccionadas = list(self.datos.keys())  # Mostrar todas si no hay selección
+
+        self.data_table.setRowCount(len(self.datos['tiempo']))
+        self.data_table.setColumnCount(len(columnas_seleccionadas))
+
+        # Establecer encabezados
+        self.data_table.setHorizontalHeaderLabels(columnas_seleccionadas)
+
+        # Llenar la tabla con datos
+        for col, key in enumerate(columnas_seleccionadas):
+            for row, value in enumerate(self.datos[key]):
+                item = QTableWidgetItem(str(value))
+                self.data_table.setItem(row, col, item)
+
+        # Ajustar tamaño de columnas
+        self.data_table.resizeColumnsToContents()
+    
     def convertir_a_numerico(self, valor):
         if isinstance(valor, (int, float)):
             return valor

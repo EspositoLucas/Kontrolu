@@ -154,6 +154,7 @@ class MainWindow(QMainWindow):
                                     carga=self.sesion.carga,
                                     graficadora=graficadora) # se la pasa como parametro a la clase Simulacion
             simulacion.ejecutar_simulacion(velocidad)
+            
             self.statusBar().showMessage('Simulación completada')
             
     def toggle_input_method(self, index):

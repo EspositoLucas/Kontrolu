@@ -291,3 +291,5 @@ class EditarEstadoDialog(QtWidgets.QDialog):
         layout.addWidget(button_box)
 
         self.setLayout(layout)
+
+
