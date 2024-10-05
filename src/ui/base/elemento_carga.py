@@ -10,7 +10,7 @@ class ElementoCarga(QPushButton):
     def __init__(self, carga):
         super().__init__()
         self.carga = carga
-        self.tipo_entrada = "Personalizada"  # Añadimos este atributo
+        self.tipo_entrada = "Misma que entrada"  # Añadimos este atributo
         self.coeficiente = "1"  # Añadimos este atributo
         self.estado_seleccionado = self.carga.estados[0]["nombre"]  # Inicializamos con el primer estado
         
@@ -91,9 +91,9 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
 
         # Tipo de entrada
         tipo_entrada_layout = QtWidgets.QHBoxLayout()
-        tipo_entrada_layout.addWidget(QtWidgets.QLabel("Tipo de entrada:"))
+        tipo_entrada_layout.addWidget(QtWidgets.QLabel("Tipo de transferencia:"))
         self.tipo_entrada_combo = QtWidgets.QComboBox()
-        self.tipo_entrada_combo.addItems(["Personalizada", "Escalón", "Rampa", "Parábola"])
+        self.tipo_entrada_combo.addItems(["Misma que entrada","Personalizada", "Escalón", "Rampa", "Parábola"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
         self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
@@ -195,9 +195,11 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def actualizar_interfaz(self):
         tipo_entrada = self.tipo_entrada_combo.currentText()
         es_personalizada = tipo_entrada == "Personalizada"
+
+        es_entrada = tipo_entrada == "Misma que entrada"
         
         self.latex_editor.setEnabled(es_personalizada)
-        self.coeficiente_input.setEnabled(not es_personalizada)
+        self.coeficiente_input.setEnabled((not es_personalizada) or (not es_entrada))
         
         if not es_personalizada:
             self.actualizar_funcion_transferencia()
@@ -217,6 +219,8 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
             latex = f"\\frac{{{coeficiente}}}{{s^2}}"
         elif tipo_entrada == "Parábola":
             latex = f"\\frac{{{coeficiente}}}{{s^3}}"
+        elif tipo_entrada == "Misma que entrada":
+            latex = f"{self.carga.entrada.funcion_transferencia}"
         else:
             return  # No actualizamos para entrada personalizada
         
@@ -239,9 +243,12 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         if self.tipo_entrada == "Personalizada":
                 self.carga.funcion_de_transferencia = self.latex_editor.get_latex()
                 self.coeficiente = "1"
+        elif self.tipo_entrada == "Misma que entrada":
+                self.coeficiente = "1"
+                self.carga.funcion_de_transferencia = ""
         else:
                 self.coeficiente = self.coeficiente_input.text() or "1"
-                self.entrada.funcion_transferencia = self.latex_editor.get_latex()
+                self.carga.funcion_de_transferencia = self.latex_editor.get_latex()
             
         # Guardamos el estado seleccionado
         current_item = self.estados_list.currentItem()

@@ -41,7 +41,8 @@ estados = [
 ]
 
 class Carga:
-    def __init__(self,funcion_de_transferencia="1",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga"):
+    def __init__(self,funcion_de_transferencia="1",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None):
+        self.entrada = entrada
         self.nombre = nombre
         self.funcion_de_transferencia = funcion_de_transferencia
         self.tipo_carga = tipo_carga
@@ -117,8 +118,14 @@ class Carga:
         return self.normalizar(self.total - self.errores,0,self.total)
 
     def salida_esperada(self,tiempo):
+        
+        funcion = self.funcion_de_transferencia
+        
+        if ((not funcion) or (funcion == " ")):
+            funcion = self.entrada.funcion_transferencia
+
         s,t = symbols('s t')
-        funcion_transferencia = latex2sympy(self.funcion_de_transferencia)
+        funcion_transferencia = latex2sympy(funcion)
         salida = inverse_laplace_transform(funcion_transferencia,s,t)
         return salida.subs(t,tiempo)
 
