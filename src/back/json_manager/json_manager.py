@@ -117,6 +117,7 @@ def crear_tipo(tipo: str, dominio: str, macro: MACROS, descripcion: str = "") ->
         "descripcion": descripcion,
         "micro_bloques": {}
     }
+    json_data = borrar_microbloques_vacios(json_data)
 
     with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
@@ -137,6 +138,8 @@ def agregar_microbloque(microbloque: MicroBloqueDto, tipo: str, dominio: str, ma
          
     json_data[str(macro)][dominio][tipo]["micro_bloques"][microbloque.nombre] = microbloque.__dict__
 
+    json_data = borrar_microbloques_vacios(json_data)
+
     with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
 
@@ -147,6 +150,8 @@ def obtener_microbloques_de_una_macro(macro: MACROS) -> list[DominioDto]:
     with open(file, "r") as json_file:
         json_data = json.load(json_file)
         json_file.close()
+
+    json_data = borrar_microbloques_vacios(json_data)
 
     dominios = []
     for dominio in json_data[str(macro)].keys():
@@ -167,6 +172,8 @@ def obtener_microbloques_de_un_dominio(dominio: str, macro: MACROS) -> list[Tipo
         json_data = json.load(json_file)
         json_file.close()
 
+    json_data = borrar_microbloques_vacios(json_data)
+
     tipos = json_data[str(macro)][dominio]
 
     tipos_list = []
@@ -185,6 +192,8 @@ def obtener_micorbloques_de_un_tipo(tipo: str, dominio: str, macro: MACROS) -> T
         json_data = json.load(json_file)
         json_file.close()
 
+    json_data = borrar_microbloques_vacios(json_data)
+
     microbloques = []
     for microbloque in json_data[str(macro)][dominio][tipo]["micro_bloques"].values():
         microbloques.append(MicroBloqueDto(**microbloque))
@@ -201,6 +210,8 @@ def borrar_tipo(tipo: str, dominio: str, macro: MACROS) -> None:
 
     del json_data[str(macro)][dominio][tipo]
 
+    json_data = borrar_microbloques_vacios(json_data)
+
     with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
 
@@ -214,8 +225,37 @@ def borrar_micro_bloque(tipo: str, dominio: str, macro: MACROS, microbloque: Mic
 
     del json_data[str(macro)][dominio][tipo]["micro_bloques"][microbloque.nombre]
 
+    json_data = borrar_microbloques_vacios(json_data)
+
     with open(file, "w") as json_file:
         json.dump(json_data, json_file, indent=4)
+
+
+#funcion que reciba un dict, si el, si algun tipo esta vacio se borra.
+#si algun dominio esta vacio no se borra
+#si algun macro esta vacio no se borra
+
+def borrar_microbloques_vacios(json) -> dict:
+    """
+    Borra microbloques vacíos del archivo JSON.
+    """
+    for macro in MACROS:
+        print(json[str(macro)])
+        for dominio in json[str(macro)].keys():
+            print(json[str(macro)][dominio])
+            tipos_a_borrar = []  # Lista para recopilar tipos a eliminar
+            for tipo in json[str(macro)][dominio].keys():
+                print(json[str(macro)][dominio][tipo])
+                if not json[str(macro)][dominio][tipo]["micro_bloques"]:
+                    print("borrando")
+                    tipos_a_borrar.append(tipo)  # Agregar a la lista para eliminar
+
+
+            for tipo in tipos_a_borrar:
+                del json[str(macro)][dominio][tipo]
+
+    return json
+
 """
 
 #Populame el json

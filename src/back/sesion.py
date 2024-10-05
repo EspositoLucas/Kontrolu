@@ -15,7 +15,7 @@ class Sesion():
         self.proceso = MacroProceso(sesion=self)
         self.medidor = MacroMedidor(sesion=self)
         self.punto_suma = MacroPuntoSuma()
-        self.carga = Carga()
+        self.carga = Carga(entrada=self.entrada)
         self.nombre = "Sistema de Control"
     
     def validar_entrada_controlador(self, unidad: str)-> bool:

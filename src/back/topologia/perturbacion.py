@@ -5,22 +5,18 @@ from .hoja import Hoja
 
 class Perturbacion(Hoja):
 
-    def __init__(self,funcion_transferencia:str="0",ciclos=0,dentro_de=0):
-        self.ciclos = ciclos
-        self.dentro_de = dentro_de
+    def __init__(self,funcion_transferencia:str="1",inicio=0,duracion=1):
+        self.inicio = inicio
+        self.duracion = duracion
+        self.ahora = False
         self.datos = {'tiempo': [], 'valor_original': [], 'perturbacion': [], 'resultado': []}
         super().__init__(funcion_transferencia=funcion_transferencia,nombre="Perturbacion")
     
     
     def simular(self,tiempo,entrada):
 
-        self.dentro_de -= 1
-        
-
-        if (not self.get_estado()): return entrada
-
-
-        self.ciclos -= 1
+        if (not self.get_estado(tiempo)):
+            return entrada
 
 
         s,t = symbols('s t')
@@ -43,26 +39,25 @@ class Perturbacion(Hoja):
         return nuevo_valor
     
 
-    def generar_perturbacion(self,ft,ciclos,dentro_de=0):
-        self.funcion_transferencia = ft
-        self.ciclos = ciclos
-        self.dentro_de = dentro_de
-    
-    def reactivar_perturbacion(self,ciclos,dentro_de=0):
-        self.ciclos = ciclos
-        self.dentro_de = dentro_de
-    
+    def set_funcion_transferencia(self, funcion):
+        print("Nueva funcion de transferencia: ", funcion)
+        self.funcion_transferencia = funcion
 
-    def get_estado(self):
-        if (self.ciclos > 0) and (self.dentro_de < 0):
-            return True
-        else:
-            return False
+    def get_estado(self,tiempo):
+        if self.ahora:
+            self.ahora = False
+            self.inicio = tiempo
+        return self.inicio <= tiempo <= (self.inicio + self.duracion)
 
-    def cancelar_perturbacion(self):
-        self.ciclos = 0
-        self.dentro_de = 0
-    
+    def perturbar_ahora(self,duracion):
+        self.ahora = True
+        self.duracion = duracion
+
+    def set_valores(self,inicio,duracion,ahora):
+        self.inicio = inicio
+        self.duracion = duracion
+        self.ahora = ahora
+
     def radio(self) -> int:
         return 10
     

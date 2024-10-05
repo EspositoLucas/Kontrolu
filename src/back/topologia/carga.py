@@ -41,7 +41,8 @@ estados = [
 ]
 
 class Carga:
-    def __init__(self,funcion_de_transferencia="1",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga"):
+    def __init__(self,funcion_de_transferencia="1",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None):
+        self.entrada = entrada
         self.nombre = nombre
         self.funcion_de_transferencia = funcion_de_transferencia
         self.tipo_carga = tipo_carga
@@ -62,63 +63,76 @@ class Carga:
         
         # Aplicar la función sigmoide ajustada
         resultado = 0 if np.exp(-k * (x_norm - x_0)) == -1 else (1 / (1 + np.exp(-k * (x_norm - x_0))))
-        
         return resultado
     
     def basic(self,x, x_min, x_max):
-        ba = 0 if x_max == x_min else (x - x_min) / (x_max - x_min)
-        return ba
+        return 1 if x_max == x_min and x == x_max else 0 if x_max == x_min else (x - x_min) / (x_max - x_min)
     
     def normalizar(self,valor, minimo, maximo):
         if((valor<minimo) or (valor>maximo)): 
+
             return 0
         if(self.desplazamiento_sigmoide): 
+
             sigmo = self.sigmoide(valor, minimo, maximo)
             return sigmo
         otro = self.basic(valor, minimo, maximo)
         return otro
 
     def obtener_estado(self,valor_normal):
-        posibles = filter(lambda x: x["minimo"] <= valor_normal, self.estados)
-        if not list(posibles): posibles = [{"minimo":0,"nombre":"ESTADO NO CONTEMPLADO","prioridad":0}]
+        posibles = list(filter(lambda x: x["minimo"] <= valor_normal, self.estados))
+
+        if(not posibles):
+            posibles = [{"minimo":0,"nombre":"ESTADO NO CONTEMPLADO","prioridad":0}]
+
+        
         return max(posibles,key=lambda x: x["minimo"])
 
 
     def salida_final(self,salida_real,valor_esperado):
-        if(salida_real<valor_esperado): 
-            carga = self.normalizar(valor_esperado,0,salida_real)
-            return carga
-        carga = self.normalizar(valor_esperado,salida_real,salida_real*2)
+
+        distancia = abs(salida_real - valor_esperado)
+
+        carga = self.normalizar(-distancia,-abs(valor_esperado),0)
+
         return carga
 
     def salida_integral(self,salida_real,valor_esperado):
         self.total += abs(valor_esperado)
         self.errores += salida_real - valor_esperado
-        self.normalizar(self.total - abs(self.errores),0,self.total)
+        return self.normalizar(self.total - abs(self.errores),0,self.total)
 
     def salida_error(self,salida_real,valor_esperado):
         self.total += abs(valor_esperado)
         self.errores += abs(salida_real - valor_esperado)
-        self.normalizar(self.total - self.errores,0,self.total)
+        return self.normalizar(self.total - self.errores,0,self.total)
 
     def salida_integral_proporcional(self,salida_real,valor_esperado):
         self.total += 1
         self.errores += (salida_real - valor_esperado)/valor_esperado
-        self.normalizar(self.total - abs(self.errores),0,self.total)
+        return self.normalizar(self.total - abs(self.errores),0,self.total)
 
     def salida_error_proporcional(self,salida_real,valor_esperado):
         self.total += 1
         self.errores += abs((salida_real - valor_esperado)/valor_esperado)
-        self.normalizar(self.total - self.errores,0,self.total)
+        return self.normalizar(self.total - self.errores,0,self.total)
 
     def salida_esperada(self,tiempo):
+        
+        funcion = self.funcion_de_transferencia
+        
+        if ((not funcion) or (funcion == " ")):
+            funcion = self.entrada.funcion_transferencia
+
         s,t = symbols('s t')
-        funcion_transferencia = latex2sympy(self.funcion_de_transferencia)
+        funcion_transferencia = latex2sympy(funcion)
         salida = inverse_laplace_transform(funcion_transferencia,s,t)
         return salida.subs(t,tiempo)
 
     def simular(self,tiempo,salida_real):
+
         valor_esperado = self.salida_esperada(tiempo)
+
 
         if self.tipo_carga == TipoCarga.INTEGRAL:
             carga = self.salida_integral(salida_real,valor_esperado)

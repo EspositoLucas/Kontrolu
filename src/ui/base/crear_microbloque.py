@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMenu,QDialog, QVBoxLayout, QTabWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QWidget, QTreeWidget, QTreeWidgetItem, QComboBox, QMessageBox, QHBoxLayout
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QSpacerItem, QSizePolicy, QHeaderView
+from PyQt5.QtWidgets import QSpacerItem, QSizePolicy, QHeaderView, QColorDialog
 from PyQt5.QtCore import Qt
 from .latex_editor import LatexEditor
 from back.topologia.configuraciones import Configuracion, TipoError
@@ -205,6 +205,7 @@ class CrearMicroBloque(QDialog):
         self.latex_editor.set_latex(self.new_microbloque.funcion_transferencia)
         self.name_input.setText(self.new_microbloque.nombre)
         self.color_button.setProperty("selected_color", self.new_microbloque.color)
+        self.descripcion_input.setText(self.new_microbloque.descripcion)
 
         self.go_to_create_microbloque_tab()
 
@@ -217,11 +218,24 @@ class CrearMicroBloque(QDialog):
         new_microbloque_layout = QVBoxLayout(new_microbloque_tab)
 
         # Nombre del microbloque
+        nombre_label = QLabel("Nombre:")
+        nombre_label.setStyleSheet("color: white;")
         name_input = QLineEdit(self.new_microbloque.nombre)
         name_input.setPlaceholderText("Nombre del microbloque")
         name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        new_microbloque_layout.addWidget(nombre_label)
         new_microbloque_layout.addWidget(name_input)
         self.name_input = name_input
+
+        # Nombre del microbloque
+        desc_label = QLabel("Descripcion:")
+        desc_label.setStyleSheet("color: white;")
+        descripcion_input = QLineEdit(self.new_microbloque.descripcion)
+        descripcion_input.setPlaceholderText("Descripcion:")
+        descripcion_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        new_microbloque_layout.addWidget(desc_label)
+        new_microbloque_layout.addWidget(descripcion_input)
+        self.descripcion_input = descripcion_input
 
         # Botón para seleccionar color
         color_button = QPushButton("Seleccionar Color")
@@ -254,6 +268,13 @@ class CrearMicroBloque(QDialog):
         new_microbloque_layout.addWidget(create_button)
         
         return new_microbloque_tab
+    
+    def select_color(self, button):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.color = color
+            button.setStyleSheet(f"background-color: {color.name()};")
+
     
     def guardar_preset(self):
 
@@ -296,6 +317,24 @@ class CrearMicroBloque(QDialog):
         dialog.exec_()
     
     def save_preset(self,tipo,dominio,dialog):
+        nombre = self.name_input.text()
+        color = self.color_button.property("selected_color")
+        funcion_transferencia = self.latex_editor.get_latex()
+        nombre_entrada = self.entrada_name_input.text()
+        nombre_salida = self.salida_name_input.text()
+        unidad_entrada = self.entrada_unidad_input.text()
+        unidad_salida = self.salida_unidad_input.text()
+        descripcion = self.descripcion_input.text()
+
+        self.new_microbloque.descripcion = descripcion
+        self.new_microbloque.nombre = nombre
+        self.new_microbloque.color = color
+        self.new_microbloque.funcion_transferencia = funcion_transferencia
+        self.new_microbloque.configuracion_entrada.nombre = nombre_entrada
+        self.new_microbloque.configuracion_salida.nombre = nombre_salida
+        self.new_microbloque.configuracion_entrada.unidad = unidad_entrada
+        self.new_microbloque.configuracion_salida.unidad = unidad_salida   
+
         agregar_microbloque(self.new_microbloque.get_dto(),tipo,dominio,self.tipo)
         # Crear una nueva pestaña de presets
         new_presets_tab = self.create_presets_tab()
@@ -325,7 +364,9 @@ class CrearMicroBloque(QDialog):
         nombre_salida = self.salida_name_input.text()
         unidad_entrada = self.entrada_unidad_input.text()
         unidad_salida = self.salida_unidad_input.text()
-        
+        descripcion = self.descripcion_input.text()
+
+        self.new_microbloque.descripcion = descripcion        
         self.new_microbloque.nombre = nombre
         self.new_microbloque.color = color
         self.new_microbloque.funcion_transferencia = funcion_transferencia

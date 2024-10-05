@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QTreeWidgetItem,QTreeWidget, QWidget ,QColorDialog , QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QComboBox, QMessageBox, QHBoxLayout, QInputDialog, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem, QSpinBox, QTabWidget, QGridLayout
+from PyQt5.QtWidgets import QTreeWidgetItem,QTreeWidget, QWidget ,QColorDialog,QCheckBox , QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QComboBox, QMessageBox, QHBoxLayout, QInputDialog, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem, QSpinBox, QTabWidget, QGridLayout
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
@@ -937,60 +937,86 @@ class DrawingArea(QGraphicsView):
         self.update()
     
     def agregar_perturbacion(self, microbloque, posicion):
-        dialog = QDialog(self)
-        dialog.setWindowTitle("Nueva Perturbación")
-        layout = QVBoxLayout()
 
-        # tengo que cargar dos cosas: la funcion de transferencia y la cantidad de ciclos de simulacion que va a durar la perturbacion
-        ft_label = QLabel("Función de Transferencia:")
-        ft_label.setStyleSheet("color: white;")
-        ft_editor = LatexEditor()
-        ft_editor.set_latex("1")
-        ft_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-        layout.addWidget(ft_label)
-        layout.addWidget(ft_editor)
+            perturbacion_nueva = Perturbacion()
 
-        ciclos = QLabel("Cantidad de ciclos de simulación:")
-        ciclos.setStyleSheet("color: white;")
-        ciclos_editor = QSpinBox()
-        ciclos_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-        ciclos_editor.setMinimum(1)
-        layout.addWidget(ciclos)
-        layout.addWidget(ciclos_editor)
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Nueva Perturbación")
+            layout = QVBoxLayout()
 
-        dentro_de_label = QLabel("Activar dentro de (ciclos):")
-        dentro_de_editor = QSpinBox()
-        dentro_de_editor.setMinimum(0)
-        dentro_de_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-        layout.addWidget(dentro_de_label)
-        layout.addWidget(dentro_de_editor)
-        
-        buttons = QHBoxLayout()
-        ok_button = QPushButton("Aceptar")
-        cancel_button = QPushButton("Cancelar")
-        buttons.addWidget(ok_button)
-        buttons.addWidget(cancel_button)
-        layout.addLayout(buttons)
-        dialog.setStyleSheet("background-color: #333; color: white;")
+            # Tengo que cargar dos cosas: la función de transferencia y la cantidad de ciclos de simulación que va a durar la perturbación
+            ft_label = QLabel("Función de Transferencia:")
+            ft_label.setStyleSheet("color: white;")
+            ft_editor = LatexEditor(perturbacion_nueva.funcion_transferencia)
+            ft_editor.set_latex("1")
+            ft_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+            layout.addWidget(ft_label)
+            layout.addWidget(ft_editor)
 
-        dialog.setLayout(layout)
+            # Checkbox para "Perturbar ahora"
+            perturbar_ahora_checkbox = QCheckBox("Perturbar ahora")
+            perturbar_ahora_checkbox.setStyleSheet("color: white;")
+            layout.addWidget(perturbar_ahora_checkbox)
 
-        ok_button.clicked.connect(dialog.accept)
-        cancel_button.clicked.connect(dialog.reject)
+            # Editor de inicio de ciclos
+            ciclos = QLabel("Tiempo de inicio (s):")
+            ciclos.setStyleSheet("color: white;")
+            ciclos_editor = QSpinBox()
+            ciclos_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+            ciclos_editor.setMinimum(0)
+            layout.addWidget(ciclos)
+            layout.addWidget(ciclos_editor)
 
-        if dialog.exec_() == QDialog.Accepted:
-            funcion_transferencia = ft_editor.get_latex()
-            ciclos = ciclos_editor.value()
-            dentro_de = dentro_de_editor.value()
-            perturbacion_nueva = Perturbacion(funcion_transferencia=funcion_transferencia, ciclos=ciclos, dentro_de=dentro_de)
-            if posicion == 'antes':
-                microbloque.elemento_back.agregar_perturbacion_antes(microbloque.elemento_back, perturbacion_nueva)
-            else:
-                microbloque.elemento_back.agregar_perturbacion_despues(microbloque.elemento_back, perturbacion_nueva)
-            
-            self.load_microbloques() 
-            self.update()
+            # Editor de duración
+            dentro_de_label = QLabel("Duración (s):")
+            dentro_de_editor = QSpinBox()
+            dentro_de_editor.setMinimum(0)
+            dentro_de_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+            layout.addWidget(dentro_de_label)
+            layout.addWidget(dentro_de_editor)
 
-        dialog.deleteLater()
+            # Conectar el checkbox para ocultar/mostrar el editor de inicio
+            def toggle_inicio_editor():
+                ciclos.setVisible(not perturbar_ahora_checkbox.isChecked())
+                ciclos_editor.setVisible(not perturbar_ahora_checkbox.isChecked())
 
+            # Conectar el checkbox a la función para que oculte el editor de inicio
+            perturbar_ahora_checkbox.stateChanged.connect(toggle_inicio_editor)
+            toggle_inicio_editor()  # Para que se oculte/visualice según el estado inicial del checkbox
+
+            # Botones de aceptar y cancelar
+            buttons = QHBoxLayout()
+            ok_button = QPushButton("Aceptar")
+            cancel_button = QPushButton("Cancelar")
+            buttons.addWidget(ok_button)
+            buttons.addWidget(cancel_button)
+            layout.addLayout(buttons)
+            dialog.setStyleSheet("background-color: #333; color: white;")
+
+            dialog.setLayout(layout)
+
+            # Conectar botones
+            ok_button.clicked.connect(dialog.accept)
+            cancel_button.clicked.connect(dialog.reject)
+
+            # Si el diálogo es aceptado
+            if dialog.exec_() == QDialog.Accepted:
+                funcion_transferencia = ft_editor.get_latex()
+                duracion = dentro_de_editor.value()
+                inicio = ciclos_editor.value()
+                ahora = perturbar_ahora_checkbox.isChecked()
+
+                perturbacion_nueva.set_funcion_transferencia(funcion_transferencia)
+                perturbacion_nueva.set_valores(inicio, duracion, ahora)
+
+
+                if posicion == 'antes':
+                    microbloque.elemento_back.agregar_perturbacion_antes(microbloque.elemento_back, perturbacion_nueva)
+                else:
+                    microbloque.elemento_back.agregar_perturbacion_despues(microbloque.elemento_back, perturbacion_nueva)
+                
+                self.load_microbloques()
+                self.update()
+
+            dialog.deleteLater()
 
