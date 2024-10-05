@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QGraphicsItemGroup,
     QGraphicsPolygonItem,
     QGraphicsLineItem,
-    QGraphicsTextItem
+    QGraphicsTextItem, QCheckBox
 )
 from PyQt5.QtGui import QBrush, QColor, QPen, QPolygonF, QFont
 from PyQt5.QtCore import QPointF
@@ -99,31 +99,57 @@ class PerturbacionVisual(QGraphicsItemGroup):
         view = self.scene().views()[0]
         screen_pos = view.mapToGlobal(view.mapFromScene(scene_pos))
         menu.exec_(screen_pos)
-    
+           
+
+
     def editar_perturbacion(self):
+        print("EDITAR")
         dialog = QDialog()
         dialog.setWindowTitle("Editar Perturbación")
         layout = QVBoxLayout()
 
+        # Tengo que cargar dos cosas: la función de transferencia y la cantidad de ciclos de simulación que va a durar la perturbación
         ft_label = QLabel("Función de Transferencia:")
-        ft_editor = LatexEditor()
-        ft_editor.set_latex(self.perturbacion_back.funcion_transferencia)
+        ft_label.setStyleSheet("color: white;")
+        ft_editor = LatexEditor(self.perturbacion_back.funcion_transferencia)
+        ft_editor.set_latex("1")
+        ft_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(ft_label)
         layout.addWidget(ft_editor)
 
-        ciclos_label = QLabel("Cantidad de ciclos de simulación:")
+        # Checkbox para "Perturbar ahora"
+        perturbar_ahora_checkbox = QCheckBox("Perturbar ahora")
+        perturbar_ahora_checkbox.setChecked(self.perturbacion_back.ahora)
+        perturbar_ahora_checkbox.setStyleSheet("color: white;")
+        layout.addWidget(perturbar_ahora_checkbox)
+
+        # Editor de inicio de ciclos
+        ciclos = QLabel("Tiempo de inicio (s):")
+        ciclos.setStyleSheet("color: white;")
         ciclos_editor = QSpinBox()
-        ciclos_editor.setMinimum(1)
-        ciclos_editor.setValue(self.perturbacion_back.ciclos)
-        layout.addWidget(ciclos_label)
+        ciclos_editor.setValue(self.perturbacion_back.inicio)
+        ciclos_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        ciclos_editor.setMinimum(0)
+        layout.addWidget(ciclos)
         layout.addWidget(ciclos_editor)
 
-        dentro_de_label = QLabel("Activar dentro de (ciclos):")
+        # Editor de duración
+        dentro_de_label = QLabel("Duración (s):")
         dentro_de_editor = QSpinBox()
+        dentro_de_editor.setValue(self.perturbacion_back.duracion)
         dentro_de_editor.setMinimum(0)
-        dentro_de_editor.setValue(self.perturbacion_back.dentro_de)
+        dentro_de_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(dentro_de_label)
         layout.addWidget(dentro_de_editor)
+
+        # Conectar el checkbox para ocultar/mostrar el editor de inicio
+        def toggle_inicio_editor():
+            ciclos.setVisible(not perturbar_ahora_checkbox.isChecked())
+            ciclos_editor.setVisible(not perturbar_ahora_checkbox.isChecked())
+
+        # Conectar el checkbox a la función para que oculte el editor de inicio
+        perturbar_ahora_checkbox.stateChanged.connect(toggle_inicio_editor)
+        toggle_inicio_editor()  # Para que se oculte/visualice según el estado inicial del checkbox
 
         buttons = QHBoxLayout()
         ok_button = QPushButton("Aceptar")
@@ -139,9 +165,12 @@ class PerturbacionVisual(QGraphicsItemGroup):
         cancel_button.clicked.connect(dialog.reject)
 
         if dialog.exec_() == QDialog.Accepted:
-            self.perturbacion_back.funcion_transferencia = ft_editor.get_latex()
-            self.perturbacion_back.ciclos = ciclos_editor.value()
-            self.perturbacion_back.dentro_de = dentro_de_editor.value()
+            print("MODIFICO")
+            self.perturbacion_back.set_funcion_transferencia(ft_editor.get_latex())
+            ahora = perturbar_ahora_checkbox.isChecked()
+            inicio = ciclos_editor.value()
+            duracion = dentro_de_editor.value()
+            self.perturbacion_back.set_valores(inicio, duracion, ahora)
     
     def eliminar_perturbacion(self):
         reply = QMessageBox.question(
