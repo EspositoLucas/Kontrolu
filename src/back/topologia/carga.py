@@ -154,3 +154,23 @@ class Carga:
         self.datos['carga'].append(carga)
 
         return estado
+    
+    def to_json(self):
+        return {
+            "nombre": self.nombre,
+            "funcion_de_transferencia": self.funcion_de_transferencia,
+            "tipo_carga": self.tipo_carga.value,
+            "escalamiento_sigmoide": self.escalamiento_sigmoide,
+            "desplazamiento_sigmoide": self.desplazamiento_sigmoide,
+            "datos": self.datos
+        }
+
+    def from_json(self, json):
+        self.funcion_de_transferencia = json['funcion_de_transferencia']
+        self.tipo_carga = TipoCarga(json['tipo_carga'])
+        self.escalamiento_sigmoide = json['escalamiento_sigmoide']
+        self.desplazamiento_sigmoide = json['desplazamiento_sigmoide']
+        self.nombre = json['nombre']
+        self.entrada = json['entrada']
+        self.datos = json['datos']
+        return self

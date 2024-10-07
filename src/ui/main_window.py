@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QIcon(icon))
 
-        menuBar = Menu(self)
+        menuBar = Menu(self,self.sesion)
         self.setMenuBar(menuBar)
 
         # Barra de herramientas

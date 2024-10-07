@@ -74,4 +74,12 @@ class Perturbacion(Hoja):
     def unidad_salida(self):
         return self.padre.unidad_entrante(self)
 
-    
+    def to_json(self):
+        return {
+            "tipo": "perturbacion",
+            "nombre": self.nombre,
+            "fdt": self.funcion_transferencia,
+            "inicio": self.inicio,
+            "duracion": self.duracion,
+            "ahora": self.ahora
+        }

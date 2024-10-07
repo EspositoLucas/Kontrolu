@@ -125,3 +125,19 @@ class MicroBloque(Hoja):
     def unidad_salida(self):
         return self.configuracion_salida.unidad
     
+    def to_json(self):
+        return {
+            "tipo": "microbloque",
+            "nombre": self.nombre,
+            "descripcion": self.descripcion,
+            "fdt": self.funcion_transferencia,
+            "configuracion_entrada": self.configuracion_entrada.to_json(),
+            "configuracion_salida": self.configuracion_salida.to_json()
+        }
+    
+    def from_json(self, json):
+        self.nombre = json['nombre']
+        self.descripcion = json['descripcion']
+        self.funcion_transferencia = json['fdt']
+        self.configuracion_entrada.from_json(json['configuracion_entrada'])
+        self.configuracion_salida.from_json(json['configuracion_salida'])

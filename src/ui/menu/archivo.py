@@ -1,10 +1,12 @@
 from PyQt5.QtWidgets import QMainWindow, QAction, QFileDialog, QMessageBox, QToolBar, QHBoxLayout, QWidget, QPushButton, QMenu, QAction
 from PyQt5.QtGui import QIcon
+import json 
 
 class Archivo(QMenu):
-    def __init__(self,main_window):
+    def __init__(self,main_window,sesion):
         super().__init__('Archivo',main_window)
         self.main_window = main_window
+        self.sesion = sesion
         self.setup()
         self.setStyleSheet("""
             QMenu {
@@ -49,9 +51,17 @@ class Archivo(QMenu):
             # Lógica para abrir un proyecto
     
     def save_project(self):
-        print('Proyecto guardado')
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, 'Guardar Proyecto', '', 'Archivos de Proyecto (*.prj)', options=options)
+        file_name = ""
+        default_name = self.sesion.nombre + ".json"
+        file_name, _ = QFileDialog.getSaveFileName(self, 'Guardar Proyecto', default_name, 'Archivos JSON (*.json)', options=options)
+        
         if file_name:
+
+            json_data = self.sesion.to_json()
+
+            with open(file_name, 'w') as file:
+                file.write(json.dumps(json_data))
+
             self.main_window.statusBar().showMessage(f'Proyecto guardado en {file_name}')
             # Lógica para guardar un proyecto

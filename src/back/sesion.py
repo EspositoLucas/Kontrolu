@@ -6,6 +6,7 @@ from .macros.macro_punto_suma import MacroPuntoSuma
 from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
 from .json_manager import json_manager
+import json
 
 class Sesion():
     def __init__(self):
@@ -56,3 +57,23 @@ class Sesion():
     def unidad_esperada_medidor(self)-> str:
         return self.controlador.unidad_entrada()
     
+    def to_json(self) -> str:
+        return {
+            "entrada": self.entrada.to_json(),
+            "controlador": self.controlador.to_json(),
+            "actuador": self.actuador.to_json(),
+            "proceso": self.proceso.to_json(),
+            "medidor": self.medidor.to_json(),
+            "carga": self.carga.to_json(),
+            "nombre": self.nombre
+        }
+    
+    def from_json(self, datos: str):
+        datos = json.loads(datos)
+        self.entrada = MicroBloque.from_json(datos["entrada"])
+        self.controlador = MacroControlador.from_json(datos["controlador"])
+        self.actuador = MacroActuador.from_json(datos["actuador"])
+        self.proceso = MacroProceso.from_json(datos["proceso"])
+        self.medidor = MacroMedidor.from_json(datos["medidor"])
+        self.carga = Carga.from_json(datos["carga"])
+        self.nombre = datos["nombre"]

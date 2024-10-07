@@ -138,6 +138,15 @@ class TopologiaSerie(InterfazTopologia):
             return self.padre.unidad_entrante()
         return self.hijos[-1].unidad_salida()
     
+    def to_json(self):
+        return {
+            "tipo": "serie",
+            "hijos": [hijo.to_json() for hijo in self.hijos]
+        }
+    
+    def from_json(self, json):
+        self.hijos = [Hoja().from_json(hijo) for hijo in json['hijos']]
+        return self
 
 
     
@@ -218,3 +227,13 @@ class TopologiaParalelo(InterfazTopologia):
     
     def unidad_saliente(self)-> str:
         return self.padre.unidad_saliente(self)
+    
+    def to_json(self):
+        return {
+            "tipo": "paralelo",
+            "hijos": [hijo.to_json() for hijo in self.hijos]
+        }
+    
+    def from_json(self, json):
+        self.hijos = [Hoja().from_json(hijo) for hijo in json['hijos']]
+        return self

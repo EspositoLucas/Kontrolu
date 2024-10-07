@@ -4,12 +4,13 @@ from PyQt5.QtGui import QFont
 from .archivo import Archivo
 
 class Menu(QMenuBar):
-    def __init__(self,main_window):
+    def __init__(self,main_window,sesion):
         super().__init__(main_window)
+        self.sesion = sesion
         self.setup(main_window)
     
     def setup(self,main_window):
-        archivo = Archivo(main_window)
+        archivo = Archivo(main_window,self.sesion)
         self.addMenu(archivo)
 
         self.setStyleSheet("""

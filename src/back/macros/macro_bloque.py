@@ -77,3 +77,15 @@ class MacroBloque(InterfazTopologia):
 
     def unidad_saliente(self):
         pass
+
+    def to_json(self):
+        return {
+            "nombre": self.nombre,
+            "tipo": self.tipo.value,
+            "topologia": self.topologia.to_json()
+        }
+    
+    def from_json(self, json):
+        self.nombre = json['nombre']
+        self.tipo = MACROS(json['tipo'])
+        self.topologia.from_json(json['topologia'])
