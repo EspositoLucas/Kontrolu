@@ -2,7 +2,10 @@ from .macro_bloque import MacroBloque
 from .tipos_macro import MACROS
 
 class MacroActuador(MacroBloque):
-    def __init__(self,sesion=None) -> None:
+    def __init__(self,sesion=None,from_json=None) -> None:
+        if from_json:
+            super().__init__(from_json=from_json)
+            return
         super().__init__(nombre="Actuador",sesion=sesion, tipo=MACROS.ACTUADOR)
 
     def validar_entrada(self, unidad: str)-> bool:

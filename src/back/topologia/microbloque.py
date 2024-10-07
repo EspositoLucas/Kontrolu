@@ -7,7 +7,11 @@ from .hoja import Hoja
 from back.json_manager.dtos import MicroBloqueDto
 
 class MicroBloque(Hoja):
-    def __init__(self, nombre: str= "Microbloque",color: QColor=None, funcion_transferencia: str="1", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None ) -> None:
+    def __init__(self, nombre: str= "Microbloque",color: QColor=None, funcion_transferencia: str="1", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
+        if from_json:
+            self.from_json(from_json)
+            self.padre = padre
+            return        
         self.color = color
         self.descripcion = descripcion
         self.configuracion_entrada = Configuracion(nombre="Configuracion Entrada")
@@ -139,5 +143,5 @@ class MicroBloque(Hoja):
         self.nombre = json['nombre']
         self.descripcion = json['descripcion']
         self.funcion_transferencia = json['fdt']
-        self.configuracion_entrada.from_json(json['configuracion_entrada'])
-        self.configuracion_salida.from_json(json['configuracion_salida'])
+        self.configuracion_entrada = Configuracion(from_json=json['configuracion_entrada'])
+        self.configuracion_salida = Configuracion(from_json=json['configuracion_salida'])

@@ -9,7 +9,10 @@ class TipoError(Enum):
     NINGUNO = "ninguno"
 
 class Configuracion:
-    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf, limite_por_ciclo=inf, error_maximo=inf, proporcion=0, tipo=TipoError.NINGUNO, ultimo_valor=0, probabilidad=0, unidad="V"):
+    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf, limite_por_ciclo=inf, error_maximo=inf, proporcion=0, tipo=TipoError.NINGUNO, ultimo_valor=0, probabilidad=0, unidad="V",from_json=None):
+        if from_json:
+            self.from_json(from_json)
+            return
         self.unidad = unidad
         self.nombre = nombre
         self.limite_inferior = limite_inferior
@@ -177,3 +180,9 @@ class Configuracion:
         self.set_probabilidad(json['probabilidad'] if json['probabilidad'] != "default" else None)
         self.unidad = json['unidad']
         return self
+    
+    def set_probabilidad(self, valor):
+        self.probabilidad = valor
+        if valor is None:
+            self.probabilidad = 0
+    

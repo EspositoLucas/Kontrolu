@@ -5,7 +5,10 @@ from back.topologia.interfaz_topologia import InterfazTopologia
 from .tipos_macro import MACROS
 
 class MacroBloque(InterfazTopologia):
-    def __init__(self,nombre="",sesion=None, tipo:MACROS=None) -> None:
+    def __init__(self,nombre="",sesion=None, tipo:MACROS=None,from_json=None) -> None:
+        if from_json:
+            self.from_json(from_json)
+            return
         self.tipo = tipo
         self.sesion = sesion
         self.topologia = TopologiaSerie(padre=self)
@@ -88,4 +91,4 @@ class MacroBloque(InterfazTopologia):
     def from_json(self, json):
         self.nombre = json['nombre']
         self.tipo = MACROS(json['tipo'])
-        self.topologia.from_json(json['topologia'])
+        self.topologia = TopologiaSerie(from_json=json['topologia'],padre=self)

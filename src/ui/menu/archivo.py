@@ -43,12 +43,19 @@ class Archivo(QMenu):
         self.main_window.statusBar().showMessage('Nuevo proyecto creado')
 
     def open_project(self):
-        print('Proyecto abierto')
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, 'Abrir Proyecto', '', 'Todos los archivos (*);;Archivos de Proyecto (*.prj)', options=options)
+        file_name, _ = QFileDialog.getOpenFileName(self, 'Abrir Proyecto', '', 'Archivos JSON (*.json);;Todos los archivos (*)', options=options)
+        
         if file_name:
+            with open(file_name, 'r') as file:
+                json_data = json.load(file)
+                self.sesion.from_json(json_data)
+                
+            self.main_window.actualizar_sesion()
             self.main_window.statusBar().showMessage(f'Proyecto {file_name} abierto')
-            # Lógica para abrir un proyecto
+
+
+            print(f'Proyecto {file_name} abierto')
     
     def save_project(self):
         options = QFileDialog.Options()

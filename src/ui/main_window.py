@@ -311,3 +311,18 @@ class MainWindow(QMainWindow):
             QApplication.quit()
         else:
             event.ignore()
+
+    def actualizar_sesion(self):
+        self.estabilidad = Estabilidad(self.sesion)
+        
+        # Actualizar el menú
+        menuBar = Menu(self, self.sesion)
+        self.setMenuBar(menuBar)
+        
+        # Actualizar la barra de herramientas
+        self.initUI()
+        
+        # Actualizar el diagrama de macrobloques
+        self.init_macrobloques()
+        
+        self.statusBar().showMessage('Sesión actualizada')

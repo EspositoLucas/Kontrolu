@@ -68,12 +68,16 @@ class Sesion():
             "nombre": self.nombre
         }
     
-    def from_json(self, datos: str):
-        datos = json.loads(datos)
-        self.entrada = MicroBloque.from_json(datos["entrada"])
-        self.controlador = MacroControlador.from_json(datos["controlador"])
-        self.actuador = MacroActuador.from_json(datos["actuador"])
-        self.proceso = MacroProceso.from_json(datos["proceso"])
-        self.medidor = MacroMedidor.from_json(datos["medidor"])
-        self.carga = Carga.from_json(datos["carga"])
+    def from_json(self, datos: dict):
+        self.entrada = MicroBloque(from_json = datos["entrada"])
+        self.controlador = MacroControlador(from_json = datos["controlador"])
+        self.controlador.sesion = self
+        self.actuador = MacroActuador(from_json = datos["actuador"])
+        self.actuador.sesion = self
+        self.proceso = MacroProceso(from_json = datos["proceso"])
+        self.proceso.sesion = self
+        self.medidor = MacroMedidor(from_json = datos["medidor"])
+        self.medidor.sesion = self
+        self.carga = Carga(from_json = datos["carga"])
+        self.carga.entrada = self.entrada
         self.nombre = datos["nombre"]

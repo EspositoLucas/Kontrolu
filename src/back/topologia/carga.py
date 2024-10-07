@@ -41,7 +41,10 @@ estados = [
 ]
 
 class Carga:
-    def __init__(self,funcion_de_transferencia="1",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None):
+    def __init__(self,funcion_de_transferencia="1",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None,from_json= None):
+        if from_json:
+            self.from_json(from_json)
+            return
         self.entrada = entrada
         self.nombre = nombre
         self.funcion_de_transferencia = funcion_de_transferencia
@@ -162,7 +165,8 @@ class Carga:
             "tipo_carga": self.tipo_carga.value,
             "escalamiento_sigmoide": self.escalamiento_sigmoide,
             "desplazamiento_sigmoide": self.desplazamiento_sigmoide,
-            "datos": self.datos
+            "datos": self.datos,
+            "estados": self.estados
         }
 
     def from_json(self, json):
@@ -171,6 +175,6 @@ class Carga:
         self.escalamiento_sigmoide = json['escalamiento_sigmoide']
         self.desplazamiento_sigmoide = json['desplazamiento_sigmoide']
         self.nombre = json['nombre']
-        self.entrada = json['entrada']
         self.datos = json['datos']
+        self.estados = json['estados']
         return self

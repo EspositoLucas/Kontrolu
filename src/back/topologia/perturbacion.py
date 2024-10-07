@@ -5,7 +5,11 @@ from .hoja import Hoja
 
 class Perturbacion(Hoja):
 
-    def __init__(self,funcion_transferencia:str="1",inicio=0,duracion=1):
+    def __init__(self,funcion_transferencia:str="1",inicio=0,duracion=1,from_json=None,padre=None) -> None:
+        if from_json:
+            self.from_json(from_json)
+            self.padre = padre
+            return
         self.inicio = inicio
         self.duracion = duracion
         self.ahora = False
@@ -83,3 +87,10 @@ class Perturbacion(Hoja):
             "duracion": self.duracion,
             "ahora": self.ahora
         }
+    
+    def from_json(self, json):
+        self.nombre = json['nombre']
+        self.funcion_transferencia = json['fdt']
+        self.inicio = json['inicio']
+        self.duracion = json['duracion']
+        self.ahora = json['ahora']

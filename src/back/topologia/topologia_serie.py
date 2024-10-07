@@ -9,7 +9,11 @@ ALTO = 80
 
 class TopologiaSerie(InterfazTopologia):
     
-    def __init__(self,micro: InterfazTopologia = None,lista_micros: list=None,padre: InterfazTopologia = None):
+    def __init__(self,micro: InterfazTopologia = None,lista_micros: list=None,padre: InterfazTopologia = None,from_json=None):
+        if from_json:
+            self.from_json(from_json)
+            self.padre = padre
+            return
         self.hijos: list[InterfazTopologia] = []
         if micro:
             micro.cambiar_padre(self)
@@ -90,9 +94,13 @@ class TopologiaSerie(InterfazTopologia):
 
 
     def alto(self) -> int:
+        if len(self.hijos) == 0:
+            return 0
         return max(map(lambda x: x.alto(),self.hijos))
     
     def ancho(self) -> int:
+        if len(self.hijos) == 0:
+            return 0
         return sum(map(lambda x: x.ancho(),self.hijos))
 
 
@@ -145,7 +153,14 @@ class TopologiaSerie(InterfazTopologia):
         }
     
     def from_json(self, json):
-        self.hijos = [Hoja().from_json(hijo) for hijo in json['hijos']]
+        self.hijos = []
+        for hijo in json['hijos']:
+            if hijo['tipo'] == 'paralelo':
+                self.hijos.append(TopologiaParalelo(from_json=hijo,padre=self))
+            elif hijo['tipo'] == 'hoja':
+                self.hijos.append(Hoja(from_json=hijo,padre=self))
+            elif hijo['tipo'] == 'perturbacion':
+                self.hijos.append(Perturbacion(from_json=hijo,padre=self))
         return self
 
 
@@ -157,7 +172,11 @@ class TopologiaSerie(InterfazTopologia):
 class TopologiaParalelo(InterfazTopologia):
     
     
-    def __init__(self,microbloqueNuevo,microbloque2:Hoja=None,serie:TopologiaSerie=None,arriba=True,padre:TopologiaSerie=None):
+    def __init__(self,microbloqueNuevo=None,microbloque2:Hoja=None,serie:TopologiaSerie=None,arriba=True,padre:TopologiaSerie=None,from_json=None):
+        if from_json:
+            self.from_json(from_json)
+            self.padre = padre
+            return
         nuevaSerie = TopologiaSerie(micro=microbloqueNuevo,padre=self)
         if(serie):  nuevo = serie
         if(microbloque2): nuevo = TopologiaSerie(micro=microbloque2,padre=self)
@@ -235,5 +254,7 @@ class TopologiaParalelo(InterfazTopologia):
         }
     
     def from_json(self, json):
-        self.hijos = [Hoja().from_json(hijo) for hijo in json['hijos']]
+        self.hijos = []
+        for hijo in json['hijos']:
+            self.hijos.append(TopologiaSerie(from_json=hijo,padre=self))
         return self
