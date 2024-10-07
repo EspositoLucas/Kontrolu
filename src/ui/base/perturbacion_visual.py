@@ -27,6 +27,7 @@ class PerturbacionVisual(QGraphicsItemGroup):
     def __init__(self, perturbacion_back, drawing_area):
         super().__init__()
         self.perturbacion_back = perturbacion_back
+        self.perturbacion_back.set_observer(self)
         self.drawing_area = drawing_area
         self.setAcceptHoverEvents(True)
         self.setZValue(1)
@@ -35,7 +36,7 @@ class PerturbacionVisual(QGraphicsItemGroup):
         self.setCursor(Qt.PointingHandCursor)
 
         self.circulo = QGraphicsEllipseItem(0, 0, 2 * RADIO_PERTURBACION, 2 * RADIO_PERTURBACION)
-        self.circulo.setBrush(QBrush(QColor("#FFD700")))
+        self.circulo.setBrush(QBrush(QColor("#FF0000")))
         self.circulo.setPen(QPen(Qt.black, 2))
         
         self.cruz1 = QGraphicsLineItem(4, 4, 2 * RADIO_PERTURBACION - 4, 2 * RADIO_PERTURBACION - 4)
@@ -75,6 +76,12 @@ class PerturbacionVisual(QGraphicsItemGroup):
         self.addToGroup(self.linea_flecha)
         self.addToGroup(self.mas_arriba)
         self.addToGroup(self.mas_izquierda)
+
+    def actualizar(self, estado):
+        color = QColor("#00FF00") if estado else QColor("#FF0000")
+        self.circulo.setBrush(QBrush(color))
+        if color != QColor("#FF0000"):
+            print("CAMBIE DE COLOR")
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Delete:
@@ -178,6 +185,7 @@ class PerturbacionVisual(QGraphicsItemGroup):
         )
         
         if reply == QMessageBox.Yes:
+            self.perturbacion_back.observer = None
             self.perturbacion_back.borrar_elemento() # elimino la perturbacion de la topologia
             self.scene().removeItem(self)
 

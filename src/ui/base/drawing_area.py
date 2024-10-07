@@ -925,17 +925,24 @@ class DrawingArea(QGraphicsView):
             self.grid_lines.append(line)
 
     def limpiar_escena(self):
-        self.scene.clear()
         self.grid_lines.clear()
         self.microbloques.clear()
-        self.perturbaciones.clear()
+        self.limpiar_perturbaciones()
         self.selected_microbloque = None
         self.selected_microbloques.clear()
         self.hide_add_buttons()
+        self.scene.clear()
 
   
         self.update()
     
+    def limpiar_perturbaciones(self):
+        for perturbacion in self.perturbaciones:
+            perturbacion.perturbacion_back.observer = None
+            self.scene.removeItem(perturbacion)
+        self.perturbaciones.clear()
+        self.update()
+
     def agregar_perturbacion(self, microbloque, posicion):
 
             perturbacion_nueva = Perturbacion()

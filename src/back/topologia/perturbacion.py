@@ -6,6 +6,7 @@ from .hoja import Hoja
 class Perturbacion(Hoja):
 
     def __init__(self,funcion_transferencia:str="1",inicio=0,duracion=1,from_json=None,padre=None) -> None:
+        self.observer = None
         if from_json:
             self.from_json(from_json)
             self.padre = padre
@@ -16,11 +17,21 @@ class Perturbacion(Hoja):
         self.datos = {'tiempo': [], 'valor_original': [], 'perturbacion': [], 'resultado': []}
         super().__init__(funcion_transferencia=funcion_transferencia,nombre="Perturbacion")
     
+    def set_observer(self,observer):
+        self.observer = observer
+    
+    def notificar(self, estado):
+        print("entrando a funcion notificar")
+        if self.observer:
+            print("notificando")
+            self.observer.actualizar(estado)
     
     def simular(self,tiempo,entrada):
 
         if (not self.get_estado(tiempo)):
+            self.notificar(False)
             return entrada
+        self.notificar(True)
 
 
         s,t = symbols('s t')
