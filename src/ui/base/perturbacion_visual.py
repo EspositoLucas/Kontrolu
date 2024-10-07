@@ -103,7 +103,6 @@ class PerturbacionVisual(QGraphicsItemGroup):
 
 
     def editar_perturbacion(self):
-        print("EDITAR")
         dialog = QDialog()
         dialog.setWindowTitle("Editar Perturbación")
         layout = QVBoxLayout()
@@ -111,7 +110,6 @@ class PerturbacionVisual(QGraphicsItemGroup):
         ft_label = QLabel("Función de Transferencia:")
         ft_label.setStyleSheet("color: white;")
         ft_editor = LatexEditor(self.perturbacion_back.funcion_transferencia)
-        ft_editor.set_latex("1")
         ft_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(ft_label)
         layout.addWidget(ft_editor)
@@ -164,7 +162,6 @@ class PerturbacionVisual(QGraphicsItemGroup):
         cancel_button.clicked.connect(dialog.reject)
 
         if dialog.exec_() == QDialog.Accepted:
-            print("MODIFICO")
             self.perturbacion_back.set_funcion_transferencia(ft_editor.get_latex())
             ahora = perturbar_ahora_checkbox.isChecked()
             inicio = ciclos_editor.value()
