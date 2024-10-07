@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMenu,QDialog, QVBoxLayout, QTabWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QWidget, QTreeWidget, QTreeWidgetItem, QComboBox, QMessageBox, QHBoxLayout
+from PyQt5.QtWidgets import QMenu,QDialog,QCheckBox, QVBoxLayout, QTabWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QWidget, QTreeWidget, QTreeWidgetItem, QComboBox, QMessageBox, QHBoxLayout
 from PyQt5.QtGui import QColor, QDoubleValidator
 from PyQt5.QtWidgets import QSpacerItem, QSizePolicy, QHeaderView, QColorDialog
 from PyQt5.QtCore import Qt
@@ -7,6 +7,7 @@ from back.topologia.configuraciones import Configuracion, TipoError
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo
 from back.topologia.microbloque import MicroBloque
 from back.json_manager.json_manager import obtener_microbloques_de_una_macro, agregar_microbloque, borrar_micro_bloque
+from .modificar_configuracion import ModificarConfiguracion
 
 
 
@@ -442,109 +443,13 @@ class CrearMicroBloque(QDialog):
         config_tab.addTab(config_content, "Configuraciones")
 
         return config_tab
-
-
-
+    
     def edit_configuration(self, configuracion, tipo):
-        dialog = QDialog()
-        dialog.setWindowTitle(f"Editar Configuración de {tipo.capitalize()}")
-        dialog.setStyleSheet("background-color: #333; color: white;")
-        layout = QVBoxLayout()
+        """
+        Abre un diálogo para editar una configuración.
+        """
+        ModificarConfiguracion(configuracion= configuracion, tipo=tipo, padre=self)
 
-        fields = [
-            ("Límite inferior", "limite_inferior", float('-inf')),
-            ("Límite superior", "limite_superior", float('inf')),
-            ("Límite por ciclo", "limite_por_ciclo", float('inf')),
-            ("Error máximo", "error_maximo", float('inf')),
-            ("Proporción", "proporcion", 1.0),
-            ("Último valor", "ultimo_valor", 0.0),
-            ("Probabilidad", "probabilidad", 1.0)
-        ]
 
-        input_fields = {}
-        for label, attr, default_value in fields:
-            row = QHBoxLayout()
-            lbl = QLabel(label)
-            lbl.setStyleSheet("color: white;")
-            
-            value_selector = QComboBox()
-            value_selector.addItems(["Valor numérico", "Infinito", "-Infinito"])
-            value_selector.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-            
-            input_field = QLineEdit()
-            input_field.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-            input_field.setValidator(QDoubleValidator())
-            
-            current_value = getattr(configuracion, attr)
-            if current_value == float('inf'):
-                value_selector.setCurrentText("Infinito")
-                input_field.setEnabled(False)
-            elif current_value == float('-inf'):
-                value_selector.setCurrentText("-Infinito")
-                input_field.setEnabled(False)
-            else:
-                value_selector.setCurrentText("Valor numérico")
-                input_field.setText(str(current_value))
-            
-            value_selector.currentTextChanged.connect(lambda text, field=input_field: self.toggle_input_field(text, field))
-            
-            row.addWidget(lbl)
-            row.addWidget(value_selector)
-            row.addWidget(input_field)
-            layout.addLayout(row)
-            input_fields[attr] = (value_selector, input_field)
-
-        tipo_error_combo = QComboBox()
-        tipo_error_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-        for error_type in TipoError:
-            tipo_error_combo.addItem(error_type.value)
-        tipo_error_combo.setCurrentText(configuracion.tipo.value)
-        layout.addWidget(QLabel("Tipo de error"))
-        layout.addWidget(tipo_error_combo)
-
-        save_button = QPushButton("Guardar cambios")
-        save_button.setStyleSheet("background-color: #444; color: white;")
-        save_button.clicked.connect(lambda: self.save_configuration(dialog, configuracion, input_fields, tipo_error_combo))
-        layout.addWidget(save_button)
-
-        dialog.setLayout(layout)
-        dialog.exec_()
-    
-    def toggle_input_field(self, selected_text, input_field):
-        if selected_text == "Valor numérico":
-            input_field.setEnabled(True)
-        else:
-            input_field.setEnabled(False)
-            input_field.clear()
-    
-    def save_configuration(self, dialog, configuracion, input_fields, tipo_error_combo):
-        for attr, (value_selector, input_field) in input_fields.items():
-            selected_value = value_selector.currentText()
-            if selected_value == "Infinito":
-                setattr(configuracion, attr, float('inf'))
-            elif selected_value == "-Infinito":
-                setattr(configuracion, attr, float('-inf'))
-            else:
-                try:
-                    value = float(input_field.text())
-                    setattr(configuracion, attr, value)
-                except ValueError:
-                    QMessageBox.warning(dialog, "Error", f"Valor inválido para {attr}")
-                    return
-
-        configuracion.tipo = TipoError(tipo_error_combo.currentText())
-        dialog.accept()
-        
-    def get_attr_from_label(self, label):
-        attr_map = {
-            "Límite inferior": "limite_inferior",
-            "Límite superior": "limite_superior",
-            "Límite por ciclo": "limite_por_ciclo",
-            "Error máximo": "error_maximo",
-            "Proporción": "proporcion",
-            "Último valor": "ultimo_valor",
-            "Probabilidad": "probabilidad"
-        }
-        return attr_map.get(label, "")
 
 

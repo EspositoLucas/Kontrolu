@@ -55,26 +55,29 @@ class Configuracion:
         self.tipo = TipoError.NINGUNO
         self.ultimo_valor = 0
     
-    def borrar_limite_inferior(self):
+    def default_limite_inferior(self):
         self.limite_inferior = -inf
     
-    def borrar_limite_superior(self):
+    def default_limite_superior(self):
         self.limite_superior = inf
     
-    def borrar_limite_por_ciclo(self):
+    def default_limite_por_ciclo(self):
         self.limite_por_ciclo = inf
     
-    def borrar_error_maximo(self):
+    def default_error_maximo(self):
         self.error_maximo = inf
     
-    def borrar_proporcion(self):
+    def default_proporcion(self):
         self.proporcion = 0
     
-    def borrar_tipo(self):
+    def default_tipo(self):
         self.tipo = TipoError.NINGUNO
     
-    def borrar_ultimo_valor(self):
+    def default_ultimo_valor(self):
         self.ultimo_valor = 0
+
+    def default_probabilidad(self):
+        self.probabilidad = 0
     
     def set_limite_inferior(self,valor):
         self.limite_inferior = valor
@@ -103,6 +106,31 @@ class Configuracion:
     def set_ultimo_valor(self,valor):
         self.ultimo_valor = valor
         if valor is None: self.ultimo_valor = 0
+
+    def es_default_limite_inferior(self):
+        return self.limite_inferior == -inf
+    
+    def es_default_limite_superior(self):
+        return self.limite_superior == inf
+    
+    def es_default_limite_por_ciclo(self):
+        return self.limite_por_ciclo == inf
+    
+    def es_default_error_maximo(self):
+        return self.error_maximo == inf
+    
+    def es_default_proporcion(self):
+        return self.proporcion == 0
+    
+    def es_default_tipo(self):
+        return self.tipo == TipoError.NINGUNO
+    
+    def es_default_ultimo_valor(self):
+        return self.ultimo_valor == 0
+    
+    def es_default_probabilidad(self):
+        return self.probabilidad == 0
+    
     
     def actualizar(self,valor,tiempo):
         error = self.calcular_error(valor)
