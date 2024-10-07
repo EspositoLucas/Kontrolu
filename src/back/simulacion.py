@@ -152,6 +152,6 @@ class Simulacion(QObject):
         ESTA_SIMULANDO = True
         self.simular_sistema_tiempo_real(velocidad=velocidad)
         ESTA_SIMULANDO = False
-        # if self.graficadora:
-        #     self.graficadora.show()  # Asegura que la gráfica sea visible al final
+        if self.graficadora and not self.graficadora.isHidden():
+            self.graficadora.close()
 

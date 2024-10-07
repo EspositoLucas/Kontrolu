@@ -19,6 +19,7 @@ from back.estabilidad import Estabilidad
 from ui.base.latex_editor import LatexEditor
 from ui.base.grafico_simulacion import Graficadora
 from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWidgets import QApplication,QMessageBox
 import sympy as sp
 # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('company.app.1')
 
@@ -297,3 +298,16 @@ class MainWindow(QMainWindow):
 
         dialog.setLayout(layout)
         dialog.exec_()
+    
+
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, 'Confirmar salida',
+                                     '¿Está seguro de que desea salir?',
+                                     QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            event.accept()
+            QApplication.quit()
+        else:
+            event.ignore()
