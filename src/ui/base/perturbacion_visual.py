@@ -80,8 +80,6 @@ class PerturbacionVisual(QGraphicsItemGroup):
     def actualizar(self, estado):
         color = QColor("#00FF00") if estado else QColor("#FF0000")
         self.circulo.setBrush(QBrush(color))
-        if color != QColor("#FF0000"):
-            print("CAMBIE DE COLOR")
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Delete:

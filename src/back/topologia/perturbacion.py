@@ -21,11 +21,12 @@ class Perturbacion(Hoja):
         self.observer = observer
     
     def notificar(self, estado):
-        print("entrando a funcion notificar")
         if self.observer:
-            print("notificando")
-            self.observer.actualizar(estado)
-    
+            try:
+                self.observer.actualizar(estado)
+            except Exception as e:
+                print("Error al notificar: ", e)
+
     def simular(self,tiempo,entrada):
 
         if (not self.get_estado(tiempo)):
