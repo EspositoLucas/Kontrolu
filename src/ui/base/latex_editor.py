@@ -102,7 +102,7 @@ class LatexEditor(QWidget):
 
         # Add symbol selector
         symbol_layout = QHBoxLayout()
-        symbols = ["s", "\\frac{}{}", "^2", "^3", "\sqrt[n]{x}", "\log","\ln", "e", "π"]
+        symbols = ["s", "\\frac{}{}", "^2", "^3", "\sqrt[n]{x}", "\log","\ln", "e", "\pi"]
         for symbol in symbols:
             button = QToolButton()
             if symbol == "\\frac{}{}":
@@ -113,6 +113,8 @@ class LatexEditor(QWidget):
                 button.setText("ln")
             elif symbol == "\log":
                 button.setText("log")
+            elif symbol == "\pi":
+                button.setText("π")
             else:
                 button.setText(symbol)
             button.clicked.connect(lambda checked, s=symbol: self.insert_symbol(s))
@@ -184,6 +186,7 @@ class LatexEditor(QWidget):
         latex = latex.replace('\\log', 'log')
         latex = latex.replace('\\ln', 'ln')
         latex = latex.replace('e', 'E')  # 'E' es reconocido como la constante e en sympy
+        latex = latex.replace('\pi', 'pi')  # 'E' es reconocido como la constante e en sympy
         
         s = Symbol('s')
         try:
