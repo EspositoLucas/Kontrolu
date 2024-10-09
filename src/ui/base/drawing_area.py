@@ -1008,7 +1008,14 @@ class DrawingArea(QGraphicsView):
 
             # Si el diálogo es aceptado
             if dialog.exec_() == QDialog.Accepted:
+                
                 funcion_transferencia = ft_editor.get_latex()
+                
+                if not ft_editor.es_funcion_valida(ft_editor.get_latex()):
+                    QMessageBox.warning(self, "Función de transferencia inválida", 
+                                        "La función de transferencia no es válida. Por favor, corríjala antes de continuar.")
+                    return
+                
                 duracion = dentro_de_editor.value()
                 inicio = ciclos_editor.value()
                 ahora = perturbar_ahora_checkbox.isChecked()

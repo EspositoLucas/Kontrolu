@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 from back.topologia.microbloque import MicroBloque
-from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QMessageBox
 from .latex_editor import LatexEditor
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QPushButton
@@ -138,6 +138,12 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.latex_editor.set_latex(latex)
         
     def accept(self):
+        
+        if not self.latex_editor.es_funcion_valida(self.latex_editor.get_latex()):
+            QMessageBox.warning(self, "Función de transferencia inválida", 
+                                "La función de transferencia no es válida. Por favor, corríjala antes de continuar.")
+            return
+    
         self.entrada.nombre = self.nombre_input.text()
         self.tipo_entrada = self.tipo_entrada_combo.currentText()
         

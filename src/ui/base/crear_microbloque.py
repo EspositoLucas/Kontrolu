@@ -317,7 +317,12 @@ class CrearMicroBloque(QDialog):
         self.update_tipo_combo(tipo_combo,dominio_combo.currentText(),presets)
         dialog.exec_()
     
-    def save_preset(self,tipo,dominio,dialog):
+    def save_preset(self, tipo, dominio, dialog):
+        if not self.latex_editor.es_funcion_valida(self.latex_editor.get_latex()):
+            QMessageBox.warning(self, "Función de transferencia inválida", 
+                                "La función de transferencia no es válida. Por favor, corríjala antes de guardar el preset.")
+            return
+
         nombre = self.name_input.text()
         color = self.color_button.property("selected_color")
         funcion_transferencia = self.latex_editor.get_latex()
@@ -336,7 +341,7 @@ class CrearMicroBloque(QDialog):
         self.new_microbloque.configuracion_entrada.unidad = unidad_entrada
         self.new_microbloque.configuracion_salida.unidad = unidad_salida   
 
-        agregar_microbloque(self.new_microbloque.get_dto(),tipo,dominio,self.tipo)
+        agregar_microbloque(self.new_microbloque.get_dto(), tipo, dominio, self.tipo)
         # Crear una nueva pestaña de presets
         new_presets_tab = self.create_presets_tab()
         
@@ -346,7 +351,6 @@ class CrearMicroBloque(QDialog):
         # Insertar la nueva pestaña en el mismo índice
         self.tabs.insertTab(0, new_presets_tab, "Presets")
         dialog.accept()
-        
 
     def update_tipo_combo(self, tipo_combo, dominio, presets):
         tipo_combo.clear()  # Limpiar las opciones actuales
@@ -358,6 +362,11 @@ class CrearMicroBloque(QDialog):
 
 
     def crear_microbloque_nuevo(self):
+        if not self.latex_editor.es_funcion_valida(self.latex_editor.get_latex()):
+            QMessageBox.warning(self, "Función de transferencia inválida", 
+                                "La función de transferencia no es válida. Por favor, corríjala antes de continuar.")
+            return
+
         nombre = self.name_input.text()
         color = self.color_button.property("selected_color")
         funcion_transferencia = self.latex_editor.get_latex()

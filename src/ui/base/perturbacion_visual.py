@@ -167,7 +167,15 @@ class PerturbacionVisual(QGraphicsItemGroup):
         cancel_button.clicked.connect(dialog.reject)
 
         if dialog.exec_() == QDialog.Accepted:
+            
+            if not ft_editor.es_funcion_valida(ft_editor.get_latex()):
+                    QMessageBox.warning(self.perturbacion_back.set_funcion_transferencia(ft_editor.get_latex()), "Función de transferencia inválida", 
+                                        "La función de transferencia no es válida. Por favor, corríjala antes de continuar.")
+                    return
+            
+            
             self.perturbacion_back.set_funcion_transferencia(ft_editor.get_latex())
+                
             ahora = perturbar_ahora_checkbox.isChecked()
             inicio = ciclos_editor.value()
             duracion = dentro_de_editor.value()

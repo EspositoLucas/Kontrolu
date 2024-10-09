@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 from .latex_editor import LatexEditor
 from back.topologia.carga import Carga,TipoCarga
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QPushButton, QMessageBox
 import os
 
 
@@ -231,6 +231,12 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.info_estado_label.setText(info)
 
     def accept(self):
+        
+        if not self.latex_editor.es_funcion_valida(self.latex_editor.get_latex()):
+            QMessageBox.warning(self, "Función de transferencia inválida", 
+                                "La función de transferencia no es válida. Por favor, corríjala antes de continuar.")
+            return
+        
         # Actualizamos los valores de la carga con los nuevos datos
         self.carga.nombre = self.nombre_input.text()
         self.carga.tipo_carga = TipoCarga(self.tipo_carga_combo.currentText())
