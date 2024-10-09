@@ -102,25 +102,22 @@ class LatexEditor(QWidget):
 
         # Add symbol selector
         symbol_layout = QHBoxLayout()
-        symbols = ["\\frac{}{}", "^2", "^3", "\sqrt[n]{x}","\\frac{d}{dx}", "∫","\int_{inf}^{sup}", "log","ln", "e","\lim_{x \\to 0}","sin","cos","tan","cot","cst","sec","∞", "π", "θ", ">", "<", "≥", "≤", "⋅", "÷", "×", "∑", "∏", "()", "[]","\{  \}"]
+        symbols = ["s", "\\frac{}{}", "^2", "^3", "\sqrt[n]{x}", "\log","\ln", "e", "π"]
         for symbol in symbols:
             button = QToolButton()
             if symbol == "\\frac{}{}":
                 button.setText("a/b")
             elif symbol == "\\sqrt[n]{x}":
                 button.setText("√ₙ(x)")
-            elif symbol == "\\int_{inf}^{sup}":
-                button.setText("∫ definida")
-            elif symbol == "\\frac{d}{dx}":
-                button.setText("d/dx")
-            elif symbol == "\lim_{x \\to 0}":
-                button.setText("lim")
-            elif symbol == "\{  \}":
-                button.setText("{}")
+            elif symbol == "\ln":
+                button.setText("ln")
+            elif symbol == "\log":
+                button.setText("log")
             else:
                 button.setText(symbol)
             button.clicked.connect(lambda checked, s=symbol: self.insert_symbol(s))
             symbol_layout.addWidget(button)
+            
         layout.addLayout(symbol_layout)
 
         self.setLayout(layout)
@@ -182,13 +179,11 @@ class LatexEditor(QWidget):
         if latex.replace('.', '').isdigit():
             return True
         
-        # Reemplazar símbolos problemáticos
-        latex = latex.replace('\\frac', '')  # eliminar \frac
-        latex = re.sub(r'\{([^}]*)\}\{([^}]*)\}', r'((\1)/(\2))', latex)  # convertir fracciones
-        latex = latex.replace('^', '**')  # cambiar exponentes
-        latex = latex.replace('()', '(x)')  # reemplazar paréntesis vacíos
-        latex = latex.replace('[]', '[x]')  # reemplazar corchetes vacíos
-        latex = latex.replace('{}', '{x}')  # reemplazar llaves vacías
+        # Tratar símbolos especiales
+        latex = re.sub(r'\\sqrt\[(\d+)\]\{([^}]+)\}', r'(\2)**(1/\1)', latex)  # raíz n-ésima
+        latex = latex.replace('\\log', 'log')
+        latex = latex.replace('\\ln', 'ln')
+        latex = latex.replace('e', 'E')  # 'E' es reconocido como la constante e en sympy
         
         s = Symbol('s')
         try:
