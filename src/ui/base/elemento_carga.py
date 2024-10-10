@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 from .latex_editor import LatexEditor
 from back.topologia.carga import Carga,TipoCarga
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QPushButton,QMessageBox
 from ..base.vista_json import VistaJson
 import os
 

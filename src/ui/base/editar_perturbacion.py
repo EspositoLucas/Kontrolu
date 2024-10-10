@@ -92,9 +92,13 @@ class EditarPerturbacion(QDialog):
         ok_button.clicked.connect(self.aceptar)
         cancel_button.clicked.connect(self.reject)
 
-            
-
     def aceptar(self):
+        
+        if not self.ft_editor.es_funcion_valida(self.ft_editor.get_latex()):
+            QMessageBox.warning(self, "Función de transferencia inválida", 
+                                "La función de transferencia no es válida. Por favor, corríjala antes de continuar.")
+            return
+        
         self.perturbacion_back.set_funcion_transferencia(self.ft_editor.get_latex())
         ahora = self.perturbar_ahora_checkbox.isChecked()
         inicio = self.ciclos_editor.value()
