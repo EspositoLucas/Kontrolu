@@ -1,27 +1,21 @@
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QPushButton, QVBoxLayout, QDialog, 
                              QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, 
-                             QWidget, QStackedWidget, QTextEdit, QToolBar, QAction, 
+                             QToolBar, QAction, 
                              QTableWidgetItem, QTableWidget, QFrame)
 from PyQt5 import QtGui
-from PyQt5.QtGui import QIcon, QFont, QColor
+from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 import os
-from .menu.archivo import Archivo
 from .menu.menu_bar import Menu
 from .macro_diagrama import MacroDiagrama
 from back.simulacion import Simulacion
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-import ctypes
 from back.simulacion import Simulacion
 from back.estabilidad import Estabilidad
-from ui.base.latex_editor import LatexEditor
 from ui.base.grafico_simulacion import Graficadora
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication,QMessageBox
 import sympy as sp
-# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('company.app.1')
 
 class MainWindow(QMainWindow):
     def __init__(self,sesion):

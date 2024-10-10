@@ -1,9 +1,6 @@
 import os
 from .macro_vista import MacroVista
-from PyQt5 import QtCore, QtGui, QtWidgets
-
-from PyQt5 import QtCore, QtGui, QtWidgets
-import os
+from PyQt5 import QtCore, QtGui
 
 class PuntoSuma(MacroVista):
     def __init__(self, parent=None):

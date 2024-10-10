@@ -2,25 +2,18 @@ from PyQt5.QtWidgets import (
     QGraphicsEllipseItem, 
     QMenu, 
     QAction, 
-    QMessageBox, 
-    QDialog, 
-    QVBoxLayout, 
-    QLabel, 
-    QSpinBox, 
-    QHBoxLayout, 
-    QPushButton, 
+    QMessageBox,
     QGraphicsItem, 
     QGraphicsItemGroup,
     QGraphicsPolygonItem,
     QGraphicsLineItem,
-    QGraphicsTextItem, QCheckBox
+    QGraphicsTextItem, 
 )
 from PyQt5.QtGui import QBrush, QColor, QPen, QPolygonF, QFont
 from PyQt5.QtCore import QPointF
 from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 import os
-from .latex_editor import LatexEditor
 from .editar_perturbacion import EditarPerturbacion
 
 RADIO_PERTURBACION = 10

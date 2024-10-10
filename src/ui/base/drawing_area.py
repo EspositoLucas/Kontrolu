@@ -1,16 +1,13 @@
 import os
-from PyQt5.QtWidgets import QTreeWidgetItem,QTreeWidget, QWidget ,QColorDialog,QCheckBox , QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QComboBox, QMessageBox, QHBoxLayout, QInputDialog, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem, QSpinBox, QTabWidget, QGridLayout
+from PyQt5.QtWidgets import QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
-from .latex_editor import LatexEditor
 from .add_button import AddButton
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo,  ANCHO, ALTO
 from back.topologia.microbloque import MicroBloque
 from back.topologia.perturbacion import Perturbacion
-from globals import ESTA_SIMULANDO
-from back.topologia.configuraciones import  TipoError
 from .perturbacion_visual import PerturbacionVisual, RADIO_PERTURBACION
 from .crear_microbloque import CrearMicroBloque
 from .vista_json import VistaJson

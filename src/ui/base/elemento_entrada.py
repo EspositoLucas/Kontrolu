@@ -3,7 +3,7 @@ from back.topologia.microbloque import MicroBloque
 from PyQt5.QtWidgets import QMessageBox
 from .latex_editor import LatexEditor
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QPushButton, QDialog
+from PyQt5.QtWidgets import QPushButton
 import os
 from ..base.vista_json import VistaJson
 

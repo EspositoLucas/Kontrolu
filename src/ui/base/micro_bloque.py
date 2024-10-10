@@ -1,8 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QLineEdit, QVBoxLayout, QLabel, QPushButton, QColorDialog, QDialog,QComboBox,QHBoxLayout, QMessageBox, QGraphicsItem,QTabWidget,QGridLayout
+from PyQt5.QtWidgets import QColorDialog, QDialog,QGraphicsItem
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF
-from .latex_editor import LatexEditor
-from back.topologia.configuraciones import Configuracion,TipoError
 from .crear_microbloque import CrearMicroBloque
 class Microbloque(QGraphicsItem):
     def __init__(self, microbloque_back=None):

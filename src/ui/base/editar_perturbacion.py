@@ -1,23 +1,13 @@
 from PyQt5.QtWidgets import (
-    QGraphicsEllipseItem, 
-    QMenu, 
-    QAction, 
     QMessageBox, 
     QDialog, 
     QVBoxLayout, 
     QLabel, 
     QSpinBox, 
     QHBoxLayout, 
-    QPushButton, 
-    QGraphicsItem, 
-    QGraphicsItemGroup,
-    QGraphicsPolygonItem,
-    QGraphicsLineItem,
-    QGraphicsTextItem, QCheckBox
+    QPushButton,
+    QCheckBox
 )
-from PyQt5.QtGui import QBrush, QColor, QPen, QPolygonF, QFont
-from PyQt5.QtCore import QPointF
-from PyQt5.QtCore import Qt
 from .latex_editor import LatexEditor
 from .vista_json import VistaJson
 

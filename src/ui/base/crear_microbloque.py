@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QMenu,QDialog, QVBoxLayout, QTabWidget, QPushButton,
 from PyQt5.QtWidgets import  QHeaderView, QColorDialog
 from PyQt5.QtCore import Qt
 from .latex_editor import LatexEditor
-from back.topologia.microbloque import MicroBloque
 from PyQt5 import QtGui
 import os
 from back.json_manager.json_manager import obtener_microbloques_de_una_macro, agregar_microbloque, borrar_micro_bloque
