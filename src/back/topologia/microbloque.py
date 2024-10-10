@@ -7,7 +7,7 @@ from .hoja import Hoja
 from back.json_manager.dtos import MicroBloqueDto
 
 class MicroBloque(Hoja):
-    def __init__(self, nombre: str= "Microbloque",color: QColor=None, funcion_transferencia: str="1", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
+    def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 0), funcion_transferencia: str="1", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
         if from_json:
             self.from_json(from_json)
             self.padre = padre
@@ -136,7 +136,8 @@ class MicroBloque(Hoja):
             "descripcion": self.descripcion,
             "fdt": self.funcion_transferencia,
             "configuracion_entrada": self.configuracion_entrada.to_json(),
-            "configuracion_salida": self.configuracion_salida.to_json()
+            "configuracion_salida": self.configuracion_salida.to_json(),
+            "color": self.color.name()
         }
     
     def from_json(self, json):
@@ -145,3 +146,5 @@ class MicroBloque(Hoja):
         self.funcion_transferencia = json['fdt']
         self.configuracion_entrada = Configuracion(from_json=json['configuracion_entrada'])
         self.configuracion_salida = Configuracion(from_json=json['configuracion_salida'])
+        self.color = QColor(json['color'])
+        print(f"Se ha creado el microbloque {self.nombre} con la configuración de entrada {self.configuracion_entrada} y la configuración de salida {self.configuracion_salida}")

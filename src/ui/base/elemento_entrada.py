@@ -5,6 +5,7 @@ from .latex_editor import LatexEditor
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QPushButton
 import os
+from ..base.vista_json import VistaJson
 
 
 class ElementoEntrada(QPushButton):
@@ -33,7 +34,7 @@ class ElementoEntrada(QPushButton):
             self.mostrar_configuracion_entrada()        
 
     def mostrar_configuracion_entrada(self):
-        dialog = ConfiguracionEntradaDialog(None, self.entrada, self.tipo_entrada, self.coeficiente)
+        dialog = ConfiguracionEntradaDialog(self, self.entrada, self.tipo_entrada, self.coeficiente)
         if dialog.exec_():
             self.entrada = dialog.entrada
             self.tipo_entrada = dialog.tipo_entrada
@@ -42,7 +43,8 @@ class ElementoEntrada(QPushButton):
             
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, entrada=None, tipo_entrada="Personalizada",coeficiente="1"):
-        super().__init__(parent)
+        super().__init__()
+        self.padre = parent
         self.setWindowTitle("Configuración de Entrada")
         self.entrada = entrada if entrada else MicroBloque()
         self.tipo_entrada = tipo_entrada
@@ -99,13 +101,32 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
+        
+        # Botón Editar JSON
+        self.boton_editar_json = QtWidgets.QPushButton("Editar JSON")
+        self.boton_editar_json.clicked.connect(self.editar_json)
+        button_box.addButton(self.boton_editar_json, QtWidgets.QDialogButtonBox.ActionRole)
         layout.addWidget(button_box)
-
         self.setLayout(layout)
         self.setStyleSheet("background-color: #333; color: white;")
         
         # Actualizamos la interfaz según el tipo de entrada inicial
         self.actualizar_interfaz()
+
+    def actualizar_campos_con_microbloque(self, microbloque):
+        self.nombre_input.setText(microbloque.nombre)
+        self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
+        self.coeficiente_input.setText(self.coeficiente)
+        self.latex_editor.set_latex(microbloque.funcion_transferencia or "")
+        self.actualizar_interfaz()
+
+    def editar_json(self):
+        vista = VistaJson(self.entrada, self)
+        vista.exec_()
+        if vista.result():
+            self.actualizar_campos_con_microbloque()
+            self.padre.setText(self.entrada.nombre)
+
 
     def actualizar_interfaz(self):
         tipo_entrada = self.tipo_entrada_combo.currentText()

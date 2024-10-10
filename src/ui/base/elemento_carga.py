@@ -2,7 +2,8 @@ from PyQt5 import QtWidgets, QtCore
 from .latex_editor import LatexEditor
 from back.topologia.carga import Carga,TipoCarga
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QPushButton, QMessageBox
+from PyQt5.QtWidgets import QPushButton
+from ..base.vista_json import VistaJson
 import os
 
 
@@ -33,7 +34,7 @@ class ElementoCarga(QPushButton):
             self.mostrar_configuracion_carga()
 
     def mostrar_configuracion_carga(self):
-        dialog = ConfiguracionCargaDialog(None, self.carga, self.tipo_entrada, self.estado_seleccionado)
+        dialog = ConfiguracionCargaDialog(self, self.carga, self.tipo_entrada, self.estado_seleccionado)
         if dialog.exec_():
             self.carga = dialog.carga
             self.tipo_entrada = dialog.tipo_entrada
@@ -42,7 +43,8 @@ class ElementoCarga(QPushButton):
 
 class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, carga=None, tipo_entrada="Personalizada", estado_seleccionado=None, coeficiente="1"):
-        super().__init__(parent)
+        super().__init__()
+        self.padre = parent
         self.setWindowTitle("Configuración de Carga")
         self.carga = carga if carga else Carga()
         self.tipo_entrada = tipo_entrada
@@ -141,11 +143,17 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.desplazamiento_sigmoide_input = QtWidgets.QLineEdit(str(self.carga.desplazamiento_sigmoide))
         ds_layout.addWidget(self.desplazamiento_sigmoide_input)
         layout.addLayout(ds_layout)
-
-        # Botones OK y Cancelar
-        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        # Botones OK, Cancelar y Editar JSON
+        button_box = QtWidgets.QDialogButtonBox()
+        button_box.addButton(QtWidgets.QDialogButtonBox.Ok)
+        button_box.addButton(QtWidgets.QDialogButtonBox.Cancel)
+        self.btn_editar_json = QtWidgets.QPushButton("Editar JSON")
+        button_box.addButton(self.btn_editar_json, QtWidgets.QDialogButtonBox.ActionRole)
+        
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
+        self.btn_editar_json.clicked.connect(self.editar_json)
+        
         layout.addWidget(button_box)
 
         self.setStyleSheet("background-color: #333; color: white;")
@@ -154,6 +162,26 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         # Actualizamos la interfaz según el tipo de entrada inicial
         self.actualizar_interfaz()
     
+
+    
+    def actualizar_campos(self):
+        self.nombre_input.setText(self.carga.nombre)
+        self.tipo_carga_combo.setCurrentText(self.carga.tipo_carga.value)
+        self.latex_editor.set_latex(self.carga.funcion_de_transferencia)
+        self.escalamiento_sigmoide_input.setText(str(self.carga.escalamiento_sigmoide))
+        self.desplazamiento_sigmoide_input.setText(str(self.carga.desplazamiento_sigmoide))
+        self.actualizar_lista_estados()
+        self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
+        self.coeficiente_input.setText(self.coeficiente)
+        self.actualizar_interfaz()
+        self.padre.setText(self.carga.nombre)
+
+    def editar_json(self):
+        vista = VistaJson(self.carga, self)
+        vista.exec_()
+        if vista.result():
+            self.actualizar_campos()
+
     def actualizar_lista_estados(self):
         self.estados_list.clear()
         for estado in self.carga.estados:

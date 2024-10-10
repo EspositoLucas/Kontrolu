@@ -55,6 +55,10 @@ class Microbloque(QGraphicsItem):
         self.update()
         
     def paint(self, painter, option, widget):
+        self.option = option
+        self.painter = painter
+        self.widget = widget
+
         painter.setRenderHint(QPainter.Antialiasing)
         
         if self.esta_selecionado:
@@ -143,3 +147,10 @@ class Microbloque(QGraphicsItem):
             self.entrada_unidad_color = color_entrada
             self.salida_unidad_color = color_salida
             self.update()
+
+    def actualizar(self):
+        self.color = self.elemento_back.color or QColor(255, 255, 0)
+        self.nombre = self.elemento_back.nombre
+        self.funcion_transferencia = self.elemento_back.funcion_transferencia or ""
+        self.configuracion_entrada = self.elemento_back.configuracion_entrada
+        self.configuracion_salida = self.elemento_back.configuracion_salida

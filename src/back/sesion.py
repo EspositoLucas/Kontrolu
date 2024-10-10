@@ -10,6 +10,9 @@ import json
 
 class Sesion():
     def __init__(self):
+        self.nueva_sesion()
+    
+    def nueva_sesion(self):
         self.entrada = MicroBloque(nombre="Entrada")
         self.controlador = MacroControlador(sesion=self)
         self.actuador = MacroActuador(sesion=self)
@@ -18,7 +21,7 @@ class Sesion():
         self.punto_suma = MacroPuntoSuma()
         self.carga = Carga(entrada=self.entrada)
         self.nombre = "Sistema de Control"
-    
+
     def validar_entrada_controlador(self, unidad: str)-> bool:
         return self.medidor.unidad_salida() == unidad
     def validar_salida_controlador(self, unidad: str)-> bool:

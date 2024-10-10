@@ -1,14 +1,11 @@
-from PyQt5.QtWidgets import QMenu,QDialog,QCheckBox, QVBoxLayout, QTabWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QWidget, QTreeWidget, QTreeWidgetItem, QComboBox, QMessageBox, QHBoxLayout
-from PyQt5.QtGui import QColor, QDoubleValidator
-from PyQt5.QtWidgets import QSpacerItem, QSizePolicy, QHeaderView, QColorDialog
+from PyQt5.QtWidgets import QMenu,QDialog, QVBoxLayout, QTabWidget, QPushButton, QLineEdit, QLabel, QGridLayout, QWidget, QTreeWidget, QTreeWidgetItem, QComboBox, QMessageBox, QHBoxLayout
+from PyQt5.QtWidgets import  QHeaderView, QColorDialog
 from PyQt5.QtCore import Qt
 from .latex_editor import LatexEditor
-from back.topologia.configuraciones import Configuracion, TipoError
-from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo
 from back.topologia.microbloque import MicroBloque
 from back.json_manager.json_manager import obtener_microbloques_de_una_macro, agregar_microbloque, borrar_micro_bloque
 from .modificar_configuracion import ModificarConfiguracion
-
+from ..base.vista_json import VistaJson
 
 
 class CrearMicroBloque(QDialog):
@@ -16,7 +13,7 @@ class CrearMicroBloque(QDialog):
         super().__init__(parent)
         self.tipo = tipo
         self.new_microbloque = micro_bloque
-        self.parent = parent
+        self.padre = parent
         self.setWindowTitle("Nuevo Micro Bloque")
         self.setStyleSheet("background-color: #333; color: white;")
         self.create_new_microbloque(tab)
@@ -241,6 +238,7 @@ class CrearMicroBloque(QDialog):
         # Botón para seleccionar color
         color_button = QPushButton("Seleccionar Color")
         color_button.setStyleSheet("background-color: #444; color: white;")
+        color_button.setProperty("selected_color", self.new_microbloque.color)
         color_button.clicked.connect(lambda: self.select_color(color_button))
         new_microbloque_layout.addWidget(color_button)
         self.color_button = color_button
@@ -267,9 +265,39 @@ class CrearMicroBloque(QDialog):
         create_button.setStyleSheet("background-color: #444; color: white;")
         create_button.clicked.connect(self.crear_microbloque_nuevo)  # Conectar el botón a la función que cambia la pestaña
         new_microbloque_layout.addWidget(create_button)
+
+        edit_json_button = QPushButton("Editar JSON")
+        edit_json_button.setStyleSheet("background-color: #444; color: white;")
+        edit_json_button.clicked.connect(self.editar_json)  # Conectar el botón al método editar_json
+        new_microbloque_layout.addWidget(edit_json_button)
         
         return new_microbloque_tab
     
+    def actualizar_campos(self):
+        """
+        Actualiza todos los campos del formulario con los valores actuales del microbloque.
+        """
+        self.name_input.setText(self.new_microbloque.nombre)
+        self.descripcion_input.setText(self.new_microbloque.descripcion)
+        self.color_button.setProperty("selected_color", self.new_microbloque.color)
+        self.color_button.setStyleSheet(f"background-color: {self.new_microbloque.color.name()};")
+        self.latex_editor.set_latex(self.new_microbloque.funcion_transferencia)
+        self.entrada_name_input.setText(self.new_microbloque.configuracion_entrada.nombre)
+        self.entrada_unidad_input.setText(self.new_microbloque.configuracion_entrada.unidad)
+        self.salida_name_input.setText(self.new_microbloque.configuracion_salida.nombre)
+        self.salida_unidad_input.setText(self.new_microbloque.configuracion_salida.unidad)
+
+    def editar_json(self):
+        """
+        Abre un diálogo para editar el JSON del microbloque.
+        """
+        vista = VistaJson(self.new_microbloque, self)
+        vista.exec_()
+        if vista.result():
+            self.actualizar_campos()
+            if self.padre.__class__.__name__ == 'Microbloque':
+                self.padre.actualizar()
+
     def select_color(self, button):
         color = QColorDialog.getColor()
         if color.isValid():

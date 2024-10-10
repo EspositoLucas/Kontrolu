@@ -41,6 +41,15 @@ class Archivo(QMenu):
     def new_project(self):
         print('Nuevo proyecto creado')
         self.main_window.statusBar().showMessage('Nuevo proyecto creado')
+        reply = QMessageBox.question(self.main_window, 'Confirmar Nuevo Proyecto', 
+                         '¿Seguro que quieres crear un nuevo proyecto? Se perderán los cambios no guardados.', 
+                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            # Lógica para crear un nuevo proyecto
+            print('Nuevo proyecto creado')
+            self.sesion.nueva_sesion()
+            self.main_window.actualizar_sesion()
+            self.main_window.statusBar().showMessage('Nuevo proyecto creado')
 
     def open_project(self):
         options = QFileDialog.Options()
