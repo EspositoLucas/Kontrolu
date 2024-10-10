@@ -3,7 +3,7 @@ from back.topologia.microbloque import MicroBloque
 from PyQt5.QtWidgets import QMessageBox
 from .latex_editor import LatexEditor
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtWidgets import QPushButton, QDialog
 import os
 from ..base.vista_json import VistaJson
 
@@ -22,7 +22,6 @@ class ElementoEntrada(QPushButton):
         self.clicked.connect(self.mousePressEvent)
         self.setStyleSheet("""
             background-color: #0072BB;;  /* Color de fondo azul /
-            font-weight: bold;          /* Texto en negrita */
             font-weight: bold;          /* Texto en negrita */
             color: white;               /* Color de texto blanco */
             font-size: 15px;            /* Tamaño de fuente */
@@ -50,17 +49,18 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.tipo_entrada = tipo_entrada
         self.coeficiente = coeficiente
         self.initUI()
+        
 
     def initUI(self):
 
+        layout = QtWidgets.QVBoxLayout()
+        
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        image_path = os.path.join(path,'imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QtGui.QIcon(icon))
-
-        layout = QtWidgets.QVBoxLayout()
 
         # Campo para el nombre
         nombre_layout = QtWidgets.QHBoxLayout()

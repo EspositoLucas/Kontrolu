@@ -253,20 +253,61 @@ class DrawingArea(QGraphicsView):
 
         return pos
 
-    def clear_all(self):
-        if self.microbloques:
-            for microbloque in self.microbloques:
-                #microbloque.deleteLater() # elimina cada elemento
-                self.scene.removeItem(microbloque)
-            self.microbloques.clear() # vacia la lista de microbloques
+    def clear_all(self):     
+        dialog = QMessageBox(None)
+        dialog.setWindowTitle('Confirmar eliminación')
+        dialog.setText('¿Está seguro que desea eliminar todos los elementos?')
+        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dialog.setDefaultButton(QMessageBox.No)
         
-         # vacia la lista de botones "+"
-        for button in self.add_buttons:
-            self.scene.removeItem(button)
-        self.add_buttons.clear()
-        self.macrobloque.modelo.reset_topologia() # si limpiamos todo, deberíamos limpiar también el arbol del macrobloque
-        self.load_microbloques() # resetea la vista
-        self.update()
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
+        
+        # Establecer el estilo de la ventana
+        dialog.setStyleSheet("""
+            QMessageBox {
+                background-color: #333;
+                color: white;
+            }
+            
+            QMessageBox QLabel {
+                color: white;
+                background-color: black;
+                padding: 10px;
+            }
+        """)
+        
+        # Cambiar el texto del botón "Yes" a "Si"
+        yes_button = dialog.button(QMessageBox.Yes)
+        if yes_button:
+            yes_button.setText("Si")
+
+        # Aplicar estilo a los botones específicos
+        for button in dialog.buttons():
+            button.setStyleSheet("""
+                background-color: black;
+                color: white;
+                min-width: 80px;
+                min-height: 30px;
+                border: none;
+            """)
+
+        reply = dialog.exec_()
+        
+        if reply == QMessageBox.Yes:
+            for microbloque in self.microbloques:
+                self.scene.removeItem(microbloque)
+            self.microbloques.clear()
+            
+            for button in self.add_buttons:
+                self.scene.removeItem(button)
+            self.add_buttons.clear()
+            self.macrobloque.modelo.reset_topologia()
+            self.load_microbloques()
     
     def dibujar_lo_demas(self):
         
@@ -834,25 +875,117 @@ class DrawingArea(QGraphicsView):
                 self.delete_microbloque(self.selected_microbloque) # borramos el microbloque seleccionado
         else:
             super().keyPressEvent(event)
-
+    
     def delete_microbloque(self, microbloque):
-        self.microbloques.remove(microbloque)
-        microbloque.elemento_back.borrar_elemento()
-        self.scene.removeItem(microbloque)
-        self.selected_microbloque = None
-        self.hide_add_buttons()
-        self.load_microbloques()
-        self.update()
+        dialog = QMessageBox(None)
+        dialog.setWindowTitle('Confirmar eliminación')
+        dialog.setText('¿Está seguro que desea eliminar este microbloque?')
+        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dialog.setDefaultButton(QMessageBox.No)
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
+        
+        # Establecer el estilo de la ventana
+        dialog.setStyleSheet("""
+            QMessageBox {
+                background-color: #333;
+                color: white;
+            }
+            
+            QMessageBox QLabel {
+                color: white;
+                background-color: black;
+                padding: 10px;
+            }
+        """)
+        
+        # Cambiar el texto del botón "Yes" a "Si"
+        yes_button = dialog.button(QMessageBox.Yes)
+        if yes_button:
+            yes_button.setText("Si")
 
-    def delete_selected_microbloques(self):
-        for microbloque in self.selected_microbloques:
+        # Aplicar estilo a los botones específicos
+        for button in dialog.buttons():
+            button.setStyleSheet("""
+                background-color: black;
+                color: white;
+                min-width: 80px;
+                min-height: 30px;
+                border: none;
+            """)
+
+        reply = dialog.exec_()
+        
+        if reply == QMessageBox.Yes:
             self.microbloques.remove(microbloque)
             microbloque.elemento_back.borrar_elemento()
             self.scene.removeItem(microbloque)
+            self.selected_microbloque = None
             self.hide_add_buttons()
-        self.selected_microbloques.clear() # limpio la lista de microbloques seleccionados
-        self.load_microbloques()
-        self.update()
+            self.load_microbloques()
+            self.update()
+
+
+    def delete_selected_microbloques(self):
+        
+        dialog = QMessageBox(None)
+        dialog.setWindowTitle('Confirmar eliminación')
+        dialog.setText('¿Está seguro que desea eliminar los microbloques seleccionados?')
+        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dialog.setDefaultButton(QMessageBox.No)
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
+        
+        # Establecer el estilo de la ventana
+        dialog.setStyleSheet("""
+            QMessageBox {
+                background-color: #333;
+                color: white;
+            }
+            
+            QMessageBox QLabel {
+                color: white;
+                background-color: black;
+                padding: 10px;
+            }
+        """)
+        
+        # Cambiar el texto del botón "Yes" a "Si"
+        yes_button = dialog.button(QMessageBox.Yes)
+        if yes_button:
+            yes_button.setText("Si")
+
+        # Aplicar estilo a los botones específicos
+        for button in dialog.buttons():
+            button.setStyleSheet("""
+                background-color: black;
+                color: white;
+                min-width: 80px;
+                min-height: 30px;
+                border: none;
+            """)
+
+        reply = dialog.exec_()
+        
+        if reply == QMessageBox.Yes:
+            for microbloque in self.selected_microbloques:
+                self.microbloques.remove(microbloque)
+                microbloque.elemento_back.borrar_elemento()
+                self.scene.removeItem(microbloque)
+                self.hide_add_buttons()
+            self.selected_microbloques.clear()
+            self.load_microbloques()
+            self.update()
 
     def set_seleccion_multiple(self, valor):
         self.seleccion_multiple = valor # seteamos el valor

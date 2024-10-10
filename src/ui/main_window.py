@@ -92,17 +92,24 @@ class MainWindow(QMainWindow):
     def iniciar_simulacion(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Parámetros de Simulación")
+        dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
 
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
 
         # Tiempo total
         tiempo_layout = QHBoxLayout()
         tiempo_layout.addWidget(QLabel("Tiempo total (s):"))
         tiempo_edit = QLineEdit()
         tiempo_edit.setText("10")
+        tiempo_edit.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         tiempo_layout.addWidget(tiempo_edit)
         layout.addLayout(tiempo_layout)
-
         # Salida
         salida_layout = QHBoxLayout()
         salida_layout.addWidget(QLabel("Variable a controlar en tiempo 0:"))
@@ -173,9 +180,17 @@ class MainWindow(QMainWindow):
     def mostrar_analisis_estabilidad(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Análisis de Estabilidad")
+        dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
 
-        # Función de transferencia
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
+        
+            # Función de transferencia
         ft_label = QLabel("Función de Transferencia de Lazo Cerrado:")
         layout.addWidget(ft_label)
         
@@ -244,6 +259,18 @@ class MainWindow(QMainWindow):
                 item = QTableWidgetItem(str(valor))
                 self.matrix_table.setItem(i, j, item)
 
+        # Ajustar el estilo de la tabla
+        self.matrix_table.setStyleSheet("""
+            QTableWidget {
+                background-color: #333;
+                gridline-color: black;
+            }
+            QTableWidget::item {
+                color: white;
+                background-color: #444;
+            }
+        """)
+
         # Ajustar el tamaño de las celdas
         self.matrix_table.resizeColumnsToContents()
         self.matrix_table.resizeRowsToContents()
@@ -261,10 +288,19 @@ class MainWindow(QMainWindow):
     def calcular_y_mostrar_error_estado_estable(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Error en Estado Estable")
+        dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
+
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
 
         tipo_entrada = QComboBox()
         tipo_entrada.addItems(["escalon", "rampa", "parabola"])
+        tipo_entrada.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(QLabel("Seleccione el tipo de entrada:"))
         layout.addWidget(tipo_entrada)
 
@@ -301,17 +337,56 @@ class MainWindow(QMainWindow):
     
 
     def closeEvent(self, event):
-        reply = QMessageBox.question(self, 'Confirmar salida',
-                                     '¿Está seguro de que desea salir?',
-                                     QMessageBox.Yes | QMessageBox.No,
-                                     QMessageBox.No)
+        dialog = QMessageBox(self)
+        dialog.setWindowTitle('Confirmar salida')
+        dialog.setText('¿Está seguro de que desea salir?')
+        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dialog.setDefaultButton(QMessageBox.No)
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
+        
+        # Establecer el estilo de la ventana
+        dialog.setStyleSheet("""
+            QMessageBox {
+                background-color: #333;
+                color: white;
+            }
+            
+            QMessageBox QLabel {
+            color: white;
+            background-color: black;
+            padding: 10px;
+        }
+        
+        """)
+        
+        # Cambiar el texto del botón "Yes" a "Si"
+        yes_button = dialog.button(QMessageBox.Yes)
+        if yes_button:
+            yes_button.setText("Si")
+
+            # Aplicar estilo a los botones específicos
+        for button in dialog.buttons():
+            button.setStyleSheet("""
+                background-color: black;
+                color: white;
+                min-width: 80px;
+                min-height: 30px;
+                border: none;
+            """)
+        reply = dialog.exec_()
 
         if reply == QMessageBox.Yes:
             event.accept()
             QApplication.quit()
         else:
             event.ignore()
-
+            
     def actualizar_sesion(self):
         
         # Actualizar el diagrama de macrobloques

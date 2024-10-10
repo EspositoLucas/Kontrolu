@@ -56,7 +56,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        image_path = os.path.join(path,'imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QtGui.QIcon(icon))

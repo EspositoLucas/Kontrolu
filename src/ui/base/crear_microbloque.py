@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import  QHeaderView, QColorDialog
 from PyQt5.QtCore import Qt
 from .latex_editor import LatexEditor
 from back.topologia.microbloque import MicroBloque
+from PyQt5 import QtGui
+import os
 from back.json_manager.json_manager import obtener_microbloques_de_una_macro, agregar_microbloque, borrar_micro_bloque
 from .modificar_configuracion import ModificarConfiguracion
 from ..base.vista_json import VistaJson
@@ -68,6 +70,7 @@ class CrearMicroBloque(QDialog):
         """
         presets_tab = QWidget()
         presets_layout = QVBoxLayout(presets_tab)
+        
 
         # Label de Presets
         preset_label = QLabel("Seleccionar Preset:")
@@ -313,6 +316,13 @@ class CrearMicroBloque(QDialog):
         dialog.setWindowTitle(f"Guardar preset de {self.new_microbloque.nombre}")
         dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
 
          # Primer desplegable: Dominio
         dominio_combo = QComboBox()

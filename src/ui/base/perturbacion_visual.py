@@ -18,6 +18,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QBrush, QColor, QPen, QPolygonF, QFont
 from PyQt5.QtCore import QPointF
 from PyQt5.QtCore import Qt
+from PyQt5 import QtGui
+import os
 from .latex_editor import LatexEditor
 from .editar_perturbacion import EditarPerturbacion
 
@@ -107,20 +109,55 @@ class PerturbacionVisual(QGraphicsItemGroup):
         menu.exec_(screen_pos)
            
 
-
-
     def eliminar_perturbacion(self):
-        reply = QMessageBox.question(
-            None, 
-            "Confirmar eliminación",
-            "¿Está seguro que desea eliminar esta perturbación?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
+        dialog = QMessageBox(None)
+        dialog.setWindowTitle('Confirmar eliminación')
+        dialog.setText('¿Está seguro que desea eliminar esta perturbación?')
+        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dialog.setDefaultButton(QMessageBox.No)
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
+        
+        # Establecer el estilo de la ventana
+        dialog.setStyleSheet("""
+            QMessageBox {
+                background-color: #333;
+                color: white;
+            }
+            
+            QMessageBox QLabel {
+                color: white;
+                background-color: black;
+                padding: 10px;
+            }
+        """)
+        
+        # Cambiar el texto del botón "Yes" a "Si"
+        yes_button = dialog.button(QMessageBox.Yes)
+        if yes_button:
+            yes_button.setText("Si")
+
+        # Aplicar estilo a los botones específicos
+        for button in dialog.buttons():
+            button.setStyleSheet("""
+                background-color: black;
+                color: white;
+                min-width: 80px;
+                min-height: 30px;
+                border: none;
+            """)
+
+        reply = dialog.exec_()
         
         if reply == QMessageBox.Yes:
             self.perturbacion_back.observer = None
-            self.perturbacion_back.borrar_elemento() # elimino la perturbacion de la topologia
+            self.perturbacion_back.borrar_elemento()  # elimino la perturbacion de la topologia
             self.scene().removeItem(self)
-
             self.drawing_area.load_microbloques()
+            
+        

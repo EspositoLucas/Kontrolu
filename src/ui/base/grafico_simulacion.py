@@ -10,8 +10,10 @@ from PyQt5.QtGui import QColor
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from PyQt5.QtWidgets import QDialog, QTextEdit, QVBoxLayout
+from PyQt5 import QtGui
 import numpy as np
 import csv
+import os
 
 
 class Graficadora(QMainWindow):
@@ -25,6 +27,15 @@ class Graficadora(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.layout = QVBoxLayout(self.central_widget)
+        
+        
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(QtGui.QIcon(icon))
 
         # Crear pestañas
         self.tabs = QTabWidget()

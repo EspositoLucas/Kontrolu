@@ -34,7 +34,7 @@
                     "Microbloque 1": {
                         "nombre": "Microbloque 1",
                         "descripcion": "Esto es un microbloque",
-                        "fdt": "s",
+                        "fdt": "1",
                         "entrada_limite_inferior": "-inf",
                         "entrada_limite_superior": "inf",
                         "entrada_limite_por_ciclo": "inf",

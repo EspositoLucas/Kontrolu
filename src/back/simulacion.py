@@ -8,6 +8,8 @@ from time import sleep
 from globals import ESTA_SIMULANDO
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5 import QtGui
+import os
 from PyQt5.QtWidgets import QApplication
 
 class Simulacion(QObject):
@@ -107,9 +109,49 @@ class Simulacion(QObject):
             event.accept()
             return
 
-        reply = QMessageBox.question(self.graficadora, 'Confirmar cierre',
-                                     '¿Desea terminar la simulación?',
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        dialog = QMessageBox(self.graficadora)
+        dialog.setWindowTitle('Confirmar cierre')
+        dialog.setText('¿Desea terminar la simulación?')
+        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        dialog.setDefaultButton(QMessageBox.No)
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        dialog.setWindowIcon(QtGui.QIcon(icon))
+        
+        # Establecer el estilo de la ventana
+        dialog.setStyleSheet("""
+            QMessageBox {
+                background-color: #333;
+                color: white;
+            }
+            
+            QMessageBox QLabel {
+                color: white;
+                background-color: black;
+                padding: 10px;
+            }
+        """)
+        
+        # Cambiar el texto del botón "Yes" a "Si"
+        yes_button = dialog.button(QMessageBox.Yes)
+        if yes_button:
+            yes_button.setText("Si")
+
+        # Aplicar estilo a los botones específicos
+        for button in dialog.buttons():
+            button.setStyleSheet("""
+                background-color: black;
+                color: white;
+                min-width: 80px;
+                min-height: 30px;
+                border: none;
+            """)
+
+        reply = dialog.exec_()
 
         if reply == QMessageBox.Yes:
             self.continuar_simulacion = False
