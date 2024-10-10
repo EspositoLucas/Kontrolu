@@ -241,6 +241,7 @@ class CrearMicroBloque(QDialog):
         # Botón para seleccionar color
         color_button = QPushButton("Seleccionar Color")
         color_button.setStyleSheet("background-color: #444; color: white;")
+        color_button.setProperty("selected_color", self.new_microbloque.color)
         color_button.clicked.connect(lambda: self.select_color(color_button))
         new_microbloque_layout.addWidget(color_button)
         self.color_button = color_button
