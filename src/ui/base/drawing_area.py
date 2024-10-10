@@ -13,6 +13,7 @@ from globals import ESTA_SIMULANDO
 from back.topologia.configuraciones import  TipoError
 from .perturbacion_visual import PerturbacionVisual, RADIO_PERTURBACION
 from .crear_microbloque import CrearMicroBloque
+from .vista_json import VistaJson
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
@@ -942,6 +943,12 @@ class DrawingArea(QGraphicsView):
             self.scene.removeItem(perturbacion)
         self.perturbaciones.clear()
         self.update()
+
+    def vista_json(self):
+        vista = VistaJson(self.modelo, self)
+        response = vista.exec_()
+        if response == QDialog.Accepted:
+            self.load_microbloques()
 
     def agregar_perturbacion(self, microbloque, posicion):
 

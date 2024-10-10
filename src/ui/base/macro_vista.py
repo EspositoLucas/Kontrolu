@@ -96,6 +96,18 @@ class MacroVista(QPushButton):
         spacer.setStyleSheet("background-color: #333;")  # Establece el color de fondo
         toolbar.addWidget(spacer)
 
+        # Botón de seleccionar varios
+        self.edicion_json = QPushButton('Edicion Json', self)
+        self.edicion_json.clicked.connect(self.drawing_area.vista_json)
+        self.edicion_json.setStyleSheet(button_style)
+        toolbar.addWidget(self.edicion_json)
+
+        # Espaciador
+        spacer = QWidget()
+        spacer.setFixedSize(50, 5)  # Ajusta el tamaño del espaciador (ancho x alto)
+        spacer.setStyleSheet("background-color: #333;")  # Establece el color de fondo
+        toolbar.addWidget(spacer)
+
         # Boton de ayuda
         help_button = QPushButton('Ayuda', self)
         help_button.clicked.connect(self.drawing_area.show_help)
