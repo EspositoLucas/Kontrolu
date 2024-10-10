@@ -43,6 +43,7 @@ class ElementoEntrada(QPushButton):
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, entrada=None, tipo_entrada="Personalizada",coeficiente="1"):
         super().__init__(parent)
+        
         self.setWindowTitle("Configuración de Entrada")
         self.entrada = entrada if entrada else MicroBloque()
         self.tipo_entrada = tipo_entrada
