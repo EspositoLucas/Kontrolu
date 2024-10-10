@@ -14,6 +14,7 @@ from back.topologia.configuraciones import  TipoError
 from .perturbacion_visual import PerturbacionVisual, RADIO_PERTURBACION
 from .crear_microbloque import CrearMicroBloque
 from .vista_json import VistaJson
+from .editar_perturbacion import EditarPerturbacion
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
@@ -954,76 +955,10 @@ class DrawingArea(QGraphicsView):
 
             perturbacion_nueva = Perturbacion()
 
-            dialog = QDialog(self)
-            dialog.setWindowTitle("Nueva Perturbación")
-            layout = QVBoxLayout()
-
-            # Tengo que cargar dos cosas: la función de transferencia y la cantidad de ciclos de simulación que va a durar la perturbación
-            ft_label = QLabel("Función de Transferencia:")
-            ft_label.setStyleSheet("color: white;")
-            ft_editor = LatexEditor(perturbacion_nueva.funcion_transferencia)
-            ft_editor.set_latex("1")
-            ft_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-            layout.addWidget(ft_label)
-            layout.addWidget(ft_editor)
-
-            # Checkbox para "Perturbar ahora"
-            perturbar_ahora_checkbox = QCheckBox("Perturbar ahora")
-            perturbar_ahora_checkbox.setStyleSheet("color: white;")
-            layout.addWidget(perturbar_ahora_checkbox)
-
-            # Editor de inicio de ciclos
-            ciclos = QLabel("Tiempo de inicio (s):")
-            ciclos.setStyleSheet("color: white;")
-            ciclos_editor = QSpinBox()
-            ciclos_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-            ciclos_editor.setMinimum(0)
-            layout.addWidget(ciclos)
-            layout.addWidget(ciclos_editor)
-
-            # Editor de duración
-            dentro_de_label = QLabel("Duración (s):")
-            dentro_de_editor = QSpinBox()
-            dentro_de_editor.setMinimum(0)
-            dentro_de_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
-            layout.addWidget(dentro_de_label)
-            layout.addWidget(dentro_de_editor)
-
-            # Conectar el checkbox para ocultar/mostrar el editor de inicio
-            def toggle_inicio_editor():
-                ciclos.setVisible(not perturbar_ahora_checkbox.isChecked())
-                ciclos_editor.setVisible(not perturbar_ahora_checkbox.isChecked())
-
-            # Conectar el checkbox a la función para que oculte el editor de inicio
-            perturbar_ahora_checkbox.stateChanged.connect(toggle_inicio_editor)
-            toggle_inicio_editor()  # Para que se oculte/visualice según el estado inicial del checkbox
-
-            # Botones de aceptar y cancelar
-            buttons = QHBoxLayout()
-            ok_button = QPushButton("Aceptar")
-            cancel_button = QPushButton("Cancelar")
-            buttons.addWidget(ok_button)
-            buttons.addWidget(cancel_button)
-            layout.addLayout(buttons)
-            dialog.setStyleSheet("background-color: #333; color: white;")
-
-            dialog.setLayout(layout)
-
-            # Conectar botones
-            ok_button.clicked.connect(dialog.accept)
-            cancel_button.clicked.connect(dialog.reject)
-
-            # Si el diálogo es aceptado
-            if dialog.exec_() == QDialog.Accepted:
-                funcion_transferencia = ft_editor.get_latex()
-                duracion = dentro_de_editor.value()
-                inicio = ciclos_editor.value()
-                ahora = perturbar_ahora_checkbox.isChecked()
-
-                perturbacion_nueva.set_funcion_transferencia(funcion_transferencia)
-                perturbacion_nueva.set_valores(inicio, duracion, ahora)
-
-
+            editar = EditarPerturbacion(self, perturbacion_nueva)
+            respouesta = editar.exec_()
+            
+            if respouesta == QDialog.Accepted:
                 if posicion == 'antes':
                     microbloque.elemento_back.agregar_perturbacion_antes(microbloque.elemento_back, perturbacion_nueva)
                 else:
@@ -1031,6 +966,4 @@ class DrawingArea(QGraphicsView):
                 
                 self.load_microbloques()
                 self.update()
-
-            dialog.deleteLater()
 

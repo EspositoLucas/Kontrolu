@@ -43,7 +43,7 @@ class ElementoCarga(QPushButton):
 
 class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, carga=None, tipo_entrada="Personalizada", estado_seleccionado=None, coeficiente="1"):
-        super().__init__(parent)
+        super().__init__()
         self.padre = parent
         self.setWindowTitle("Configuración de Carga")
         self.carga = carga if carga else Carga()
