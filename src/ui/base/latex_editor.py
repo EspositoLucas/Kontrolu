@@ -181,8 +181,18 @@ class LatexEditor(QWidget):
         if latex.replace('.', '').isdigit():
             return True
         
+        # Permitir expresiones LaTeX específicas
+        valid_latex_expressions = ["\\frac", "\\log", "\\ln", "e", "\\pi", "\\sqrt"]
+        if any(expr in latex for expr in valid_latex_expressions):
+            pass  # Permitir estas expresiones y continuar con la validación
+        elif re.search(r'([a-z\d])([a-z\d])', latex):
+            # Verificar si hay términos adyacentes sin operador, excluyendo comandos LaTeX
+            return False
+        
         # Tratar símbolos especiales
         latex = re.sub(r'\\sqrt\[(\d+)\]\{([^}]+)\}', r'(\2)**(1/\1)', latex)  # raíz n-ésima
+        # Tratar fracciones
+        latex = re.sub(r'\\frac\{([\d+])\}\{([^}]+)\}', r'((\1)/(\2))', latex)
         latex = latex.replace('\\log', 'log')
         latex = latex.replace('\\ln', 'ln')
         latex = latex.replace('e', 'E')  # 'E' es reconocido como la constante e en sympy
