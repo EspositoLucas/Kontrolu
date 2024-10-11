@@ -163,7 +163,7 @@ class Configuracion:
             "limite_por_ciclo": self.limite_por_ciclo if not self.es_default_limite_por_ciclo() else "default",
             "error_maximo": self.error_maximo if not self.es_default_error_maximo() else "default",
             "proporcion": self.proporcion if not self.es_default_proporcion() else "default",
-            "tipo": self.tipo.value if not self.es_default_tipo() else "default",
+            "tipo": self.tipo.value,
             "ultimo_valor": self.ultimo_valor if not self.es_default_ultimo_valor() else "default",
             "probabilidad": self.probabilidad if not self.es_default_probabilidad() else "default",
             "unidad": self.unidad
@@ -176,7 +176,7 @@ class Configuracion:
         self.set_limite_por_ciclo(json['limite_por_ciclo'] if json['limite_por_ciclo'] != "default" else None)
         self.set_error_maximo(json['error_maximo'] if json['error_maximo'] != "default" else None)
         self.set_proporcion(json['proporcion'] if json['proporcion'] != "default" else None)
-        self.set_tipo(TipoError(json['tipo']) if json['tipo'] != "default" else None)
+        self.set_tipo(TipoError(json['tipo']))
         self.set_ultimo_valor(json['ultimo_valor'] if json['ultimo_valor'] != "default" else None)
         self.set_probabilidad(json['probabilidad'] if json['probabilidad'] != "default" else None)
         self.unidad = json['unidad']
