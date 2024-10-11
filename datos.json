@@ -5,35 +5,12 @@
     ],
     "MACROS.CONTROLADOR": {
         "SISTEMAS": {
-            "tipo1": {
-                "descripcion": "descripcion",
+            "AI": {
+                "descripcion": "",
                 "micro_bloques": {
-                    "two": {
-                        "nombre": "two",
-                        "descripcion": "descripcion",
-                        "fdt": "fdt",
-                        "entrada_limite_inferior": 1.0,
-                        "entrada_limite_superior": 2.0,
-                        "entrada_limite_por_ciclo": 3.0,
-                        "entrada_error_maximo": 4.0,
-                        "entrada_proporcion": 5.0,
-                        "entrada_tipo": "tipo",
-                        "entrada_ultimo_valor": 6.0,
-                        "entrada_propabilidad": 7.0,
-                        "salida_limite_inferior": 1.0,
-                        "salida_limite_superior": 2.0,
-                        "salida_limite_por_ciclo": 3.0,
-                        "salida_error_maximo": 4.0,
-                        "salida_proporcion": 5.0,
-                        "salida_tipo": "tipo",
-                        "salida_ultimo_valor": 6.0,
-                        "salida_propabilidad": 7.0,
-                        "unidad_entrada": "unidad",
-                        "unidad_salida": "unidad"
-                    },
-                    "Microbloque 1": {
-                        "nombre": "Microbloque 1",
-                        "descripcion": "Esto es un microbloque",
+                    "Controlador Predictivo Impulsado por AI": {
+                        "nombre": "Controlador Predictivo Impulsado por AI",
+                        "descripcion": "Los controladores impulsados por AI son muy eficientes, pero cometen muchos errores",
                         "fdt": "1",
                         "entrada_limite_inferior": "-inf",
                         "entrada_limite_superior": "inf",
@@ -53,77 +30,20 @@
                         "salida_propabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "V"
-                    }
-                }
-            },
-            "tipo2": {
-                "descripcion": "descripcion",
-                "micro_bloques": {
-                    "two": {
-                        "nombre": "two",
-                        "descripcion": "descripcion",
-                        "fdt": "fdt",
-                        "entrada_limite_inferior": 1.0,
-                        "entrada_limite_superior": 2.0,
-                        "entrada_limite_por_ciclo": 3.0,
-                        "entrada_error_maximo": 4.0,
-                        "entrada_proporcion": 5.0,
-                        "entrada_tipo": "tipo",
-                        "entrada_ultimo_valor": 6.0,
-                        "entrada_propabilidad": 7.0,
-                        "salida_limite_inferior": 1.0,
-                        "salida_limite_superior": 2.0,
-                        "salida_limite_por_ciclo": 3.0,
-                        "salida_error_maximo": 4.0,
-                        "salida_proporcion": 5.0,
-                        "salida_tipo": "tipo",
-                        "salida_ultimo_valor": 6.0,
-                        "salida_propabilidad": 7.0,
-                        "unidad_entrada": "unidad",
-                        "unidad_salida": "unidad"
                     }
                 }
             }
         },
-        "ELECTRONICA": {
-            "tipo2": {
-                "descripcion": "descripcion",
-                "micro_bloques": {
-                    "one": {
-                        "nombre": "one",
-                        "descripcion": "descripcion",
-                        "fdt": "fdt",
-                        "entrada_limite_inferior": 1.0,
-                        "entrada_limite_superior": 2.0,
-                        "entrada_limite_por_ciclo": 3.0,
-                        "entrada_error_maximo": 4.0,
-                        "entrada_proporcion": 5.0,
-                        "entrada_tipo": "tipo",
-                        "entrada_ultimo_valor": 6.0,
-                        "entrada_propabilidad": 7.0,
-                        "salida_limite_inferior": 1.0,
-                        "salida_limite_superior": 2.0,
-                        "salida_limite_por_ciclo": 3.0,
-                        "salida_error_maximo": 4.0,
-                        "salida_proporcion": 5.0,
-                        "salida_tipo": "tipo",
-                        "salida_ultimo_valor": 6.0,
-                        "salida_propabilidad": 7.0,
-                        "unidad_entrada": "unidad",
-                        "unidad_salida": "unidad"
-                    }
-                }
-            }
-        }
+        "ELECTRONICA": {}
     },
     "MACROS.ACTUADOR": {
         "SISTEMAS": {
-            "tipo1": {
-                "descripcion": "descripcion",
+            "Escaladores": {
+                "descripcion": "",
                 "micro_bloques": {
-                    "pedro": {
-                        "nombre": "pedro",
-                        "descripcion": "Esto es un microbloque",
+                    "Escalador Vertical de Servidores Livianos": {
+                        "nombre": "Escalador Vertical de Servidores Livianos",
+                        "descripcion": "Los servidores livianos suelen escalar mas rapidamente",
                         "fdt": "1",
                         "entrada_limite_inferior": "-inf",
                         "entrada_limite_superior": "inf",
@@ -144,9 +64,55 @@
                         "unidad_entrada": "V",
                         "unidad_salida": "V"
                     },
-                    "Microbloque 1": {
-                        "nombre": "Microbloque 1",
-                        "descripcion": "Holaaaaa",
+                    "Escalador Horizontal de Servidores Livianos": {
+                        "nombre": "Escalador Horizontal de Servidores Livianos",
+                        "descripcion": "Los servidores livianos suelen escalar mas rapidamente",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "Escalador Horizontal de Servidores Pesados": {
+                        "nombre": "Escalador Horizontal de Servidores Pesados",
+                        "descripcion": "Los servidores pesados suelen tener problemas para escalar",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "Escalador Vertical de Servidores Pesados": {
+                        "nombre": "Escalador Vertical de Servidores Pesados",
+                        "descripcion": "Los servidores pesados suelen tener problemas para escalar",
                         "fdt": "1",
                         "entrada_limite_inferior": "-inf",
                         "entrada_limite_superior": "inf",
@@ -173,13 +139,17 @@
         "ELECTRONICA": {}
     },
     "MACROS.PROCESO": {
+        "SISTEMAS": {},
+        "ELECTRONICA": {}
+    },
+    "MACROS.MEDIDOR": {
         "SISTEMAS": {
-            "LOAD QUE": {
+            "Logs": {
                 "descripcion": "",
                 "micro_bloques": {
-                    "Microbloque 1": {
-                        "nombre": "Microbloque 1",
-                        "descripcion": "Esto es un microbloque",
+                    "Medidor de Logs de Excepciones": {
+                        "nombre": "Medidor de Logs de Excepciones",
+                        "descripcion": "El medidor de logs de excepciones toma en cuenta cualquier excepcion existente",
                         "fdt": "1",
                         "entrada_limite_inferior": "-inf",
                         "entrada_limite_superior": "inf",
@@ -197,74 +167,183 @@
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
                         "salida_propabilidad": 0,
-                        "unidad_entrada": "V",
-                        "unidad_salida": "V"
+                        "unidad_entrada": "File",
+                        "unidad_salida": "Bin"
+                    },
+                    "Medidor de Logs de Warnings": {
+                        "nombre": "Medidor de Logs de Warnings",
+                        "descripcion": "El medidor de logs de warnings toma un subgrupo de excepciones",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "File",
+                        "unidad_salida": "Bin"
+                    },
+                    "Medidor de Logs de Errores": {
+                        "nombre": "Medidor de Logs de Errores",
+                        "descripcion": "A veces es muy tarde para corregir",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "File",
+                        "unidad_salida": "Bin"
+                    }
+                }
+            },
+            "Temperatura Cpu": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Medidor de Temperatura de Cpu Industrial": {
+                        "nombre": "Medidor de Temperatura de Cpu Industrial",
+                        "descripcion": "Un medidor de temperatura para los mejores servidores AWS",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "C",
+                        "unidad_salida": "Bin"
+                    },
+                    "Medidor de Temperatura de Cpu Computadora Gamer": {
+                        "nombre": "Medidor de Temperatura de Cpu Computadora Gamer",
+                        "descripcion": "Un medidor de temperatura para as computadoras mas potentes del hogar",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "C",
+                        "unidad_salida": "Bin"
+                    },
+                    "Medidor de Temperatura de Cpu Computadora Regular": {
+                        "nombre": "Medidor de Temperatura de Cpu Computadora Regular",
+                        "descripcion": "Al menos mide algo",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "C",
+                        "unidad_salida": "Bin"
+                    }
+                }
+            },
+            "Health Checks": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Health Checker Misma LAN": {
+                        "nombre": "Health Checker Misma LAN",
+                        "descripcion": "Al estar en la misma lan, es mas veloz",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Ping",
+                        "unidad_salida": "Bin"
+                    },
+                    "Health Checker Cross Continente": {
+                        "nombre": "Health Checker Cross Continente",
+                        "descripcion": "Largas distancias, grandes latencias",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Ping",
+                        "unidad_salida": "Bin"
                     }
                 }
             }
         },
         "ELECTRONICA": {}
-    },
-    "MACROS.MEDIDOR": {
-        "SISTEMAS": {
-            "tipo2": {
-                "descripcion": "descripcion",
-                "micro_bloques": {
-                    "three": {
-                        "nombre": "three",
-                        "descripcion": "descripcion",
-                        "fdt": "fdt",
-                        "entrada_limite_inferior": 1.0,
-                        "entrada_limite_superior": 2.0,
-                        "entrada_limite_por_ciclo": 3.0,
-                        "entrada_error_maximo": 4.0,
-                        "entrada_proporcion": 5.0,
-                        "entrada_tipo": "tipo",
-                        "entrada_ultimo_valor": 6.0,
-                        "entrada_propabilidad": 7.0,
-                        "salida_limite_inferior": 1.0,
-                        "salida_limite_superior": 2.0,
-                        "salida_limite_por_ciclo": 3.0,
-                        "salida_error_maximo": 4.0,
-                        "salida_proporcion": 5.0,
-                        "salida_tipo": "tipo",
-                        "salida_ultimo_valor": 6.0,
-                        "salida_propabilidad": 7.0,
-                        "unidad_entrada": "unidad",
-                        "unidad_salida": "unidad"
-                    }
-                }
-            }
-        },
-        "ELECTRONICA": {
-            "tipo2": {
-                "descripcion": "descripcion",
-                "micro_bloques": {
-                    "three": {
-                        "nombre": "three",
-                        "descripcion": "descripcion",
-                        "fdt": "fdt",
-                        "entrada_limite_inferior": 1.0,
-                        "entrada_limite_superior": 2.0,
-                        "entrada_limite_por_ciclo": 3.0,
-                        "entrada_error_maximo": 4.0,
-                        "entrada_proporcion": 5.0,
-                        "entrada_tipo": "tipo",
-                        "entrada_ultimo_valor": 6.0,
-                        "entrada_propabilidad": 7.0,
-                        "salida_limite_inferior": 1.0,
-                        "salida_limite_superior": 2.0,
-                        "salida_limite_por_ciclo": 3.0,
-                        "salida_error_maximo": 4.0,
-                        "salida_proporcion": 5.0,
-                        "salida_tipo": "tipo",
-                        "salida_ultimo_valor": 6.0,
-                        "salida_propabilidad": 7.0,
-                        "unidad_entrada": "unidad",
-                        "unidad_salida": "unidad"
-                    }
-                }
-            }
-        }
     }
 }
