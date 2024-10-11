@@ -84,3 +84,46 @@ class Sesion():
         self.carga = Carga(from_json = datos["carga"])
         self.carga.entrada = self.entrada
         self.nombre = datos["nombre"]
+
+    @staticmethod
+    def validar_dict(datos: dict) -> bool:
+        required_keys = ["entrada", "controlador", "actuador", "proceso", "medidor", "carga", "nombre"]
+        for key in required_keys:
+            if key not in datos:
+                raise Exception(f"El diccionario no contiene la clave {key}")
+        
+        if not isinstance(datos["nombre"], str):
+            raise Exception("El nombre de la sesión debe ser un string")
+        
+
+        try:
+            MicroBloque.validar_dict(datos["entrada"])
+        except Exception as e:
+            raise Exception(f"Error en la entrada: {e}")
+        
+        try:
+            MacroControlador.validar_dict(datos["controlador"])
+        except Exception as e:
+            raise Exception(f"Error en el controlador: {e}")
+        
+        try:
+            MacroActuador.validar_dict(datos["actuador"])
+        except Exception as e:
+            raise Exception(f"Error en el actuador: {e}")
+        
+        try:
+            MacroProceso.validar_dict(datos["proceso"])
+        except Exception as e:
+            raise Exception(f"Error en el proceso: {e}")
+        
+        try:
+            MacroMedidor.validar_dict(datos["medidor"])
+        except Exception as e:
+            raise Exception(f"Error en el medidor: {e}")
+
+        try:   
+            Carga.validar_dict(datos["carga"])
+        except Exception as e:
+            raise Exception(f"Error en la carga: {e}")
+        
+        return True

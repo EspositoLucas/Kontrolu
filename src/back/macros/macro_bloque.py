@@ -92,3 +92,28 @@ class MacroBloque(InterfazTopologia):
         self.nombre = json['nombre']
         self.tipo = MACROS(json['tipo'])
         self.topologia = TopologiaSerie(from_json=json['topologia'],padre=self)
+
+    @staticmethod
+    def validar_dict(datos: dict) -> bool:
+        required_keys = ["nombre", "tipo", "topologia"]
+        for key in required_keys:
+            if key not in datos:
+                raise Exception(f"El diccionario no contiene la clave {key}")
+
+        if not isinstance(datos["nombre"], str):
+            raise Exception(f"El nombre debe ser un string")
+
+        try:
+            MACROS(datos["tipo"])
+        except ValueError:
+            raise Exception(f"El tipo de {datos['nombre']} debe ser un valor válido de MACROS")
+
+        if not isinstance(datos["topologia"], dict):
+            raise Exception(f"La topología de {datos['nombre']} debe ser un diccionario")
+        
+        try:
+            TopologiaSerie.validar_dict(datos["topologia"])
+        except Exception as e:
+            raise Exception(f"Error en la topología de {datos['nombre']}: {e}")
+        
+        return True

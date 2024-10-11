@@ -106,3 +106,30 @@ class Perturbacion(Hoja):
         self.inicio = json['inicio']
         self.duracion = json['duracion']
         self.ahora = json['ahora']
+
+    @staticmethod
+    def validar_dict(datos: dict) -> bool:
+        required_keys = ["tipo", "nombre", "fdt", "inicio", "duracion", "ahora"]
+        for key in required_keys:
+            if key not in datos:
+                raise Exception(f"El diccionario no contiene la clave {key}")
+
+        if datos["tipo"] != "perturbacion":
+            raise Exception(f"El tipo debe ser 'perturbacion'")
+
+        if not isinstance(datos["nombre"], str):
+            raise Exception(f"El nombre debe ser una cadena de caracteres")
+
+        if not isinstance(datos["fdt"], str):
+            raise Exception(f"La funcion de transferencia debe ser una cadena de caracteres")
+
+        if not isinstance(datos["inicio"], (int, float)):
+            raise Exception(f"El inicio debe ser un número")
+
+        if not isinstance(datos["duracion"], (int, float)):
+            raise Exception(f"La duracion debe ser un número")
+
+        if not isinstance(datos["ahora"], bool):
+            raise Exception(f"El valor de 'ahora' debe ser booleano")
+
+        return True

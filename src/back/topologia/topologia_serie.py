@@ -166,7 +166,34 @@ class TopologiaSerie(InterfazTopologia):
         return self
 
 
-    
+    @staticmethod
+    def validar_dict(datos: dict) -> bool:
+        required_keys = ["tipo", "hijos"]
+        for key in required_keys:
+            if key not in datos:
+                raise Exception(f"El diccionario no contiene la clave {key}")
+
+        if datos["tipo"] != "serie":
+            raise Exception(f"El tipo debe ser 'serie'")
+
+        if not isinstance(datos["hijos"], list):
+            raise Exception(f"Los hijos deben ser una lista")
+
+        for hijo in datos["hijos"]:
+            if not isinstance(hijo, dict):
+                raise Exception(f"Cada hijo debe ser un diccionario")
+            if "tipo" not in hijo:
+                raise Exception(f"Cada hijo debe contener la clave 'tipo'")
+            if hijo["tipo"] == "paralelo":
+                TopologiaParalelo.validar_dict(hijo)
+            elif hijo["tipo"] == "microbloque":
+                MicroBloque.validar_dict(hijo)
+            elif hijo["tipo"] == "perturbacion":
+                Perturbacion.validar_dict(hijo)
+            else:
+                raise Exception(f"Tipo de hijo desconocido: {hijo['tipo']}")
+
+        return True
 
 
     
@@ -261,3 +288,32 @@ class TopologiaParalelo(InterfazTopologia):
             self.hijos.append(TopologiaSerie(from_json=hijo,padre=self))
         print("Se ha creado una topología en paralelo")
         return self
+    
+    @staticmethod
+    def validar_dict(datos: dict) -> bool:
+        required_keys = ["tipo", "hijos"]
+        for key in required_keys:
+            if key not in datos:
+                raise Exception(f"El diccionario no contiene la clave {key}")
+
+        if datos["tipo"] != "paralelo":
+            raise Exception(f"El tipo debe ser 'paralelo'")
+
+        if not isinstance(datos["hijos"], list):
+            raise Exception(f"Los hijos deben ser una lista")
+
+        for hijo in datos["hijos"]:
+            if not isinstance(hijo, dict):
+                raise Exception(f"Cada hijo debe ser un diccionario")
+            if "tipo" not in hijo:
+                raise Exception(f"Cada hijo debe contener la clave 'tipo'")
+            if hijo["tipo"] == "serie":
+                TopologiaSerie.validar_dict(hijo)
+            elif hijo["tipo"] == "microbloque":
+                MicroBloque.validar_dict(hijo)
+            elif hijo["tipo"] == "perturbacion":
+                Perturbacion.validar_dict(hijo)
+            else:
+                raise Exception(f"Tipo de hijo desconocido: {hijo['tipo']}")
+
+        return True

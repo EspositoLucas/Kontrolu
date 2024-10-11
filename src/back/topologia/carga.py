@@ -178,3 +178,42 @@ class Carga:
         self.datos = json['datos']
         self.estados = json['estados']
         return self
+    
+    @staticmethod
+    def validar_dict(datos: dict) -> bool:
+        required_keys = ["nombre", "funcion_de_transferencia", "tipo_carga", "escalamiento_sigmoide", "desplazamiento_sigmoide", "estados"]
+        for key in required_keys:
+            if key not in datos:
+                raise Exception(f"El diccionario no contiene la clave {key}")
+
+        if not isinstance(datos["nombre"], str):
+            raise Exception(f"El nombre debe ser una cadena de caracteres")
+
+        if not isinstance(datos["funcion_de_transferencia"], str):
+            raise Exception(f"La función de transferencia debe ser una cadena de caracteres")
+
+        if datos["tipo_carga"] not in TipoCarga._value2member_map_:
+            raise Exception(f"El tipo de carga debe ser uno de los siguientes: {[e.value for e in TipoCarga]}")
+
+        if not isinstance(datos["escalamiento_sigmoide"], (int, float)):
+            raise Exception(f"El escalamiento sigmoide debe ser un número")
+
+        if not isinstance(datos["desplazamiento_sigmoide"], (int, float)):
+            raise Exception(f"El desplazamiento sigmoide debe ser un número")
+
+        if not isinstance(datos["estados"], list):
+            raise Exception(f"Los estados deben ser una lista")
+
+        for estado in datos["estados"]:
+            if not isinstance(estado, dict):
+                raise Exception(f"Cada estado debe ser un diccionario")
+            if "minimo" not in estado or "nombre" not in estado or "prioridad" not in estado:
+                raise Exception(f"Cada estado debe contener las claves 'minimo', 'nombre' y 'prioridad'")
+            if not isinstance(estado["minimo"], (int, float)):
+                raise Exception(f"El valor de 'minimo' debe ser un número")
+            if not isinstance(estado["nombre"], str):
+                raise Exception(f"El valor de 'nombre' debe ser una cadena de caracteres")
+            if not isinstance(estado["prioridad"], int):
+                raise Exception(f"El valor de 'prioridad' debe ser un entero")
+
+        return True

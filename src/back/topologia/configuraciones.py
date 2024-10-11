@@ -155,9 +155,9 @@ class Configuracion:
         self.datos['error_total'].append(nuevo - valor)
         self.datos['resultado'].append(nuevo)
         return nuevo
-    
     def to_json(self):
         return {
+            "nombre": self.nombre,
             "limite_inferior": self.limite_inferior if not self.es_default_limite_inferior() else "default",
             "limite_superior": self.limite_superior if not self.es_default_limite_superior() else "default",
             "limite_por_ciclo": self.limite_por_ciclo if not self.es_default_limite_por_ciclo() else "default",
@@ -170,6 +170,7 @@ class Configuracion:
         }
     
     def from_json(self, json):
+        self.nombre = json['nombre']
         self.set_limite_inferior(json['limite_inferior'] if json['limite_inferior'] != "default" else None)
         self.set_limite_superior(json['limite_superior'] if json['limite_superior'] != "default" else None)
         self.set_limite_por_ciclo(json['limite_por_ciclo'] if json['limite_por_ciclo'] != "default" else None)
@@ -186,3 +187,39 @@ class Configuracion:
         if valor is None:
             self.probabilidad = 0
     
+
+    @staticmethod
+    def validar_dict(datos: dict) -> bool:
+        required_keys = ["nombre", "limite_inferior", "limite_superior", "limite_por_ciclo", "error_maximo", "proporcion", "tipo", "ultimo_valor", "probabilidad", "unidad"]
+        for key in required_keys:
+            if key not in datos:
+                raise Exception(f"El diccionario no contiene la clave {key}")
+        
+        if not (isinstance(datos["limite_inferior"], (int, float)) or datos["limite_inferior"] == "default"):
+            raise Exception("El limite_inferior debe ser un número o 'default'")
+        
+        if not (isinstance(datos["limite_superior"], (int, float)) or datos["limite_superior"] == "default"):
+            raise Exception("El limite_superior debe ser un número o 'default'")
+        
+        if not (isinstance(datos["limite_por_ciclo"], (int, float)) or datos["limite_por_ciclo"] == "default"):
+            raise Exception("El limite_por_ciclo debe ser un número o 'default'")
+        
+        if not (isinstance(datos["error_maximo"], (int, float)) or datos["error_maximo"] == "default"):
+            raise Exception("El error_maximo debe ser un número o 'default'")
+        
+        if not (isinstance(datos["proporcion"], (int, float)) or datos["proporcion"] == "default"):
+            raise Exception("El proporcion debe ser un número o 'default'")
+        
+        if not isinstance(datos["tipo"], str) or datos["tipo"] not in TipoError._value2member_map_:
+            raise Exception("El tipo debe ser uno de los valores definidos en TipoError")
+        
+        if not (isinstance(datos["ultimo_valor"], (int, float)) or datos["ultimo_valor"] == "default"):
+            raise Exception("El ultimo_valor debe ser un número o 'default'")
+        
+        if not (isinstance(datos["probabilidad"], (int, float)) or datos["probabilidad"] == "default"):
+            raise Exception("El probabilidad debe ser un número o 'default'")
+        
+        if not isinstance(datos["unidad"], str):
+            raise Exception("La unidad debe ser un string")
+        
+        return True

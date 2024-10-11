@@ -57,13 +57,33 @@ class Archivo(QMenu):
         
         if file_name:
             with open(file_name, 'r') as file:
-                json_data = json.load(file)
+                json_text = file.read()
+                try:
+                    json_data = json.loads(json_text)
+                except json.JSONDecodeError as e:
+                    print(f"Error parsing JSON: {e}")
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("La estructura del JSON es incorrecta")
+                    msg.setInformativeText(str(e))
+                    msg.setWindowTitle("JSON Error")
+                    msg.exec_()
+                    return
+                try:
+                    self.sesion.validar_dict(json_data)
+                except Exception as e:
+                    print(f"Error loading JSON: {e}")
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText("Error al cargar el JSON")
+                    msg.setInformativeText(str(e))
+                    msg.setWindowTitle("JSON Error")
+                    msg.exec_()
+                    return
                 self.sesion.from_json(json_data)
                 
             self.main_window.actualizar_sesion()
             self.main_window.statusBar().showMessage(f'Proyecto {file_name} abierto')
-
-
             print(f'Proyecto {file_name} abierto')
     
     def save_project(self):

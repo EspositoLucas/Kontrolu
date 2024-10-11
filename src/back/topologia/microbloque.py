@@ -148,3 +148,38 @@ class MicroBloque(Hoja):
         self.configuracion_salida = Configuracion(from_json=json['configuracion_salida'])
         self.color = QColor(json['color'])
         print(f"Se ha creado el microbloque {self.nombre} con la configuración de entrada {self.configuracion_entrada} y la configuración de salida {self.configuracion_salida}")
+
+    @staticmethod
+    def validar_dict(datos: dict) -> bool:
+        required_keys = ["nombre", "descripcion", "fdt", "configuracion_entrada", "configuracion_salida", "color"]
+        for key in required_keys:
+            if key not in datos:
+                raise Exception(f"El diccionario no contiene la clave {key}")
+        
+        if not isinstance(datos['nombre'], str):
+            raise Exception(f"El nombre de {datos['nombre']} debe ser un string")
+        
+        if not isinstance(datos['descripcion'], str):
+            raise Exception(f"La descripción de {datos['nombre']} debe ser un string")
+        
+        if not isinstance(datos['fdt'], str):
+            raise Exception(f"La función de transferencia de {datos['nombre']} debe ser un string")
+        
+        try:
+            latex2sympy(datos['fdt'])
+        except Exception as e:
+            raise Exception(f"Error en la función de transferencia de {datos['nombre']}")
+        
+        try:
+            Configuracion.validar_dict(datos['configuracion_entrada'])
+        except Exception as e:
+            raise Exception(f"Error en la configuración de entrada de {datos['nombre']}: {e}")
+        try:
+            Configuracion.validar_dict(datos['configuracion_salida'])
+        except Exception as e:
+            raise Exception(f"Error en la configuración de salida de {datos['nombre']}: {e}")
+
+        if not isinstance(datos['color'], str):
+            raise Exception(f"El color de {datos['nombre']} debe ser un string")
+        
+        return True
