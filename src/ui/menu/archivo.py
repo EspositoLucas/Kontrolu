@@ -22,9 +22,11 @@ class Archivo(QMenu):
     
     def setup(self):
         # Menú de archivo
+        
+        # Modificar la acción "Nuevo" para usar el parámetro from_menu
         new_action = QAction(QIcon('new.png'), 'Nuevo', self.main_window)
         new_action.setShortcut('Ctrl+N')
-        new_action.triggered.connect(self.new_project)
+        new_action.triggered.connect(lambda: self.new_project(from_menu=False))
         
         open_action = QAction(QIcon('open.png'), 'Abrir', self.main_window)
         open_action.setShortcut('Ctrl+O')
@@ -38,53 +40,41 @@ class Archivo(QMenu):
         self.addAction(open_action)
         self.addAction(save_action)
     
-    def new_project(self):
-        print('Nuevo proyecto creado')
-        self.main_window.statusBar().showMessage('Nuevo proyecto creado')
-        reply = QMessageBox.question(self.main_window, 'Confirmar Nuevo Proyecto', 
-                         '¿Seguro que quieres crear un nuevo proyecto? Se perderán los cambios no guardados.', 
-                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            # Lógica para crear un nuevo proyecto
-            print('Nuevo proyecto creado')
-            self.sesion.nueva_sesion()
-            self.main_window.actualizar_sesion()
-            self.main_window.statusBar().showMessage('Nuevo proyecto creado')
+    def new_project(self, from_menu=False):
+            if not from_menu:
+                reply = QMessageBox.question(self.main_window, 'Confirmar Nuevo Proyecto', 
+                            '¿Seguro que quieres crear un nuevo proyecto? Se perderán los cambios no guardados.', 
+                            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    self.sesion.nueva_sesion()
+                    self.main_window.actualizar_sesion()
+                    self.main_window.statusBar().showMessage('Nuevo proyecto creado')
+                    return True
+                return False
+            else:
+                # Si se llama desde el menú inicial, no mostrar confirmación
+                self.sesion.nueva_sesion()
+                return True
 
     def open_project(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, 'Abrir Proyecto', '', 'Archivos JSON (*.json);;Todos los archivos (*)', options=options)
+        file_name, _ = QFileDialog.getOpenFileName(self.main_window, 'Abrir Proyecto', '', 'Archivos JSON (*.json);;Todos los archivos (*)', options=options)
         
         if file_name:
             with open(file_name, 'r') as file:
                 json_text = file.read()
                 try:
                     json_data = json.loads(json_text)
-                except json.JSONDecodeError as e:
-                    print(f"Error parsing JSON: {e}")
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setText("La estructura del JSON es incorrecta")
-                    msg.setInformativeText(str(e))
-                    msg.setWindowTitle("JSON Error")
-                    msg.exec_()
-                    return
-                try:
                     self.sesion.validar_dict(json_data)
+                    self.sesion.from_json(json_data)
+                    self.main_window.actualizar_sesion()
+                    self.main_window.statusBar().showMessage(f'Proyecto {file_name} abierto')
+                    return True
+                except json.JSONDecodeError as e:
+                    QMessageBox.critical(self.main_window, "JSON Error", f"La estructura del JSON es incorrecta: {str(e)}")
                 except Exception as e:
-                    print(f"Error loading JSON: {e}")
-                    msg = QMessageBox()
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setText("Error al cargar el JSON")
-                    msg.setInformativeText(str(e))
-                    msg.setWindowTitle("JSON Error")
-                    msg.exec_()
-                    return
-                self.sesion.from_json(json_data)
-                
-            self.main_window.actualizar_sesion()
-            self.main_window.statusBar().showMessage(f'Proyecto {file_name} abierto')
-            print(f'Proyecto {file_name} abierto')
+                    QMessageBox.critical(self.main_window, "Error", f"Error al cargar el JSON: {str(e)}")
+        return False
     
     def save_project(self):
         options = QFileDialog.Options()

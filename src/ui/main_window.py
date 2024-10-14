@@ -9,6 +9,7 @@ from PyQt5.QtGui import QIcon
 import os
 from .menu.menu_bar import Menu
 from .macro_diagrama import MacroDiagrama
+from .menu.archivo import Archivo
 from back.simulacion import Simulacion
 from back.simulacion import Simulacion
 from back.estabilidad import Estabilidad
@@ -16,15 +17,55 @@ from ui.base.grafico_simulacion import Graficadora
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication,QMessageBox
 import sympy as sp
-
+import sys
 class MainWindow(QMainWindow):
+    
     def __init__(self,sesion):
         super().__init__()
         self.sesion = sesion
         self.estabilidad = Estabilidad(sesion)
-        self.initUI()
+        self.archivo = Archivo(self, self.sesion)  # Crea una instancia de Archivo
         
+        # Mostrar el menú inicial
+        self.show_initial_menu()
 
+    def show_initial_menu(self):
+        self.initial_menu = self.create_initial_menu()
+        self.initial_menu.show()
+
+    def create_initial_menu(self):
+        initial_menu = QDialog(self)
+        initial_menu.setWindowTitle('Menú Inicial - Kontrolu')
+        initial_menu.setStyleSheet("background-color: #ADD8E6;")
+        layout = QVBoxLayout()
+
+        new_project_btn = QPushButton('Crear proyecto nuevo')
+        new_project_btn.clicked.connect(self.new_project_from_menu)
+        layout.addWidget(new_project_btn)
+
+        open_project_btn = QPushButton('Abrir proyecto existente')
+        open_project_btn.clicked.connect(self.open_project_from_menu)
+        layout.addWidget(open_project_btn)
+
+        initial_menu.setLayout(layout)
+        return initial_menu
+    
+    def new_project_from_menu(self):
+        self.sesion.nueva_sesion()
+        self.close_initial_menu_and_show_main()
+
+    def open_project_from_menu(self):
+        self.archivo.open_project()
+        self.close_initial_menu_and_show_main()
+
+    def close_initial_menu_and_show_main(self):
+        if self.initial_menu:
+            self.initial_menu.close()
+            self.initial_menu = None
+        self.initUI()
+        self.show()
+            
+    
     def initUI(self):
         self.setWindowTitle('Kontrolu')
         self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
@@ -53,10 +94,19 @@ class MainWindow(QMainWindow):
         toolbar.addAction(boton_estabilidad)
         toolbar.setStyleSheet("background-color: #333; color: white;")
         self.statusBar().showMessage('Listo')
+        
+        # Modificar la conexión del botón "Nuevo proyecto" en la barra de herramientas
+        new_project_action = QAction("Nuevo proyecto", self)
+        new_project_action.triggered.connect(self.new_project_from_main)
+        toolbar.addAction(new_project_action)
 
         self.init_macrobloques() 
 
         self.showMaximized()
+    
+    def new_project_from_main(self):
+        if self.archivo.new_project(from_menu=False):
+            self.actualizar_sesion()
     
         
     def init_macrobloques(self):
