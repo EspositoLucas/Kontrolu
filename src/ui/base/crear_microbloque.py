@@ -302,6 +302,7 @@ class CrearMicroBloque(QDialog):
 
     def select_color(self, button):
         color = QColorDialog.getColor()
+        
         if color.isValid():
             self.color = color
             button.setStyleSheet(f"background-color: {color.name()};")

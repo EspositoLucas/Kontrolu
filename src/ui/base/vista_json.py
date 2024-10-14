@@ -13,6 +13,7 @@ class VistaJson(QDialog):
         self.microbloque = microbloque
         self.setWindowTitle("Json")
         self.layout = QVBoxLayout()
+        self.setStyleSheet("background-color: #333; color: white;")
         self.setLayout(self.layout)
         self.text_edit = QTextEdit()
         self.text_edit.setStyleSheet("background-color: white;")

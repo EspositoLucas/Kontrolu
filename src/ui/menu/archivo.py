@@ -41,20 +41,52 @@ class Archivo(QMenu):
         self.addAction(save_action)
     
     def new_project(self, from_menu=False):
-            if not from_menu:
-                reply = QMessageBox.question(self.main_window, 'Confirmar Nuevo Proyecto', 
-                            '¿Seguro que quieres crear un nuevo proyecto? Se perderán los cambios no guardados.', 
-                            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-                if reply == QMessageBox.Yes:
-                    self.sesion.nueva_sesion()
-                    self.main_window.actualizar_sesion()
-                    self.main_window.statusBar().showMessage('Nuevo proyecto creado')
-                    return True
-                return False
-            else:
-                # Si se llama desde el menú inicial, no mostrar confirmación
+        if not from_menu:
+            msgBox = QMessageBox(self.main_window)
+            msgBox.setWindowTitle('Confirmar Nuevo Proyecto')
+            msgBox.setText('¿Seguro que quieres crear un nuevo proyecto? Se perderán los cambios no guardados.')
+            msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            msgBox.setDefaultButton(QMessageBox.No)
+            
+            # Cambiar el texto del botón "Yes" a "Si"
+            yesButton = msgBox.button(QMessageBox.Yes)
+            yesButton.setText('Si')
+            
+            # Aplicar estilo
+            msgBox.setStyleSheet("""
+                QMessageBox {
+                    background-color: black;
+                    color: white;
+                }
+                QMessageBox QLabel {
+                color: white;
+                background-color: black;
+                padding: 10px;
+            }
+            """)
+            
+            # Aplicar estilo a los botones específicos
+            for button in msgBox.buttons():
+                button.setStyleSheet("""
+                    background-color: black;
+                    color: white;
+                    min-width: 80px;
+                    min-height: 30px;
+                    border: none;
+                """)
+            
+            reply = msgBox.exec_()
+            
+            if reply == QMessageBox.Yes:
                 self.sesion.nueva_sesion()
+                self.main_window.actualizar_sesion()
+                self.main_window.statusBar().showMessage('Nuevo proyecto creado')
                 return True
+            return False
+        else:
+            # Si se llama desde el menú inicial, no mostrar confirmación
+            self.sesion.nueva_sesion()
+            return True
 
     def open_project(self):
         options = QFileDialog.Options()

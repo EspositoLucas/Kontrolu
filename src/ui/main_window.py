@@ -102,10 +102,10 @@ class MainWindow(QMainWindow):
         toolbar.setStyleSheet("background-color: #333; color: white;")
         self.statusBar().showMessage('Listo')
         
-        # Modificar la conexión del botón "Nuevo proyecto" en la barra de herramientas
-        new_project_action = QAction("Nuevo proyecto", self)
-        new_project_action.triggered.connect(self.new_project_from_main)
-        toolbar.addAction(new_project_action)
+        # # Modificar la conexión del botón "Nuevo proyecto" en la barra de herramientas
+        # new_project_action = QAction("Nuevo proyecto", self)
+        # new_project_action.triggered.connect(self.new_project_from_main)
+        # toolbar.addAction(new_project_action)
 
         self.init_macrobloques() 
 

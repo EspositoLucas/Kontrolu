@@ -153,6 +153,8 @@ class DrawingArea(QGraphicsView):
     def show_help(self):
         help_dialog = QDialog(self)
         help_dialog.setWindowTitle("Ayuda")
+        
+        help_dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
 
         help_text = QTextEdit()
