@@ -36,8 +36,15 @@ class MainWindow(QMainWindow):
     def create_initial_menu(self):
         initial_menu = QDialog(self)
         initial_menu.setWindowTitle('Menú Inicial - Kontrolu')
-        initial_menu.setStyleSheet("background-color: #ADD8E6;")
+        initial_menu.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'base','imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(QtGui.QIcon(icon))
 
         new_project_btn = QPushButton('Crear proyecto nuevo')
         new_project_btn.clicked.connect(self.new_project_from_menu)
