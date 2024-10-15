@@ -1,6 +1,8 @@
 import sympy as sp
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo
 from back.topologia.microbloque import MicroBloque
+from back.topologia.perturbacion import Perturbacion
+from back.topologia.hoja import Hoja
 from latex2sympy2 import latex2sympy
 
 class Estabilidad:
@@ -13,12 +15,33 @@ class Estabilidad:
         ft_proceso = self.calcular_ft_macrobloque(self.sesion.proceso)
         ft_medidor = self.calcular_ft_macrobloque(self.sesion.medidor)
 
-        ft_lazo_directo = ft_controlador * ft_actuador * ft_proceso
-        ft_global = ft_lazo_directo / (1 + ft_lazo_directo * ft_medidor)
+        # Calcula la función de transferencia de lazo directo considerando las perturbaciones
+        ft_lazo_directo = self.calcular_ft_con_perturbaciones_lazo_directo(ft_controlador * ft_actuador * ft_proceso)
+        ft_retroalimentacion = self.calcular_ft_con_perturbaciones_retroalimentacion(ft_medidor)
+
+        ft_global = ft_lazo_directo / (1 + (ft_lazo_directo * ft_retroalimentacion))
 
         ft_global_simplificada = sp.simplify(ft_global)
-        # Convertir la expresión simbólica a LaTeX
         return sp.latex(ft_global_simplificada)
+    
+    def calcular_ft_con_perturbaciones_lazo_directo(self, ft_base):
+        ft_total = ft_base
+        for macrobloque in [self.sesion.controlador, self.sesion.actuador, self.sesion.proceso]:
+            ft_total += self.obtener_perturbaciones(macrobloque)
+        return ft_total
+    
+    def calcular_ft_con_perturbaciones_retroalimentacion(self, ft_base):
+        ft_total = ft_base
+        for macrobloque in [self.sesion.medidor]:
+            ft_total += self.obtener_perturbaciones(macrobloque)
+        return ft_total
+
+    def obtener_perturbaciones(self, macrobloque):
+        ft_perturbaciones = 0
+        for elemento in macrobloque.topologia.obtener_micros():
+            if isinstance(elemento, Perturbacion):
+                ft_perturbaciones += self.parse_latex_to_sympy(elemento.funcion_transferencia)
+        return ft_perturbaciones
 
     def calcular_ft_macrobloque(self, macrobloque):
         return self.calcular_ft_topologia(macrobloque.topologia)
@@ -30,13 +53,18 @@ class Estabilidad:
             return self.calcular_ft_paralelo(topologia)
         elif isinstance(topologia, MicroBloque):
             return self.parse_latex_to_sympy(topologia.funcion_transferencia)
+        elif isinstance(topologia, Hoja):
+            if isinstance(topologia, Perturbacion):
+                return 0  # Las perturbaciones se manejan por separado
+            return self.parse_latex_to_sympy(topologia.funcion_transferencia)
         else:
             raise ValueError(f"Tipo de topología no reconocido: {type(topologia)}")
 
     def calcular_ft_serie(self, serie):
         ft = 1
         for hijo in serie.hijos:
-            ft *= self.calcular_ft_topologia(hijo)
+            if not isinstance(hijo, Perturbacion):
+                ft *= self.calcular_ft_topologia(hijo)
         return ft
 
     def calcular_ft_paralelo(self, paralelo):
