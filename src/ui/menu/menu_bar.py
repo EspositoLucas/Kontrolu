@@ -27,6 +27,7 @@ class Menu(QMenuBar):
                 padding: 5px;
                 background-color: #555;
                 border-radius: 3px;
+                margin-right: 10px;
             }      
         """)
         

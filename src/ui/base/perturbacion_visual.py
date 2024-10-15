@@ -143,6 +143,7 @@ class PerturbacionVisual(QGraphicsItemGroup):
                 min-width: 80px;
                 min-height: 30px;
                 border: none;
+                border-radius: 3px;
             """)
 
         reply = dialog.exec_()

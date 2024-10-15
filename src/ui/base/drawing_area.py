@@ -293,6 +293,7 @@ class DrawingArea(QGraphicsView):
                 min-width: 80px;
                 min-height: 30px;
                 border: none;
+                border-radius: 3px;
             """)
 
         reply = dialog.exec_()
@@ -916,6 +917,7 @@ class DrawingArea(QGraphicsView):
                 min-width: 80px;
                 min-height: 30px;
                 border: none;
+                border-radius: 3px;
             """)
 
         reply = dialog.exec_()
@@ -972,6 +974,7 @@ class DrawingArea(QGraphicsView):
                 min-width: 80px;
                 min-height: 30px;
                 border: none;
+                border-radius: 3px;
             """)
 
         reply = dialog.exec_()

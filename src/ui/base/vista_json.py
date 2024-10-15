@@ -130,6 +130,9 @@ class VistaJson(QDialog):
                 index = regex.indexIn(json_text, pos)
 
     def adjust_dialog_size(self):
+        """
         document = self.text_edit.document()
         document_size = document.size()
         self.resize(int(document_size.width()) + 50, int(document_size.height()) + 100)
+        """
+        self.setMinimumSize(400, 400)

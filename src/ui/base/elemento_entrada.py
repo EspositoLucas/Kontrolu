@@ -23,6 +23,7 @@ class ElementoEntrada(QPushButton):
         self.setStyleSheet("""
             background-color: #0072BB;;  /* Color de fondo azul /
             font-weight: bold;          /* Texto en negrita */
+            font-weight: bold;
             color: white;               /* Color de texto blanco */
             font-size: 15px;            /* Tamaño de fuente */
             font-family: Arial;  
@@ -66,6 +67,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         nombre_layout = QtWidgets.QHBoxLayout()
         nombre_layout.addWidget(QtWidgets.QLabel("Nombre:"))
         self.nombre_input = QtWidgets.QLineEdit(self.entrada.nombre)
+        self.nombre_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         nombre_layout.addWidget(self.nombre_input)
         layout.addLayout(nombre_layout)
 
@@ -75,6 +77,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.tipo_entrada_combo = QtWidgets.QComboBox()
         self.tipo_entrada_combo.addItems(["Personalizada", "Escalón", "Rampa", "Parábola"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
+        self.tipo_entrada_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
         layout.addLayout(tipo_entrada_layout)
@@ -84,6 +87,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         coeficiente_layout.addWidget(QtWidgets.QLabel("Coeficiente:"))
         self.coeficiente_input = QtWidgets.QLineEdit(self.coeficiente)
         self.coeficiente_input.setValidator(QtGui.QDoubleValidator())
+        self.coeficiente_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.coeficiente_input.textChanged.connect(self.actualizar_funcion_transferencia)
         coeficiente_layout.addWidget(self.coeficiente_input)
         layout.addLayout(coeficiente_layout)

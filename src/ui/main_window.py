@@ -37,6 +37,7 @@ class MainWindow(QMainWindow):
         initial_menu = QDialog(self)
         initial_menu.setWindowTitle('Menú Inicial - Kontrolu')
         initial_menu.setStyleSheet("background-color: #333; color: white;")
+        initial_menu.resize(400, 150)
         layout = QVBoxLayout()
         
         # Configurar el icono de la ventana
@@ -95,11 +96,47 @@ class MainWindow(QMainWindow):
         boton_simulacion.triggered.connect(self.iniciar_simulacion)
         toolbar.addAction(boton_simulacion)
 
+        toolbar.addSeparator()
+
         # Botón de análisis de estabilidad
         boton_estabilidad = QAction("Análisis de Estabilidad", self)
         boton_estabilidad.triggered.connect(self.mostrar_analisis_estabilidad)
         toolbar.addAction(boton_estabilidad)
-        toolbar.setStyleSheet("background-color: #333; color: white;")
+        toolbar.setStyleSheet("background-color: #444; color: white;")
+
+        # Obtener los botones de la barra de herramientas y aplicarles estilos personalizados
+        simulacion_button = toolbar.widgetForAction(boton_simulacion)
+        if simulacion_button:
+            simulacion_button.setStyleSheet("""
+                QToolButton {
+                    background-color: #666;  
+                    color: white;               /* Color del texto */
+                    font-weight: bold;          /* Texto en negrita */
+                    border: none;               /* Sin borde */
+                    padding: 5px;               /* Espaciado interno */
+                    border-radius: 3px;
+                }
+                QToolButton:hover {
+                    background-color: #4cae4c;  /* Color de fondo cuando se pasa el mouse */
+                }
+            """)
+
+        estabilidad_button = toolbar.widgetForAction(boton_estabilidad)
+        if estabilidad_button:
+            estabilidad_button.setStyleSheet("""
+                QToolButton {
+                    background-color: #666;  
+                    color: white;               /* Color del texto */
+                    font-weight: bold;          /* Texto en negrita */
+                    border: none;               /* Sin borde */
+                    padding: 5px;               /* Espaciado interno */
+                    border-radius: 3px;
+                }
+                QToolButton:hover {
+                    background-color: #c9302c;  /* Color de fondo cuando se pasa el mouse */
+                }
+            """)
+
         self.statusBar().showMessage('Listo')
         
         # # Modificar la conexión del botón "Nuevo proyecto" en la barra de herramientas
@@ -166,6 +203,7 @@ class MainWindow(QMainWindow):
         salida_layout.addWidget(QLabel("Variable a controlar en tiempo 0:"))
         salida_edit = QLineEdit()
         salida_edit.setText("10")
+        salida_edit.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         salida_layout.addWidget(salida_edit)
         layout.addLayout(salida_layout)
 
@@ -174,6 +212,7 @@ class MainWindow(QMainWindow):
         dt_layout.addWidget(QLabel("Intervalo de tiempo (dt):"))
         dt_edit = QLineEdit()
         dt_edit.setText("0.01")
+        dt_edit.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         dt_layout.addWidget(dt_edit)
         layout.addLayout(dt_layout)
 
@@ -182,6 +221,7 @@ class MainWindow(QMainWindow):
         velocidad_layout.addWidget(QLabel("Duracion de simulacion de cada ciclo (segundos reales):"))
         velocidad_edit = QLineEdit()
         velocidad_edit.setText("2")
+        velocidad_edit.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         velocidad_layout.addWidget(velocidad_edit)
         layout.addLayout(velocidad_layout)
 
@@ -308,6 +348,7 @@ class MainWindow(QMainWindow):
                 if isinstance(valor, sp.Expr):
                     valor = sp.simplify(valor)
                 item = QTableWidgetItem(str(valor))
+                item.setTextAlignment(Qt.AlignCenter)
                 self.matrix_table.setItem(i, j, item)
 
         # Ajustar el estilo de la tabla
@@ -320,7 +361,14 @@ class MainWindow(QMainWindow):
                 color: white;
                 background-color: #444;
             }
+            QHeaderView::section {
+                background-color: #333;
+                color: white;
+                font-weight: bold;
+            }
         """)
+        self.matrix_table.horizontalHeader().setVisible(True)
+        self.matrix_table.verticalHeader().setVisible(True)
 
         # Ajustar el tamaño de las celdas
         self.matrix_table.resizeColumnsToContents()
@@ -429,6 +477,7 @@ class MainWindow(QMainWindow):
                 min-width: 80px;
                 min-height: 30px;
                 border: none;
+                border-radius: 3px;
             """)
         reply = dialog.exec_()
 

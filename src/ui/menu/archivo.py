@@ -10,30 +10,34 @@ class Archivo(QMenu):
         self.setup()
         self.setStyleSheet("""
             QMenu {
-                background-color: white;
-                border: 1px solid #777;
+                background-color: #444;
+                color: white;
             }
-            
+            QMenu::item {
+                background-color: #666;
+                border-radius: 3px;
+                padding-right: 40px;  
+                margin-top: 5px;  
+            }
             QMenu::item:selected {
-                background-color: #ADD8E6;
-                color: black;
+                background-color: #777;
             }
         """)
+        
+
+        
     
     def setup(self):
         # Menú de archivo
         
         # Modificar la acción "Nuevo" para usar el parámetro from_menu
         new_action = QAction(QIcon('new.png'), 'Nuevo', self.main_window)
-        new_action.setShortcut('Ctrl+N')
         new_action.triggered.connect(lambda: self.new_project(from_menu=False))
         
         open_action = QAction(QIcon('open.png'), 'Abrir', self.main_window)
-        open_action.setShortcut('Ctrl+O')
         open_action.triggered.connect(self.open_project)
         
         save_action = QAction(QIcon('save.png'), 'Guardar', self.main_window)
-        save_action.setShortcut('Ctrl+S')
         save_action.triggered.connect(self.save_project)
 
         self.addAction(new_action)
@@ -55,7 +59,7 @@ class Archivo(QMenu):
             # Aplicar estilo
             msgBox.setStyleSheet("""
                 QMessageBox {
-                    background-color: black;
+                    background-color: #333;
                     color: white;
                 }
                 QMessageBox QLabel {
@@ -73,6 +77,7 @@ class Archivo(QMenu):
                     min-width: 80px;
                     min-height: 30px;
                     border: none;
+                    border-radius: 3px;
                 """)
             
             reply = msgBox.exec_()
