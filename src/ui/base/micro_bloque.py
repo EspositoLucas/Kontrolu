@@ -108,8 +108,15 @@ class Microbloque(QGraphicsItem):
         result = micro.exec_()
 
         if result == QDialog.Accepted:
+            self.actualizar()
             if unidad_vieja_entrada != self.elemento_back.configuracion_entrada.unidad or unidad_vieja_salida != self.elemento_back.configuracion_salida.unidad:
-                self.scene().parent().actualizar_colores_unidades()               
+                self.scene().parent().actualizar_colores_unidades() 
+
+            try:
+                self.elemento_back.color = micro.color
+                self.color = micro.color
+            except:
+                pass        
                 
             self.update()
     
