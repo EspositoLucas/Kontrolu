@@ -169,6 +169,9 @@ class Graficadora(QMainWindow):
                     self.checkboxes[clave].stateChanged.connect(self.actualizar_grafico)
                     self.controls_layout.addWidget(self.checkboxes[clave])
                 
+                # if clave == 'carga':
+                #     self.datos[clave].append(valor)  # Mantener el diccionario para 'carga'
+                
                 # Agregar clave a la lista de selección de columnas
                 self.column_list.addItem(clave)
             
@@ -192,7 +195,7 @@ class Graficadora(QMainWindow):
             'excelente': QColor(0, 255, 0),  # Verde brillante fuerte
             'bueno': QColor(144, 238, 144),  # Verde claro apenas notorio
             'regular': QColor(255, 255, 0),  # Amarillo
-            'mal': QColor(255, 99, 71),  # Rojo claro
+            'malo': QColor(255, 99, 71),  # Rojo claro
             'pesimo': QColor(255, 0, 0)  # Rojo fuerte
         }
         return colores_estado.get(nombre_estado, QColor(255, 255, 255))  # Blanco por defecto
@@ -279,7 +282,7 @@ class InterpretacionDatos(QDialog):
     def __init__(self, datos):
         super().__init__()
         self.setWindowTitle("Interpretación de Datos")
-        self.setGeometry(200, 200, 600, 400)
+        self.setGeometry(200, 200, 800, 600)
 
         layout = QVBoxLayout()
         self.text_edit = QTextEdit()
@@ -288,22 +291,114 @@ class InterpretacionDatos(QDialog):
         self.setLayout(layout)
 
         self.interpretar_datos(datos)
+    
+    def obtener_nombre_estado(self, prioridad):
+        estados = {
+            5: "Excelente",
+            4: "Bueno",
+            3: "Regular",
+            2: "Malo",
+            1: "Pésimo"
+        }
+        return estados.get(prioridad, "Desconocido")
 
     def interpretar_datos(self, datos):
-        interpretacion = "Interpretación de los datos de la simulación:\n\n"
+        interpretacion = "Interpretación detallada de los datos de la simulación:\n\n"
 
-        # Ejemplo de interpretación básica
         tiempo_total = datos['tiempo'][-1] - datos['tiempo'][0]
-        interpretacion += f"Tiempo total de simulación: {tiempo_total:.2f} unidades\n"
+        interpretacion += f"Tiempo total de simulación: {tiempo_total:.2f} unidades\n\n"
 
+        # Análisis de estabilización
+        tiempo_estabilizacion = self.analizar_estabilizacion(datos)
+        interpretacion += f"El sistema se estabilizó aproximadamente a las {tiempo_estabilizacion:.2f} unidades de tiempo.\n\n"
+
+        # Análisis de control
+        hubo_control = self.analizar_control(datos)
+        interpretacion += f"{'Hubo' if hubo_control else 'No hubo'} un control efectivo del sistema.\n\n"
+
+        # Análisis de cambios bruscos
+        cambios_bruscos = self.analizar_cambios_bruscos(datos)
+        if cambios_bruscos:
+            interpretacion += "Se detectaron los siguientes cambios bruscos en el estado de la carga:\n"
+            for cambio in cambios_bruscos:
+                estado_anterior = self.obtener_nombre_estado(cambio[1])
+                estado_nuevo = self.obtener_nombre_estado(cambio[2])
+                interpretacion += f"  - En el tiempo {cambio[0]:.2f}: cambio de '{estado_anterior}' a '{estado_nuevo}'\n"
+        else:
+            interpretacion += "No se detectaron cambios bruscos significativos en el estado de la carga.\n"
+
+        # Análisis por variable
         for key in datos:
-            if key != 'tiempo':
-                promedio = sum(datos[key]) / len(datos[key])
-                maximo = max(datos[key])
-                minimo = min(datos[key])
-                interpretacion += f"\n{key.capitalize()}:\n"
-                interpretacion += f"  Promedio: {promedio:.2f}\n"
-                interpretacion += f"  Máximo: {maximo:.2f}\n"
-                interpretacion += f"  Mínimo: {minimo:.2f}\n"
+            if key != 'tiempo' and key != 'carga':
+                interpretacion += self.analizar_variable(key, datos[key])
 
         self.text_edit.setText(interpretacion)
+    def analizar_estabilizacion(self, datos):
+        # Implementa lógica para determinar cuándo el sistema se estabiliza
+        salida = datos['salida']
+        for i in range(len(salida) - 1):
+            if abs(salida[i] - salida[i+1]) < 0.01:  # Umbral de estabilización
+                return datos['tiempo'][i]
+        return datos['tiempo'][-1]  # Si no se estabiliza, retorna el tiempo final
+
+    def analizar_control(self, datos):
+        # Implementa lógica para determinar si hubo control efectivo
+        # Por ejemplo, comparando el error inicial con el error final
+        error_inicial = abs(datos['error'][0])
+        error_final = abs(datos['error'][-1])
+        return error_final < error_inicial / 2  # Control efectivo si el error se reduce a la mitad
+    
+    def analizar_cambios_bruscos(self, datos):
+        cambios_bruscos = []
+        if 'carga' not in datos or len(datos['carga']) < 2:
+            return cambios_bruscos
+
+        estados_carga = datos['carga']
+        tiempos = datos['tiempo']
+        print("nombre")
+        def calificar_estado(estado):
+            if estado is not None:
+                if estado== 5:
+                    return 4
+                elif estado == 4:
+                    return 3
+                elif estado == 3:
+                    return 2
+                elif estado == 2:
+                    return 1
+                elif estado == 1:
+                    return 0
+            print(f"Estado no reconocido: {estado}")  # Para depuración
+            return -1  # Estado desconocido
+        
+        print(estados_carga[0])
+
+        estado_anterior = calificar_estado(estados_carga[0])
+        print(estado_anterior)
+        for i in range(1, len(estados_carga)):
+            estado_actual = calificar_estado(estados_carga[i])
+            print(estado_actual)
+            if estado_actual != -1 and estado_anterior != -1:
+                if abs(estado_actual - estado_anterior) > 0:  # Cambio brusco
+                    cambios_bruscos.append((tiempos[i], estados_carga[i-1], estados_carga[i]))
+                estado_anterior = estado_actual
+                print(estado_anterior)
+
+        return cambios_bruscos
+
+    def analizar_variable(self, nombre, valores):
+        promedio = sum(valores) / len(valores)
+        maximo = max(valores)
+        minimo = min(valores)
+        tiempo_max = (valores.index(maximo) / len(valores)) * 100
+        
+        analisis = f"\n{nombre.capitalize()}:\n"
+        analisis += f"  Promedio: {promedio:.2f}\n"
+        analisis += f"  Máximo: {maximo:.2f} (alcanzado al {tiempo_max:.1f}% del tiempo total)\n"
+        analisis += f"  Mínimo: {minimo:.2f}\n"
+        
+        if nombre == 'salida':
+            tiempo_en_maximo = sum(1 for v in valores if v > 0.95 * maximo) / len(valores) * 100
+            analisis += f"  Tiempo en máximo esplendor (>95% del máximo): {tiempo_en_maximo:.1f}%\n"
+        
+        return analisis

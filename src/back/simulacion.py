@@ -165,8 +165,8 @@ class Simulacion(QObject):
 
         for i in range(1, self.ciclos+1):
             if not self.continuar_simulacion or (self.graficadora and self.graficadora.is_paused):
-                while self.graficadora and self.graficadora.is_paused:
-                    self.graficadora.procesar_eventos()
+                while self.graficadora and self.graficadora.is_paused: # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
+                    self.graficadora.procesar_eventos()   # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
                     sleep(0.1)
             if not self.continuar_simulacion:
                 break
@@ -196,4 +196,5 @@ class Simulacion(QObject):
         ESTA_SIMULANDO = False
         if self.graficadora and not self.graficadora.isHidden():
             self.graficadora.close()
+    
 

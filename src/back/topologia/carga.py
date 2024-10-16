@@ -35,7 +35,7 @@ estados = [
     },
     {
         "minimo":0.1,
-        "nombre":"Pésimo",
+        "nombre":"Pesimo",
         "prioridad":1
     }
 ]
