@@ -95,8 +95,8 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         # Función de transferencia con editor LaTeX
         ft_layout = QtWidgets.QVBoxLayout()
         ft_layout.addWidget(QtWidgets.QLabel("Función de transferencia:"))
-        self.latex_editor = LatexEditor()
-        self.latex_editor.set_latex(self.entrada.funcion_transferencia or "")
+        # Pasar el valor inicial directamente en el constructor
+        self.latex_editor = LatexEditor(self.entrada.funcion_transferencia or "")
         self.latex_editor.setEnabled(self.tipo_entrada == "Personalizada")
         ft_layout.addWidget(self.latex_editor)
         layout.addLayout(ft_layout)
