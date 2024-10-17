@@ -10,6 +10,8 @@ class LatexEditor(QWidget):
 
     def __init__(self, initial_latex="", parent=None):
         super().__init__(parent)
+        self.initial_latex = initial_latex  # Guardamos el valor inicial
+        self.page_loaded = False  # Nueva bandera para controlar el estado de carga
         self.init_ui(initial_latex)
         self.connect_web_signals()
         self.validation_timer = QTimer(self)
@@ -35,6 +37,15 @@ class LatexEditor(QWidget):
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML"></script>
     <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script>
+    
+        // Definimos updateLatex inmediatamente
+        window.updateLatex = function(latex) {
+            var content = document.getElementById('latex-content');
+            if (content) {
+                content.innerHTML = '$$' + latex + '$$';
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, content]);
+            }
+        };
         var latex_editor;
 
         MathJax.Hub.Config({
@@ -63,14 +74,10 @@ class LatexEditor(QWidget):
         function initWebChannel() {
             new QWebChannel(qt.webChannelTransport, function (channel) {
                 latex_editor = channel.objects.latex_editor;
-                console.log("QWebChannel initialized");
                 if (latex_editor && typeof latex_editor.get_latex === 'function') {
                     latex_editor.get_latex(function(initialLatex) {
-                        console.log("Initial LaTeX:", initialLatex);
                         updateLatex(initialLatex);
                     });
-                } else {
-                    console.error("latex_editor or get_latex not available");
                 }
             });
         }
@@ -149,6 +156,9 @@ class LatexEditor(QWidget):
             self.validation_label.setStyleSheet("color: red; font-weight: bold;")
 
     def update_preview(self):
+        if not self.page_loaded:  # Si la página no está cargada, no hacemos nada
+            return
+        
         latex = self.editor.toPlainText()
         escaped_latex = latex.replace('\\', '\\\\').replace("'", "\\'")
         js_code = f"if(window.updateLatex) {{ window.updateLatex('{escaped_latex}'); }} else {{ console.error('updateLatex not available'); }}"
@@ -161,7 +171,9 @@ class LatexEditor(QWidget):
     def on_load_finished(self, ok):
         if ok:
             print("Web page loaded successfully")
-            QTimer.singleShot(500, self.update_preview)  # Delay the initial update
+            self.page_loaded = True  # Marcamos la página como cargada
+            if self.initial_latex:  # Si hay un valor inicial, lo actualizamos
+                self.update_preview()
         else:
             print("Failed to load web page")
 
@@ -170,8 +182,9 @@ class LatexEditor(QWidget):
 
     def set_latex(self, latex):
         self.editor.setText(latex)
-        self.update_preview()
-
+        if self.page_loaded:  # Solo actualizamos si la página está cargada
+            self.update_preview()
+            
     def es_funcion_valida(self, latex):
         latex = latex.replace(' ', '').lower()
         
