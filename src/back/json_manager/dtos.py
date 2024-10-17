@@ -1,28 +1,29 @@
 from dataclasses import dataclass
+from typing import Optional
 
 @dataclass
 class MicroBloqueDto:
-    nombre: str
-    descripcion: str
-    fdt: str
-    entrada_limite_inferior: float
-    entrada_limite_superior: float
-    entrada_limite_por_ciclo: float
-    entrada_error_maximo: float
-    entrada_proporcion: float
-    entrada_tipo: str
-    entrada_ultimo_valor: float
-    entrada_propabilidad: float
-    salida_limite_inferior: float
-    salida_limite_superior: float
-    salida_limite_por_ciclo: float
-    salida_error_maximo: float
-    salida_proporcion: float
-    salida_tipo: str
-    salida_ultimo_valor: float
-    salida_propabilidad: float
-    unidad_entrada: str
-    unidad_salida: str
+    nombre: str = None
+    descripcion: str = None
+    fdt: str = None
+    entrada_limite_inferior: Optional[float] = None
+    entrada_limite_superior: Optional[float] = None
+    entrada_limite_por_ciclo: Optional[float] = None
+    entrada_error_maximo: Optional[float] = None
+    entrada_proporcion: Optional[float] = None
+    entrada_tipo: Optional[str] = None
+    entrada_ultimo_valor: Optional[float] = None
+    entrada_propabilidad: Optional[float] = None
+    salida_limite_inferior: Optional[float] = None
+    salida_limite_superior: Optional[float] = None
+    salida_limite_por_ciclo: Optional[float] = None
+    salida_error_maximo: Optional[float] = None
+    salida_proporcion: Optional[float] = None
+    salida_tipo: Optional[str] = None
+    salida_ultimo_valor: Optional[float] = None
+    salida_propabilidad: Optional[float] = None
+    unidad_entrada: str = None
+    unidad_salida: str = None
 
 @dataclass
 class TipoMicroBloqueDto:

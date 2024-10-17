@@ -34,8 +34,233 @@
                 }
             }
         },
-        "ELECTRONICA": {}
-    },
+        "ELECTRONICA": {
+            "PID":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }    
+                }
+            },
+            "P":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "I":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "D":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "PI":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "ID":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "PD":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "PLC":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            }
+    }
+},
     "MACROS.ACTUADOR": {
         "SISTEMAS": {
             "Escaladores": {
@@ -136,12 +361,479 @@
                 }
             }
         },
-        "ELECTRONICA": {}
-    },
+        "ELECTRONICA": {
+            "Relé":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Transistor":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Servomotor":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Motor paso a paso":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "LED":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Altavoz":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Válvula solenoide":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Actuador térmico":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "Generico": {
+                        "nombre": "Generico",
+                        "descripcion": "No hay descripcion para cosas genericas",
+                        "fdt": "1",
+                        "entrada_limite_inferior": "default",
+                        "entrada_limite_superior": "default",
+                        "entrada_limite_por_ciclo": "default",
+                        "entrada_error_maximo": "default",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "default",
+                        "salida_limite_superior": "default",
+                        "salida_limite_por_ciclo": "default",
+                        "salida_error_maximo": "default",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            }
+    }
+},
     "MACROS.PROCESO": {
         "SISTEMAS": {},
-        "ELECTRONICA": {}
-    },
+        "ELECTRONICA": {
+            "Regulación de voltaje":{
+                "descripcion": "",
+                "micro_bloques":{
+                    "regulador_voltaje_basico": {
+                        "nombre": "Regulador de Voltaje Básico",
+                        "descripcion": "Regulador de voltaje básico, adecuado para pequeñas fluctuaciones.",
+                        "fdt": "\\frac{1}{1 + 0.05s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "12",
+                        "entrada_limite_por_ciclo": "6",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "12",
+                        "salida_limite_por_ciclo": "6",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "regulador_voltaje_precision": {
+                        "nombre": "Regulador de Voltaje de Precisión",
+                        "descripcion": "Regulador de voltaje con mayor precisión y baja tolerancia al error.",
+                        "fdt": "\\frac{10}{1 + 0.01s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "24",
+                        "entrada_limite_por_ciclo": "12",
+                        "entrada_error_maximo": "0.02",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "24",
+                        "salida_limite_por_ciclo": "12",
+                        "salida_error_maximo": "0.02",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+                
+
+            },
+            "Regulación de corriente":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "regulador_corriente_basico": {
+                        "nombre": "Regulador de Corriente Básico",
+                        "descripcion": "Regulador de corriente básico, apto para corrientes bajas.",
+                        "fdt": "\\frac{1}{1 + 0.05s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "2",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "2",
+                        "salida_limite_por_ciclo": "1",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "A",
+                        "unidad_salida": "A"
+                    },
+                    "regulador_corriente_alta_precision": {
+                        "nombre": "Regulador de Corriente de Alta Precisión",
+                        "descripcion": "Regulador de corriente preciso para aplicaciones críticas.",
+                        "fdt": "\\frac{5}{1 + 0.01s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "5",
+                        "entrada_error_maximo": "0.01",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "10",
+                        "salida_limite_por_ciclo": "5",
+                        "salida_error_maximo": "0.01",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "A",
+                        "unidad_salida": "A"
+                    }
+                }
+                
+            },
+            "Control de temperatura":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "control_temperatura_basico": {
+                        "nombre": "Control de Temperatura Básico",
+                        "descripcion": "Controlador de temperatura básico para ambientes no críticos.",
+                        "fdt": "\\frac{2}{1 + 0.1s}",
+                        "entrada_limite_inferior": "-40",
+                        "entrada_limite_superior": "85",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "0.5",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-40",
+                        "salida_limite_superior": "85",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.5",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "°C",
+                        "unidad_salida": "°C"
+                    },
+                    "control_temperatura_alta_precision": {
+                        "nombre": "Control de Temperatura de Alta Precisión",
+                        "descripcion": "Controlador de temperatura para aplicaciones industriales.",
+                        "fdt": "\\frac{5}{1 + 0.01s}",
+                        "entrada_limite_inferior": "-40",
+                        "entrada_limite_superior": "150",
+                        "entrada_limite_por_ciclo": "20",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-40",
+                        "salida_limite_superior": "150",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "°C",
+                        "unidad_salida": "°C"
+                    }
+                }
+                
+            },
+            "Control de velocidad":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "control_velocidad_basico": {
+                        "nombre": "Control de Velocidad Básico",
+                        "descripcion": "Controlador de velocidad para aplicaciones sencillas en motores eléctricos.",
+                        "fdt": "\\frac{1}{1 + 0.5s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "2000",
+                        "entrada_limite_por_ciclo": "500",
+                        "entrada_error_maximo": "5",
+                        "unidad_entrada": "RPM",
+                        "unidad_salida": "RPM"
+                    },
+                    "control_velocidad_precision": {
+                        "nombre": "Control de Velocidad de Alta Precisión",
+                        "descripcion": "Controlador de velocidad para motores de alta precisión con baja inercia.",
+                        "fdt": "\\frac{4}{1 + 0.05s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10000",
+                        "entrada_limite_por_ciclo": "2000",
+                        "entrada_error_maximo": "0.5",
+                        "unidad_entrada": "RPM",
+                        "unidad_salida": "RPM"
+                    }
+                }
+                
+            },
+            "Filtrado de señal":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "filtro_bajo_paso": {
+                        "nombre": "Filtro Pasa-Bajos",
+                        "descripcion": "Filtro pasa-bajos de primer orden utilizado para atenuar frecuencias altas.",
+                        "fdt": "\\frac{1}{1 + 0.1s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "2",
+                        "entrada_error_maximo": "0.1",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "filtro_alto_paso": {
+                        "nombre": "Filtro Pasa-Altos",
+                        "descripcion": "Filtro pasa-altos de segundo orden para atenuar frecuencias bajas.",
+                        "fdt": "\\frac{0.2s}{1 + 0.2s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "2",
+                        "entrada_error_maximo": "0.1",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+                
+            },
+            "Modulación de señales":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "modulacion_amplitud": {
+                        "nombre": "Modulación en Amplitud (AM)",
+                        "descripcion": "Modulación de señales utilizando la amplitud de una portadora.",
+                        "fdt": "\\frac{1}{1 + 0.01s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "modulacion_frecuencia": {
+                        "nombre": "Modulación en Frecuencia (FM)",
+                        "descripcion": "Modulación de señales utilizando la variación de la frecuencia de una portadora.",
+                        "fdt": "\\frac{1}{1 + 0.05s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "Hz"
+                    }
+                }
+                
+            }
+    }
+},
     "MACROS.MEDIDOR": {
         "SISTEMAS": {
             "Logs": {
@@ -344,6 +1036,388 @@
                 }
             }
         },
-        "ELECTRONICA": {}
+        "ELECTRONICA": {
+            "Amperimetros":{
+                "descripcion": "",
+                "micro_bloques":{
+                        "amperimetro_basico": {
+                            "nombre": "Amperímetro Básico",
+                            "descripcion": "Amperímetro de baja calidad, mide corriente continua con errores mínimos.",
+                            "fdt": "\\frac{1}{1 + 0.01s}",
+                            "entrada_limite_inferior": "0",
+                            "entrada_limite_superior": "10",
+                            "entrada_limite_por_ciclo": "5",
+                            "entrada_error_maximo": "0.05",
+                            "entrada_proporcion": 0,
+                            "entrada_tipo": "ninguno",
+                            "entrada_ultimo_valor": 0,
+                            "entrada_propabilidad": 0,
+                            "salida_limite_inferior": "0",
+                            "salida_limite_superior": "10",
+                            "salida_limite_por_ciclo": "5",
+                            "salida_error_maximo": "0.05",
+                            "salida_proporcion": 0,
+                            "salida_tipo": "ninguno",
+                            "salida_ultimo_valor": 0,
+                            "salida_propabilidad": 0,
+                            "unidad_entrada": "A",
+                            "unidad_salida": "A"
+                        },
+                        "amperimetro_preciso": {
+                            "nombre": "Amperímetro Preciso",
+                            "descripcion": "Amperímetro de alta precisión para medir corrientes con menor error.",
+                            "fdt": "\\frac{1}{1 + 0.001s}",
+                            "entrada_limite_inferior": "-20",
+                            "entrada_limite_superior": "20",
+                            "entrada_limite_por_ciclo": "10",
+                            "entrada_error_maximo": "0.01",
+                            "entrada_proporcion": 0,
+                            "entrada_tipo": "ninguno",
+                            "entrada_ultimo_valor": 0,
+                            "entrada_propabilidad": 0,
+                            "salida_limite_inferior": "-20",
+                            "salida_limite_superior": "20",
+                            "salida_limite_por_ciclo": "10",
+                            "salida_error_maximo": "0.01",
+                            "salida_proporcion": 0,
+                            "salida_tipo": "ninguno",
+                            "salida_ultimo_valor": 0,
+                            "salida_propabilidad": 0,
+                            "unidad_entrada": "A",
+                            "unidad_salida": "A"
+                        },
+                        "amperimetro_dinamico": {
+                            "nombre": "Amperímetro Dinámico",
+                            "descripcion": "Amperímetro capaz de medir corrientes dinámicas con respuesta más rápida.",
+                            "fdt": "\\frac{10}{1 + 0.1s}",
+                            "entrada_limite_inferior": "-50",
+                            "entrada_limite_superior": "50",
+                            "entrada_limite_por_ciclo": "15",
+                            "entrada_error_maximo": "0.02",
+                            "entrada_proporcion": 0,
+                            "entrada_tipo": "ninguno",
+                            "entrada_ultimo_valor": 0,
+                            "entrada_propabilidad": 0,
+                            "salida_limite_inferior": "-50",
+                            "salida_limite_superior": "50",
+                            "salida_limite_por_ciclo": "15",
+                            "salida_error_maximo": "0.02",
+                            "salida_proporcion": 0,
+                            "salida_tipo": "ninguno",
+                            "salida_ultimo_valor": 0,
+                            "salida_propabilidad": 0,
+                            "unidad_entrada": "A",
+                            "unidad_salida": "A"
+                        }
+                    }
+
+            },
+            "Voltimetros":{
+                "descripcion": "",
+                "micro_bloques": {
+                        "voltimetro_basico": {
+                            "nombre": "Voltímetro Básico",
+                            "descripcion": "Voltímetro de baja precisión para mediciones de voltaje simple.",
+                            "fdt": "\\frac{1}{1 + 0.05s}",
+                            "entrada_limite_inferior": "-100",
+                            "entrada_limite_superior": "100",
+                            "entrada_limite_por_ciclo": "50",
+                            "entrada_error_maximo": "0.1",
+                            "entrada_proporcion": 0,
+                            "entrada_tipo": "ninguno",
+                            "entrada_ultimo_valor": 0,
+                            "entrada_propabilidad": 0,
+                            "salida_limite_inferior": "-100",
+                            "salida_limite_superior": "100",
+                            "salida_limite_por_ciclo": "50",
+                            "salida_error_maximo": "0.1",
+                            "salida_proporcion": 0,
+                            "salida_tipo": "ninguno",
+                            "salida_ultimo_valor": 0,
+                            "salida_propabilidad": 0,
+                            "unidad_entrada": "V",
+                            "unidad_salida": "V"
+                        },
+                        "voltimetro_precision": {
+                            "nombre": "Voltímetro de Precisión",
+                            "descripcion": "Voltímetro de alta precisión con mayor rango de entrada y bajo error.",
+                            "fdt": "\\frac{5}{1 + 0.01s}",
+                            "entrada_limite_inferior": "-500",
+                            "entrada_limite_superior": "500",
+                            "entrada_limite_por_ciclo": "200",
+                            "entrada_error_maximo": "0.02",
+                            "entrada_proporcion": 0,
+                            "entrada_tipo": "ninguno",
+                            "entrada_ultimo_valor": 0,
+                            "entrada_propabilidad": 0,
+                            "salida_limite_inferior": "-500",
+                            "salida_limite_superior": "500",
+                            "salida_limite_por_ciclo": "200",
+                            "salida_error_maximo": "0.02",
+                            "salida_proporcion": 0,
+                            "salida_tipo": "ninguno",
+                            "salida_ultimo_valor": 0,
+                            "salida_propabilidad": 0,
+                            "unidad_entrada": "V",
+                            "unidad_salida": "V"
+                        },
+                        "voltimetro_rapido": {
+                            "nombre": "Voltímetro Rápido",
+                            "descripcion": "Voltímetro con alta tasa de respuesta para señales de voltaje rápido.",
+                            "fdt": "\\frac{20}{1 + 0.1s}",
+                            "entrada_limite_inferior": "-1000",
+                            "entrada_limite_superior": "1000",
+                            "entrada_limite_por_ciclo": "400",
+                            "entrada_error_maximo": "0.05",
+                            "entrada_proporcion": 0,
+                            "entrada_tipo": "ninguno",
+                            "entrada_ultimo_valor": 0,
+                            "entrada_propabilidad": 0,
+                            "salida_limite_inferior": "-1000",
+                            "salida_limite_superior": "1000",
+                            "salida_limite_por_ciclo": "400",
+                            "salida_error_maximo": "0.05",
+                            "salida_proporcion": 0,
+                            "salida_tipo": "ninguno",
+                            "salida_ultimo_valor": 0,
+                            "salida_propabilidad": 0,
+                            "unidad_entrada": "V",
+                            "unidad_salida": "V"
+                        }                   
+                }
+
+            },
+            "Ohmímetro":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "ohimetro_basico": {
+                        "nombre": "Ohímetro Básico",
+                        "descripcion": "Ohímetro básico para mediciones simples de resistencia.",
+                        "fdt": "\\frac{1}{1 + 0.02s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "20",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Ω",
+                        "unidad_salida": "Ω"
+                    },
+                    "ohimetro_precision": {
+                        "nombre": "Ohímetro de Precisión",
+                        "descripcion": "Ohímetro de precisión con mayor exactitud y menor error de medición.",
+                        "fdt": "\\frac{2}{1 + 0.01s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "100",
+                        "entrada_error_maximo": "0.01",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "100",
+                        "salida_error_maximo": "0.01",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Ω",
+                        "unidad_salida": "Ω"
+                    },
+                    "ohimetro_avanzado": {
+                        "nombre": "Ohímetro Avanzado",
+                        "descripcion": "Ohímetro avanzado capaz de medir resistencias en rangos muy altos.",
+                        "fdt": "\\frac{10}{1 + 0.05s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10000",
+                        "entrada_limite_por_ciclo": "500",
+                        "entrada_error_maximo": "0.005",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "10000",
+                        "salida_limite_por_ciclo": "500",
+                        "salida_error_maximo": "0.005",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Ω",
+                        "unidad_salida": "Ω"
+                    }
+                }
+                
+
+            },
+            "Frecuencímetro":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "frecuencimetro_basico": {
+                        "nombre": "Frecuencímetro Básico",
+                        "descripcion": "Frecuencímetro de baja precisión, para medir señales simples.",
+                        "fdt": "\\frac{1}{1 + 0.02s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "500",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "500",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Hz",
+                        "unidad_salida": "Hz"
+                    },
+                    "frecuencimetro_avanzado": {
+                        "nombre": "Frecuencímetro Avanzado",
+                        "descripcion": "Frecuencímetro avanzado para medir señales con alta precisión.",
+                        "fdt": "\\frac{2}{1 + 0.01s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5000",
+                        "entrada_limite_por_ciclo": "1000",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "5000",
+                        "salida_limite_por_ciclo": "1000",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Hz",
+                        "unidad_salida": "Hz"
+                    }
+                }                
+
+            },
+            "Capacímetro":{
+                "descripcion": "",
+                "micro_bloques": {
+                    "capacimetro_basico": {
+                        "nombre": "Capacímetro Básico",
+                        "descripcion": "Capacímetro para medir capacitancia en rangos pequeños.",
+                        "fdt": "\\frac{1}{1 + 0.03s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "F",
+                        "unidad_salida": "F"
+                    },
+                    "capacimetro_precision": {
+                        "nombre": "Capacímetro de Precisión",
+                        "descripcion": "Capacímetro con mayor precisión para mediciones detalladas.",
+                        "fdt": "\\frac{5}{1 + 0.01s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "100",
+                        "entrada_error_maximo": "0.02",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "100",
+                        "salida_error_maximo": "0.02",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "F",
+                        "unidad_salida": "F"
+                    }
+                }
+                
+            },
+            "Inductómetro":{
+                "descripcion": "",
+                "micro_bloques":{
+                    "inductometro_basico": {
+                        "nombre": "Inductómetro Básico",
+                        "descripcion": "Inductómetro para medir pequeñas inductancias.",
+                        "fdt": "\\frac{1}{1 + 0.04s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "20",
+                        "entrada_error_maximo": "0.15",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.15",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "H",
+                        "unidad_salida": "H"
+                    },
+                    "inductometro_avanzado": {
+                        "nombre": "Inductómetro Avanzado",
+                        "descripcion": "Inductómetro avanzado para medir inductancias de precisión.",
+                        "fdt": "\\frac{10}{1 + 0.02s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "100",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "100",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "H",
+                        "unidad_salida": "H"
+                    }
+                }               
+            }
+        }
     }
 }
