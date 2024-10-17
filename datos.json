@@ -5,58 +5,527 @@
     ],
     "MACROS.CONTROLADOR": {
         "SISTEMAS": {
-            "AI": {
+            "Orquestadores de Contenedores": {
                 "descripcion": "",
                 "micro_bloques": {
-                    "Controlador Predictivo Impulsado por AI": {
-                        "nombre": "Controlador Predictivo Impulsado por AI",
-                        "descripcion": "Los controladores impulsados por AI son muy eficientes, pero cometen muchos errores",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "V",
-                        "unidad_salida": "V"
+                    "Orquestador de contenedores básico": {
+                        "nombre": "Orquestador de contenedores básico",
+                        "descripcion": "Gestiona contenedores de manera simple",
+                        "fdt": "\\frac{0.7}{1 + 2*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 1,
+                        "salida_limite_superior": 50,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "con"
+                    },
+                    "Orquestador de contenedores avanzado": {
+                        "nombre": "Orquestador de contenedores avanzado",
+                        "descripcion": "Gestiona contenedores de manera eficiente",
+                        "fdt": "0.85 + \\frac{0.1}{s} + 0.05*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 1,
+                        "salida_limite_superior": 500,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "req",
+                        "unidad_salida": "con"
+                    }
+                }
+            },
+            "Gestor de Recursos": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Gestor de recursos del SO básico": {
+                        "nombre": "Gestor de recursos del SO básico",
+                        "descripcion": "Gestiona recursos del sistema operativo de manera simple",
+                        "fdt": "\\frac{0.8}{1 + s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 100,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "%"
+                    },
+                    "Gestor de recursos del SO avanzado": {
+                        "nombre": "Gestor de recursos del SO avanzado",
+                        "descripcion": "Gestiona recursos del sistema operativo de manera eficiente",
+                        "fdt": "0.9 + \\frac{0.05}{s} + 0.05*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 100,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "%"
+                    }
+                }
+            },
+            "Controles de Admisión": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Controlador de admisión básico": {
+                        "nombre": "Controlador de admisión básico",
+                        "descripcion": "Controla la admisión de peticiones de manera simple",
+                        "fdt": "\\frac{0.6}{1 + 0.5*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "req",
+                        "unidad_salida": "adm"
+                    },
+                    "Controlador de admisión avanzado": {
+                        "nombre": "Controlador de admisión avanzado",
+                        "descripcion": "Controla la admisión de peticiones de manera inteligente",
+                        "fdt": "0.75 + \\frac{0.15}{s} + 0.1*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 10000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "req",
+                        "unidad_salida": "adm"
+                    }
+                }
+            },
+            "Gestor de energía": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Gestor de energía básico": {
+                        "nombre": "Gestor de energía básico",
+                        "descripcion": "Gestiona el consumo de energía de manera simple",
+                        "fdt": "\\frac{0.7}{1 + 3*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 100,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "W",
+                        "unidad_salida": "%"
+                    },
+                    "Gestor de energía avanzado": {
+                        "nombre": "Gestor de energía avanzado",
+                        "descripcion": "Gestiona el consumo de energía de manera eficiente",
+                        "fdt": "0.8 + \\frac{0.1}{s} + 0.1*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 5000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 100,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "W",
+                        "unidad_salida": "%"
+                    }
+                }
+            },
+            "Planificador de Tareas": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Planificador de tareas básico": {
+                        "nombre": "Planificador de tareas básico",
+                        "descripcion": "Planifica tareas de manera simple",
+                        "fdt": "\\frac{0.65}{1 + s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 1,
+                        "salida_limite_superior": 10,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "tsk",
+                        "unidad_salida": "prio"
+                    },
+                    "Planificador de tareas avanzado": {
+                        "nombre": "Planificador de tareas avanzado",
+                        "descripcion": "Planifica tareas de manera eficiente",
+                        "fdt": "0.8 + \\frac{0.1}{s} + 0.1*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 1,
+                        "salida_limite_superior": 100,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "tsk",
+                        "unidad_salida": "prio"
+                    }
+                }
+            },
+            "Controlador de Replicacion": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Controlador de replicación de BD básico": {
+                        "nombre": "Controlador de replicación de BD básico",
+                        "descripcion": "Controla la replicación de bases de datos de manera simple",
+                        "fdt": "\\frac{0.75}{1 + 2*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 1,
+                        "salida_limite_superior": 5,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "trx",
+                        "unidad_salida": "rep"
+                    },
+                    "Controlador de replicación de BD avanzado": {
+                        "nombre": "Controlador de replicación de BD avanzado",
+                        "descripcion": "Controla la replicación de bases de datos de manera eficiente",
+                        "fdt": "0.85 + \\frac{0.1}{s} + 0.05*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 10000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 1,
+                        "salida_limite_superior": 20,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "trx",
+                        "unidad_salida": "rep"
                     }
                 }
             }
         },
-        "ELECTRONICA": {}
+        "ELECTRONICA": {
+            "PID": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "pid": {
+                        "nombre": "Controlador PID",
+                        "descripcion": "Controlador con acción proporcional, integral y derivativa.",
+                        "fdt": "\\frac{1 + 1/s + 1 * s}{1}",
+                        "entrada_limite_inferior": "-100",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "1",
+                        "salida_limite_inferior": "-100",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "P": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "p": {
+                        "nombre": "Controlador P",
+                        "descripcion": "Controlador con solo acción proporcional.",
+                        "fdt": "\\frac{1}{1}",
+                        "entrada_limite_inferior": "-100",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "1",
+                        "salida_limite_inferior": "-100",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "I": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "i": {
+                        "nombre": "Controlador I",
+                        "descripcion": "Controlador con solo acción integral.",
+                        "fdt": "\\frac{1}{s}",
+                        "entrada_limite_inferior": "-100",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "1",
+                        "salida_limite_inferior": "-100",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "D": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "d": {
+                        "nombre": "Controlador D",
+                        "descripcion": "Controlador con solo acción derivativa.",
+                        "fdt": "1 * s",
+                        "entrada_limite_inferior": "-100",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "1",
+                        "salida_limite_inferior": "-100",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "PI": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "pi": {
+                        "nombre": "Controlador PI",
+                        "descripcion": "Controlador con acción proporcional e integral.",
+                        "fdt": "\\frac{1 + 1/s}{1}",
+                        "entrada_limite_inferior": "-100",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "1",
+                        "salida_limite_inferior": "-100",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "ID": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "id": {
+                        "nombre": "Controlador ID",
+                        "descripcion": "Controlador con acción integral y derivativa.",
+                        "fdt": "\\frac{1/s + 1 * s}{1}",
+                        "entrada_limite_inferior": "-100",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "1",
+                        "salida_limite_inferior": "-100",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "PD": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "pd": {
+                        "nombre": "Controlador PD",
+                        "descripcion": "Controlador con acción proporcional y derivativa.",
+                        "fdt": "\\frac{2 * s}{1}",
+                        "entrada_limite_inferior": "-100",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "1",
+                        "salida_limite_inferior": "-100",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "PLC": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "plc": {
+                        "nombre": "Controlador PLC",
+                        "descripcion": "Controlador Lógico Programable para automatización industrial.",
+                        "fdt": "No aplica",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1",
+                        "entrada_limite_por_ciclo": "0.1",
+                        "entrada_error_maximo": "0.01",
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1",
+                        "salida_limite_por_ciclo": "0.1",
+                        "salida_error_maximo": "0.01",
+                        "unidad_entrada": "digital",
+                        "unidad_salida": "digital"
+                    }
+                }
+            }
+        }
     },
     "MACROS.ACTUADOR": {
         "SISTEMAS": {
-            "Escaladores": {
+            "balanceador_carga": {
                 "descripcion": "",
                 "micro_bloques": {
-                    "Escalador Vertical de Servidores Livianos": {
-                        "nombre": "Escalador Vertical de Servidores Livianos",
-                        "descripcion": "Los servidores livianos suelen escalar mas rapidamente",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
+                    "Balanceador de carga simple": {
+                        "nombre": "Balanceador de carga simple",
+                        "descripcion": "Distribuye el tráfico de manera básica",
+                        "fdt": "\\frac{0.5}{s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 5,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "req",
+                        "unidad_salida": "srv"
+                    },
+                    "Balanceador de carga avanzado": {
+                        "nombre": "Balanceador de carga avanzado",
+                        "descripcion": "Distribuye el tráfico de manera inteligente",
+                        "fdt": "0.8 + \\frac{0.2}{s} + 0.05*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 10000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 20,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "req",
+                        "unidad_salida": "srv"
+                    }
+                }
+            },
+            "escalador_instancias": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Escalador de instancias básico": {
+                        "nombre": "Escalador de instancias básico",
+                        "descripcion": "Escala instancias en la nube de manera simple",
+                        "fdt": "\\frac{0.6}{1 + 2*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 1,
+                        "salida_limite_superior": 10,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "ins"
+                    },
+                    "Escalador de instancias avanzado": {
+                        "nombre": "Escalador de instancias avanzado",
+                        "descripcion": "Escala instancias en la nube de manera inteligente",
+                        "fdt": "0.7 + \\frac{0.15}{s} + 0.1*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 1,
+                        "salida_limite_superior": 100,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "ins"
+                    }
+                }
+            },
+            "reinicio_servicios": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Sistema de reinicio simple": {
+                        "nombre": "Sistema de reinicio simple",
+                        "descripcion": "Reinicia servicios de manera básica",
+                        "fdt": "0.5",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "err",
+                        "unidad_salida": "rst"
+                    },
+                    "Sistema de reinicio avanzado": {
+                        "nombre": "Sistema de reinicio avanzado",
+                        "descripcion": "Reinicia servicios de manera inteligente",
+                        "fdt": "\\frac{0.8}{1 + 0.5*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 10,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "err",
+                        "unidad_salida": "rst"
+                    }
+                }
+            },
+            "limpieza_cache": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Limpiador de caché simple": {
+                        "nombre": "Limpiador de caché simple",
+                        "descripcion": "Limpia la caché de manera básica",
+                        "fdt": "0.7",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "clr"
+                    },
+                    "Limpiador de caché avanzado": {
+                        "nombre": "Limpiador de caché avanzado",
+                        "descripcion": "Limpia la caché de manera inteligente",
+                        "fdt": "\\frac{0.9}{1 + 0.1*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "clr"
+                    }
+                }
+            },
+            "ajustador_parametros": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Ajustador de parámetros simple": {
+                        "nombre": "Ajustador de parámetros simple",
+                        "descripcion": "Ajusta parámetros de configuración de manera básica",
+                        "fdt": "0.6",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 10,
+                        "salida_limite_superior": 1000,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "con"
+                    },
+                    "Ajustador de parámetros avanzado": {
+                        "nombre": "Ajustador de parámetros avanzado",
+                        "descripcion": "Ajusta parámetros de configuración de manera inteligente",
+                        "fdt": "0.75 + \\frac{0.2}{s} + 0.05*s",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 10,
+                        "salida_limite_superior": 1000,
+                        "salida_tipo": "proporcional",
+                        "unidad_entrada": "%",
+                        "unidad_salida": "con"
+                    }
+                }
+            }
+        },
+        "ELECTRONICA": {
+            "Relé": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "rele_basico": {
+                        "nombre": "Relé Básico",
+                        "descripcion": "Un relé básico que actúa como un interruptor controlado electrónicamente.",
+                        "fdt": "\\frac{1}{1 + 0.1*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.1",
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
                         "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "5",
+                        "salida_limite_por_ciclo": "1",
+                        "salida_error_maximo": "0.1",
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
@@ -64,68 +533,22 @@
                         "unidad_entrada": "V",
                         "unidad_salida": "V"
                     },
-                    "Escalador Horizontal de Servidores Livianos": {
-                        "nombre": "Escalador Horizontal de Servidores Livianos",
-                        "descripcion": "Los servidores livianos suelen escalar mas rapidamente",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
+                    "rele_avanzado": {
+                        "nombre": "Relé de Alta Precisión",
+                        "descripcion": "Relé con menor tiempo de respuesta y mayor precisión en la conmutación.",
+                        "fdt": "\\frac{1}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
                         "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "V",
-                        "unidad_salida": "V"
-                    },
-                    "Escalador Horizontal de Servidores Pesados": {
-                        "nombre": "Escalador Horizontal de Servidores Pesados",
-                        "descripcion": "Los servidores pesados suelen tener problemas para escalar",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "V",
-                        "unidad_salida": "V"
-                    },
-                    "Escalador Vertical de Servidores Pesados": {
-                        "nombre": "Escalador Vertical de Servidores Pesados",
-                        "descripcion": "Los servidores pesados suelen tener problemas para escalar",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "5",
+                        "salida_limite_por_ciclo": "1",
+                        "salida_error_maximo": "0.05",
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
@@ -134,216 +557,1313 @@
                         "unidad_salida": "V"
                     }
                 }
+            },
+            "Transistor": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "transistor_npn_basico": {
+                        "nombre": "Transistor NPN Básico",
+                        "descripcion": "Transistor NPN que amplifica señales de corriente.",
+                        "fdt": "\\frac{100}{1 + 0.1*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "0.7",
+                        "entrada_limite_por_ciclo": "0.1",
+                        "entrada_error_maximo": "0.01",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.01",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "A"
+                    },
+                    "transistor_pnp_avanzado": {
+                        "nombre": "Transistor PNP Avanzado",
+                        "descripcion": "Transistor PNP con alta ganancia y baja caída de voltaje.",
+                        "fdt": "\\frac{200}{1 + 0.05*s}",
+                        "entrada_limite_inferior": "-0.7",
+                        "entrada_limite_superior": "0",
+                        "entrada_limite_por_ciclo": "0.05",
+                        "entrada_error_maximo": "0.005",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "200",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.005",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "A"
+                    }
+                }
+            },
+            "Servomotor": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "servomotor_basico": {
+                        "nombre": "Servomotor Básico",
+                        "descripcion": "Servomotor con control de posición básico y tiempo de respuesta estándar.",
+                        "fdt": "\\frac{2}{s*(s + 0.5)}",
+                        "entrada_limite_inferior": "-90",
+                        "entrada_limite_superior": "90",
+                        "entrada_limite_por_ciclo": "15",
+                        "entrada_error_maximo": "1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-90",
+                        "salida_limite_superior": "90",
+                        "salida_limite_por_ciclo": "15",
+                        "salida_error_maximo": "1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "deg",
+                        "unidad_salida": "deg"
+                    },
+                    "servomotor_precision": {
+                        "nombre": "Servomotor de Alta Precisión",
+                        "descripcion": "Servomotor con control de alta precisión para aplicaciones críticas.",
+                        "fdt": "\\frac{10}{s*(s + 0.05)}",
+                        "entrada_limite_inferior": "-90",
+                        "entrada_limite_superior": "90",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-90",
+                        "salida_limite_superior": "90",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "deg",
+                        "unidad_salida": "deg"
+                    }
+                }
+            },
+            "Motor paso a paso": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "motor_paso_basico": {
+                        "nombre": "Motor Paso a Paso Básico",
+                        "descripcion": "Motor paso a paso con resolución estándar y respuesta moderada.",
+                        "fdt": "\\frac{1}{s + 1}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "200",
+                        "entrada_limite_por_ciclo": "20",
+                        "entrada_error_maximo": "0.5",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "200",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.5",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "pasos",
+                        "unidad_salida": "pasos"
+                    },
+                    "motor_paso_alta_precision": {
+                        "nombre": "Motor Paso a Paso de Alta Precisión",
+                        "descripcion": "Motor paso a paso con alta precisión y bajo tiempo de respuesta.",
+                        "fdt": "\\frac{10}{s + 0.1}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "400",
+                        "entrada_limite_por_ciclo": "40",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "400",
+                        "salida_limite_por_ciclo": "40",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "pasos",
+                        "unidad_salida": "pasos"
+                    }
+                }
+            },
+            "LED": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "led_basico": {
+                        "nombre": "LED Básico",
+                        "descripcion": "Un LED básico que se enciende con corriente continua.",
+                        "fdt": "\\frac{1}{s + 1}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "3",
+                        "entrada_limite_por_ciclo": "0.5",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "3",
+                        "salida_limite_por_ciclo": "0.5",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "lumen"
+                    },
+                    "led_alta_potencia": {
+                        "nombre": "LED de Alta Potencia",
+                        "descripcion": "Un LED de alta potencia con mayor brillo y menor tiempo de respuesta.",
+                        "fdt": "\\frac{5}{s + 0.1}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "0.5",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "100",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "lumen"
+                    }
+                }
+            },
+            "Altavoz": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "altavoz_basico": {
+                        "nombre": "Altavoz Básico",
+                        "descripcion": "Altavoz básico para reproducción de sonido de baja potencia.",
+                        "fdt": "\\frac{1}{s + 2}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "dB"
+                    },
+                    "altavoz_alta_fidelidad": {
+                        "nombre": "Altavoz de Alta Fidelidad",
+                        "descripcion": "Altavoz con alta fidelidad para sonido de precisión y bajo nivel de distorsión.",
+                        "fdt": "\\frac{10}{s + 0.5}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "150",
+                        "salida_limite_por_ciclo": "15",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "dB"
+                    }
+                }
+            },
+            "Válvula solenoide": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "valvula_solenoide_basica": {
+                        "nombre": "Válvula Solenoide Básica",
+                        "descripcion": "Válvula solenoide que controla el flujo de líquido mediante una señal eléctrica básica.",
+                        "fdt": "\\frac{1}{s + 0.1}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "l/min"
+                    },
+                    "valvula_solenoide_rapida": {
+                        "nombre": "Válvula Solenoide Rápida",
+                        "descripcion": "Válvula solenoide de alta velocidad y precisión para control rápido de flujo.",
+                        "fdt": "\\frac{5}{s + 0.01}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "200",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "l/min"
+                    }
+                }
+            },
+            "Actuador térmico": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "actuador_termico_basico": {
+                        "nombre": "Actuador Térmico Básico",
+                        "descripcion": "Actuador térmico simple que controla la temperatura mediante una señal eléctrica.",
+                        "fdt": "\\frac{1}{s + 0.5}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "°C"
+                    },
+                    "actuador_termico_avanzado": {
+                        "nombre": "Actuador Térmico Avanzado",
+                        "descripcion": "Actuador térmico de alta precisión con rápida respuesta a cambios de temperatura.",
+                        "fdt": "\\frac{10}{s + 0.01}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "200",
+                        "entrada_limite_por_ciclo": "20",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "200",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "°C"
+                    }
+                }
             }
-        },
-        "ELECTRONICA": {}
+        }
     },
     "MACROS.PROCESO": {
-        "SISTEMAS": {},
-        "ELECTRONICA": {}
+        "SISTEMAS": {
+            "Servicio Web": {
+              "descripcion": "",
+              "micro_bloques": {
+              "Servicio web básico": {
+                "nombre": "Servicio web básico",
+                "descripcion": "Proceso de servicio web simple",
+                "fdt": "\\frac{0.8}{1 + 0.5*s}",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 1000,
+                "entrada_tipo": "aleatorio",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 1000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "req",
+                "unidad_salida": "res"
+              },
+              "Servicio web avanzado": {
+                "nombre": "Servicio web avanzado",
+                "descripcion": "Proceso de servicio web optimizado",
+                "fdt": "0.9 + \\frac{0.05}{s} + 0.05*s",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 10000,
+                "entrada_tipo": "aleatorio",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 10000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "req",
+                "unidad_salida": "res"
+              }}
+            },
+            "Base de Datos": {
+              "descripcion": "",
+              "micro_bloques": {
+              "Base de datos básica": {
+                "nombre": "Base de datos básica",
+                "descripcion": "Proceso de base de datos simple",
+                "fdt": "\\frac{0.7}{1 + s}",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 1000,
+                "entrada_tipo": "aleatorio",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 1000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "qry",
+                "unidad_salida": "res"
+              },
+              "Base de datos avanzada": {
+                "nombre": "Base de datos avanzada",
+                "descripcion": "Proceso de base de datos optimizado",
+                "fdt": "0.85 + \\frac{0.1}{s} + 0.05*s",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 10000,
+                "entrada_tipo": "aleatorio",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 10000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "qry",
+                "unidad_salida": "res"
+              }}
+            },
+            "Cola de Mensajes": {
+              "descripcion": "",
+              "micro_bloques": {
+              "Cola de mensajes básica": {
+                "nombre": "Cola de mensajes básica",
+                "descripcion": "Proceso de cola de mensajes simple",
+                "fdt": "\\frac{0.75}{1 + 0.3*s}",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 1000,
+                "entrada_tipo": "aleatorio",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 1000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "msg",
+                "unidad_salida": "prc"
+              },
+              "Cola de mensajes avanzada": {
+                "nombre": "Cola de mensajes avanzada",
+                "descripcion": "Proceso de cola de mensajes optimizado",
+                "fdt": "0.9 + \\frac{0.05}{s} + 0.05*s",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 10000,
+                "entrada_tipo": "aleatorio",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 10000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "msg",
+                "unidad_salida": "prc"
+              }}
+            },
+            "Indexacion de Busqueda": {
+              "descripcion": "",
+              "micro_bloques": {
+              "Indexación de búsqueda básica": {
+                "nombre": "Indexación de búsqueda básica",
+                "descripcion": "Proceso de indexación de búsqueda simple",
+                "fdt": "\\frac{0.6}{1 + 2*s}",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 10000,
+                "entrada_tipo": "aleatorio",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 10000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "doc",
+                "unidad_salida": "idx"
+              },
+              "Indexación de búsqueda avanzada": {
+                "nombre": "Indexación de búsqueda avanzada",
+                "descripcion": "Proceso de indexación de búsqueda optimizado",
+                "fdt": "0.8 + \\frac{0.15}{s} + 0.05*s",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 100000,
+                "entrada_tipo": "aleatorio",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 100000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "doc",
+                "unidad_salida": "idx"
+              }}
+            },
+            "BackUps": {
+              "descripcion": "",
+              "micro_bloques": {
+              "Tarea de respaldo básica": {
+                "nombre": "Tarea de respaldo básica",
+                "descripcion": "Proceso de respaldo simple",
+                "fdt": "\\frac{0.7}{1 + 3*s}",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 1000,
+                "entrada_tipo": "proporcional",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 1000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "GB",
+                "unidad_salida": "GB"
+              },
+              "Tarea de respaldo avanzada": {
+                "nombre": "Tarea de respaldo avanzada",
+                "descripcion": "Proceso de respaldo optimizado",
+                "fdt": "0.85 + \\frac{0.1}{s} + 0.05*s",
+                "entrada_limite_inferior": 0,
+                "entrada_limite_superior": 10000,
+                "entrada_tipo": "proporcional",
+                "salida_limite_inferior": 0,
+                "salida_limite_superior": 10000,
+                "salida_tipo": "proporcional",
+                "unidad_entrada": "GB",
+                "unidad_salida": "GB"
+              }
+            }}
+          },
+        "ELECTRONICA": {
+            "Regulación de voltaje": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "regulador_voltaje_basico": {
+                        "nombre": "Regulador de Voltaje Básico",
+                        "descripcion": "Regulador de voltaje básico, adecuado para pequeñas fluctuaciones.",
+                        "fdt": "\\frac{1}{1 + 0.05*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "12",
+                        "entrada_limite_por_ciclo": "6",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "12",
+                        "salida_limite_por_ciclo": "6",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "regulador_voltaje_precision": {
+                        "nombre": "Regulador de Voltaje de Precisión",
+                        "descripcion": "Regulador de voltaje con mayor precisión y baja tolerancia al error.",
+                        "fdt": "\\frac{10}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "24",
+                        "entrada_limite_por_ciclo": "12",
+                        "entrada_error_maximo": "0.02",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "24",
+                        "salida_limite_por_ciclo": "12",
+                        "salida_error_maximo": "0.02",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Regulación de corriente": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "regulador_corriente_basico": {
+                        "nombre": "Regulador de Corriente Básico",
+                        "descripcion": "Regulador de corriente básico, apto para corrientes bajas.",
+                        "fdt": "\\frac{1}{1 + 0.05*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "2",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "2",
+                        "salida_limite_por_ciclo": "1",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "A",
+                        "unidad_salida": "A"
+                    },
+                    "regulador_corriente_alta_precision": {
+                        "nombre": "Regulador de Corriente de Alta Precisión",
+                        "descripcion": "Regulador de corriente preciso para aplicaciones críticas.",
+                        "fdt": "\\frac{5}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "5",
+                        "entrada_error_maximo": "0.01",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "10",
+                        "salida_limite_por_ciclo": "5",
+                        "salida_error_maximo": "0.01",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "A",
+                        "unidad_salida": "A"
+                    }
+                }
+            },
+            "Control de temperatura": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "control_temperatura_basico": {
+                        "nombre": "Control de Temperatura Básico",
+                        "descripcion": "Controlador de temperatura básico para ambientes no críticos.",
+                        "fdt": "\\frac{2}{1 + 0.1*s}",
+                        "entrada_limite_inferior": "-40",
+                        "entrada_limite_superior": "85",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "0.5",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-40",
+                        "salida_limite_superior": "85",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.5",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "°C",
+                        "unidad_salida": "°C"
+                    },
+                    "control_temperatura_alta_precision": {
+                        "nombre": "Control de Temperatura de Alta Precisión",
+                        "descripcion": "Controlador de temperatura para aplicaciones industriales.",
+                        "fdt": "\\frac{5}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "-40",
+                        "entrada_limite_superior": "150",
+                        "entrada_limite_por_ciclo": "20",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-40",
+                        "salida_limite_superior": "150",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "°C",
+                        "unidad_salida": "°C"
+                    }
+                }
+            },
+            "Control de velocidad": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "control_velocidad_basico": {
+                        "nombre": "Control de Velocidad Básico",
+                        "descripcion": "Controlador de velocidad para aplicaciones sencillas en motores eléctricos.",
+                        "fdt": "\\frac{1}{1 + 0.5*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "2000",
+                        "entrada_limite_por_ciclo": "500",
+                        "entrada_error_maximo": "5",
+                        "unidad_entrada": "RPM",
+                        "unidad_salida": "RPM"
+                    },
+                    "control_velocidad_precision": {
+                        "nombre": "Control de Velocidad de Alta Precisión",
+                        "descripcion": "Controlador de velocidad para motores de alta precisión con baja inercia.",
+                        "fdt": "\\frac{4}{1 + 0.05*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10000",
+                        "entrada_limite_por_ciclo": "2000",
+                        "entrada_error_maximo": "0.5",
+                        "unidad_entrada": "RPM",
+                        "unidad_salida": "RPM"
+                    }
+                }
+            },
+            "Filtrado de señal": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "filtro_bajo_paso": {
+                        "nombre": "Filtro Pasa-Bajos",
+                        "descripcion": "Filtro pasa-bajos de primer orden utilizado para atenuar frecuencias altas.",
+                        "fdt": "\\frac{1}{1 + 0.1*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "2",
+                        "entrada_error_maximo": "0.1",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "filtro_alto_paso": {
+                        "nombre": "Filtro Pasa-Altos",
+                        "descripcion": "Filtro pasa-altos de segundo orden para atenuar frecuencias bajas.",
+                        "fdt": "\\frac{0.2*s}{1 + 0.2*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "2",
+                        "entrada_error_maximo": "0.1",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Modulación de señales": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "modulacion_amplitud": {
+                        "nombre": "Modulación en Amplitud (AM)",
+                        "descripcion": "Modulación de señales utilizando la amplitud de una portadora.",
+                        "fdt": "\\frac{1}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "modulacion_frecuencia": {
+                        "nombre": "Modulación en Frecuencia (FM)",
+                        "descripcion": "Modulación de señales utilizando la variación de la frecuencia de una portadora.",
+                        "fdt": "\\frac{1}{1 + 0.05*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5",
+                        "entrada_limite_por_ciclo": "1",
+                        "entrada_error_maximo": "0.05",
+                        "unidad_entrada": "V",
+                        "unidad_salida": "Hz"
+                    }
+                }
+            }
+        }
     },
     "MACROS.MEDIDOR": {
         "SISTEMAS": {
-            "Logs": {
+            "uso_cpu": {
                 "descripcion": "",
                 "micro_bloques": {
-                    "Medidor de Logs de Excepciones": {
-                        "nombre": "Medidor de Logs de Excepciones",
-                        "descripcion": "El medidor de logs de excepciones toma en cuenta cualquier excepcion existente",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "File",
-                        "unidad_salida": "Bin"
+                    "Medidor de CPU básico": {
+                        "nombre": "Medidor de CPU básico",
+                        "descripcion": "Mide el uso de CPU con baja precisión",
+                        "fdt": "\\frac{0.8}{1 + 0.5*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_error_maximo": 5,
+                        "entrada_tipo": "aleatorio",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 100,
+                        "salida_error_maximo": 10,
+                        "unidad_entrada": "%",
+                        "unidad_salida": "%"
                     },
-                    "Medidor de Logs de Warnings": {
-                        "nombre": "Medidor de Logs de Warnings",
-                        "descripcion": "El medidor de logs de warnings toma un subgrupo de excepciones",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "File",
-                        "unidad_salida": "Bin"
-                    },
-                    "Medidor de Logs de Errores": {
-                        "nombre": "Medidor de Logs de Errores",
-                        "descripcion": "A veces es muy tarde para corregir",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "File",
-                        "unidad_salida": "Bin"
+                    "Medidor de CPU avanzado": {
+                        "nombre": "Medidor de CPU avanzado",
+                        "descripcion": "Mide el uso de CPU con alta precisión",
+                        "fdt": "\\frac{0.95}{1 + 0.1*s + 0.01*s^2}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 100,
+                        "entrada_error_maximo": 0.5,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 100,
+                        "salida_error_maximo": 1,
+                        "unidad_entrada": "%",
+                        "unidad_salida": "%"
                     }
                 }
             },
-            "Temperatura Cpu": {
+            "uso_ram": {
                 "descripcion": "",
                 "micro_bloques": {
-                    "Medidor de Temperatura de Cpu Industrial": {
-                        "nombre": "Medidor de Temperatura de Cpu Industrial",
-                        "descripcion": "Un medidor de temperatura para los mejores servidores AWS",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "C",
-                        "unidad_salida": "Bin"
+                    "Medidor de RAM simple": {
+                        "nombre": "Medidor de RAM simple",
+                        "descripcion": "Mide el uso de RAM con precisión media",
+                        "fdt": "0.9",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 32768,
+                        "entrada_error_maximo": 256,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 32768,
+                        "salida_error_maximo": 512,
+                        "unidad_entrada": "MB",
+                        "unidad_salida": "MB"
                     },
-                    "Medidor de Temperatura de Cpu Computadora Gamer": {
-                        "nombre": "Medidor de Temperatura de Cpu Computadora Gamer",
-                        "descripcion": "Un medidor de temperatura para as computadoras mas potentes del hogar",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "C",
-                        "unidad_salida": "Bin"
-                    },
-                    "Medidor de Temperatura de Cpu Computadora Regular": {
-                        "nombre": "Medidor de Temperatura de Cpu Computadora Regular",
-                        "descripcion": "Al menos mide algo",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "C",
-                        "unidad_salida": "Bin"
+                    "Medidor de RAM preciso": {
+                        "nombre": "Medidor de RAM preciso",
+                        "descripcion": "Mide el uso de RAM con alta precisión",
+                        "fdt": "\\frac{0.98}{1 + 0.05*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 131072,
+                        "entrada_error_maximo": 64,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 131072,
+                        "salida_error_maximo": 128,
+                        "unidad_entrada": "MB",
+                        "unidad_salida": "MB"
                     }
                 }
             },
-            "Health Checks": {
+            "espacio_disco": {
                 "descripcion": "",
                 "micro_bloques": {
-                    "Health Checker Misma LAN": {
-                        "nombre": "Health Checker Misma LAN",
-                        "descripcion": "Al estar en la misma lan, es mas veloz",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "Ping",
-                        "unidad_salida": "Bin"
+                    "Medidor de disco básico": {
+                        "nombre": "Medidor de disco básico",
+                        "descripcion": "Mide el espacio en disco con baja precisión",
+                        "fdt": "0.85",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000000,
+                        "entrada_error_maximo": 1000,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1000000,
+                        "salida_error_maximo": 2000,
+                        "unidad_entrada": "MB",
+                        "unidad_salida": "MB"
                     },
-                    "Health Checker Cross Continente": {
-                        "nombre": "Health Checker Cross Continente",
-                        "descripcion": "Largas distancias, grandes latencias",
-                        "fdt": "1",
-                        "entrada_limite_inferior": "-inf",
-                        "entrada_limite_superior": "inf",
-                        "entrada_limite_por_ciclo": "inf",
-                        "entrada_error_maximo": "inf",
-                        "entrada_proporcion": 0,
-                        "entrada_tipo": "ninguno",
-                        "entrada_ultimo_valor": 0,
-                        "entrada_propabilidad": 0,
-                        "salida_limite_inferior": "-inf",
-                        "salida_limite_superior": "inf",
-                        "salida_limite_por_ciclo": "inf",
-                        "salida_error_maximo": "inf",
-                        "salida_proporcion": 0,
-                        "salida_tipo": "ninguno",
-                        "salida_ultimo_valor": 0,
-                        "salida_propabilidad": 0,
-                        "unidad_entrada": "Ping",
-                        "unidad_salida": "Bin"
+                    "Medidor de disco avanzado": {
+                        "nombre": "Medidor de disco avanzado",
+                        "descripcion": "Mide el espacio en disco con alta precisión",
+                        "fdt": "\\frac{0.99}{1 + 0.01*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 10000000,
+                        "entrada_error_maximo": 100,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 10000000,
+                        "salida_error_maximo": 200,
+                        "unidad_entrada": "MB",
+                        "unidad_salida": "MB"
+                    }
+                }
+            },
+            "trafico_red": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Medidor de tráfico de red simple": {
+                        "nombre": "Medidor de tráfico de red simple",
+                        "descripcion": "Mide el tráfico de red con precisión media",
+                        "fdt": "0.8 \\cdot e^{-0.1*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_error_maximo": 10,
+                        "entrada_tipo": "aleatorio",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1000,
+                        "salida_error_maximo": 15,
+                        "unidad_entrada": "Mb",
+                        "unidad_salida": "Mb"
+                    },
+                    "Medidor de tráfico de red avanzado": {
+                        "nombre": "Medidor de tráfico de red avanzado",
+                        "descripcion": "Mide el tráfico de red con alta precisión",
+                        "fdt": "\\frac{0.95}{1 + 0.05*s} \\cdot e^{-0.02*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 10000,
+                        "entrada_error_maximo": 1,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 10000,
+                        "salida_error_maximo": 2,
+                        "unidad_entrada": "Mb",
+                        "unidad_salida": "Mb"
+                    }
+                }
+            },
+            "peticiones_servidor": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Contador de peticiones básico": {
+                        "nombre": "Contador de peticiones básico",
+                        "descripcion": "Cuenta peticiones por segundo con precisión baja",
+                        "fdt": "0.75",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_error_maximo": 10,
+                        "entrada_tipo": "aleatorio",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1000,
+                        "salida_error_maximo": 20,
+                        "unidad_entrada": "req",
+                        "unidad_salida": "req"
+                    },
+                    "Contador de peticiones avanzado": {
+                        "nombre": "Contador de peticiones avanzado",
+                        "descripcion": "Cuenta peticiones por segundo con alta precisión",
+                        "fdt": "\\frac{0.98}{1 + 0.02*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 10000,
+                        "entrada_error_maximo": 1,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 10000,
+                        "salida_error_maximo": 2,
+                        "unidad_entrada": "req",
+                        "unidad_salida": "req"
+                    }
+                }
+            },
+            "tiempo_respuesta": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Monitor de tiempo de respuesta simple": {
+                        "nombre": "Monitor de tiempo de respuesta simple",
+                        "descripcion": "Mide el tiempo de respuesta con precisión media",
+                        "fdt": "0.85 \\cdot e^{-0.15*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 1000,
+                        "entrada_error_maximo": 10,
+                        "entrada_tipo": "aleatorio",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 1000,
+                        "salida_error_maximo": 20,
+                        "unidad_entrada": "ms",
+                        "unidad_salida": "ms"
+                    },
+                    "Monitor de tiempo de respuesta preciso": {
+                        "nombre": "Monitor de tiempo de respuesta preciso",
+                        "descripcion": "Mide el tiempo de respuesta con alta precisión",
+                        "fdt": "\\frac{0.97}{1 + 0.03*s} \\cdot e^{-0.01*s}",
+                        "entrada_limite_inferior": 0,
+                        "entrada_limite_superior": 5000,
+                        "entrada_error_maximo": 1,
+                        "entrada_tipo": "proporcional",
+                        "salida_limite_inferior": 0,
+                        "salida_limite_superior": 5000,
+                        "salida_error_maximo": 2,
+                        "unidad_entrada": "ms",
+                        "unidad_salida": "ms"
                     }
                 }
             }
         },
-        "ELECTRONICA": {}
+        "ELECTRONICA": {
+            "Amperimetros": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "amperimetro_basico": {
+                        "nombre": "Amperímetro Básico",
+                        "descripcion": "Amperímetro de baja calidad, mide corriente continua con errores mínimos.",
+                        "fdt": "\\frac{1}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10",
+                        "entrada_limite_por_ciclo": "5",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "10",
+                        "salida_limite_por_ciclo": "5",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "A",
+                        "unidad_salida": "A"
+                    },
+                    "amperimetro_preciso": {
+                        "nombre": "Amperímetro Preciso",
+                        "descripcion": "Amperímetro de alta precisión para medir corrientes con menor error.",
+                        "fdt": "\\frac{1}{1 + 0.001*s}",
+                        "entrada_limite_inferior": "-20",
+                        "entrada_limite_superior": "20",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "0.01",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-20",
+                        "salida_limite_superior": "20",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.01",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "A",
+                        "unidad_salida": "A"
+                    },
+                    "amperimetro_dinamico": {
+                        "nombre": "Amperímetro Dinámico",
+                        "descripcion": "Amperímetro capaz de medir corrientes dinámicas con respuesta más rápida.",
+                        "fdt": "\\frac{10}{1 + 0.1*s}",
+                        "entrada_limite_inferior": "-50",
+                        "entrada_limite_superior": "50",
+                        "entrada_limite_por_ciclo": "15",
+                        "entrada_error_maximo": "0.02",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-50",
+                        "salida_limite_superior": "50",
+                        "salida_limite_por_ciclo": "15",
+                        "salida_error_maximo": "0.02",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "A",
+                        "unidad_salida": "A"
+                    }
+                }
+            },
+            "Voltimetros": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "voltimetro_basico": {
+                        "nombre": "Voltímetro Básico",
+                        "descripcion": "Voltímetro de baja precisión para mediciones de voltaje simple.",
+                        "fdt": "\\frac{1}{1 + 0.05*s}",
+                        "entrada_limite_inferior": "-100",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "50",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-100",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "50",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "voltimetro_precision": {
+                        "nombre": "Voltímetro de Precisión",
+                        "descripcion": "Voltímetro de alta precisión con mayor rango de entrada y bajo error.",
+                        "fdt": "\\frac{5}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "-500",
+                        "entrada_limite_superior": "500",
+                        "entrada_limite_por_ciclo": "200",
+                        "entrada_error_maximo": "0.02",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-500",
+                        "salida_limite_superior": "500",
+                        "salida_limite_por_ciclo": "200",
+                        "salida_error_maximo": "0.02",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    },
+                    "voltimetro_rapido": {
+                        "nombre": "Voltímetro Rápido",
+                        "descripcion": "Voltímetro con alta tasa de respuesta para señales de voltaje rápido.",
+                        "fdt": "\\frac{20}{1 + 0.1*s}",
+                        "entrada_limite_inferior": "-1000",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "400",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "-1000",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "400",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
+                    }
+                }
+            },
+            "Ohmímetro": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "ohimetro_basico": {
+                        "nombre": "Ohímetro Básico",
+                        "descripcion": "Ohímetro básico para mediciones simples de resistencia.",
+                        "fdt": "\\frac{1}{1 + 0.02*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "20",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Ω",
+                        "unidad_salida": "Ω"
+                    },
+                    "ohimetro_precision": {
+                        "nombre": "Ohímetro de Precisión",
+                        "descripcion": "Ohímetro de precisión con mayor exactitud y menor error de medición.",
+                        "fdt": "\\frac{2}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "100",
+                        "entrada_error_maximo": "0.01",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "100",
+                        "salida_error_maximo": "0.01",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Ω",
+                        "unidad_salida": "Ω"
+                    },
+                    "ohimetro_avanzado": {
+                        "nombre": "Ohímetro Avanzado",
+                        "descripcion": "Ohímetro avanzado capaz de medir resistencias en rangos muy altos.",
+                        "fdt": "\\frac{10}{1 + 0.05*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "10000",
+                        "entrada_limite_por_ciclo": "500",
+                        "entrada_error_maximo": "0.005",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "10000",
+                        "salida_limite_por_ciclo": "500",
+                        "salida_error_maximo": "0.005",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Ω",
+                        "unidad_salida": "Ω"
+                    }
+                }
+            },
+            "Frecuencímetro": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "frecuencimetro_basico": {
+                        "nombre": "Frecuencímetro Básico",
+                        "descripcion": "Frecuencímetro de baja precisión, para medir señales simples.",
+                        "fdt": "\\frac{1}{1 + 0.02*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "500",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "500",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Hz",
+                        "unidad_salida": "Hz"
+                    },
+                    "frecuencimetro_avanzado": {
+                        "nombre": "Frecuencímetro Avanzado",
+                        "descripcion": "Frecuencímetro avanzado para medir señales con alta precisión.",
+                        "fdt": "\\frac{2}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "5000",
+                        "entrada_limite_por_ciclo": "1000",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "5000",
+                        "salida_limite_por_ciclo": "1000",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "Hz",
+                        "unidad_salida": "Hz"
+                    }
+                }
+            },
+            "Capacímetro": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "capacimetro_basico": {
+                        "nombre": "Capacímetro Básico",
+                        "descripcion": "Capacímetro para medir capacitancia en rangos pequeños.",
+                        "fdt": "\\frac{1}{1 + 0.03*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "10",
+                        "entrada_error_maximo": "0.1",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "10",
+                        "salida_error_maximo": "0.1",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "F",
+                        "unidad_salida": "F"
+                    },
+                    "capacimetro_precision": {
+                        "nombre": "Capacímetro de Precisión",
+                        "descripcion": "Capacímetro con mayor precisión para mediciones detalladas.",
+                        "fdt": "\\frac{5}{1 + 0.01*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "100",
+                        "entrada_error_maximo": "0.02",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "100",
+                        "salida_error_maximo": "0.02",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "F",
+                        "unidad_salida": "F"
+                    }
+                }
+            },
+            "Inductómetro": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "inductometro_basico": {
+                        "nombre": "Inductómetro Básico",
+                        "descripcion": "Inductómetro para medir pequeñas inductancias.",
+                        "fdt": "\\frac{1}{1 + 0.04*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "100",
+                        "entrada_limite_por_ciclo": "20",
+                        "entrada_error_maximo": "0.15",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "100",
+                        "salida_limite_por_ciclo": "20",
+                        "salida_error_maximo": "0.15",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "H",
+                        "unidad_salida": "H"
+                    },
+                    "inductometro_avanzado": {
+                        "nombre": "Inductómetro Avanzado",
+                        "descripcion": "Inductómetro avanzado para medir inductancias de precisión.",
+                        "fdt": "\\frac{10}{1 + 0.02*s}",
+                        "entrada_limite_inferior": "0",
+                        "entrada_limite_superior": "1000",
+                        "entrada_limite_por_ciclo": "100",
+                        "entrada_error_maximo": "0.05",
+                        "entrada_proporcion": 0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0,
+                        "entrada_propabilidad": 0,
+                        "salida_limite_inferior": "0",
+                        "salida_limite_superior": "1000",
+                        "salida_limite_por_ciclo": "100",
+                        "salida_error_maximo": "0.05",
+                        "salida_proporcion": 0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0,
+                        "salida_propabilidad": 0,
+                        "unidad_entrada": "H",
+                        "unidad_salida": "H"
+                    }
+                }
+            }
+        }
     }
 }

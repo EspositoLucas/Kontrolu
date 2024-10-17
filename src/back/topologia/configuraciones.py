@@ -9,7 +9,7 @@ class TipoError(Enum):
     NINGUNO = "ninguno"
 
 class Configuracion:
-    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf, limite_por_ciclo=inf, error_maximo=inf, proporcion=0, tipo=TipoError.NINGUNO, ultimo_valor=0, probabilidad=0, unidad="V",from_json=None):
+    def __init__(self, nombre="Configuracion", limite_inferior=-inf, limite_superior=inf, limite_por_ciclo=inf, error_maximo=inf, proporcion=0, tipo=TipoError.NINGUNO, ultimo_valor=0, probabilidad=1, unidad="V",from_json=None):
         if from_json:
             self.from_json(from_json)
             return
