@@ -5,7 +5,9 @@
     ],
     "MACROS.CONTROLADOR": {
         "SISTEMAS": {
-            "orquestador_contenedores": {
+            "Orquestadores de Contenedores":{
+            "descripcion": "",
+            "micro_bloques":{
               "Orquestador de contenedores básico": {
                 "nombre": "Orquestador de contenedores básico",
                 "descripcion": "Gestiona contenedores de manera simple",
@@ -32,8 +34,11 @@
                 "unidad_entrada": "req",
                 "unidad_salida": "con"
               }
-            },
-            "gestor_recursos_so": {
+            }
+          },
+          "Gestor de Recursos":{
+            "descripcion": "",
+            "micro_bloques":{
               "Gestor de recursos del SO básico": {
                 "nombre": "Gestor de recursos del SO básico",
                 "descripcion": "Gestiona recursos del sistema operativo de manera simple",
@@ -60,8 +65,11 @@
                 "unidad_entrada": "%",
                 "unidad_salida": "%"
               }
+            }
             },
-            "controlador_admision": {
+            "Controles de Admisión":{
+              "descripcion": "",
+              "micro_bloques":{
               "Controlador de admisión básico": {
                 "nombre": "Controlador de admisión básico",
                 "descripcion": "Controla la admisión de peticiones de manera simple",
@@ -88,8 +96,11 @@
                 "unidad_entrada": "req",
                 "unidad_salida": "adm"
               }
+              }
             },
-            "gestor_energia": {
+            "Gestor de energía":{
+              "descripcion": "",
+              "micro_bloques":{
               "Gestor de energía básico": {
                 "nombre": "Gestor de energía básico",
                 "descripcion": "Gestiona el consumo de energía de manera simple",
@@ -116,8 +127,12 @@
                 "unidad_entrada": "W",
                 "unidad_salida": "%"
               }
+          }
             },
-            "planificador_tareas": {
+            
+          "Planificador de Tareas":{
+            "descripcion": "",
+            "micro_bloques":{
               "Planificador de tareas básico": {
                 "nombre": "Planificador de tareas básico",
                 "descripcion": "Planifica tareas de manera simple",
@@ -143,9 +158,12 @@
                 "salida_tipo": "proporcional",
                 "unidad_entrada": "tsk",
                 "unidad_salida": "prio"
-              }
+              }}
             },
-            "controlador_replicacion_bd": {
+            
+          "Controlador de Replicacion":{
+            "descripcion": "",
+            "micro_bloques":{
               "Controlador de replicación de BD básico": {
                 "nombre": "Controlador de replicación de BD básico",
                 "descripcion": "Controla la replicación de bases de datos de manera simple",
@@ -172,6 +190,7 @@
                 "unidad_entrada": "trx",
                 "unidad_salida": "rep"
               }
+            }
             }
           },
         "ELECTRONICA": {
@@ -901,145 +920,356 @@
     },
     "MACROS.PROCESO": {
         "SISTEMAS": {
-            "servicio_web": {
-              "Servicio web básico": {
-                "nombre": "Servicio web básico",
-                "descripcion": "Proceso de servicio web simple",
-                "fdt": "\\frac{0.8}{1 + 0.5s}",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 1000,
-                "entrada_tipo": "aleatorio",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 1000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "req",
-                "unidad_salida": "res"
-              },
-              "Servicio web avanzado": {
-                "nombre": "Servicio web avanzado",
-                "descripcion": "Proceso de servicio web optimizado",
-                "fdt": "0.9 + \\frac{0.05}{s} + 0.05s",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 10000,
-                "entrada_tipo": "aleatorio",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 10000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "req",
-                "unidad_salida": "res"
+            "controladores": {
+              "Orquestadores de Contenedores":{
+              "descripcion": "",
+              "micro_bloques":{
+                "orquestador_contenedores": {
+                "Orquestador de contenedores básico": {
+                  "nombre": "Orquestador de contenedores básico",
+                  "descripcion": "Gestiona contenedores de manera simple",
+                  "fdt": "\\frac{0.7}{1 + 2s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 100,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 1,
+                  "salida_limite_superior": 50,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "%",
+                  "unidad_salida": "con"
+                },
+                "Orquestador de contenedores avanzado": {
+                  "nombre": "Orquestador de contenedores avanzado",
+                  "descripcion": "Gestiona contenedores de manera eficiente",
+                  "fdt": "0.85 + \\frac{0.1}{s} + 0.05s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 1,
+                  "salida_limite_superior": 500,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "req",
+                  "unidad_salida": "con"
+                }
+              }
               }
             },
-            "base_datos": {
-              "Base de datos básica": {
-                "nombre": "Base de datos básica",
-                "descripcion": "Proceso de base de datos simple",
-                "fdt": "\\frac{0.7}{1 + s}",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 1000,
-                "entrada_tipo": "aleatorio",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 1000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "qry",
-                "unidad_salida": "res"
+            "Gestor de Recursos":{
+              "descripcion": "",
+              "micro_bloques":{
+              "gestor_recursos_so": {
+                "Gestor de recursos del SO básico": {
+                  "nombre": "Gestor de recursos del SO básico",
+                  "descripcion": "Gestiona recursos del sistema operativo de manera simple",
+                  "fdt": "\\frac{0.8}{1 + s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 100,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 100,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "%",
+                  "unidad_salida": "%"
+                },
+                "Gestor de recursos del SO avanzado": {
+                  "nombre": "Gestor de recursos del SO avanzado",
+                  "descripcion": "Gestiona recursos del sistema operativo de manera eficiente",
+                  "fdt": "0.9 + \\frac{0.05}{s} + 0.05s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 100,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 100,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "%",
+                  "unidad_salida": "%"
+                }
+              }
+              }
               },
-              "Base de datos avanzada": {
-                "nombre": "Base de datos avanzada",
-                "descripcion": "Proceso de base de datos optimizado",
-                "fdt": "0.85 + \\frac{0.1}{s} + 0.05s",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 10000,
-                "entrada_tipo": "aleatorio",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 10000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "qry",
-                "unidad_salida": "res"
+              "Controles de Admisión":{
+                "descripcion": "",
+                "micro_bloques":{
+              "controlador_admision": {
+                "Controlador de admisión básico": {
+                  "nombre": "Controlador de admisión básico",
+                  "descripcion": "Controla la admisión de peticiones de manera simple",
+                  "fdt": "\\frac{0.6}{1 + 0.5s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 1,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "req",
+                  "unidad_salida": "adm"
+                },
+                "Controlador de admisión avanzado": {
+                  "nombre": "Controlador de admisión avanzado",
+                  "descripcion": "Controla la admisión de peticiones de manera inteligente",
+                  "fdt": "0.75 + \\frac{0.15}{s} + 0.1s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 10000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 1,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "req",
+                  "unidad_salida": "adm"
+                }
+              }
+                }
+              },
+              "Gestor de energía":{
+                "descripcion": "",
+                "micro_bloques":{
+              "gestor_energia": {
+                "Gestor de energía básico": {
+                  "nombre": "Gestor de energía básico",
+                  "descripcion": "Gestiona el consumo de energía de manera simple",
+                  "fdt": "\\frac{0.7}{1 + 3s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 100,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "W",
+                  "unidad_salida": "%"
+                },
+                "Gestor de energía avanzado": {
+                  "nombre": "Gestor de energía avanzado",
+                  "descripcion": "Gestiona el consumo de energía de manera eficiente",
+                  "fdt": "0.8 + \\frac{0.1}{s} + 0.1s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 5000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 100,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "W",
+                  "unidad_salida": "%"
+                }
+              }
+            }
+              },
+              
+            "Planificador de Tareas":{
+              "descripcion": "",
+              "micro_bloques":{
+              "planificador_tareas": {
+                "Planificador de tareas básico": {
+                  "nombre": "Planificador de tareas básico",
+                  "descripcion": "Planifica tareas de manera simple",
+                  "fdt": "\\frac{0.65}{1 + s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 100,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 1,
+                  "salida_limite_superior": 10,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "tsk",
+                  "unidad_salida": "prio"
+                },
+                "Planificador de tareas avanzado": {
+                  "nombre": "Planificador de tareas avanzado",
+                  "descripcion": "Planifica tareas de manera eficiente",
+                  "fdt": "0.8 + \\frac{0.1}{s} + 0.1s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 1,
+                  "salida_limite_superior": 100,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "tsk",
+                  "unidad_salida": "prio"
+                }}}
+              },
+              
+            "Controlador de Replicacion":{
+              "descripcion": "",
+              "micro_bloques":{
+              "controlador_replicacion_bd": {
+                "Controlador de replicación de BD básico": {
+                  "nombre": "Controlador de replicación de BD básico",
+                  "descripcion": "Controla la replicación de bases de datos de manera simple",
+                  "fdt": "\\frac{0.75}{1 + 2s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 1,
+                  "salida_limite_superior": 5,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "trx",
+                  "unidad_salida": "rep"
+                },
+                "Controlador de replicación de BD avanzado": {
+                  "nombre": "Controlador de replicación de BD avanzado",
+                  "descripcion": "Controla la replicación de bases de datos de manera eficiente",
+                  "fdt": "0.85 + \\frac{0.1}{s} + 0.05s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 10000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 1,
+                  "salida_limite_superior": 20,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "trx",
+                  "unidad_salida": "rep"
+                }
+              }}
               }
             },
-            "cola_mensajes": {
-              "Cola de mensajes básica": {
-                "nombre": "Cola de mensajes básica",
-                "descripcion": "Proceso de cola de mensajes simple",
-                "fdt": "\\frac{0.75}{1 + 0.3s}",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 1000,
-                "entrada_tipo": "aleatorio",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 1000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "msg",
-                "unidad_salida": "prc"
+            "procesos": {
+              "Servicio Web": {
+                "descripcion": "",
+                "micro_bloques": {
+                "Servicio web básico": {
+                  "nombre": "Servicio web básico",
+                  "descripcion": "Proceso de servicio web simple",
+                  "fdt": "\\frac{0.8}{1 + 0.5s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "aleatorio",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 1000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "req",
+                  "unidad_salida": "res"
+                },
+                "Servicio web avanzado": {
+                  "nombre": "Servicio web avanzado",
+                  "descripcion": "Proceso de servicio web optimizado",
+                  "fdt": "0.9 + \\frac{0.05}{s} + 0.05s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 10000,
+                  "entrada_tipo": "aleatorio",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 10000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "req",
+                  "unidad_salida": "res"
+                }}
               },
-              "Cola de mensajes avanzada": {
-                "nombre": "Cola de mensajes avanzada",
-                "descripcion": "Proceso de cola de mensajes optimizado",
-                "fdt": "0.9 + \\frac{0.05}{s} + 0.05s",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 10000,
-                "entrada_tipo": "aleatorio",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 10000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "msg",
-                "unidad_salida": "prc"
-              }
-            },
-            "indexacion_busqueda": {
-              "Indexación de búsqueda básica": {
-                "nombre": "Indexación de búsqueda básica",
-                "descripcion": "Proceso de indexación de búsqueda simple",
-                "fdt": "\\frac{0.6}{1 + 2s}",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 10000,
-                "entrada_tipo": "aleatorio",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 10000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "doc",
-                "unidad_salida": "idx"
+              "Base de Datos": {
+                "descripcion": "",
+                "micro_bloques": {
+                "Base de datos básica": {
+                  "nombre": "Base de datos básica",
+                  "descripcion": "Proceso de base de datos simple",
+                  "fdt": "\\frac{0.7}{1 + s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "aleatorio",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 1000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "qry",
+                  "unidad_salida": "res"
+                },
+                "Base de datos avanzada": {
+                  "nombre": "Base de datos avanzada",
+                  "descripcion": "Proceso de base de datos optimizado",
+                  "fdt": "0.85 + \\frac{0.1}{s} + 0.05s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 10000,
+                  "entrada_tipo": "aleatorio",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 10000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "qry",
+                  "unidad_salida": "res"
+                }}
               },
-              "Indexación de búsqueda avanzada": {
-                "nombre": "Indexación de búsqueda avanzada",
-                "descripcion": "Proceso de indexación de búsqueda optimizado",
-                "fdt": "0.8 + \\frac{0.15}{s} + 0.05s",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 100000,
-                "entrada_tipo": "aleatorio",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 100000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "doc",
-                "unidad_salida": "idx"
-              }
-            },
-            "tarea_respaldo": {
-              "Tarea de respaldo básica": {
-                "nombre": "Tarea de respaldo básica",
-                "descripcion": "Proceso de respaldo simple",
-                "fdt": "\\frac{0.7}{1 + 3s}",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 1000,
-                "entrada_tipo": "proporcional",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 1000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "GB",
-                "unidad_salida": "GB"
+              "Cola de Mensajes": {
+                "descripcion": "",
+                "micro_bloques": {
+                "Cola de mensajes básica": {
+                  "nombre": "Cola de mensajes básica",
+                  "descripcion": "Proceso de cola de mensajes simple",
+                  "fdt": "\\frac{0.75}{1 + 0.3s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "aleatorio",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 1000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "msg",
+                  "unidad_salida": "prc"
+                },
+                "Cola de mensajes avanzada": {
+                  "nombre": "Cola de mensajes avanzada",
+                  "descripcion": "Proceso de cola de mensajes optimizado",
+                  "fdt": "0.9 + \\frac{0.05}{s} + 0.05s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 10000,
+                  "entrada_tipo": "aleatorio",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 10000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "msg",
+                  "unidad_salida": "prc"
+                }}
               },
-              "Tarea de respaldo avanzada": {
-                "nombre": "Tarea de respaldo avanzada",
-                "descripcion": "Proceso de respaldo optimizado",
-                "fdt": "0.85 + \\frac{0.1}{s} + 0.05s",
-                "entrada_limite_inferior": 0,
-                "entrada_limite_superior": 10000,
-                "entrada_tipo": "proporcional",
-                "salida_limite_inferior": 0,
-                "salida_limite_superior": 10000,
-                "salida_tipo": "proporcional",
-                "unidad_entrada": "GB",
-                "unidad_salida": "GB"
-              }
+              "Indexacion de Busqueda": {
+                "descripcion": "",
+                "micro_bloques": {
+                "Indexación de búsqueda básica": {
+                  "nombre": "Indexación de búsqueda básica",
+                  "descripcion": "Proceso de indexación de búsqueda simple",
+                  "fdt": "\\frac{0.6}{1 + 2s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 10000,
+                  "entrada_tipo": "aleatorio",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 10000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "doc",
+                  "unidad_salida": "idx"
+                },
+                "Indexación de búsqueda avanzada": {
+                  "nombre": "Indexación de búsqueda avanzada",
+                  "descripcion": "Proceso de indexación de búsqueda optimizado",
+                  "fdt": "0.8 + \\frac{0.15}{s} + 0.05s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 100000,
+                  "entrada_tipo": "aleatorio",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 100000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "doc",
+                  "unidad_salida": "idx"
+                }}
+              },
+              "BackUps": {
+                "descripcion": "",
+                "micro_bloques": {
+                "Tarea de respaldo básica": {
+                  "nombre": "Tarea de respaldo básica",
+                  "descripcion": "Proceso de respaldo simple",
+                  "fdt": "\\frac{0.7}{1 + 3s}",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 1000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 1000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "GB",
+                  "unidad_salida": "GB"
+                },
+                "Tarea de respaldo avanzada": {
+                  "nombre": "Tarea de respaldo avanzada",
+                  "descripcion": "Proceso de respaldo optimizado",
+                  "fdt": "0.85 + \\frac{0.1}{s} + 0.05s",
+                  "entrada_limite_inferior": 0,
+                  "entrada_limite_superior": 10000,
+                  "entrada_tipo": "proporcional",
+                  "salida_limite_inferior": 0,
+                  "salida_limite_superior": 10000,
+                  "salida_tipo": "proporcional",
+                  "unidad_entrada": "GB",
+                  "unidad_salida": "GB"
+                }
+              }}
             }
           },
         "ELECTRONICA": {
