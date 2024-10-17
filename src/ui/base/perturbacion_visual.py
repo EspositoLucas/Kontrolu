@@ -90,17 +90,30 @@ class PerturbacionVisual(QGraphicsItemGroup):
             self.mostrar_menu_contextual(event)
         super().mousePressEvent(event)
     
+    # En perturbacion_visual.py
+
     def mostrar_menu_contextual(self, event):
         menu = QMenu()
+        
+        # Agregamos opción para crear microbloque después de la perturbación
+        agregar_micro_action = QAction("Agregar microbloque después", None)
+        agregar_micro_action.triggered.connect(lambda: self.drawing_area.create_new_microbloque_post_perturbacion(self))
+        menu.addAction(agregar_micro_action)
+        
         eliminar_action = QAction("Eliminar perturbación", None)
         eliminar_action.triggered.connect(self.eliminar_perturbacion)
         menu.addAction(eliminar_action)
         
-        scene_pos = event.scenePos()
-        view = self.scene().views()[0]
-        screen_pos = view.mapToGlobal(view.mapFromScene(scene_pos))
+        # Obtenemos la posición de manera más segura
+        if self.scene() and self.scene().views():
+            scene_pos = event.scenePos()
+            view = self.scene().views()[0]
+            screen_pos = view.mapToGlobal(view.mapFromScene(scene_pos))
+        else:
+            # Si no podemos obtener la posición de la escena, usamos la posición del cursor
+            screen_pos = event.screenPos()
+        
         menu.exec_(screen_pos)
-           
 
     def eliminar_perturbacion(self):
         dialog = QMessageBox(None)
@@ -154,4 +167,4 @@ class PerturbacionVisual(QGraphicsItemGroup):
             self.scene().removeItem(self)
             self.drawing_area.load_microbloques()
             
-        
+             
