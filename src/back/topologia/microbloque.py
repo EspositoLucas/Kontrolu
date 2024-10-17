@@ -100,7 +100,7 @@ class MicroBloque(Hoja):
             return float('-inf')
         elif value == 'Infinity':
             return float('inf')
-        return value
+        return float(value)
 
     def _check_infinite(self, value):
         if value == float('inf'):
