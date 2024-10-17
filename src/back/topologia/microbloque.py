@@ -19,28 +19,52 @@ class MicroBloque(Hoja):
         super().__init__(nombre=nombre, funcion_transferencia=funcion_transferencia)
         if datos:
             self.set_dto(datos)
+    
     def set_dto(self, datos: MicroBloqueDto):
-        self.funcion_transferencia = datos.fdt
-        self.nombre = datos.nombre
-        self.descripcion = datos.descripcion
-        self.configuracion_entrada.unidad = datos.unidad_entrada
-        self.configuracion_salida.unidad = datos.unidad_salida
-        self.configuracion_entrada.error_maximo = self._convert_to_float(datos.entrada_error_maximo)
-        self.configuracion_salida.error_maximo = self._convert_to_float(datos.salida_error_maximo)
-        self.configuracion_entrada.limite_inferior = self._convert_to_float(datos.entrada_limite_inferior)
-        self.configuracion_salida.limite_inferior = self._convert_to_float(datos.salida_limite_inferior)
-        self.configuracion_entrada.limite_superior = self._convert_to_float(datos.entrada_limite_superior)
-        self.configuracion_salida.limite_superior = self._convert_to_float(datos.salida_limite_superior)
-        self.configuracion_entrada.limite_por_ciclo = self._convert_to_float(datos.entrada_limite_por_ciclo)
-        self.configuracion_salida.limite_por_ciclo = self._convert_to_float(datos.salida_limite_por_ciclo)
-        self.configuracion_entrada.proporcion = self._convert_to_float(datos.entrada_proporcion)
-        self.configuracion_salida.proporcion = self._convert_to_float(datos.salida_proporcion)
-        self.configuracion_entrada.probabilidad = self._convert_to_float(datos.entrada_propabilidad)
-        self.configuracion_salida.probabilidad = self._convert_to_float(datos.salida_propabilidad)
-        self.configuracion_entrada.tipo = TipoError(datos.entrada_tipo)
-        self.configuracion_salida.tipo = TipoError(datos.salida_tipo)
-        self.configuracion_entrada.ultimo_valor = self._convert_to_float(datos.entrada_ultimo_valor)
-        self.configuracion_salida.ultimo_valor = self._convert_to_float(datos.salida_ultimo_valor)
+        if datos.fdt is not None:
+            self.funcion_transferencia = datos.fdt
+        if datos.nombre is not None:
+            self.nombre = datos.nombre
+        if datos.descripcion is not None:
+            self.descripcion = datos.descripcion
+        if datos.unidad_entrada is not None:
+            self.configuracion_entrada.unidad = datos.unidad_entrada
+        if datos.unidad_salida is not None:
+            self.configuracion_salida.unidad = datos.unidad_salida
+        if datos.entrada_error_maximo is not None:
+            self.configuracion_entrada.error_maximo = self._convert_to_float(datos.entrada_error_maximo)
+        if datos.salida_error_maximo is not None:
+            self.configuracion_salida.error_maximo = self._convert_to_float(datos.salida_error_maximo)
+        if datos.entrada_limite_inferior is not None:
+            self.configuracion_entrada.limite_inferior = self._convert_to_float(datos.entrada_limite_inferior)
+        if datos.salida_limite_inferior is not None:
+            self.configuracion_salida.limite_inferior = self._convert_to_float(datos.salida_limite_inferior)
+        if datos.entrada_limite_superior is not None:
+            self.configuracion_entrada.limite_superior = self._convert_to_float(datos.entrada_limite_superior)
+        if datos.salida_limite_superior is not None:
+            self.configuracion_salida.limite_superior = self._convert_to_float(datos.salida_limite_superior)
+        if datos.entrada_limite_por_ciclo is not None:
+            self.configuracion_entrada.limite_por_ciclo = self._convert_to_float(datos.entrada_limite_por_ciclo)
+        if datos.salida_limite_por_ciclo is not None:
+            self.configuracion_salida.limite_por_ciclo = self._convert_to_float(datos.salida_limite_por_ciclo)
+        if datos.entrada_proporcion is not None:
+            self.configuracion_entrada.proporcion = self._convert_to_float(datos.entrada_proporcion)
+        if datos.salida_proporcion is not None:
+            self.configuracion_salida.proporcion = self._convert_to_float(datos.salida_proporcion)
+        if datos.entrada_propabilidad is not None:
+            self.configuracion_entrada.probabilidad = self._convert_to_float(datos.entrada_propabilidad)
+        if datos.salida_propabilidad is not None:
+            self.configuracion_salida.probabilidad = self._convert_to_float(datos.salida_propabilidad)
+        if datos.entrada_tipo is not None:
+            self.configuracion_entrada.tipo = TipoError(datos.entrada_tipo)
+        if datos.salida_tipo is not None:
+            self.configuracion_salida.tipo = TipoError(datos.salida_tipo)
+        if datos.entrada_ultimo_valor is not None:
+            self.configuracion_entrada.ultimo_valor = self._convert_to_float(datos.entrada_ultimo_valor)
+        if datos.salida_ultimo_valor is not None:
+            self.configuracion_salida.ultimo_valor = self._convert_to_float(datos.salida_ultimo_valor)
+
+    
     def get_dto(self) -> MicroBloqueDto:
 
         return MicroBloqueDto(
