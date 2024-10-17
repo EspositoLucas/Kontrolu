@@ -89,16 +89,19 @@ class PerturbacionVisual(QGraphicsItemGroup):
         elif event.button() == Qt.RightButton:
             self.mostrar_menu_contextual(event)
         super().mousePressEvent(event)
-    
-    # En perturbacion_visual.py
 
     def mostrar_menu_contextual(self, event):
         menu = QMenu()
         
         # Agregamos opción para crear microbloque después de la perturbación
-        agregar_micro_action = QAction("Agregar microbloque después", None)
-        agregar_micro_action.triggered.connect(lambda: self.drawing_area.create_new_microbloque_post_perturbacion(self))
-        menu.addAction(agregar_micro_action)
+        agregar_micro_action_antes = QAction("Agregar microbloque antes", None)
+        agregar_micro_action_antes.triggered.connect(lambda: self.drawing_area.create_new_microbloque_pre_perturbacion(self))
+        menu.addAction(agregar_micro_action_antes)
+        
+        # Agregamos opción para crear microbloque después de la perturbación
+        agregar_micro_action_despues = QAction("Agregar microbloque después", None)
+        agregar_micro_action_despues.triggered.connect(lambda: self.drawing_area.create_new_microbloque_post_perturbacion(self))
+        menu.addAction(agregar_micro_action_despues)
         
         eliminar_action = QAction("Eliminar perturbación", None)
         eliminar_action.triggered.connect(self.eliminar_perturbacion)

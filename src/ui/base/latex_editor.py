@@ -137,10 +137,16 @@ class LatexEditor(QWidget):
             cursor.insertText("\\frac{numerador}{denominador}")
             # Seleccionar "numerador" para que el usuario pueda reemplazarlo fácilmente
             cursor.movePosition(cursor.Left, cursor.KeepAnchor, 9)
+        elif symbol == "\log":
+            cursor.insertText("\\log()")
+            cursor.movePosition(cursor.Left, cursor.MoveMode.MoveAnchor, 1)
+        elif symbol == "\ln":
+            cursor.insertText("\\ln()")
+            cursor.movePosition(cursor.Left, cursor.MoveMode.MoveAnchor, 1)
         else:
             cursor.insertText(symbol)
         self.editor.setFocus()
-
+        
     def start_validation_timer(self):
         self.validation_timer.start(1000)  # 1000 ms = 1 segundo de delay
 
@@ -198,18 +204,18 @@ class LatexEditor(QWidget):
         valid_latex_expressions = ["\\frac", "\\log", "\\ln", "e", "\\pi", "\\sqrt"]
         if any(expr in latex for expr in valid_latex_expressions):
             pass  # Permitir estas expresiones y continuar con la validación
-        elif re.search(r'([a-z\d])([a-z\d])', latex):
+        elif re.search(r'([a-z\d])\s*([a-z\d])', latex):
             # Verificar si hay términos adyacentes sin operador, excluyendo comandos LaTeX
             return False
         
         # Tratar símbolos especiales
-        latex = re.sub(r'\\sqrt\[(\d+)\]\{([^}]+)\}', r'(\2)**(1/\1)', latex)  # raíz n-ésima
+        latex = re.sub(r'\\sqrt\[([^]]+)\]\{([^}]+)\}', r'(\2)**(1/(\1))', latex)  # raíz n-ésima
         # Tratar fracciones
-        latex = re.sub(r'\\frac\{([\d+])\}\{([^}]+)\}', r'((\1)/(\2))', latex)
+        latex = re.sub(r'\\frac\{([^}]+)\}\{([^}]+)\}', r'((\1)/(\2))', latex)
         latex = latex.replace('\\log', 'log')
         latex = latex.replace('\\ln', 'ln')
         latex = latex.replace('e', 'E')  # 'E' es reconocido como la constante e en sympy
-        latex = latex.replace('\pi', 'pi')  # 'E' es reconocido como la constante e en sympy
+        latex = latex.replace('\\pi', 'pi')
         
         s = Symbol('s')
         try:

@@ -559,6 +559,20 @@ class DrawingArea(QGraphicsView):
         # Si no se encuentra el microbloque, retornamos el punto de inicio --> Si no encuentra el microbloque en la lista, simplemente retorna el punto_inicial
         return punto_inicial
     
+    def create_new_microbloque_pre_perturbacion(self, perturbacion_visual):
+        """
+        Crea un nuevo microbloque después de una perturbación
+        """
+        nuevo_microbloque = MicroBloque(nombre="Microbloque " + str(len(self.microbloques)+1))
+        micro = CrearMicroBloque(nuevo_microbloque, self.modelo.tipo, self)
+        result = micro.exec_()
+
+        if result == QDialog.Accepted:
+            new_microbloque = micro.new_microbloque
+            perturbacion_visual.perturbacion_back.agregar_antes(new_microbloque)
+            self.load_microbloques()
+            self.update()
+            
     def create_new_microbloque_post_perturbacion(self, perturbacion_visual):
         """
         Crea un nuevo microbloque después de una perturbación
@@ -572,21 +586,6 @@ class DrawingArea(QGraphicsView):
             perturbacion_visual.perturbacion_back.agregar_despues(new_microbloque)
             self.load_microbloques()
             self.update()
-
-    # def draw_perturbacion_connection(self, perturbacion, punto_inicial):
-    #     for perturbacion_visual in self.perturbaciones: # busca en la lista de perturbaciones de la drawing_area, la perturbacion que queremos conectar
-    #         if perturbacion_visual.perturbacion_back == perturbacion: # compara su perturbacion back
-    #             # La PerturbacionVisual es un circulo con radio RADIO_PERTURBACION
-    #             punto_final = perturbacion_visual.pos() + QPointF(RADIO_PERTURBACION, RADIO_PERTURBACION) # punto_final es el punto medio derecho de la perturbacion
-    #             if punto_inicial is not None and punto_final is not None:
-    #                 # dibujar la linea desde el punto_inicial hasta el punto_final
-    #                 line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), punto_final.x(), punto_final.y())
-    #                 line.setPen(QPen(Qt.black, 2))
-    #                 self.scene.addItem(line)
-                
-    #             return perturbacion_visual.pos() + QPointF(RADIO_PERTURBACION, RADIO_PERTURBACION) # retorna un punto que representa la mitad del lado derecho de la perturbacion. Este punto se usará como punto de inicio para la siguiente conexión.
-        
-    #     return punto_inicial
     
     def draw_perturbacion_connection(self, perturbacion, punto_inicial):
         for perturbacion_visual in self.perturbaciones:
@@ -607,8 +606,6 @@ class DrawingArea(QGraphicsView):
                     return punto_siguiente
                 
             return punto_inicial
-    
-
     
     def create_new_microbloque(self, pos, relation=None, reference_structure=None):
         """
@@ -634,7 +631,6 @@ class DrawingArea(QGraphicsView):
             self.hide_add_buttons() # ocultamos los botones "+" por si quedaron visibles
 
 
-    
     def agregar_respecto_microbloque(self, new_microbloque, relation, reference_microbloque):
         if relation == "arriba":
             reference_microbloque.agregar_arriba(new_microbloque) # agrega el nuevo microbloque arriba del microbloque de referencia
