@@ -674,7 +674,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "200",
                         "salida_limite_por_ciclo": "20",
@@ -682,7 +681,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "pasos",
                         "unidad_salida": "pasos"
                     },
@@ -697,7 +695,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "400",
                         "salida_limite_por_ciclo": "40",
@@ -705,7 +702,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "pasos",
                         "unidad_salida": "pasos"
                     }
@@ -725,7 +721,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "3",
                         "salida_limite_por_ciclo": "0.5",
@@ -733,7 +728,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "lumen"
                     },
@@ -748,7 +742,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "1000",
                         "salida_limite_por_ciclo": "100",
@@ -756,7 +749,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "lumen"
                     }
@@ -776,7 +768,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "100",
                         "salida_limite_por_ciclo": "10",
@@ -784,7 +775,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "dB"
                     },
@@ -799,7 +789,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "150",
                         "salida_limite_por_ciclo": "15",
@@ -807,7 +796,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "dB"
                     }
@@ -827,7 +815,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "100",
                         "salida_limite_por_ciclo": "10",
@@ -835,7 +822,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "l/min"
                     },
@@ -850,7 +836,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "200",
                         "salida_limite_por_ciclo": "20",
@@ -858,7 +843,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "l/min"
                     }
@@ -878,7 +862,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "100",
                         "salida_limite_por_ciclo": "10",
@@ -886,7 +869,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "°C"
                     },
@@ -901,7 +883,6 @@
                         "entrada_proporcion": 0,
                         "entrada_tipo": "ninguno",
                         "entrada_ultimo_valor": 0,
-                        "entrada_probabilidad": 0,
                         "salida_limite_inferior": "0",
                         "salida_limite_superior": "200",
                         "salida_limite_por_ciclo": "20",
@@ -909,7 +890,6 @@
                         "salida_proporcion": 0,
                         "salida_tipo": "ninguno",
                         "salida_ultimo_valor": 0,
-                        "salida_probabilidad": 0,
                         "unidad_entrada": "V",
                         "unidad_salida": "°C"
                     }
