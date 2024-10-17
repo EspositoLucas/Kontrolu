@@ -355,7 +355,6 @@ class InterpretacionDatos(QDialog):
 
         estados_carga = datos['carga']
         tiempos = datos['tiempo']
-        print("nombre")
         def calificar_estado(estado):
             if estado is not None:
                 if estado== 5:
@@ -370,19 +369,14 @@ class InterpretacionDatos(QDialog):
                     return 0
             print(f"Estado no reconocido: {estado}")  # Para depuración
             return -1  # Estado desconocido
-        
-        print(estados_carga[0])
 
         estado_anterior = calificar_estado(estados_carga[0])
-        print(estado_anterior)
         for i in range(1, len(estados_carga)):
             estado_actual = calificar_estado(estados_carga[i])
-            print(estado_actual)
             if estado_actual != -1 and estado_anterior != -1:
                 if abs(estado_actual - estado_anterior) > 0:  # Cambio brusco
                     cambios_bruscos.append((tiempos[i], estados_carga[i-1], estados_carga[i]))
                 estado_anterior = estado_actual
-                print(estado_anterior)
 
         return cambios_bruscos
 
