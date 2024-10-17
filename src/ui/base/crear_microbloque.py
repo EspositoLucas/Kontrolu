@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from .latex_editor import LatexEditor
 from PyQt5 import QtGui
 import os
-from back.json_manager.json_manager import obtener_microbloques_de_una_macro, agregar_microbloque, borrar_micro_bloque
+from back.json_manager.json_manager import obtener_microbloques_de_una_macro, agregar_microbloque, borrar_micro_bloque, recrear_datos
 from .modificar_configuracion import ModificarConfiguracion
 from ..base.vista_json import VistaJson
 
@@ -81,11 +81,24 @@ class CrearMicroBloque(QDialog):
         presets_tree.setHeaderLabels(["Preset", "Seleccionar"])
         presets_tree.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
 
+        try:
 
-        # Añadir elementos del diccionario al QTreeWidget
-        self.populate_presets_tree(presets_tree)
+            # Añadir elementos del diccionario al QTreeWidget
+            self.populate_presets_tree(presets_tree)
 
-        presets_layout.addWidget(presets_tree)
+            presets_layout.addWidget(presets_tree)
+        except Exception as e:
+
+            error_layout = QHBoxLayout()
+            error_label = QLabel("El archivo de presets falló.")
+            error_label.setStyleSheet("color: red;")
+            recreate_button = QPushButton("Recrear Archivo de Presets")
+            recreate_button.setStyleSheet("background-color: #444; color: white;")
+            recreate_button.clicked.connect(self.recreate_presets_file)
+            error_layout.addWidget(error_label)
+            error_layout.addWidget(recreate_button)
+            error_layout.addStretch()  # Añadir un estiramiento para empujar los widgets a la izquierda
+            presets_layout.addLayout(error_layout)
         
         # Botón "Crear Microbloque"
         create_button = QPushButton("Crear Microbloque Desde 0")
@@ -94,12 +107,31 @@ class CrearMicroBloque(QDialog):
         presets_layout.addWidget(create_button)
         
         return presets_tab
+    
+    def recreate_presets_file(self):
+
+        recrear_datos()        
+
+        # Crear una nueva pestaña de presets
+        new_presets_tab = self.create_presets_tab()
+        
+        # Eliminar la pestaña antigua
+        self.tabs.removeTab(0)
+        
+        # Insertar la nueva pestaña en el mismo índice
+        self.tabs.insertTab(0, new_presets_tab, "Presets")
+        
+        # Establecer la pestaña actualizada como la actual
+        self.tabs.setCurrentIndex(0)
+
 
     def go_to_create_microbloque_tab(self):
         """
         Cambia a la pestaña 'Nuevo Microbloque' en el QTabWidget.
         """
         self.tabs.setCurrentIndex(1)
+
+        
 
 
 

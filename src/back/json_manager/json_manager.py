@@ -4,6 +4,7 @@ from back.macros.macro_bloque import MACROS
 from back.json_manager.dtos import DominioDto, MicroBloqueDto, TipoMicroBloqueDto
 
 file = "datos.json"
+backup_datos = "backup_datos.json"
 
 def crear_json_para_dominios(dominios: list[str] = ["SISTEMAS", "ELECTRONICA"]) -> None:
     """
@@ -256,3 +257,25 @@ def borrar_microbloques_vacios(json_data) -> dict:
                 del json_data[str(macro)][dominio][tipo]
 
     return json_data
+
+def crear_desde_backup() -> None:
+    """
+    Crea el archivo json con los datos del backup
+    """
+    if os.path.exists(backup_datos):
+        with open(backup_datos, "r") as json_file:
+            json_data = json.load(json_file)
+
+        with open(file, "w") as json_file:
+            json.dump(json_data, json_file, indent=4)
+
+def recrear_datos():
+    """
+    Borra el archivo json y lo vuelve a crear
+    """
+    if os.path.exists(file):
+        os.remove(file)
+    try:
+        crear_desde_backup()
+    except:
+        crear_json_para_dominios()
