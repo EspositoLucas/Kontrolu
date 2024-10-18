@@ -27,10 +27,6 @@ class MainWindow(QMainWindow):
         self.archivo = Archivo(self, self.sesion)
         # Agregar configuración por defecto de simulación
         self.config_simulacion = {
-            'tiempo_total': 10,
-            'salida_inicial': 10,
-            'delta_t': 0.01,
-            'velocidad': 2
         }
         self.show_initial_menu()
 
@@ -219,10 +215,10 @@ class MainWindow(QMainWindow):
 
         # Campos de configuración
         campos = {
-            'tiempo_total': ('Tiempo total (s):', str(self.config_simulacion['tiempo_total'])),
-            'salida_inicial': ('Variable a controlar en tiempo 0:', str(self.config_simulacion['salida_inicial'])),
-            'delta_t': ('Intervalo de tiempo (dt):', str(self.config_simulacion['delta_t'])),
-            'velocidad': ('Duración de simulación de cada ciclo (Milisegundos):', str(self.config_simulacion['velocidad']))
+            'tiempo_total': ('Tiempo total (s):', str(self.sesion.tiempo_total)),
+            'salida_inicial': ('Variable a controlar en tiempo 0:', str(self.sesion.salida_inicial)),
+            'delta_t': ('Intervalo de tiempo (dt):', str(self.sesion.delta_t)),
+            'velocidad': ('Duración de simulación de cada ciclo (Milisegundos):', str(self.sesion.velocidad))
         }
 
         inputs = {}
@@ -250,8 +246,11 @@ class MainWindow(QMainWindow):
         dialog.setLayout(layout)
 
         if dialog.exec_():
-            for key, input_field in inputs.items():
-                self.config_simulacion[key] = float(input_field.text())
+
+            self.sesion.delta_t = float(self.config_simulacion['delta_t'])
+            self.sesion.tiempo_total = float(self.config_simulacion['tiempo_total'])
+            self.sesion.salida_inicial = float(self.config_simulacion['salida_inicial'])
+            self.sesion.velocidad = float(self.config_simulacion['velocidad'])
 
     # Modificar el método iniciar_simulacion existente
     def iniciar_simulacion(self):
@@ -263,15 +262,15 @@ class MainWindow(QMainWindow):
             actuador=self.sesion.actuador,
             proceso=self.sesion.proceso,
             medidor=self.sesion.medidor,
-            delta=self.config_simulacion['delta_t'],
-            ciclos=int(self.config_simulacion['tiempo_total']/self.config_simulacion['delta_t']),
+            delta=self.sesion.delta_t,
+            ciclos=int(self.sesion.tiempo_total/self.sesion.delta_t),
             entrada=self.sesion.entrada,
-            salida_cero=self.config_simulacion['salida_inicial'],
+            salida_cero=self.sesion.salida_inicial,
             carga=self.sesion.carga,
             graficadora=graficadora
         )
         
-        simulacion.ejecutar_simulacion(self.config_simulacion['velocidad'])
+        simulacion.ejecutar_simulacion(self.sesion.velocidad)
         self.statusBar().showMessage('Simulación completada')
             
     def toggle_input_method(self, index):

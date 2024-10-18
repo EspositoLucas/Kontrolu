@@ -2,9 +2,10 @@ from .macros.macro_actuador import MacroActuador
 from .macros.macro_controlador import MacroControlador
 from .macros.macro_medidor import MacroMedidor
 from .macros.macro_proceso import MacroProceso
-from .macros.macro_punto_suma import MacroPuntoSuma
 from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
+
+
 
 class Sesion():
     def __init__(self):
@@ -16,8 +17,11 @@ class Sesion():
         self.actuador = MacroActuador(sesion=self)
         self.proceso = MacroProceso(sesion=self)
         self.medidor = MacroMedidor(sesion=self)
-        self.punto_suma = MacroPuntoSuma()
         self.carga = Carga(entrada=self.entrada)
+        self.tiempo_total = 10
+        self.salida_inicial = 0
+        self.delta_t = 1
+        self.velocidad = 1000
         self.nombre = "Sistema de Control"
 
     def validar_entrada_controlador(self, unidad: str)-> bool:
@@ -66,6 +70,10 @@ class Sesion():
             "proceso": self.proceso.to_json(),
             "medidor": self.medidor.to_json(),
             "carga": self.carga.to_json(),
+            "tiempo_total": self.tiempo_total,
+            "salida_inicial": self.salida_inicial,
+            "delta_t": self.delta_t,
+            "velocidad": self.velocidad,
             "nombre": self.nombre
         }
     
@@ -81,11 +89,15 @@ class Sesion():
         self.medidor.sesion = self
         self.carga = Carga(from_json = datos["carga"])
         self.carga.entrada = self.entrada
+        self.tiempo_total = float(datos["tiempo_total"])
+        self.salida_inicial = float(datos["salida_inicial"])
+        self.delta_t = float(datos["delta_t"])
+        self.velocidad = float(datos["velocidad"])
         self.nombre = datos["nombre"]
 
     @staticmethod
     def validar_dict(datos: dict) -> bool:
-        required_keys = ["entrada", "controlador", "actuador", "proceso", "medidor", "carga", "nombre"]
+        required_keys = ["entrada", "controlador", "actuador", "proceso", "medidor", "carga", "nombre", "tiempo_total", "salida_inicial", "delta_t", "velocidad"]
         for key in required_keys:
             if key not in datos:
                 raise Exception(f"El diccionario no contiene la clave {key}")
