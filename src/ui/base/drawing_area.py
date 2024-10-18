@@ -109,27 +109,40 @@ class DrawingArea(QGraphicsView):
         
     def draw_title(self):
         self.title_item = QGraphicsTextItem(self.modelo.nombre)
-
-        self.title_item.setTextInteractionFlags(Qt.TextEditable)
-        font = QtGui.QFont("Arial", 60, QtGui.QFont.Bold)  # Set font to bold
+        self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
+        font = QtGui.QFont("Arial", 60, QtGui.QFont.Bold)
         self.title_item.setFont(font)
-        self.title_item.setDefaultTextColor(LETRA_COLOR)  # Set the color of the text
+        self.title_item.setDefaultTextColor(LETRA_COLOR)
         text_rect = self.title_item.boundingRect()
         
-        self.title_item.setPos((self.scene.width()-text_rect.width())/2,5)
+        self.title_item.setPos((self.scene.width()-text_rect.width())/2, 5)
         self.title_item.focusOutEvent = self.update_model_title
+        self.title_item.mousePressEvent = self.enable_text_editing
 
         self.scene.addItem(self.title_item)
-    
+
+    def enable_text_editing(self, event):
+        self.title_item.setTextInteractionFlags(Qt.TextEditorInteraction)
+        self.title_item.setFocus()
+        cursor = self.title_item.textCursor()
+        cursor.setPosition(self.title_item.document().documentLayout().hitTest(event.pos(), Qt.FuzzyHit))
+        self.title_item.setTextCursor(cursor)
+
     def update_model_title(self, event):
+        new_title = self.title_item.toPlainText()
+        self.modelo.nombre = new_title
 
-        new_title = self.title_item.toPlainText()  # Obtener el texto actualizado del título
-        self.modelo.nombre = new_title  # Actualizar el nombre en self.modelo
-        # Reposicionar el título después de editar si cambió el ancho
+        # Reposicionar el título
         text_rect = self.title_item.boundingRect()
+        title_x = (self.scene.width() - text_rect.width()) / 2
+        self.title_item.setPos(title_x, 5)
 
-        title_x = (self.scene.width()-text_rect.width())/2  # Recalcular la posición central
-        self.title_item.setPos(title_x, 5)  # Mantener la posición vertical
+        # Desactivar la edición y limpiar la selección
+        self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
+        cursor = self.title_item.textCursor()
+        cursor.clearSelection()
+        self.title_item.setTextCursor(cursor)
+        self.title_item.clearFocus()
 
         self.macrobloque.update_nombre()
         
