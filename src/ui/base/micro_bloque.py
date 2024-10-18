@@ -7,7 +7,6 @@ class Microbloque(QGraphicsItem):
         super().__init__()
         self.elemento_back = microbloque_back
         self.nombre = microbloque_back.nombre
-        self.color = microbloque_back.color or QColor(255, 255, 0)
         self.funcion_transferencia = microbloque_back.funcion_transferencia or ""
         self.configuracion_entrada = microbloque_back.configuracion_entrada
         self.configuracion_salida = microbloque_back.configuracion_salida
@@ -21,11 +20,25 @@ class Microbloque(QGraphicsItem):
         if microbloque_back.validar_salida():
             self.salida_unidad_color = Qt.green
         
+        self.calcular_colores()
         
 
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(1)
-    
+
+    def calcular_colores(self):
+        self.color = self.elemento_back.color or QColor(255, 255, 0)
+
+        self.default_brush = self.color  # Fondo
+
+        self.hover_color = self.color.lighter(150) 
+
+        self.border_color = self.color.darker(150)
+
+        self.selected_color = self.border_color.darker(150)
+
+        self.texto_color = QColor(self.calcular_color(self.color))
+
     def boundingRect(self):
         return QRectF(0, 0, self.elemento_back.ancho(), self.elemento_back.alto())
 
@@ -57,12 +70,12 @@ class Microbloque(QGraphicsItem):
         self.painter = painter
         self.widget = widget
 
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(painter.Antialiasing)
         
         if self.esta_selecionado:
-            painter.setPen(QPen(Qt.red, 3))
+            painter.setPen(QPen(self.selected_color, 5))
         else:
-            painter.setPen(QPen(Qt.black, 2))
+            painter.setPen(QPen(self.border_color, 4))
         
         painter.setBrush(self.color)
         rect = self.boundingRect()
@@ -71,8 +84,7 @@ class Microbloque(QGraphicsItem):
         font = QFont("Arial", max(1, round(10)), QFont.Bold)
         painter.setFont(font)
         
-        color_texto = self.calcular_color(self.color)
-        painter.setPen(QPen(QColor(color_texto)))
+        painter.setPen(QPen(self.texto_color))
         
         text_rect = rect.adjusted(5, 5, -5, -5)
         painter.drawText(text_rect, Qt.AlignCenter | Qt.TextWordWrap, self.nombre)
@@ -154,7 +166,7 @@ class Microbloque(QGraphicsItem):
             self.update()
 
     def actualizar(self):
-        self.color = self.elemento_back.color or QColor(255, 255, 0)
+        self.calcular_colores()
         self.nombre = self.elemento_back.nombre
         self.funcion_transferencia = self.elemento_back.funcion_transferencia or ""
         self.configuracion_entrada = self.elemento_back.configuracion_entrada
