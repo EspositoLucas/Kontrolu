@@ -7,6 +7,9 @@ import os
 from back.json_manager.json_manager import obtener_microbloques_de_una_macro, agregar_microbloque, borrar_micro_bloque, recrear_datos
 from .modificar_configuracion import ModificarConfiguracion
 from ..base.vista_json import VistaJson
+from vcolorpicker import getColor
+from PyQt5.QtGui import QColor
+
 
 
 class CrearMicroBloque(QDialog):
@@ -270,12 +273,12 @@ class CrearMicroBloque(QDialog):
         self.descripcion_input = descripcion_input
 
         # Botón para seleccionar color
-        color_button = QPushButton("Seleccionar Color")
-        color_button.setStyleSheet("background-color: #444; color: white;")
-        color_button.setProperty("selected_color", self.new_microbloque.color)
-        color_button.clicked.connect(lambda: self.select_color(color_button))
-        new_microbloque_layout.addWidget(color_button)
-        self.color_button = color_button
+        self.color_button = QPushButton("Seleccionar Color")
+        self.color_button.setStyleSheet("background-color: #444; color: white;")
+        self.color_button.setProperty("selected_color", self.new_microbloque.color)
+        self.color_button.setStyleSheet(f"background-color: {self.new_microbloque.color.name()};")
+        self.color_button.clicked.connect(lambda: self.select_color(self.color_button))
+        new_microbloque_layout.addWidget(self.color_button)
 
         # Función de transferencia
         transfer_label = QLabel("Función de Transferencia:")
@@ -335,12 +338,17 @@ class CrearMicroBloque(QDialog):
 
     def select_color(self, button):
 
-        color = QColorDialog.getColor()
-             
+        r, g, b, _ = self.new_microbloque.color.getRgb()
+        rgb_tuple = getColor((r, g, b))
+        rgb_int_tuple = tuple(int(x) for x in rgb_tuple)
+        print("COLOR SELECCIONADO")
+        print(rgb_int_tuple)
+        color = QColor(*rgb_int_tuple)
+
         if color.isValid():
             self.color = color
             self.color_button.setProperty("selected_color", self.color)
-            button.setStyleSheet(f"background-color: {color.name()};")
+            self.color_button.setStyleSheet(f"background-color: {color.name()};")
 
     
     def guardar_preset(self):
