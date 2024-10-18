@@ -3,26 +3,71 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QWidget
 from .drawing_area import DrawingArea
+from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsTextItem
+from PyQt5.QtGui import QBrush, QPen, QColor, QFont,QFontMetrics
+from PyQt5.QtCore import Qt, QRectF
 
-class MacroVista(QPushButton):
-    def __init__(self, elementoBack, posicion, tamano):
-        super().__init__()
+
+class MacroVista(QGraphicsRectItem):
+    def __init__(self, elementoBack,  pos):
+        qrect = pos
+        super().__init__(qrect)
         self.modelo = elementoBack
-        self.setText(self.modelo.nombre)
-        self.move(*posicion)
-        self.setFixedSize(*tamano)
-        self.clicked.connect(self.click)
-        self.setStyleSheet("""
-            background-color: #0072BB;;  /* Color de fondo azul /
-            font-weight: bold;          /* Texto en negrita */
-            font-weight: bold;          /* Texto en negrita */
-            color: white;               /* Color de texto blanco */
-            font-size: 15px;            /* Tamaño de fuente */
-            font-family: Arial;  
-        """)
+        #self.setText(self.modelo.nombre)
+        #self.clicked.connect(self.click)
+        # Establecer colores suaves
+        self.default_brush = QBrush(QColor("#A8DADC"))  # Fondo celeste suave
+        self.hover_brush = QBrush(QColor("#F1FAEE"))  # Fondo aclarado al pasar el mouse
+        self.setBrush(QBrush(QColor("#A8DADC")))  # Fondo celeste suave
+        self.setPen(QPen(QColor("#457B9D"), 4))  # Borde azul con grosor de 2px
+        self.setRect(qrect)  # Establecer el tamaño del rectángulo
+
+        # Agregar texto centrado
+        # Texto que se mostrará en el rectángulo
+        self.text = self.modelo.nombre
+        self.font = QFont("Arial", 16, QFont.Bold)  # Estilo del texto
+        self.setAcceptHoverEvents(True)  # Permitir que el rectángulo detecte eventos de hover
+        # Permitir que el rectángulo detecte eventos de hover
+        self.setAcceptHoverEvents(True)
+        
+        #self.move(*posicion)
+        #self.setFixedSize(*tamano)
+        
+
+    def paint(self, painter, option, widget=None):
+        # Dibujar un rectángulo con esquinas redondeadas
+        painter.setRenderHint(painter.Antialiasing)
+        painter.setBrush(self.brush())
+        painter.setPen(self.pen())
+        painter.drawRoundedRect(self.rect(), 10, 10)
+
+        # Dibujar el texto centrado en el rectángulo
+        painter.setFont(self.font)
+        painter.setPen(QColor("#2B2D42"))  # Color del texto
+        text_rect = painter.boundingRect(self.rect(), Qt.AlignCenter, self.text)
+        painter.drawText(text_rect, Qt.AlignCenter, self.text)
+
+    def hoverEnterEvent(self, event):
+        # Cambia el fondo al pasar el mouse sobre el rectángulo
+        self.setBrush(self.hover_brush)
+        self.update()  # Actualizar el rectángulo para que se vea el cambio
+
+    def hoverLeaveEvent(self, event):
+        # Restaura el fondo original cuando el mouse sale del rectángulo
+        self.setBrush(self.default_brush)
+        self.update()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.click()
+
+    def updateText(self):
+        # Actualizar el texto del rectángulo
+        self.text = self.modelo.nombre
+        self.update()  # Actualizar el rectángulo para redibujar
 
     def update_nombre(self):
-        self.setText(self.modelo.nombre)
+        self.updateText()
     
     def click(self):
         self.ventana = QMainWindow()
@@ -68,7 +113,7 @@ class MacroVista(QPushButton):
             """
         
         # Botón de borrar todo
-        delete_button = QPushButton('Borrar todo', self)
+        delete_button = QPushButton('Borrar todo', self.drawing_area)
         delete_button.clicked.connect(self.drawing_area.clear_all)
         delete_button.setStyleSheet(button_style)
         toolbar.addWidget(delete_button)
@@ -80,7 +125,7 @@ class MacroVista(QPushButton):
         toolbar.addWidget(spacer)
 
         # Botón de seleccionar varios
-        self.seleccion_multiple = QPushButton('Seleccionar varios', self)
+        self.seleccion_multiple = QPushButton('Seleccionar varios', self.drawing_area)
         self.seleccion_multiple.setCheckable(True)
         self.seleccion_multiple.toggled.connect(self.drawing_area.set_seleccion_multiple)
         self.seleccion_multiple.setStyleSheet(button_style + """
@@ -97,7 +142,7 @@ class MacroVista(QPushButton):
         toolbar.addWidget(spacer)
 
         # Botón de seleccionar varios
-        self.edicion_json = QPushButton('Edicion Json', self)
+        self.edicion_json = QPushButton('Edicion Json', self.drawing_area)
         self.edicion_json.clicked.connect(self.drawing_area.vista_json)
         self.edicion_json.setStyleSheet(button_style)
         toolbar.addWidget(self.edicion_json)
@@ -109,7 +154,7 @@ class MacroVista(QPushButton):
         toolbar.addWidget(spacer)
 
         # Boton de ayuda
-        help_button = QPushButton('Ayuda', self)
+        help_button = QPushButton('Ayuda',self.drawing_area)
         help_button.clicked.connect(self.drawing_area.show_help)
         help_button.setStyleSheet(button_style + """
         QPushButton {

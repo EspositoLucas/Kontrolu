@@ -1,8 +1,9 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtGui import QColor
 import math
 
 class Flecha(QtWidgets.QGraphicsItem):
-    def __init__(self, source: QtCore.QPointF, destination: QtCore.QPointF, arrow_height=15, arrow_width=10, length_width=5, arrow=True, color=QtGui.QColor(0, 0, 0),*args, **kwargs):
+    def __init__(self, source: QtCore.QPointF, destination: QtCore.QPointF, arrow_height=15, arrow_width=10, length_width=5, arrow=True, color=QColor("#457B9D"),*args, **kwargs):
         super(Flecha, self).__init__(*args, **kwargs)
         self._sourcePoint = source
         self._destinationPoint = destination
@@ -12,10 +13,10 @@ class Flecha(QtWidgets.QGraphicsItem):
         self.arrow = arrow
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, False)
         self.setAcceptHoverEvents(True)
-        self.color = color
-        self.default_color = QtGui.QColor(0, 0, 0)  # Color negro por defecto
-        self.hover_color = QtGui.QColor(0, 0, 0)    # Color de hover, se establecerá en las subclases en macro_diagrama.py
-        self.current_color = self.default_color
+        self.color = QColor("#457B9D")
+        self.default_color = QColor("#457B9D")  # Color negro por defecto
+        self.hover_color = QColor("#457B9D")    # Color de hover, se establecerá en las subclases en macro_diagrama.py
+        self.current_color = self.color
         self.setAcceptHoverEvents(True)
     
     def set_color(self, color):
@@ -43,13 +44,13 @@ class Flecha(QtWidgets.QGraphicsItem):
             arrow_polygon = self.arrowCalc(points[0], points[1])
             if arrow_polygon is not None:
                 painter.drawPolyline(QtGui.QPolygonF(points))
-                painter.setBrush(QtGui.QColor(0, 0, 0))
+                painter.setBrush(QColor("#457B9D"))
                 painter.drawPolygon(arrow_polygon)
         else:
             rectangle_polygon = self.rectangleCalc(points[0], points[1])
             if rectangle_polygon is not None:
                 painter.drawPolyline(QtGui.QPolygonF(points))
-                painter.setBrush(QtGui.QColor(0, 0, 0))
+                painter.setBrush(QColor("#457B9D"))
                 painter.drawPolygon(rectangle_polygon)
 
     def arrowCalc(self, start_point, end_point):

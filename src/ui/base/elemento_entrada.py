@@ -6,29 +6,20 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QPushButton
 import os
 from ..base.vista_json import VistaJson
+from ..base.macro_vista import MacroVista
+from PyQt5.QtCore import QRectF
 
 
-class ElementoEntrada(QPushButton):
+
+
+class ElementoEntrada(MacroVista):
     
-    def __init__(self, entrada):
-        super().__init__()
+    def __init__(self, entrada,pos):
+        MacroVista.__init__(self, entrada, pos)
         self.entrada = entrada
         self.tipo_entrada = "Personalizada"  # Añadimos este atributo
         self.coeficiente = "1"  # Añadimos este atributo
-        
-        self.setText(self.entrada.nombre)
-        self.move(0, 210)
-        self.setFixedSize(121, 41)
-        self.clicked.connect(self.mousePressEvent)
-        self.setStyleSheet("""
-            background-color: #0072BB;;  /* Color de fondo azul /
-            font-weight: bold;          /* Texto en negrita */
-            font-weight: bold;
-            color: white;               /* Color de texto blanco */
-            font-size: 15px;            /* Tamaño de fuente */
-            font-family: Arial;  
-        """)
-      
+
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             self.mostrar_configuracion_entrada()        
@@ -39,7 +30,7 @@ class ElementoEntrada(QPushButton):
             self.entrada = dialog.entrada
             self.tipo_entrada = dialog.tipo_entrada
             self.coeficiente = dialog.coeficiente
-            self.setText(self.entrada.nombre)
+            self.updateText()
             
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, entrada=None, tipo_entrada="Personalizada",coeficiente="1"):

@@ -107,7 +107,7 @@ class MicroBloque(Hoja):
             return 'inf'
         elif value == float('-inf'):
             return '-inf'
-        return value
+        return float(value)
 
     def alto(self) -> int:
         return 80

@@ -682,7 +682,6 @@ class MainWindow(QMainWindow):
         self.diagrama.setupUi(self)
         self.setCentralWidget(self.diagrama)
         self.diagrama.mostrarElementos()
-        self.diagrama.zoom_in()
 
     def new_project(self):
         self.statusBar().showMessage('Nuevo proyecto creado')
@@ -720,7 +719,7 @@ class MainWindow(QMainWindow):
             'tiempo_total': ('Tiempo total (s):', str(self.config_simulacion['tiempo_total'])),
             'salida_inicial': ('Variable a controlar en tiempo 0:', str(self.config_simulacion['salida_inicial'])),
             'delta_t': ('Intervalo de tiempo (dt):', str(self.config_simulacion['delta_t'])),
-            'velocidad': ('Duración de simulación de cada ciclo (segundos reales):', str(self.config_simulacion['velocidad']))
+            'velocidad': ('Duración de simulación de cada ciclo (Milisegundos):', str(self.config_simulacion['velocidad']))
         }
 
         inputs = {}

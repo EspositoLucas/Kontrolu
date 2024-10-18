@@ -4,30 +4,21 @@ from back.topologia.carga import Carga,TipoCarga
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QPushButton,QMessageBox
 from ..base.vista_json import VistaJson
+from ..base.macro_vista import MacroVista
 import os
+from PyQt5.QtCore import QRectF
 
 
-class ElementoCarga(QPushButton):
-    def __init__(self, carga):
-        super().__init__()
+class ElementoCarga(MacroVista):
+    def __init__(self, carga,pos):
+
+        MacroVista.__init__(self, carga, pos)
         self.carga = carga
         self.tipo_entrada = "Misma que entrada"  # Añadimos este atributo
         self.coeficiente = "1"  # Añadimos este atributo
         self.estado_seleccionado = self.carga.estados[0]["nombre"]  # Inicializamos con el primer estado
         
-        
-        self.setText(self.carga.nombre)
-        self.move(700, 210)
-        self.setFixedSize(121, 41)
-        self.clicked.connect(self.mousePressEvent)
-        self.setStyleSheet("""
-            background-color: #0072BB;;  /* Color de fondo azul /
-            font-weight: bold;          /* Texto en negrita */
-            font-weight: bold;          /* Texto en negrita */
-            color: white;               /* Color de texto blanco */
-            font-size: 15px;            /* Tamaño de fuente */
-            font-family: Arial;  
-        """)
+
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
@@ -39,7 +30,7 @@ class ElementoCarga(QPushButton):
             self.carga = dialog.carga
             self.tipo_entrada = dialog.tipo_entrada
             self.estado_seleccionado = dialog.estado_seleccionado
-            self.setText(self.carga.nombre)
+            self.updateText()
 
 class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, carga=None, tipo_entrada="Personalizada", estado_seleccionado=None, coeficiente="1"):
