@@ -13,9 +13,6 @@ class MacroVista(QGraphicsRectItem):
         qrect = pos
         super().__init__(qrect)
         self.modelo = elementoBack
-        #self.setText(self.modelo.nombre)
-        #self.clicked.connect(self.click)
-        # Establecer colores suaves
         self.default_brush = QBrush(QColor("#A8DADC"))  # Fondo celeste suave
         self.hover_brush = QBrush(QColor("#F1FAEE"))  # Fondo aclarado al pasar el mouse
         self.setBrush(QBrush(QColor("#A8DADC")))  # Fondo celeste suave
@@ -27,11 +24,8 @@ class MacroVista(QGraphicsRectItem):
         self.text = self.modelo.nombre
         self.font = QFont("Arial", 16, QFont.Bold)  # Estilo del texto
         self.setAcceptHoverEvents(True)  # Permitir que el rectángulo detecte eventos de hover
-        # Permitir que el rectángulo detecte eventos de hover
-        self.setAcceptHoverEvents(True)
-        
-        #self.move(*posicion)
-        #self.setFixedSize(*tamano)
+
+
         
 
     def paint(self, painter, option, widget=None):
