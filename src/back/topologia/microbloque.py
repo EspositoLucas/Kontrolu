@@ -7,7 +7,7 @@ from .hoja import Hoja
 from back.json_manager.dtos import MicroBloqueDto
 
 class MicroBloque(Hoja):
-    def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 0), funcion_transferencia: str="1", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
+    def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 255), funcion_transferencia: str="1", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
         if from_json:
             self.from_json(from_json)
             self.padre = padre

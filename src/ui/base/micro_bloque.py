@@ -22,6 +22,7 @@ class Microbloque(QGraphicsItem):
         
         self.calcular_colores()
         
+        self.setAcceptHoverEvents(True)
 
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(1)
@@ -79,7 +80,7 @@ class Microbloque(QGraphicsItem):
         
         painter.setBrush(self.color)
         rect = self.boundingRect()
-        painter.drawRect(rect)
+        painter.drawRoundedRect(rect, 10, 10)
         
         font = QFont("Arial", max(1, round(10)), QFont.Bold)
         painter.setFont(font)
@@ -171,3 +172,16 @@ class Microbloque(QGraphicsItem):
         self.funcion_transferencia = self.elemento_back.funcion_transferencia or ""
         self.configuracion_entrada = self.elemento_back.configuracion_entrada
         self.configuracion_salida = self.elemento_back.configuracion_salida
+
+    
+    def hoverEnterEvent(self, event):
+        print("hoverEnterEvent")
+        self.color = self.hover_color
+        self.update()
+        super().hoverEnterEvent(event)
+
+    def hoverLeaveEvent(self, event):
+        print("hoverLeaveEvent")
+        self.color = self.default_brush
+        self.update()
+        super().hoverLeaveEvent(event)

@@ -23,7 +23,7 @@ class MacroVista(QGraphicsRectItem):
         # Texto que se mostrará en el rectángulo
         self.text = self.modelo.nombre
         self.font = QFont("Arial", 16, QFont.Bold)  # Estilo del texto
-        self.setAcceptHoverEvents(True)  # Permitir que el rectángulo detecte eventos de hover
+        self.setAcceptHoverEvents(True)  
 
 
         
@@ -40,6 +40,7 @@ class MacroVista(QGraphicsRectItem):
         painter.setPen(QColor("#2B2D42"))  # Color del texto
         text_rect = painter.boundingRect(self.rect(), Qt.AlignCenter, self.text)
         painter.drawText(text_rect, Qt.AlignCenter, self.text)
+    
 
     def hoverEnterEvent(self, event):
         # Cambia el fondo al pasar el mouse sobre el rectángulo
@@ -70,15 +71,13 @@ class MacroVista(QGraphicsRectItem):
         screen = QtGui.QGuiApplication.primaryScreen().geometry()
         self.ventana.setGeometry(screen)
         self.ventana.showMaximized()
-        #self.ventana.setFixedSize(screen.width(), screen.height())
-        #self.ventana.setWindowFlags(Qt.Window | Qt.WindowMaximizeButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowCloseButtonHint)
         
         self.drawing_area = DrawingArea(self, self.ventana)
         self.ventana.setCentralWidget(self.drawing_area)
         
         self.init_tool_bar()
         self.ventana.show()
-        self.ventana.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
+        self.ventana.setStyleSheet("background-color: #F1FAEE;")  # Color azul claro
         # Ruta de la imagen del logo
         path =  os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path, 'imgs', 'logo.png')

@@ -123,7 +123,7 @@ class MacroDiagrama(QtWidgets.QWidget):
         self.scene.addItem(self.line_5)
 
         # PUNTO SUMA
-        puntoSuma = PuntoSuma(x_medio = x_subida,y_medio = y_linea_1, RADIO_PERTURBACION = 20)
+        puntoSuma = PuntoSuma(x_medio = x_subida,y_medio = y_linea_1, RADIO_PERTURBACION = 20,izq=2,abajo=1)
         self.scene.addItem(puntoSuma)
 
         #self.line_7 = Flecha(QtCore.QPointF(190, 230), QtCore.QPointF(221, 230),ah, aw, lw) # punto suma a controlador

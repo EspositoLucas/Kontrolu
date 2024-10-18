@@ -12,12 +12,20 @@ from .perturbacion_visual import PerturbacionVisual, RADIO_PERTURBACION
 from .crear_microbloque import CrearMicroBloque
 from .vista_json import VistaJson
 from .editar_perturbacion import EditarPerturbacion
+from ..base.punto_suma import PuntoSuma
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
 BUTTON_SIZE = 20
 RADIO = 40
 MARGEN_PARALELO = 20
+
+LINEA_GROSOR = 4
+LINEA_COLOR = QColor("#457B9D")
+FONDO_CICULO_COLOR = QColor("#A8DADC")
+ACLARADO = QColor("#F1FAEE")
+LETRA_COLOR = QColor("#2B2D42")
+
 
 class DrawingArea(QGraphicsView):
     def __init__(self, macrobloque=None, ventana=None):
@@ -51,7 +59,6 @@ class DrawingArea(QGraphicsView):
         self.edit_config_layout = QVBoxLayout()
         self.lista_configuraciones = None
         self.load_preview_images()
-        self.load_connection_image()
     
         self.init_ui()
         
@@ -101,13 +108,12 @@ class DrawingArea(QGraphicsView):
     def draw_title(self):
         self.title_item = QGraphicsTextItem(self.modelo.nombre)
 
-        
-
         self.title_item.setTextInteractionFlags(Qt.TextEditable)
-        font = QtGui.QFont("Arial", 60)
+        font = QtGui.QFont("Arial", 60, QtGui.QFont.Bold)  # Set font to bold
         self.title_item.setFont(font)
+        self.title_item.setDefaultTextColor(LETRA_COLOR)  # Set the color of the text
         text_rect = self.title_item.boundingRect()
-
+        
         self.title_item.setPos((self.scene.width()-text_rect.width())/2,5)
         self.title_item.focusOutEvent = self.update_model_title
 
@@ -143,12 +149,6 @@ class DrawingArea(QGraphicsView):
             'derecha': QPixmap(os.path.join(imgs_dir, 'serie.png'))
         }
     
-    def load_connection_image(self): # dibuja la imagen de punto suma en las conexiones de paralelo
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        img_path = os.path.join(current_dir, '..','base', 'imgs')
-        self.connection_image = QPixmap(os.path.join(img_path, 'puntoSuma_positiva.png'))
-        if self.connection_image.isNull():
-            print(f"Error: No se pudo cargar la imagen en {img_path}")
     
     def show_help(self):
         help_dialog = QDialog(self)
@@ -322,6 +322,7 @@ class DrawingArea(QGraphicsView):
         self.draw_io_blocks()
 
     def draw_final_connection(self, start_point):
+        qpen = QPen(LINEA_COLOR, LINEA_GROSOR)
         if start_point is None:
             return
         
@@ -334,33 +335,32 @@ class DrawingArea(QGraphicsView):
             self.punto_salida_actual.setX(start_point.x() + MARGEN_HORIZONTAL)
             end_x = self.punto_salida_actual.x()
 
-        end_point = QPointF(end_x, self.height() / 2) # end_point es el lugar donde está el bloque de salida
-        #painter.setPen(QPen(Qt.black, 2))
-        #painter.drawLine(start_point, end_point)
+        end_point = QPointF(end_x, self.height() / 2) 
         line = QGraphicsLineItem(start_point.x(), start_point.y(), end_point.x(), end_point.y())
-        line.setPen(QPen(Qt.black, 2))
+        line.setPen(qpen)
         self.scene.addItem(line)
 
         self.update()
 
     def draw_empty_connection(self):
+        qpen = QPen(LINEA_COLOR, LINEA_GROSOR)
         entrada = QPointF(130, self.height() / 2)
         salida = QPointF(self.width() - 210, self.height() / 2)
         self.punto_salida_actual = salida
         line = QGraphicsLineItem(entrada.x(), entrada.y(), salida.x(), salida.y())
-        line.setPen(QPen(Qt.black, 3))
+        line.setPen(qpen)
         self.scene.addItem(line)
         
         # Dibujar el botón "+" en el medio
         center = QPointF((entrada.x() + salida.x()) / 2, self.height() / 2)
         button = QGraphicsEllipseItem(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
-        button.setBrush(QBrush(QColor("#ADD8E6")))
-        button.setPen(QPen(Qt.black, 2))
+        button.setBrush(QBrush(FONDO_CICULO_COLOR))
+        button.setPen(qpen)
         self.scene.addItem(button)
 
         text = QGraphicsTextItem("+")
         text.setFont(QFont("Arial", 12, QFont.Bold))
-        text.setDefaultTextColor(Qt.black)
+        text.setDefaultTextColor(LETRA_COLOR)
         text.setPos(center.x() - text.boundingRect().width() / 2, center.y() - text.boundingRect().height() / 2)
         self.scene.addItem(text)
 
@@ -368,20 +368,21 @@ class DrawingArea(QGraphicsView):
         self.add_button_rect = QRectF(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
 
     def draw_io_blocks(self):
+        qpen = QPen(LINEA_COLOR,LINEA_GROSOR)
         centro_y = self.height() / 2  # Posición y del centro para ambos círculos 
         centro_entrada_x = 50 + RADIO  # Posición x del centro del círculo de entrada
         centro_salida_x = self.width() - 130 - RADIO  # Posición x del centro del círculo de salida
         
         # Dibujar el círculo de entrada
         entrada = QGraphicsEllipseItem(centro_entrada_x - RADIO, centro_y - RADIO, RADIO * 2, RADIO * 2)
-        entrada.setBrush(QBrush(QColor(128, 128, 128)))
-        entrada.setPen(QPen(Qt.black, 3))
+        entrada.setBrush(QBrush(FONDO_CICULO_COLOR))
+        entrada.setPen(qpen)
         self.scene.addItem(entrada)
 
         # Colocar texto "Entrada" en el círculo de entrada
         text = QGraphicsTextItem("Entrada")
-        text.setFont(QFont("Arial", 12))
-        text.setDefaultTextColor(Qt.black)
+        text.setFont(QFont("Arial", 12, QFont.Bold))
+        text.setDefaultTextColor(LETRA_COLOR)
         text.setPos(centro_entrada_x - text.boundingRect().width() / 2, centro_y - text.boundingRect().height() / 2)
         self.scene.addItem(text)
 
@@ -396,14 +397,14 @@ class DrawingArea(QGraphicsView):
 
         # Dibujar círculo de salida
         salida = QGraphicsEllipseItem(centro_salida_x - RADIO, centro_y - RADIO, RADIO * 2, RADIO * 2)
-        salida.setBrush(QBrush(QColor(128, 128, 128)))
-        salida.setPen(QPen(Qt.black, 3))
+        salida.setBrush(QBrush(FONDO_CICULO_COLOR))
+        salida.setPen(qpen)
         self.scene.addItem(salida)
 
         # Colocar texto "Salida" en el círculo de salida
         text = QGraphicsTextItem("Salida")
-        text.setFont(QFont("Arial", 12))
-        text.setDefaultTextColor(Qt.black)
+        text.setFont(QFont("Arial", 12, QFont.Bold))
+        text.setDefaultTextColor(LETRA_COLOR)
         text.setPos(centro_salida_x - text.boundingRect().width() / 2, centro_y - text.boundingRect().height() / 2)
         self.scene.addItem(text)       
         
@@ -442,6 +443,8 @@ class DrawingArea(QGraphicsView):
         return punto_actual
 
     def draw_paralelo_connections(self, paralelo, punto_inicial):
+        qpen = QPen(LINEA_COLOR,LINEA_GROSOR)
+
         if punto_inicial is None:
             return None
 
@@ -452,7 +455,7 @@ class DrawingArea(QGraphicsView):
         
         # Dibujar línea horizontal antes de la bifurcación (desde el punto inicial hasta el comienzo de la rama)
         line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), comienzo_de_rama.x(), comienzo_de_rama.y())
-        line.setPen(QPen(Qt.black, 2))
+        line.setPen(qpen)
         self.scene.addItem(line)
         
         # Dibujar conexiones para cada rama
@@ -462,7 +465,7 @@ class DrawingArea(QGraphicsView):
             punto_final_rama_vertical = QPointF(comienzo_de_rama.x(), y_actual + hijo.alto() / 2) # deja igual la "x" y pone la "y" en el centro del microbloque
             
             line = QGraphicsLineItem(comienzo_de_rama.x(), comienzo_de_rama.y(), punto_final_rama_vertical.x(), punto_final_rama_vertical.y()) # Línea vertical de bifurcación (desde el comienzo de la rama hasta el punto final rama vertical)
-            line.setPen(QPen(Qt.black, 2))
+            line.setPen(qpen)
             self.scene.addItem(line)
             
             punto_final_rama_actual = self.draw_connections(hijo, punto_final_rama_vertical, True) # partiendo desde el extremo de la linea vertical de bifurcacion, comienza a dibujar lo que sigue
@@ -480,64 +483,43 @@ class DrawingArea(QGraphicsView):
         for end_point in puntos_finales:
             #painter.drawLine(end_point, QPointF(max_x, end_point.y())) # le sumamos 20 para tener una linea horizontal (al salir del microbloque) antes de reconectar
             line = QGraphicsLineItem(end_point.x(), end_point.y(), max_x, end_point.y())
-            line.setPen(QPen(Qt.black, 2))
+            line.setPen(qpen)
             self.scene.addItem(line)
 
         punto_de_reconexion = QPointF(max_x, punto_inicial.y())  # punto de reconexión (es el punto más a la derecha de la estructura paralelo)
         
-        if not self.connection_image.isNull():
-            scaled_image = self.connection_image.scaled(
-                int(40), 
-                int(40), 
-                Qt.KeepAspectRatio, 
-                Qt.SmoothTransformation
-            )
-            x = int(punto_de_reconexion.x() - scaled_image.width() / 2)
-            y = int(punto_de_reconexion.y() - scaled_image.height() / 2)
-            image = QGraphicsPixmapItem(scaled_image)
-            image.setPos(x, y)
-            self.scene.addItem(image)
-            
-            # Calcular el centro y radio de la imagen del punto suma
-            imagen_centro = QPointF(x + scaled_image.width() / 2, y + scaled_image.height() / 2)
-            radio_imagen = scaled_image.width() / 2
-            
-            # Dibujar línea desde la rama superior al borde superior de la imagen
-            punto_superior = QPointF(imagen_centro.x(), imagen_centro.y() - radio_imagen)
-            line = QGraphicsLineItem(max_x, puntos_finales[0].y(), punto_superior.x(), punto_superior.y())
-            line.setPen(QPen(Qt.black, 2))
-            self.scene.addItem(line)
-            
-            # Dibujar línea desde la rama inferior al borde inferior de la imagen
-            punto_inferior = QPointF(imagen_centro.x(), imagen_centro.y() + radio_imagen)
-            line = QGraphicsLineItem(max_x, puntos_finales[-1].y(), punto_inferior.x(), punto_inferior.y())
-            line.setPen(QPen(Qt.black, 2))
-            self.scene.addItem(line)
-            
-            # Dibujar línea horizontal final desde el borde derecho de la imagen
-            punto_derecho = QPointF(imagen_centro.x() + radio_imagen, imagen_centro.y())
-            punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
-            line = QGraphicsLineItem(punto_derecho.x(), punto_derecho.y(), punto_mas_alejado.x(), punto_mas_alejado.y())
-            line.setPen(QPen(Qt.black, 2))
-            self.scene.addItem(line)
-        else:
-            ellipse = QGraphicsEllipseItem(punto_de_reconexion.x() - 5, punto_de_reconexion.y() - 5, 10, 10)
-            ellipse.setBrush(QBrush(Qt.black))
-            self.scene.addItem(ellipse)
-            
-            punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
-            
-            line = QGraphicsLineItem(max_x, puntos_finales[0].y(), max_x, puntos_finales[-1].y())
-            line.setPen(QPen(Qt.black, 2))
-            self.scene.addItem(line)
-            
-            line = QGraphicsLineItem(max_x, punto_inicial.y(), punto_mas_alejado.x(), punto_mas_alejado.y())
-            line.setPen(QPen(Qt.black, 2))
-            self.scene.addItem(line)
+
+
+        punto_suma = PuntoSuma(RADIO_PERTURBACION= 20, x_medio= punto_de_reconexion.x(), y_medio= punto_de_reconexion.y(),arriba=2,abajo=2)
+        self.scene.addItem(punto_suma)
+        
+        # Calcular el centro y radio de la imagen del punto suma
+        imagen_centro = QPointF(punto_de_reconexion.x(), punto_de_reconexion.y())
+        radio_imagen = 20
+        
+        # Dibujar línea desde la rama superior al borde superior de la imagen
+        punto_superior = QPointF(imagen_centro.x(), imagen_centro.y() - radio_imagen)
+        line = QGraphicsLineItem(max_x, puntos_finales[0].y(), punto_superior.x(), punto_superior.y())
+        line.setPen(qpen)
+        self.scene.addItem(line)
+        
+        # Dibujar línea desde la rama inferior al borde inferior de la imagen
+        punto_inferior = QPointF(imagen_centro.x(), imagen_centro.y() + radio_imagen)
+        line = QGraphicsLineItem(max_x, puntos_finales[-1].y(), punto_inferior.x(), punto_inferior.y())
+        line.setPen(qpen)
+        self.scene.addItem(line)
+        
+        # Dibujar línea horizontal final desde el borde derecho de la imagen
+        punto_derecho = QPointF(imagen_centro.x() + radio_imagen, imagen_centro.y())
+        punto_mas_alejado = QPointF(max_x + MARGEN_PARALELO, punto_inicial.y())
+        line = QGraphicsLineItem(punto_derecho.x(), punto_derecho.y(), punto_mas_alejado.x(), punto_mas_alejado.y())
+        line.setPen(qpen)
+        self.scene.addItem(line)
 
         return punto_mas_alejado
     
     def draw_microbloque_connection(self, microbloque, punto_inicial, es_paralelo):
+        qpen = QPen(LINEA_COLOR,LINEA_GROSOR)
         # busca en la lista de microbloques de la drawing_area, el microbloque que queremos conectar
         for mb in self.microbloques: # los microbloques ahora heredan de QGraphicsItem
             if mb.elemento_back == microbloque: # compara su elemento back
@@ -551,7 +533,7 @@ class DrawingArea(QGraphicsView):
                 if punto_inicial is not None and punto_final is not None:
                     # dibujar la linea desde el punto_inicial hasta el punto_final
                     line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), punto_final.x(), punto_final.y())
-                    line.setPen(QPen(Qt.black, 2))
+                    line.setPen(qpen)
                     self.scene.addItem(line)
                 
                 return mb.pos() + QPointF(mb.width(), mb.height() / 2) # retorna un punto que representa la mitad del lado derecho del microbloque. Este punto se usará como punto de inicio para la siguiente conexión.
@@ -588,19 +570,20 @@ class DrawingArea(QGraphicsView):
             self.update()
     
     def draw_perturbacion_connection(self, perturbacion, punto_inicial):
+        qpen = QPen(LINEA_COLOR,LINEA_GROSOR)
         for perturbacion_visual in self.perturbaciones:
             if perturbacion_visual.perturbacion_back == perturbacion:
                 punto_final = perturbacion_visual.pos() + QPointF(RADIO_PERTURBACION, RADIO_PERTURBACION)
                 
                 if punto_inicial is not None and punto_final is not None:
                     line = QGraphicsLineItem(punto_inicial.x(), punto_inicial.y(), punto_final.x(), punto_final.y())
-                    line.setPen(QPen(Qt.black, 2))
+                    line.setPen(qpen)
                     self.scene.addItem(line)
                     
                     # Añadimos una línea adicional para la conexión posterior
                     punto_siguiente = QPointF(punto_final.x() + MARGEN_HORIZONTAL/2, punto_final.y())
                     line_siguiente = QGraphicsLineItem(punto_final.x(), punto_final.y(), punto_siguiente.x(), punto_siguiente.y())
-                    line_siguiente.setPen(QPen(Qt.black, 2))
+                    line_siguiente.setPen(qpen)
                     self.scene.addItem(line_siguiente)
                     
                     return punto_siguiente

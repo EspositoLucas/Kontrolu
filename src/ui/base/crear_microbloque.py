@@ -332,11 +332,14 @@ class CrearMicroBloque(QDialog):
             if self.padre.__class__.__name__ == 'Microbloque':
                 self.padre.actualizar()
 
+
     def select_color(self, button):
+
         color = QColorDialog.getColor()
-        
+             
         if color.isValid():
             self.color = color
+            self.color_button.setProperty("selected_color", self.color)
             button.setStyleSheet(f"background-color: {color.name()};")
 
     
