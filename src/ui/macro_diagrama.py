@@ -168,12 +168,13 @@ class MacroDiagrama(QGraphicsView):
 
     def draw_title(self):
         self.title_item = QGraphicsTextItem(self.sesion.nombre)
-        self.title_item.setTextInteractionFlags(Qt.TextEditable)
+        self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
         font = QtGui.QFont("Arial", 20)
         self.title_item.setFont(font)
         text_rect = self.title_item.boundingRect()
-        self.title_item.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL)
+        self.title_item.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL)
         self.title_item.focusOutEvent = self.update_model_title
+        self.title_item.mousePressEvent = self.enable_text_editing
         self.scene.addItem(self.title_item)
 
     def agregar_botones(self):
@@ -227,10 +228,30 @@ class MacroDiagrama(QGraphicsView):
     def update_model_title(self, event):
         new_title = self.title_item.toPlainText()  # Obtener el texto actualizado del título
         self.sesion.nombre = new_title  # Actualizar el nombre en self.modelo
-        # Reposicionar el título después de editar si cambió el ancho
+        current_pos = self.title_item.pos()
         text_rect = self.title_item.boundingRect()
-        title_x = 430.5 - (text_rect.width() / 2)  # Recalcular la posición central
-        self.title_item.setPos(title_x, 1)  # Mantener la posición vertical
+        new_x = current_pos.x() + (text_rect.width() / 2) - (self.title_item.boundingRect().width() / 2)
+        
+        self.title_item.setPos(new_x, current_pos.y())
+        self.title_item.clearFocus()
+        cursor = self.title_item.textCursor()
+        cursor.clearSelection()
+        self.title_item.setTextCursor(cursor)
+        self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.title_item.mousePressEvent = self.enable_text_editing
+        super(type(self.title_item), self.title_item).focusOutEvent(event)
+
+    def enable_text_editing(self, event):
+        self.title_item.setTextInteractionFlags(Qt.TextEditorInteraction)
+        self.title_item.setFocus()
+        
+        # Posicionar el cursor en la posición exacta del clic
+        cursor = self.title_item.textCursor()
+        cursor.setPosition(self.title_item.document().documentLayout().hitTest(event.pos(), Qt.FuzzyHit))
+        self.title_item.setTextCursor(cursor)
+        
+        # Llamar al método original de mousePressEvent
+        super(type(self.title_item), self.title_item).mousePressEvent(event)
 
     def mostrarElementos(self):
         for item in self.items():
