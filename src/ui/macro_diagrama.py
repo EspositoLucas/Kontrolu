@@ -13,6 +13,9 @@ from PyQt5.QtWidgets import QGraphicsTextItem, QGroupBox, QVBoxLayout, QPushButt
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QRectF
+from .base.simular_button import BotonSimular
+from .base.pausar_button import BotonPausar
+from .base.detener_button import BotonDetener
 
 #DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL = 75
 #DISTANCIA_ENTRE_ELEMENTOS_VERTICAL = 32.5
@@ -146,6 +149,23 @@ class MacroDiagrama(QGraphicsView):
 
         self.agregar_botones()
 
+        pos_simular = QRectF(self.ANCHO_TOTAL-400, self.ALTO_TOTAL-300, 350, 100)
+
+        self.simular_buton = BotonSimular(pos_simular,self)
+        self.scene.addItem(self.simular_buton)
+
+        pos_pausar = QRectF(self.ANCHO_TOTAL-400 - 400 , self.ALTO_TOTAL-300, 350, 100)
+
+        self.pausar_buton = BotonPausar(pos_pausar,self)
+        self.scene.addItem(self.pausar_buton)
+        self.pausar_buton.hide()
+
+        pos_detener = QRectF(self.ANCHO_TOTAL-400, self.ALTO_TOTAL-300, 350, 100)
+
+        self.boton_detener = BotonDetener(pos_detener,self)
+        self.scene.addItem(self.boton_detener)
+        self.boton_detener.hide()
+
     def draw_title(self):
         self.title_item = QGraphicsTextItem(self.sesion.nombre)
         self.title_item.setTextInteractionFlags(Qt.TextEditable)
@@ -187,7 +207,7 @@ class MacroDiagrama(QGraphicsView):
 
         boton_iniciar_sim = QPushButton("Iniciar Simulación")
         boton_iniciar_sim.setStyleSheet(estilos_botones)
-        boton_iniciar_sim.clicked.connect(self.main_window.iniciar_simulacion)
+        boton_iniciar_sim.clicked.connect(self.simular_button)
         layout.addWidget(boton_iniciar_sim)
 
         boton_estabilidad = QPushButton("Análisis de Estabilidad")
@@ -216,3 +236,14 @@ class MacroDiagrama(QGraphicsView):
         for item in self.items():
             if isinstance(item, QtWidgets.QWidget):
                 item.show()
+    
+    def simular_button(self):
+        self.simular_buton.hide()
+        self.pausar_buton.show()
+        self.boton_detener.show()
+        self.main_window.iniciar_simulacion()
+        self.pausar_buton.hide()
+        self.boton_detener.hide()
+        self.simular_buton.show()
+
+        
