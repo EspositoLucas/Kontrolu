@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QPushButton, QVBoxLayout, QDialog, 
                              QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, 
                              QToolBar, QAction, 
-                             QTableWidgetItem, QTableWidget, QFrame)
+                             QTableWidgetItem, QTableWidget, QFrame,QGraphicsView)
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
@@ -102,11 +102,12 @@ class MainWindow(QMainWindow):
     
         
     def init_macrobloques(self):
-        self.diagrama = MacroDiagrama()
-        self.diagrama.setupUi(self)
-        self.setCentralWidget(self.diagrama)
-        self.diagrama.mostrarElementos()
+        self.diagrama = MacroDiagrama(self)
 
+
+        self.diagrama.mostrarElementos()
+        self.setCentralWidget(self.diagrama)
+    
     def new_project(self):
         self.statusBar().showMessage('Nuevo proyecto creado')
 
