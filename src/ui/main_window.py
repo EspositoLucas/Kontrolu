@@ -27,6 +27,10 @@ class MainWindow(QMainWindow):
         self.archivo = Archivo(self, self.sesion)
         # Agregar configuración por defecto de simulación
         self.config_simulacion = {
+            'tiempo_total': '10',
+            'salida_inicial': '0',
+            'delta_t': '0.1',
+            'velocidad': '100'
         }
         self.show_initial_menu()
 

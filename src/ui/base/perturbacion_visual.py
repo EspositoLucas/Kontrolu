@@ -15,30 +15,35 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 import os
 from .editar_perturbacion import EditarPerturbacion
+from ..base.punto_suma import PuntoSuma
+from math import pi, cos, sin
+
 
 RADIO_PERTURBACION = 10
 LONGITUD_FLECHA = 10
+VERDE = QColor("#55AA55")
+ROJO = QColor("#CC6666")
+LINEA_COLOR = QColor("#457B9D")
 
 class PerturbacionVisual(QGraphicsItemGroup):
     def __init__(self, perturbacion_back, drawing_area):
         super().__init__()
+        RADIO_PERTURBACION = 15
         self.perturbacion_back = perturbacion_back
         self.perturbacion_back.set_observer(self)
         self.drawing_area = drawing_area
         self.setAcceptHoverEvents(True)
         self.setZValue(1)
+
+        angle = pi / 4
+        x_medio = RADIO_PERTURBACION * cos(angle)
+        y_medio = RADIO_PERTURBACION * sin(angle)
+
+        self.punto_suma = PuntoSuma(self, x_medio=x_medio,y_medio=y_medio,RADIO_PERTURBACION=RADIO_PERTURBACION,izq=2,arriba=2,color_fondo=ROJO)
+
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setFlag(QGraphicsItem.ItemIsFocusable)
         self.setCursor(Qt.PointingHandCursor)
-
-        self.circulo = QGraphicsEllipseItem(0, 0, 2 * RADIO_PERTURBACION, 2 * RADIO_PERTURBACION)
-        self.circulo.setBrush(QBrush(QColor("#FF0000")))
-        self.circulo.setPen(QPen(Qt.black, 2))
-        
-        self.cruz1 = QGraphicsLineItem(4, 4, 2 * RADIO_PERTURBACION - 4, 2 * RADIO_PERTURBACION - 4)
-        self.cruz2 = QGraphicsLineItem(4, 2 * RADIO_PERTURBACION - 4, 2 * RADIO_PERTURBACION - 4, 4)
-        self.cruz1.setPen(QPen(Qt.black, 2))
-        self.cruz2.setPen(QPen(Qt.black, 2))
 
         puntos_flecha = QPolygonF([
             QPointF(0, 0),  # Punta de la flecha
@@ -46,36 +51,26 @@ class PerturbacionVisual(QGraphicsItemGroup):
             QPointF(5, -10)   # Esquina derecha
         ])
         self.flecha = QGraphicsPolygonItem(puntos_flecha)
-        self.flecha.setBrush(QBrush(Qt.black))
-        self.flecha.setPen(QPen(Qt.black, 2))
-        self.flecha.setPos(RADIO_PERTURBACION, -LONGITUD_FLECHA + RADIO_PERTURBACION)
+        self.flecha.setBrush(QBrush(LINEA_COLOR))
+        self.flecha.setPen(QPen(LINEA_COLOR, 2))
+        self.flecha.setPos(x_medio,y_medio-RADIO_PERTURBACION)
         
         self.linea_flecha = QGraphicsPolygonItem(QPolygonF([
-            QPointF(RADIO_PERTURBACION, -2 * RADIO_PERTURBACION - LONGITUD_FLECHA),
-            QPointF(RADIO_PERTURBACION, 0)
+            QPointF(x_medio, y_medio-RADIO_PERTURBACION-RADIO_PERTURBACION-RADIO_PERTURBACION),
+            QPointF(x_medio,y_medio-RADIO_PERTURBACION)
         ]))
-        self.linea_flecha.setPen(QPen(Qt.black, 2))
+        self.linea_flecha.setPen(QPen(LINEA_COLOR, 4))
 
-        font = QFont()
-        font.setBold(True)
-        self.mas_arriba = QGraphicsTextItem("+")
-        self.mas_arriba.setFont(font)
-        self.mas_arriba.setPos(RADIO_PERTURBACION - 15, -2 * RADIO_PERTURBACION - LONGITUD_FLECHA)
-        self.mas_izquierda = QGraphicsTextItem("+")
-        self.mas_izquierda.setFont(font)
-        self.mas_izquierda.setPos(-13, RADIO_PERTURBACION - 5)
 
-        self.addToGroup(self.circulo)
-        self.addToGroup(self.cruz1)
-        self.addToGroup(self.cruz2)
+
+
         self.addToGroup(self.flecha)
         self.addToGroup(self.linea_flecha)
-        self.addToGroup(self.mas_arriba)
-        self.addToGroup(self.mas_izquierda)
+        self.addToGroup(self.punto_suma)
 
     def actualizar(self, estado):
-        color = QColor("#00FF00") if estado else QColor("#FF0000")
-        self.circulo.setBrush(QBrush(color))
+        color = VERDE if estado else ROJO
+        self.punto_suma.actualizar_color(QBrush(color))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Delete:

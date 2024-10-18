@@ -2,6 +2,13 @@ from PyQt5.QtWidgets import QColorDialog, QDialog,QGraphicsItem
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont
 from PyQt5.QtCore import Qt, QPointF, QRectF
 from .crear_microbloque import CrearMicroBloque
+
+
+LETRA_COLOR = QColor("#2B2D42")
+TEXTO_BLANCO = QColor("#FFFDF5")
+VERDE = QColor("#55AA55")
+ROJO = QColor("#CC6666")
+
 class Microbloque(QGraphicsItem):
     def __init__(self, microbloque_back=None):
         super().__init__()
@@ -12,13 +19,13 @@ class Microbloque(QGraphicsItem):
         self.configuracion_salida = microbloque_back.configuracion_salida
         self.esta_selecionado = False
         
-        self.entrada_unidad_color = Qt.red
-        self.salida_unidad_color = Qt.red
+        self.entrada_unidad_color = ROJO
+        self.salida_unidad_color = ROJO
         
         if microbloque_back.validar_entrada():
-            self.entrada_unidad_color = Qt.green
+            self.entrada_unidad_color = VERDE
         if microbloque_back.validar_salida():
-            self.salida_unidad_color = Qt.green
+            self.salida_unidad_color = VERDE
         
         self.calcular_colores()
         
@@ -38,7 +45,7 @@ class Microbloque(QGraphicsItem):
 
         self.selected_color = self.border_color.darker(150)
 
-        self.texto_color = QColor(self.calcular_color(self.color))
+        self.texto_color = self.calcular_color(self.color)
 
     def boundingRect(self):
         return QRectF(0, 0, self.elemento_back.ancho(), self.elemento_back.alto())
@@ -50,7 +57,7 @@ class Microbloque(QGraphicsItem):
     def calcular_color(self, color):
         fondo_color = color
         es_claro = self.es_color_claro(fondo_color)
-        color_texto = "black" if es_claro else "white"
+        color_texto = LETRA_COLOR if es_claro else TEXTO_BLANCO
         return color_texto
 
     def setPos(self, pos):
@@ -153,13 +160,13 @@ class Microbloque(QGraphicsItem):
         return self.__str__()
     
     def actualizar_color_unidades(self):
-        color_entrada = Qt.red
-        color_salida = Qt.red
+        color_entrada = ROJO
+        color_salida = ROJO
 
         if self.elemento_back.validar_entrada():
-            color_entrada = Qt.green
+            color_entrada = VERDE
         if self.elemento_back.validar_salida():
-            color_salida = Qt.green
+            color_salida = VERDE
         
         if self.entrada_unidad_color != color_entrada or self.salida_unidad_color != color_salida:
             self.entrada_unidad_color = color_entrada

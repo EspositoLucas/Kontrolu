@@ -10,7 +10,8 @@ from ..base.vista_json import VistaJson
 from vcolorpicker import getColor
 from PyQt5.QtGui import QColor
 
-
+LETRA_COLOR = QColor("#2B2D42")
+TEXTO_BLANCO = QColor("#FFFDF5")
 
 class CrearMicroBloque(QDialog):
     def __init__(self, micro_bloque, tipo, parent=None,tab=0):
@@ -274,9 +275,8 @@ class CrearMicroBloque(QDialog):
 
         # Botón para seleccionar color
         self.color_button = QPushButton("Seleccionar Color")
-        self.color_button.setStyleSheet("background-color: #444; color: white;")
+        self.color_button.setStyleSheet(f"background-color: {self.new_microbloque.color.name()}; color: {self.calcular_color(self.new_microbloque.color).name()};")
         self.color_button.setProperty("selected_color", self.new_microbloque.color)
-        self.color_button.setStyleSheet(f"background-color: {self.new_microbloque.color.name()};")
         self.color_button.clicked.connect(lambda: self.select_color(self.color_button))
         new_microbloque_layout.addWidget(self.color_button)
 
@@ -347,8 +347,8 @@ class CrearMicroBloque(QDialog):
 
         if color.isValid():
             self.color = color
-            self.color_button.setProperty("selected_color", self.color)
-            self.color_button.setStyleSheet(f"background-color: {color.name()};")
+            self.color_button.setProperty("selected_color", color)
+            self.color_button.setStyleSheet(f"background-color: {color.name()}; color: {self.calcular_color(color).name()};")
 
     
     def guardar_preset(self):
@@ -541,5 +541,12 @@ class CrearMicroBloque(QDialog):
         ModificarConfiguracion(configuracion= configuracion, tipo=tipo, padre=self)
 
 
+    def es_color_claro(self, color):
+        r, g, b = color.red(), color.green(), color.blue()
+        return r * 0.299 + g * 0.587 + b * 0.114 > 186
 
-
+    def calcular_color(self, color):
+        fondo_color = color
+        es_claro = self.es_color_claro(fondo_color)
+        color_texto = LETRA_COLOR if es_claro else TEXTO_BLANCO
+        return color_texto

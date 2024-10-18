@@ -25,6 +25,8 @@ LINEA_COLOR = QColor("#457B9D")
 FONDO_CICULO_COLOR = QColor("#A8DADC")
 ACLARADO = QColor("#F1FAEE")
 LETRA_COLOR = QColor("#2B2D42")
+TEXTO_BLANCO = QColor("#FFFDF5")
+
 
 
 class DrawingArea(QGraphicsView):
