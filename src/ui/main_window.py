@@ -84,96 +84,17 @@ class MainWindow(QMainWindow):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QIcon(icon))
-
         menuBar = Menu(self,self.sesion)
         self.setMenuBar(menuBar)
-
-        # Barra de herramientas
-        toolbar = QToolBar("Barra de Herramientas")
-        self.addToolBar(toolbar)
-        
-        # Configurar Simulacion
-        boton_config_simulacion = QAction("Configurar Simulación", self)
-        boton_config_simulacion.triggered.connect(self.configurar_simulacion)
-        toolbar.addAction(boton_config_simulacion)
-        
-        # Aplicar el mismo estilo que los otros botones
-        config_button = toolbar.widgetForAction(boton_config_simulacion)
-        if config_button:
-            config_button.setStyleSheet("""
-                QToolButton {
-                    background-color: #666;  
-                    color: white;
-                    font-weight: bold;
-                    border: none;
-                    padding: 5px;
-                    border-radius: 3px;
-                }
-                QToolButton:hover {
-                    background-color: #4cae4c;
-                }
-            """)
-
-        # Botón de simulación
-        boton_simulacion = QAction("Iniciar Simulación", self)
-        boton_simulacion.triggered.connect(self.iniciar_simulacion)
-        toolbar.addAction(boton_simulacion)
-
-        toolbar.addSeparator()
-
-        # Botón de análisis de estabilidad
-        boton_estabilidad = QAction("Análisis de Estabilidad", self)
-        boton_estabilidad.triggered.connect(self.mostrar_analisis_estabilidad)
-        toolbar.addAction(boton_estabilidad)
-        toolbar.setStyleSheet("background-color: #444; color: white;")
-
-        # Obtener los botones de la barra de herramientas y aplicarles estilos personalizados
-        simulacion_button = toolbar.widgetForAction(boton_simulacion)
-        if simulacion_button:
-            simulacion_button.setStyleSheet("""
-                QToolButton {
-                    background-color: #666;  
-                    color: white;               /* Color del texto */
-                    font-weight: bold;          /* Texto en negrita */
-                    border: none;               /* Sin borde */
-                    padding: 5px;               /* Espaciado interno */
-                    border-radius: 3px;
-                }
-                QToolButton:hover {
-                    background-color: #4cae4c;  /* Color de fondo cuando se pasa el mouse */
-                }
-            """)
-
-        estabilidad_button = toolbar.widgetForAction(boton_estabilidad)
-        if estabilidad_button:
-            estabilidad_button.setStyleSheet("""
-                QToolButton {
-                    background-color: #666;  
-                    color: white;               /* Color del texto */
-                    font-weight: bold;          /* Texto en negrita */
-                    border: none;               /* Sin borde */
-                    padding: 5px;               /* Espaciado interno */
-                    border-radius: 3px;
-                }
-                QToolButton:hover {
-                    background-color: #c9302c;  /* Color de fondo cuando se pasa el mouse */
-                }
-            """)
-
-        self.statusBar().showMessage('Listo')
-        
-        # # Modificar la conexión del botón "Nuevo proyecto" en la barra de herramientas
-        # new_project_action = QAction("Nuevo proyecto", self)
-        # new_project_action.triggered.connect(self.new_project_from_main)
-        # toolbar.addAction(new_project_action)
-
         self.init_macrobloques() 
-
         self.showMaximized()
     
     def new_project_from_main(self):
         if self.archivo.new_project(from_menu=False):
             self.actualizar_sesion()
+            self.actualizar_sesion()
+    
+            self.actualizar_sesion() 
     
         
     def init_macrobloques(self):

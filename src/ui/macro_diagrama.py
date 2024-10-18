@@ -9,7 +9,7 @@ from .base.elemento_carga import ElementoCarga
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QGraphicsTextItem
+from PyQt5.QtWidgets import QGraphicsTextItem, QGroupBox, QVBoxLayout, QPushButton
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QRectF
@@ -25,6 +25,7 @@ DISTANCIA_HORIZONTAL_EXTRA = 75+37.5
 class MacroDiagrama(QtWidgets.QWidget):
         
     def setupUi(self, mainWindow):
+        self.main_window = mainWindow
         self.scene = QtWidgets.QGraphicsScene()
         self.view = QtWidgets.QGraphicsView(self.scene, mainWindow)
         self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
@@ -32,8 +33,6 @@ class MacroDiagrama(QtWidgets.QWidget):
         layout.addWidget(self.view)
         self.setLayout(layout)
         self.sesion = mainWindow.sesion
-        
-
 
         # ACTUADOR
         x_actuador = X_MEDIO - ANCHO_ELEMENTO/2
@@ -133,6 +132,7 @@ class MacroDiagrama(QtWidgets.QWidget):
 
 
         self.draw_title()
+        self.agregar_botones()
 
         QtCore.QMetaObject.connectSlotsByName(mainWindow)
 
@@ -151,6 +151,49 @@ class MacroDiagrama(QtWidgets.QWidget):
 
         self.scene.addItem(self.title_item)
     
+    def agregar_botones(self):
+        recuadro = QGroupBox()
+        recuadro.setStyleSheet("""
+            QGroupBox {
+                background-color: #A8DADC;
+                border: 3px solid #457B9D;
+                border-radius: 5px;
+            }
+        """)
+
+        layout = QVBoxLayout()
+        estilos_botones = """
+            QPushButton {
+                    background-color: #A8DADC;  
+                    color: #2B2D42;
+                    font-weight: bold;
+                    border: 3px solid #457B9D;
+                    padding: 5px;
+                    border-radius: 3px;
+                }
+                QPushButton:hover {
+                    background-color: #F1FAEE;
+                }
+        """
+        boton_config_sim = QPushButton("Configurar Simulación")
+        boton_config_sim.setStyleSheet(estilos_botones)
+        boton_config_sim.clicked.connect(self.main_window.configurar_simulacion)
+        layout.addWidget(boton_config_sim)
+
+        boton_iniciar_sim = QPushButton("Iniciar Simulación")
+        boton_iniciar_sim.setStyleSheet(estilos_botones)
+        boton_iniciar_sim.clicked.connect(self.main_window.iniciar_simulacion)
+        layout.addWidget(boton_iniciar_sim)
+
+        boton_estabilidad = QPushButton("Análisis de Estabilidad")
+        boton_estabilidad.setStyleSheet(estilos_botones)
+        boton_estabilidad.clicked.connect(self.main_window.mostrar_analisis_estabilidad)
+        layout.addWidget(boton_estabilidad)
+
+        recuadro.setLayout(layout)
+        recuadro.setGeometry(1200, -200, 200, 150)
+        self.scene.addWidget(recuadro)
+
     def update_model_title(self, event):
 
         new_title = self.title_item.toPlainText()  # Obtener el texto actualizado del título
