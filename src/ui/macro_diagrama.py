@@ -31,6 +31,7 @@ ALTO_ELEMENTO = 65
 X_MEDIO = 100
 Y_MEDIO = 50
 DISTANCIA_HORIZONTAL_EXTRA = (75+37.5)
+LETRA_COLOR = QColor("#2B2D42")
 
 class MacroDiagrama(QGraphicsView):
 
@@ -167,10 +168,12 @@ class MacroDiagrama(QGraphicsView):
         self.boton_detener.hide()
 
     def draw_title(self):
+
         self.title_item = QGraphicsTextItem(self.sesion.nombre)
         self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
-        font = QtGui.QFont("Arial", 20)
+        font = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
         self.title_item.setFont(font)
+        self.title_item.setDefaultTextColor(LETRA_COLOR)
         text_rect = self.title_item.boundingRect()
         self.title_item.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL)
         self.title_item.focusOutEvent = self.update_model_title
