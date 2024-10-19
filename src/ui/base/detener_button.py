@@ -1,12 +1,12 @@
 import os
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QWidget
+from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QWidget, QStyle
 from .drawing_area import DrawingArea
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsTextItem
-from PyQt5.QtGui import QBrush, QPen, QColor, QFont,QFontMetrics
+from PyQt5.QtGui import QBrush, QPen, QColor, QFont, QFontMetrics, QPixmap
 from PyQt5.QtCore import Qt, QRectF
-
+import qtawesome as qta
 
 LETRA_COLOR = QColor("#2B2D42")
 TEXTO_BLANCO = QColor("#FFFDF5")
@@ -14,10 +14,8 @@ VERDE = QColor("#55AA55")
 ROJO = QColor("#CC6666")
 AMARILLO = QColor("#FFCC66")
 
-
-
 class BotonDetener(QGraphicsRectItem):
-    def __init__(self, pos,parent):
+    def __init__(self, pos, parent):
         self.parent = parent
         qrect = pos
         super().__init__(qrect)
@@ -30,21 +28,18 @@ class BotonDetener(QGraphicsRectItem):
         self.hover_brush = QBrush(self.fondo_claro)  # Fondo aclarado al pasar el mouse
         self.default_brush = QBrush(self.fondo_simular)
 
-        self.borde_pen = QPen(self.borde_simular, 4)  # Borde azul con grosor de 2px
+        self.borde_pen = QPen(self.borde_simular, 4)  # Borde rojo con grosor de 4px
 
-        self.setBrush(self.default_brush)  # Fondo celeste suave
-        self.setPen(self.borde_pen) # Borde azul con grosor de 2px
+        self.setBrush(self.default_brush)  # Fondo rojo suave
+        self.setPen(self.borde_pen)  # Borde más oscuro
         self.setRect(qrect)  # Establecer el tamaño del rectángulo
 
-        self.text = "DETENER | "
-        self.icon = "\u25A0"  # Icono de stop
-
+        self.text = "DETENER"
         self.font = QFont("Arial", 32, QFont.Bold)  # Estilo del texto
-        self.font_icon = QFont("Arial", 64, QFont.Bold)  # Estilo del texto
-        self.setAcceptHoverEvents(True)  
+        self.setAcceptHoverEvents(True)
 
-
-        
+        # Crear el icono de QtAwesome como pixmap
+        self.icon = qta.icon('fa5s.stop').pixmap(48, 48)  # Tamaño del ícono en 48x48 px
 
     def paint(self, painter, option, widget=None):
         # Dibujar un rectángulo con esquinas redondeadas
@@ -53,18 +48,17 @@ class BotonDetener(QGraphicsRectItem):
         painter.setPen(self.pen())
         painter.drawRoundedRect(self.rect(), 10, 10)
 
-        # Dibujar el texto centrado en el rectángulo
+        # Dibujar el texto centrado en los primeros 3/4 del rectángulo
         painter.setFont(self.font)
         painter.setPen(self.color_texto)  # Color del texto
-        text_rect = painter.boundingRect(self.rect(), Qt.AlignCenter, self.text)
-        painter.drawText(text_rect, Qt.AlignLeft, self.text)
+        margin = 10  # Margen entre el texto y las paredes del rectángulo
+        text_rect = QRectF(self.rect().left() + margin, self.rect().top(), self.rect().width() * 0.75 - margin, self.rect().height())
+        painter.drawText(text_rect, Qt.AlignCenter, self.text)
 
-        # Dibujar el icono a la derecha del texto
-        painter.setFont(self.font_icon)
-        icon_rect = painter.boundingRect(self.rect(), Qt.AlignCenter, self.icon)
-        icon_rect.moveLeft(text_rect.right() + 5)  # Mover el icono a la derecha del texto con un margen de 5px
-        painter.drawText(icon_rect, Qt.AlignLeft, self.icon)
-    
+        # Dibujar el icono en el último 1/4 del rectángulo
+        icon_x = self.rect().left() + self.rect().width() * 0.75  # Inicio del último 1/4
+        icon_y = (self.rect().height() - self.icon.height()) / 2 + self.rect().top()  # Centrando verticalmente
+        painter.drawPixmap(int(icon_x), int(icon_y), self.icon)  # Dibujar el ícono
 
     def hoverEnterEvent(self, event):
         # Cambia el fondo al pasar el mouse sobre el rectángulo

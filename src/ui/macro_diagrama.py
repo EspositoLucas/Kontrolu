@@ -151,12 +151,12 @@ class MacroDiagrama(QGraphicsView):
 
         self.agregar_botones()
 
-        pos_simular = QRectF(self.ANCHO_TOTAL-400, self.ALTO_TOTAL-300, 350, 100)
+        pos_simular = QRectF(self.ANCHO_TOTAL-200, self.ALTO_TOTAL-150, 300, 75)
 
         self.simular_buton = BotonSimular(pos_simular,self)
         self.scene.addItem(self.simular_buton)
 
-        pos_pausar = QRectF(self.ANCHO_TOTAL-400 - 400 , self.ALTO_TOTAL-300, 350, 100)
+        pos_pausar = QRectF(self.ANCHO_TOTAL-200 - 325 , self.ALTO_TOTAL-150, 300, 75)
 
         self.pausar_buton = BotonPausar(pos_pausar,self)
         self.scene.addItem(self.pausar_buton)
