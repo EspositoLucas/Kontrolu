@@ -173,10 +173,18 @@ class MainWindow(QMainWindow):
 
         if dialog.exec_():
 
-            self.sesion.delta_t = float(self.config_simulacion['delta_t'])
-            self.sesion.tiempo_total = float(self.config_simulacion['tiempo_total'])
-            self.sesion.salida_inicial = float(self.config_simulacion['salida_inicial'])
-            self.sesion.velocidad = float(self.config_simulacion['velocidad'])
+            
+            delta_t = float(inputs['delta_t'].text())
+            tiempo_total = float(inputs['tiempo_total'].text())
+            salida_inicial = float(inputs['salida_inicial'].text())
+            velocidad = float(inputs['velocidad'].text())
+
+
+            self.sesion.delta_t = delta_t
+            self.sesion.tiempo_total = tiempo_total
+            self.sesion.salida_inicial = salida_inicial
+            self.sesion.velocidad = velocidad
+
 
     # Modificar el método iniciar_simulacion existente
     def iniciar_simulacion(self):
@@ -195,6 +203,8 @@ class MainWindow(QMainWindow):
             carga=self.sesion.carga,
             graficadora=graficadora
         )
+        print("VELOCIDAD")
+        print(self.sesion.velocidad)
         
         simulacion.ejecutar_simulacion(self.sesion.velocidad)
         self.statusBar().showMessage('Simulación completada')

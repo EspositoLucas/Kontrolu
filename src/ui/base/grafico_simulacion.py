@@ -116,11 +116,6 @@ class Graficadora(QMainWindow):
 
         self.setup_controls()
 
-        # Temporizador para actualizar la tabla
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.actualizar_tabla)
-        self.timer.start(1000)  # Actualizar cada segundo
-
 
     def setup_controls(self):
         export_button = QPushButton("Exportar Datos")

@@ -4,18 +4,21 @@ from back.macros.macro_actuador import MacroActuador
 from back.macros.macro_proceso import MacroProceso
 from back.macros.macro_medidor import MacroMedidor
 from back.topologia.carga import Carga
-from time import sleep
 from globals import ESTA_SIMULANDO
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5 import QtGui
 import os
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QTimer
 
 class Simulacion(QObject):
     
     def __init__(self, controlador :MacroControlador= None, actuador:MacroActuador = None, proceso:MacroProceso =None, medidor:MacroMedidor =None, delta =1, ciclos=10, entrada:MicroBloque=None,salida_cero=10,carga:MicroBloque= None,graficadora =None):
-        
+        super().__init__()
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.simular_paso_timer)
+
+        self.paso_actual = 0
         self.controlador : MacroControlador = controlador
         self.actuador : MacroActuador = actuador
         self.proceso : MacroProceso = proceso
@@ -32,6 +35,9 @@ class Simulacion(QObject):
         if self.graficadora:
             self.graficadora.closeEvent = self.confirmar_cierre  # Reemplaza el evento de cierre
         self.cerrando = False  # Nueva variable para controlar el cierre
+
+        print("Simulando sistema en tiempo real")
+
 
             
     def simular_paso(self, y_actual, ciclo):
@@ -159,42 +165,53 @@ class Simulacion(QObject):
             self.graficadora.close()  # Cerramos la ventana del gráfico
         else:
             event.ignore()
+            
 
-    def simular_sistema_tiempo_real(self, velocidad=5000):
-        y_salida = self.salida_cero
-
-        for i in range(1, self.ciclos+1):
+        
+  
+    def simular_paso_timer(self):
+        print("Simulando paso timer")
+        # Simula un paso de la simulación
+        if self.paso_actual <= self.ciclos:
+            print(f"Simulando paso {self.paso_actual}")
             if not self.continuar_simulacion or (self.graficadora and self.graficadora.is_paused):
+                print("Simulación pausada por el usuario")
                 while self.graficadora and self.graficadora.is_paused: # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
                     self.graficadora.procesar_eventos()   # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
-                    sleep(0.1)
             if not self.continuar_simulacion:
-                break
-            y_salida = self.simular_paso(y_salida, i)
-            sleep(velocidad / 1000)  # Convierte la velocidad a segundos
-            
-        if self.continuar_simulacion and self.graficadora and not self.cerrando:
-            self.graficadora.show()  # Asegura que la gráfica sea visible al final
-        
-        return self.datos
-        
-    def init_animation(self):
-        self.line.set_data([], [])
-        return self.line,
+                print("Simulación detenida por el usuario")
+                self.timer.stop()
+            print("Simulando paso eeee", self.paso_actual)
+            self.y_salida = self.simular_paso(self.y_salida, self.paso_actual)
+            self.paso_actual += 1
+        else:
+            self.timer.stop()  # Detener el temporizador cuando la simulación termine
+            print("Simulación completada:", self.datos)
+            return self.datos  # Retornar los datos al final
+    
+    def simular_sistema_tiempo_real(self,velocidad):
+        print("Simulando sistema en tiempo real")
+        self.paso_actual = 1  # Reiniciar el contador de pasos
+        self.y_salida = self.salida_cero  # Reiniciar el valor de salida
+        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
+        print("Simulando paso 0")
+        self.timer.setInterval(int(velocidad))
+        self.timer.start()  # Iniciar el temporizador con el intervalo (milisegundos)
 
-    def update_animation(self, frame):
-        t, y = frame
-        self.line.set_data(t, y)
-        self.ax.relim()
-        self.ax.autoscale_view()
-        return self.line,
+        #if self.continuar_simulacion and self.graficadora and not self.cerrando:
+        #    self.graficadora.show()  # Asegura que la gráfica sea visible al final
+        print("Simulación iniciada")        
+        return self.datos
+    
+
     
     def ejecutar_simulacion(self, velocidad=5):
         global ESTA_SIMULANDO
         ESTA_SIMULANDO = True
         self.simular_sistema_tiempo_real(velocidad=velocidad)
         ESTA_SIMULANDO = False
-        if self.graficadora and not self.graficadora.isHidden():
-            self.graficadora.close()
-    
+        #if self.graficadora and not self.graficadora.isHidden():
+        #    self.graficadora.close()
 
+    
+        
