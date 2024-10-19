@@ -17,6 +17,7 @@ from .base.simular_button import BotonSimular
 from .base.pausar_button import BotonPausar
 from .base.detener_button import BotonDetener
 from .base.reanudar_button import BotonReanudar
+from .base.boton_circulo import QGraphicCircleItem
 
 #DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL = 75
 #DISTANCIA_ENTRE_ELEMENTOS_VERTICAL = 32.5
@@ -185,6 +186,13 @@ class MacroDiagrama(QGraphicsView):
         self.scene.addItem(self.title_item)
 
     def agregar_botones(self):
+
+        circulo = QGraphicCircleItem(20,350,40,'fa5s.cog',self.main_window.configurar_simulacion,self)
+        self.scene.addItem(circulo)
+        icono_analisis = QGraphicCircleItem(20, 450, 40, 'fa5s.chart-line', self.main_window.mostrar_analisis_estabilidad, self)
+        self.scene.addItem(icono_analisis)
+        return
+
         recuadro = QGroupBox()
         recuadro.setStyleSheet("""
             QGroupBox {
