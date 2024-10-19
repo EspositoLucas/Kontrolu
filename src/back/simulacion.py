@@ -4,7 +4,6 @@ from back.macros.macro_actuador import MacroActuador
 from back.macros.macro_proceso import MacroProceso
 from back.macros.macro_medidor import MacroMedidor
 from back.topologia.carga import Carga
-from globals import ESTA_SIMULANDO
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5 import QtGui
@@ -215,12 +214,7 @@ class Simulacion(QObject):
 
     
     def ejecutar_simulacion(self, velocidad=5):
-        global ESTA_SIMULANDO
-        ESTA_SIMULANDO = True
         self.simular_sistema_tiempo_real(velocidad=velocidad)
-        ESTA_SIMULANDO = False
-        #if self.graficadora and not self.graficadora.isHidden():
-        #    self.graficadora.close()
 
     
     def detener_simulacion(self):
