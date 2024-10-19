@@ -79,4 +79,4 @@ class BotonPausar(QGraphicsRectItem):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             print("esperar")
-            #self.click()
+            self.parent.pausar_button()

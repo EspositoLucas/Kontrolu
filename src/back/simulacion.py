@@ -13,7 +13,7 @@ from PyQt5.QtCore import QTimer
 
 class Simulacion(QObject):
     
-    def __init__(self, controlador :MacroControlador= None, actuador:MacroActuador = None, proceso:MacroProceso =None, medidor:MacroMedidor =None, delta =1, ciclos=10, entrada:MicroBloque=None,salida_cero=10,carga:MicroBloque= None,graficadora =None):
+    def __init__(self, controlador :MacroControlador= None, actuador:MacroActuador = None, proceso:MacroProceso =None, medidor:MacroMedidor =None, delta =1, ciclos=10, entrada:MicroBloque=None,salida_cero=10,carga:MicroBloque= None,graficadora =None,window = None):
         super().__init__()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.simular_paso_timer)
@@ -30,7 +30,9 @@ class Simulacion(QObject):
         self.carga :Carga = carga
         self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
         self.graficadora = graficadora
+        self.graficadora.add_simulacion(self)
         self.continuar_simulacion = True
+        self.window = window
         
         if self.graficadora:
             self.graficadora.closeEvent = self.confirmar_cierre  # Reemplaza el evento de cierre
@@ -111,7 +113,10 @@ class Simulacion(QObject):
         return y_actual
     
     def confirmar_cierre(self, event):
+        self.timer.stop()
+        self.window.no_buttons()
         if self.cerrando:  # Si ya estamos en proceso de cierre, aceptar el evento
+            self.window.deteniendo_buttons()
             event.accept()
             return
 
@@ -160,10 +165,14 @@ class Simulacion(QObject):
         reply = dialog.exec_()
 
         if reply == QMessageBox.Yes:
+            self.window.deteniendo_buttons()
+            self.timer.stop()
             self.continuar_simulacion = False
             self.cerrando = True  # Marcamos que estamos en proceso de cierre
             self.graficadora.close()  # Cerramos la ventana del gráfico
         else:
+            self.window.reanudando_buttons()
+            self.timer.start()
             event.ignore()
             
 
@@ -174,9 +183,9 @@ class Simulacion(QObject):
         # Simula un paso de la simulación
         if self.paso_actual <= self.ciclos:
             print(f"Simulando paso {self.paso_actual}")
-            if not self.continuar_simulacion or (self.graficadora and self.graficadora.is_paused):
+            if not self.continuar_simulacion:
                 print("Simulación pausada por el usuario")
-                while self.graficadora and self.graficadora.is_paused: # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
+                while self.graficadora: # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
                     self.graficadora.procesar_eventos()   # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
             if not self.continuar_simulacion:
                 print("Simulación detenida por el usuario")
@@ -214,4 +223,27 @@ class Simulacion(QObject):
         #    self.graficadora.close()
 
     
-        
+    def detener_simulacion(self):
+        self.graficadora.close()
+        print("Simulación detenida")
+        return self.datos
+    
+    def pausar_simulacion(self):
+        self.timer.stop()
+        self.graficadora.resume_button_change()
+        print("Simulación pausada")
+        return self.datos
+    
+    def reanudar_simulacion(self):
+        self.timer.start()
+        self.graficadora.pause_button_change()
+        print("Simulación reanudada")
+        return self.datos
+    
+    def parar(self):
+        self.timer.stop()
+        self.window.pausando_buttons()
+    
+    def reanudar(self):
+        self.timer.start()
+        self.window.reanudando_buttons()

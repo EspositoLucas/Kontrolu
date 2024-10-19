@@ -16,15 +16,15 @@ AMARILLO = QColor("#FFCC66")
 
 
 
-class BotonDetener(QGraphicsRectItem):
+class BotonReanudar(QGraphicsRectItem):
     def __init__(self, pos,parent):
         self.parent = parent
         qrect = pos
         super().__init__(qrect)
 
-        self.fondo_simular = ROJO
-        self.borde_simular = ROJO.darker(150)
-        self.fondo_claro = ROJO.lighter(150)
+        self.fondo_simular = AMARILLO
+        self.borde_simular = AMARILLO.darker(150)
+        self.fondo_claro = AMARILLO.lighter(150)
         self.color_texto = LETRA_COLOR
 
         self.hover_brush = QBrush(self.fondo_claro)  # Fondo aclarado al pasar el mouse
@@ -36,8 +36,8 @@ class BotonDetener(QGraphicsRectItem):
         self.setPen(self.borde_pen) # Borde azul con grosor de 2px
         self.setRect(qrect)  # Establecer el tamaño del rectángulo
 
-        self.text = "DETENER | "
-        self.icon = "\u25A0"  # Icono de stop
+        self.text = "REANUDAR | "
+        self.icon = "\u25B6"  # Unicode character for play icon
 
         self.font = QFont("Arial", 32, QFont.Bold)  # Estilo del texto
         self.font_icon = QFont("Arial", 64, QFont.Bold)  # Estilo del texto
@@ -78,4 +78,4 @@ class BotonDetener(QGraphicsRectItem):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.parent.detener_button()
+            self.parent.reanudar_button()

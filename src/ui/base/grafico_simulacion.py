@@ -116,7 +116,9 @@ class Graficadora(QMainWindow):
 
         self.setup_controls()
 
-
+    def add_simulacion(self, simulacion):
+        self.simulacion = simulacion
+    
     def setup_controls(self):
         export_button = QPushButton("Exportar Datos")
         export_button.clicked.connect(self.export_manager.export_data)
@@ -129,17 +131,21 @@ class Graficadora(QMainWindow):
         self.pause_button = QPushButton("Pausar Simulacion")
         self.pause_button.clicked.connect(self.toggle_pause)
         self.controls_layout.addWidget(self.pause_button)
-
-        self.is_paused = False
     
     def toggle_pause(self):
-        self.is_paused = not self.is_paused
-        self.pause_button.setText("Reanudar" if self.is_paused else "Pausar")
-        if self.is_paused:
-            self.timer.stop()
+        if self.pause_button.text() == "Pausar Simulacion":
+            self.pause_button.setText("Reanudar Simulacion")
+            self.simulacion.parar()
         else:
-            self.timer.start(1000)
-        self.actualizar_tabla()  # Actualizar la tabla inmediatamente al pausar/reanudar
+            self.pause_button.setText("Pausar Simulacion")
+            self.simulacion.reanudar()
+
+
+    def pause_button_change(self):
+        self.pause_button.setText("Pausar Simulacion")
+    
+    def resume_button_change(self):
+        self.pause_button.setText("Reanudar Simulacion")
 
 
     def mostrar_interpretacion(self):
@@ -173,11 +179,11 @@ class Graficadora(QMainWindow):
             valor_numerico = self.convertir_a_numerico(valor)
             self.datos[clave].append(valor_numerico)
 
-        if not self.is_paused:
-            self.actualizar_grafico()
-            self.actualizar_estado_carga(nuevos_datos.get('carga', None))
-            self.actualizar_tabla()
-    
+        
+        self.actualizar_grafico()
+        self.actualizar_estado_carga(nuevos_datos.get('carga', None))
+        self.actualizar_tabla()
+
     def actualizar_estado_carga(self, estado):
         if estado is not None:
             nombre_estado = estado.get('nombre', 'Desconocido').lower()

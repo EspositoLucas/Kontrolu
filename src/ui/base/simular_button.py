@@ -80,35 +80,3 @@ class BotonSimular(QGraphicsRectItem):
         if event.button() == Qt.LeftButton:
             print("Simular")
             self.parent.simular_button()
-
-    def updateText(self):
-        # Actualizar el texto del rectángulo
-        self.text = self.modelo.nombre
-        self.update()  # Actualizar el rectángulo para redibujar
-
-    def update_nombre(self):
-        self.updateText()
-"""
-    def click(self):
-        self.ventana = QMainWindow()
-        self.ventana.setWindowTitle(self.modelo.nombre)
-        
-        screen = QtGui.QGuiApplication.primaryScreen().geometry()
-        self.ventana.setGeometry(screen)
-        self.ventana.showMaximized()
-        
-        self.drawing_area = DrawingArea(self, self.ventana)
-        self.ventana.setCentralWidget(self.drawing_area)
-        
-        self.init_tool_bar()
-        self.ventana.show()
-        self.ventana.setStyleSheet("background-color: #F1FAEE;")  # Color azul claro
-        # Ruta de la imagen del logo
-        path =  os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'imgs', 'logo.png')
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.ventana.setWindowIcon(icon)
-        
-        QTimer.singleShot(100, self.drawing_area.load_microbloques)
-"""

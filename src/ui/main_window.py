@@ -188,10 +188,10 @@ class MainWindow(QMainWindow):
 
     # Modificar el método iniciar_simulacion existente
     def iniciar_simulacion(self):
-        graficadora = Graficadora()
-        graficadora.show()
+        self.graficadora = Graficadora()
+        self.graficadora.show()
         
-        simulacion = Simulacion(
+        self.simulacion = Simulacion(
             controlador=self.sesion.controlador, 
             actuador=self.sesion.actuador,
             proceso=self.sesion.proceso,
@@ -201,13 +201,23 @@ class MainWindow(QMainWindow):
             entrada=self.sesion.entrada,
             salida_cero=self.sesion.salida_inicial,
             carga=self.sesion.carga,
-            graficadora=graficadora
+            graficadora=self.graficadora,
+            window= self.diagrama
         )
         print("VELOCIDAD")
         print(self.sesion.velocidad)
         
-        simulacion.ejecutar_simulacion(self.sesion.velocidad)
+        self.simulacion.ejecutar_simulacion(self.sesion.velocidad)
         self.statusBar().showMessage('Simulación completada')
+    
+    def detener_simulacion(self):
+        self.simulacion.detener_simulacion()
+
+    def pausar_simulacion(self):
+        self.simulacion.pausar_simulacion()
+
+    def reanudar_simulacion(self):
+        self.simulacion.reanudar_simulacion()
             
     def toggle_input_method(self, index):
         if self.entrada_combo.currentText() == "Personalizada":
