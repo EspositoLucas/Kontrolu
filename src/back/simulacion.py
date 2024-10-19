@@ -29,9 +29,9 @@ class Simulacion(QObject):
         self.graficadora = graficadora
         self.continuar_simulacion = True
         
-        if self.graficadora:
-            self.graficadora.closeEvent = self.confirmar_cierre  # Reemplaza el evento de cierre
-        self.cerrando = False  # Nueva variable para controlar el cierre
+        #if self.graficadora:
+        #    self.graficadora.closeEvent = self.confirmar_cierre  # Reemplaza el evento de cierre
+        #self.cerrando = False  # Nueva variable para controlar el cierre
 
             
     def simular_paso(self, y_actual, ciclo):
@@ -85,9 +85,11 @@ class Simulacion(QObject):
             'carga': estado_carga  # Añadimos el estado de la carga
         }
 
-        if self.graficadora:
-            self.graficadora.agregar_datos(datos_paso)
-            self.graficadora.procesar_eventos()
+        self.graficadora.update_plot(tiempo,y_actual)
+
+        #if self.graficadora:
+        #    self.graficadora.agregar_datos(datos_paso)
+        #    self.graficadora.procesar_eventos()
             
         # Añadir impresión detallada de los valores
         print(f"\nCiclo {ciclo}:")
@@ -164,6 +166,21 @@ class Simulacion(QObject):
         y_salida = self.salida_cero
 
         for i in range(1, self.ciclos+1):
+            y_salida = self.simular_paso(y_salida, i)
+            sleep(velocidad / 1000)  # Convierte la velocidad a segundos
+
+        
+        return self.datos
+
+
+
+
+
+
+
+
+
+        for i in range(1, self.ciclos+1):
             if not self.continuar_simulacion or (self.graficadora and self.graficadora.is_paused):
                 while self.graficadora and self.graficadora.is_paused: # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
                     self.graficadora.procesar_eventos()   # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
@@ -194,7 +211,7 @@ class Simulacion(QObject):
         ESTA_SIMULANDO = True
         self.simular_sistema_tiempo_real(velocidad=velocidad)
         ESTA_SIMULANDO = False
-        if self.graficadora and not self.graficadora.isHidden():
-            self.graficadora.close()
+        #if self.graficadora and not self.graficadora.isHidden():
+        #    self.graficadora.close()
     
 

@@ -1,8 +1,6 @@
 import os
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QWidget
-from .drawing_area import DrawingArea
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsTextItem
 from PyQt5.QtGui import QBrush, QPen, QColor, QFont,QFontMetrics
 from PyQt5.QtCore import Qt, QRectF

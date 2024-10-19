@@ -18,6 +18,7 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication,QMessageBox
 import sympy as sp
 import sys
+from .base.graficadora_pyqtgraph import RealTimePlot
 class MainWindow(QMainWindow):
     
     def __init__(self, sesion):
@@ -180,9 +181,12 @@ class MainWindow(QMainWindow):
 
     # Modificar el método iniciar_simulacion existente
     def iniciar_simulacion(self):
-        graficadora = Graficadora()
-        graficadora.show()
+        #graficadora = Graficadora()
+        #graficadora.show()
         
+        self.graficadora = RealTimePlot()
+        self.graficadora.show()
+
         simulacion = Simulacion(
             controlador=self.sesion.controlador, 
             actuador=self.sesion.actuador,
@@ -193,7 +197,7 @@ class MainWindow(QMainWindow):
             entrada=self.sesion.entrada,
             salida_cero=self.sesion.salida_inicial,
             carga=self.sesion.carga,
-            graficadora=graficadora
+            graficadora=self.graficadora
         )
         
         simulacion.ejecutar_simulacion(self.sesion.velocidad)
