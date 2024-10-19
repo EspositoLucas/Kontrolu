@@ -31,7 +31,7 @@ class ElementoEntrada(MacroVista):
             self.tipo_entrada = dialog.tipo_entrada
             self.coeficiente = dialog.coeficiente
             self.updateText()
-            
+                
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, entrada=None, tipo_entrada="Personalizada",coeficiente="1"):
         super().__init__()

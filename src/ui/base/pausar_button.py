@@ -81,3 +81,7 @@ class BotonPausar(QGraphicsRectItem):
         if event.button() == Qt.LeftButton:
             print("esperar")
             self.parent.pausar_button()
+    
+    def hoverMoveEvent(self, event):
+        # Cambia el cursor a una mano al pasar el mouse sobre el rectángulo
+        self.setCursor(Qt.PointingHandCursor)

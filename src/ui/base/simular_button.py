@@ -74,3 +74,7 @@ class BotonSimular(QGraphicsRectItem):
         if event.button() == Qt.LeftButton:
             print("Simular")
             self.parent.simular_button()
+            
+    def hoverMoveEvent(self, event):
+        # Cambia el cursor a una mano al pasar el mouse sobre el rectángulo
+        self.setCursor(Qt.PointingHandCursor)

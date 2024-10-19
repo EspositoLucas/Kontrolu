@@ -34,24 +34,27 @@ X_MEDIO = 100
 Y_MEDIO = 50
 DISTANCIA_HORIZONTAL_EXTRA = (75+37.5)
 LETRA_COLOR = QColor("#2B2D42")
+COLOR_FONDO = QColor("#F1FAEE")
 
 class MacroDiagrama(QGraphicsView):
 
     def __init__(self, mainWindow):
         super().__init__()
+        
         self.main_window = mainWindow
 
         self.sesion = mainWindow.sesion
         self.setup_scene()
 
     def setup_scene(self):
+        self.setBackgroundBrush(COLOR_FONDO)
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
 
         # Establecer los límites de la escena
         self.scene.setSceneRect(0, 0, 1600, 1000)
 
-        self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
+        #self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
         # Calcular el medio de la QGraphicsScene
         scene_rect = self.sceneRect()
         self.ANCHO_TOTAL = scene_rect.width()

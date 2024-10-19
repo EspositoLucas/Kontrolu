@@ -49,3 +49,7 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
         print("Circle clicked!")
         self.metodo()
         super().mousePressEvent(event)
+    
+    def hoverMoveEvent(self, event):
+        # Cambia el cursor a una mano al pasar el mouse sobre el rectángulo
+        self.setCursor(Qt.PointingHandCursor)

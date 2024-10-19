@@ -192,3 +192,7 @@ class Microbloque(QGraphicsItem):
         self.color = self.default_brush
         self.update()
         super().hoverLeaveEvent(event)
+    
+    def hoverMoveEvent(self, event):
+        # Cambia el cursor a una mano al pasar el mouse sobre el rectángulo
+        self.setCursor(Qt.PointingHandCursor)

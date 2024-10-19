@@ -73,3 +73,7 @@ class BotonReanudar(QGraphicsRectItem):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.parent.reanudar_button()
+
+    def hoverMoveEvent(self, event):
+        # Cambia el cursor a una mano al pasar el mouse sobre el rectángulo
+        self.setCursor(Qt.PointingHandCursor)

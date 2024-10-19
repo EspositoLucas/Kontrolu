@@ -39,7 +39,9 @@ class PerturbacionVisual(QGraphicsItemGroup):
         x_medio = RADIO_PERTURBACION * cos(angle)
         y_medio = RADIO_PERTURBACION * sin(angle)
 
-        self.punto_suma = PuntoSuma(self, x_medio=x_medio,y_medio=y_medio,RADIO_PERTURBACION=RADIO_PERTURBACION,izq=2,arriba=2,color_fondo=ROJO)
+        self.color = ROJO
+
+        self.punto_suma = PuntoSuma(self, x_medio=x_medio,y_medio=y_medio,RADIO_PERTURBACION=RADIO_PERTURBACION,izq=2,arriba=2,color_fondo=self.color)
 
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setFlag(QGraphicsItem.ItemIsFocusable)
@@ -63,14 +65,13 @@ class PerturbacionVisual(QGraphicsItemGroup):
 
 
 
-
         self.addToGroup(self.flecha)
         self.addToGroup(self.linea_flecha)
         self.addToGroup(self.punto_suma)
 
     def actualizar(self, estado):
-        color = VERDE if estado else ROJO
-        self.punto_suma.actualizar_color(QBrush(color))
+        self.color = VERDE if estado else ROJO
+        self.punto_suma.actualizar_color(QBrush(self.color))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Delete:
@@ -165,4 +166,12 @@ class PerturbacionVisual(QGraphicsItemGroup):
             self.scene().removeItem(self)
             self.drawing_area.load_microbloques()
             
-             
+    def hoverEnterEvent(self, event):
+        print("hoverEnterEvent")
+        self.punto_suma.actualizar_color(QBrush(self.color.lighter(150)))
+        super().hoverEnterEvent(event)
+
+    def hoverLeaveEvent(self, event):
+        print("hoverLeaveEvent")
+        self.punto_suma.actualizar_color(QBrush(self.color))
+        super().hoverLeaveEvent(event)

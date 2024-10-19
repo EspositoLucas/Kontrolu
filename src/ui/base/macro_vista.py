@@ -52,10 +52,6 @@ class MacroVista(QGraphicsRectItem):
         self.setBrush(self.default_brush)
         self.update()
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.click()
-
     def updateText(self):
         # Actualizar el texto del rectángulo
         self.text = self.modelo.nombre
@@ -172,4 +168,11 @@ class MacroVista(QGraphicsRectItem):
 
     def configure_microbloque(self):
         self.drawing_area.create_new_microbloque()
-        
+    
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.click()
+
+    def hoverMoveEvent(self, event):
+        # Cambia el cursor a una mano al pasar el mouse sobre el rectángulo
+        self.setCursor(Qt.PointingHandCursor)
