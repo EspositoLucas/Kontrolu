@@ -120,24 +120,35 @@ class MicroBloque(Hoja):
         
     def simular(self, tiempo, entrada=None):
 
+        print(f"Simulando microbloque: {self.nombre}")
+        print(f"Tiempo: {tiempo}")
+        print(f"Entrada: {entrada}")
+        print(f"Función de transferencia: {self.funcion_transferencia}")
+
         s,t = symbols('s t')
 
         tf_sympy = latex2sympy(self.funcion_transferencia)
 
         operacion_laplace = tf_sympy
 
-        if entrada:
+        if entrada!=None:
 
 
             entrada_con_error = self.configuracion_entrada.actualizar(entrada,tiempo)
+            print(f"Entrada con error: {entrada_con_error}")
 
             entrada_micro_bloque = laplace_transform(entrada_con_error,t,s)[0]
+            print(f"Entrada en laplace: {entrada_micro_bloque}")
             operacion_laplace = entrada_micro_bloque * tf_sympy
+            print(f"Operación en laplace: {operacion_laplace}")
         
         operacion_tiempo = inverse_laplace_transform(operacion_laplace,s,t)
+        print(f"Operación en tiempo: {operacion_tiempo}")
         salida_micro_bloque = operacion_tiempo.subs(t,tiempo)
+        print(f"Salida: {salida_micro_bloque}")
 
         salida_con_error = self.configuracion_salida.actualizar(salida_micro_bloque,tiempo)
+        print(f"Salida con error: {salida_con_error}")
 
 
         return salida_con_error
