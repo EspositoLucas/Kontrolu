@@ -41,7 +41,7 @@ estados = [
 ]
 
 class Carga:
-    def __init__(self,funcion_de_transferencia="1",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None,from_json= None):
+    def __init__(self,funcion_de_transferencia="",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None,from_json= None):
         if from_json:
             self.from_json(from_json)
             return
@@ -121,11 +121,15 @@ class Carga:
         return self.normalizar(self.total - self.errores,0,self.total)
 
     def salida_esperada(self,tiempo):
+
+
         
         funcion = self.funcion_de_transferencia
+        print(f"Funcion de transferencia: {funcion}")
         
         if ((not funcion) or (funcion == " ")):
             funcion = self.entrada.funcion_transferencia
+            print(f"Funcion de transferencia: {funcion}")
 
         s,t = symbols('s t')
         funcion_transferencia = latex2sympy(funcion)
@@ -135,6 +139,9 @@ class Carga:
     def simular(self,tiempo,salida_real):
 
         valor_esperado = self.salida_esperada(tiempo)
+
+        print(f"Valor esperado: {valor_esperado}")
+        print(f"Salida real: {salida_real}")
 
 
         if self.tipo_carga == TipoCarga.INTEGRAL:

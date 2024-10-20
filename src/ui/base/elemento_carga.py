@@ -7,6 +7,7 @@ from ..base.vista_json import VistaJson
 from ..base.macro_vista import MacroVista
 import os
 from PyQt5.QtCore import QRectF
+import re
 
 
 class ElementoCarga(MacroVista):
@@ -14,7 +15,6 @@ class ElementoCarga(MacroVista):
 
         MacroVista.__init__(self, carga, pos)
         self.carga = carga
-        self.tipo_entrada = "Misma que entrada"  # Añadimos este atributo
         self.coeficiente = "1"  # Añadimos este atributo
         self.estado_seleccionado = self.carga.estados[0]["nombre"]  # Inicializamos con el primer estado
         
@@ -25,7 +25,7 @@ class ElementoCarga(MacroVista):
             self.mostrar_configuracion_carga()
 
     def mostrar_configuracion_carga(self):
-        dialog = ConfiguracionCargaDialog(self, self.carga, self.tipo_entrada, self.estado_seleccionado)
+        dialog = ConfiguracionCargaDialog(self, self.carga, self.estado_seleccionado)
         if dialog.exec_():
             self.carga = dialog.carga
             self.tipo_entrada = dialog.tipo_entrada
@@ -33,15 +33,31 @@ class ElementoCarga(MacroVista):
             self.updateText()
 
 class ConfiguracionCargaDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None, carga=None, tipo_entrada="Personalizada", estado_seleccionado=None, coeficiente="1"):
+    def __init__(self, parent=None, carga=None, estado_seleccionado=None):
         super().__init__()
         self.padre = parent
         self.setWindowTitle("Configuración de Carga")
-        self.carga = carga if carga else Carga()
-        self.tipo_entrada = tipo_entrada
+        self.carga = carga
+        self.tipo_entrada, self.coeficiente = self.determinar_tipo_funcion(carga.funcion_de_transferencia)
         self.estado_seleccionado = estado_seleccionado
-        self.coeficiente = coeficiente
         self.initUI()
+    
+    def determinar_tipo_funcion(self, latex_funcion):
+        if not latex_funcion or latex_funcion == "" or latex_funcion == " ":
+            return "Misma que entrada", "1"
+        
+        match = re.match(r"\\frac\{(.+?)\}\{s(?:\^(\d+))?\}", latex_funcion)
+        if match:
+            coeficiente = match.group(1)
+            exponente = match.group(2)
+            if exponente == "1" or exponente is None:
+                return "Escalón", coeficiente
+            elif exponente == "2":
+                return "Rampa", coeficiente
+            elif exponente == "3":
+                return "Parábola", coeficiente
+        
+        return "Personalizada", "1"
 
     def initUI(self):
         
@@ -238,24 +254,22 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
     
     def actualizar_interfaz(self):
         tipo_entrada = self.tipo_entrada_combo.currentText()
+
         es_personalizada = tipo_entrada == "Personalizada"
 
         es_entrada = tipo_entrada == "Misma que entrada"
-        
+
         self.latex_editor.setEnabled(es_personalizada)
-        self.coeficiente_input.setEnabled((not es_personalizada) or (not es_entrada))
+
+        self.coeficiente_input.setVisible((not es_personalizada) and (not es_entrada))
         
-        if not es_personalizada:
-            self.actualizar_funcion_transferencia()
-        else:
-            self.latex_editor.set_latex(self.carga.funcion_de_transferencia)
+
+        self.actualizar_funcion_transferencia()
+
 
     def actualizar_funcion_transferencia(self):
         tipo_entrada = self.tipo_entrada_combo.currentText()
         coeficiente = self.coeficiente_input.text()
-        
-        if not coeficiente:
-            coeficiente = "1"
         
         if tipo_entrada == "Escalón":
             latex = f"\\frac{{{coeficiente}}}{{s}}"
@@ -266,10 +280,9 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         elif tipo_entrada == "Misma que entrada":
             latex = f"{self.carga.entrada.funcion_transferencia}"
         else:
-            return  # No actualizamos para entrada personalizada
+            latex = self.carga.funcion_de_transferencia
         
         self.latex_editor.set_latex(latex)
-        self.latex_editor.setEnabled(tipo_entrada == "Personalizada")
 
     def actualizar_info_estado(self):
         estado_actual = self.carga.estados[self.estado_combo.currentIndex()]
@@ -277,6 +290,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.info_estado_label.setText(info)
 
     def accept(self):
+        self.tipo_entrada = self.tipo_entrada_combo.currentText()
         
         if not self.latex_editor.es_funcion_valida(self.latex_editor.get_latex()):
             QMessageBox.warning(self, "Función de transferencia inválida", 
@@ -290,15 +304,9 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.carga.escalamiento_sigmoide = float(self.escalamiento_sigmoide_input.text())
         self.carga.desplazamiento_sigmoide = float(self.desplazamiento_sigmoide_input.text())
 
-        if self.tipo_entrada == "Personalizada":
-                self.carga.funcion_de_transferencia = self.latex_editor.get_latex()
-                self.coeficiente = "1"
-        elif self.tipo_entrada == "Misma que entrada":
-                self.coeficiente = "1"
+        if self.tipo_entrada == "Misma que entrada":
                 self.carga.funcion_de_transferencia = ""
-        else:
-                self.coeficiente = self.coeficiente_input.text() or "1"
-                self.carga.funcion_de_transferencia = self.latex_editor.get_latex()
+
             
         # Guardamos el estado seleccionado
         current_item = self.estados_list.currentItem()
