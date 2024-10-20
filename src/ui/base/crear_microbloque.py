@@ -341,8 +341,6 @@ class CrearMicroBloque(QDialog):
         r, g, b, _ = self.new_microbloque.color.getRgb()
         rgb_tuple = getColor((r, g, b))
         rgb_int_tuple = tuple(int(x) for x in rgb_tuple)
-        print("COLOR SELECCIONADO")
-        print(rgb_int_tuple)
         color = QColor(*rgb_int_tuple)
 
         if color.isValid():
@@ -466,7 +464,6 @@ class CrearMicroBloque(QDialog):
         self.new_microbloque.configuracion_entrada.unidad = unidad_entrada
         self.new_microbloque.configuracion_salida.unidad = unidad_salida   
         
-        print("Microbloque creado")
         self.accept()
         
     def create_config_tab(self):

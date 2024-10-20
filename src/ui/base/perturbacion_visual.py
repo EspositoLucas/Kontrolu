@@ -167,11 +167,9 @@ class PerturbacionVisual(QGraphicsItemGroup):
             self.drawing_area.load_microbloques()
             
     def hoverEnterEvent(self, event):
-        print("hoverEnterEvent")
         self.punto_suma.actualizar_color(QBrush(self.color.lighter(150)))
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        print("hoverLeaveEvent")
         self.punto_suma.actualizar_color(QBrush(self.color))
         super().hoverLeaveEvent(event)

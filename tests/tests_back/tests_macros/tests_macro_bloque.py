@@ -18,7 +18,6 @@ class TestMacroBloque(unittest.TestCase):
         micro = MicroBloque("microSerie1")
         macro = MacroBloque()
         macro.topologia.agregar_elemento(micro)
-        #print(str(macro))
 
     def test_agregar_serie_despues_y_antes(self):
         micro0 = MicroBloque("microSerie0")
@@ -42,7 +41,6 @@ class TestMacroBloque(unittest.TestCase):
         micro1.agregar_arriba(micro0)
 
 
-        #print(str(macro))
 
     def test_crear_paralelo_de_una_serie(self):
         micro0 = MicroBloque("microParalelo0")
@@ -52,7 +50,6 @@ class TestMacroBloque(unittest.TestCase):
         macro.topologia.agregar_elemento(micro1,5)
         micro1.agregar_arriba(micro0)
         micro1.padre.agregar_serie_abajo(micro2)
-        #print(str(macro))
 
     
     def test_eliminar_base(self):
@@ -61,7 +58,6 @@ class TestMacroBloque(unittest.TestCase):
         macro.topologia.agregar_elemento(micro0)
         micro0.borrar_elemento()
 
-        #print(str(macro))
     
     def test_eliminar_de_paralela_normal(self):
         micro0 = MicroBloque("microSerie0")
@@ -74,7 +70,6 @@ class TestMacroBloque(unittest.TestCase):
 
         micro1.borrar_elemento()
 
-        #print(str(macro))
 
     def test_eliminar_de_paralela_borra_serie_no_paralela(self):
         micro0 = MicroBloque("microSerie0")
@@ -87,7 +82,6 @@ class TestMacroBloque(unittest.TestCase):
 
         micro1.borrar_elemento()
 
-        #print(str(macro))
 
     def test_eliminar_de_paralela_borra_serie_y_paralela(self):
         micro0 = MicroBloque("microSerie0")
@@ -101,7 +95,6 @@ class TestMacroBloque(unittest.TestCase):
         micro1.borrar_elemento()
         
 
-        #print(str(macro))
 
     def test_agregar_antes_de_paralela_microbloque(self):
         micro0 = MicroBloque("microSerie0")
@@ -115,7 +108,6 @@ class TestMacroBloque(unittest.TestCase):
         micro0.agregar_en_serie_fuera_de_paralela_antes(micro3)
         micro0.agregar_en_serie_fuera_de_paralela_despues(micro4)
 
-        #print(str(macro))
 
     
 
@@ -126,7 +118,6 @@ class TestMacroBloque(unittest.TestCase):
         macro.topologia.agregar_elemento(micro0)
         macro.topologia.agregar_serie_abajo(micro1)
 
-        print(str(macro))
 
 
 if __name__ == '__main__':

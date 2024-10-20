@@ -46,7 +46,6 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
         super().hoverLeaveEvent(event)
 
     def mousePressEvent(self, event):
-        print("Circle clicked!")
         self.metodo()
         super().mousePressEvent(event)
     

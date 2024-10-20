@@ -56,7 +56,6 @@ class Perturbacion(Hoja):
     
 
     def set_funcion_transferencia(self, funcion):
-        print("Nueva funcion de transferencia: ", funcion)
         self.funcion_transferencia = funcion
 
     def get_estado(self,tiempo):

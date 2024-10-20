@@ -205,8 +205,6 @@ class MainWindow(QMainWindow):
             graficadora=self.graficadora,
             window= self.diagrama
         )
-        print("VELOCIDAD")
-        print(self.sesion.velocidad)
         
         self.simulacion.ejecutar_simulacion(self.sesion.velocidad)
         self.statusBar().showMessage('Simulación completada')

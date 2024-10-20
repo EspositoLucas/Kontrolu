@@ -162,7 +162,6 @@ class TopologiaSerie(InterfazTopologia):
                 self.hijos.append(MicroBloque(from_json=hijo,padre=self))
             elif hijo['tipo'] == 'perturbacion':
                 self.hijos.append(Perturbacion(from_json=hijo,padre=self))
-        print("Se ha creado una topología en serie")
         return self
 
 
@@ -286,7 +285,6 @@ class TopologiaParalelo(InterfazTopologia):
         self.hijos = []
         for hijo in json['hijos']:
             self.hijos.append(TopologiaSerie(from_json=hijo,padre=self))
-        print("Se ha creado una topología en paralelo")
         return self
     
     @staticmethod

@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QFileDialog
 class VistaJson(QDialog):
 
     def __init__(self, microbloque, parent):
-        print("VistaJson")
         super().__init__(parent)
         self.microbloque = microbloque
         self.setWindowTitle("Json")
@@ -29,7 +28,6 @@ class VistaJson(QDialog):
         self.boton_guardar.clicked.connect(self.aplicar)
         self.layout.addWidget(self.boton_guardar)
         self.show()
-        print("VistaJson")
         self.boton_cargar = QPushButton("Cargar JSON")
         self.boton_cargar.clicked.connect(self.cargar_json)
         self.layout.addWidget(self.boton_cargar)
@@ -56,18 +54,14 @@ class VistaJson(QDialog):
                 file.write(json_text)
 
     def copiar(self):
-        print("copiar")
         clipboard = QApplication.clipboard()
         clipboard.setText(self.text_edit.toPlainText())
-        print("copiar")
 
     def aplicar(self):
-        print("aplicar")
         json_text = self.text_edit.toPlainText()
         try:
             json_format = json.loads(json_text)
         except json.JSONDecodeError as e:
-            print(f"Error parsing JSON: {e}")
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
             msg.setText("La estructura del JSON es incorrecta")
@@ -78,7 +72,6 @@ class VistaJson(QDialog):
         try:
             self.microbloque.validar_dict(json_format)
         except Exception as e:
-            print(f"Error loading JSON: {e}")
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
             msg.setText("Error al cargar el JSON")
@@ -88,7 +81,6 @@ class VistaJson(QDialog):
             return
         self.microbloque.from_json(json_format)
         self.accept()
-        print("aplicar")
 
     def highlight_json(self):
         json_text = self.text_edit.toPlainText()

@@ -72,7 +72,6 @@ class BotonSimular(QGraphicsRectItem):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            print("Simular")
             self.parent.simular_button()
             
     def hoverMoveEvent(self, event):

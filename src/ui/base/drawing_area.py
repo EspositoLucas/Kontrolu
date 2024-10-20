@@ -100,9 +100,7 @@ class DrawingArea(QGraphicsView):
         self.limpiar_seleccion() # si habia seleccionados, los limpia
         self.dibujar_topologia(self.macrobloque.modelo.topologia, QPointF(ANCHO, (self.height() / 2) - (ALTO / 2))) #le agregue el 40 para que quede centrado
         self.dibujar_lo_demas()
-        # self.print_topologia(self.macrobloque.modelo.topologia)
         self.update_scene_rect(self.scene.itemsBoundingRect()) # actualiza el rectangulo de la escena en funcion de lo dibujado
-        #self.actualizar_colores_unidades()
         self.update()
         self.draw_title()
 
@@ -1058,11 +1056,9 @@ class DrawingArea(QGraphicsView):
         """
         space = ' ' * (indent * 2)
         if isinstance(topologia, TopologiaSerie):
-            print(f"{space}Serie:")
             for hijo in topologia.hijos:
                 self.print_topologia(hijo, indent + 1)
         elif isinstance(topologia, TopologiaParalelo):
-            print(f"{space}Paralelo:")
             for hijo in topologia.hijos:
                 self.print_topologia(hijo, indent + 1)
         elif isinstance(topologia, MicroBloque):

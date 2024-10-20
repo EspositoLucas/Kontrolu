@@ -182,13 +182,11 @@ class Microbloque(QGraphicsItem):
 
     
     def hoverEnterEvent(self, event):
-        print("hoverEnterEvent")
         self.color = self.hover_color
         self.update()
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        print("hoverLeaveEvent")
         self.color = self.default_brush
         self.update()
         super().hoverLeaveEvent(event)

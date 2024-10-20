@@ -37,7 +37,6 @@ class Simulacion(QObject):
             self.graficadora.closeEvent = self.confirmar_cierre  # Reemplaza el evento de cierre
         self.cerrando = False  # Nueva variable para controlar el cierre
 
-        print("Simulando sistema en tiempo real")
 
 
             
@@ -46,38 +45,30 @@ class Simulacion(QObject):
         tiempo = ciclo * self.delta
 
         y_medidor = self.medidor.simular(tiempo, y_actual)
-        print(f"Paso {ciclo}: Salida del medidor: {y_medidor}")
         self.datos['medidor'].append(y_medidor)
 
         y_entrada =  self.entrada.simular(tiempo)
-        print(f"Mi entrada es {self.entrada}")
-        print(f"Paso {ciclo}: Salida de la entrada: {y_entrada}")
         self.datos['entrada'].append(y_entrada)
 
         # Calcula el error actual
         error = y_entrada - y_medidor        
-        print(f"Paso {ciclo}: Error obtenido: {error}")
         self.datos['error'].append(error)
         
         # Simula cada componente del sistema en secuencia
         # Cada componente recibe el mismo vector de tiempo
         y_controlador = self.controlador.simular(tiempo, error)
-        print(f"Paso {ciclo}: Salida del controlador: {y_controlador}")
         self.datos['controlador'].append(y_controlador)
         
         y_actuador = self.actuador.simular(tiempo, y_controlador)
-        print(f"Paso {ciclo}: Salida del actuador: {y_actuador}")
         self.datos['actuador'].append(y_actuador)
 
         y_proceso = self.proceso.simular(tiempo, y_actuador)
-        print(f"Paso {ciclo}: Salida del proceso (SALIDA DEL SISTEMA): {y_proceso}")
         self.datos['proceso'].append(y_proceso)
 
         y_actual += y_proceso
         self.datos['salida'].append(y_actual)
 
         estado_carga = self.carga.simular(tiempo, y_actual)
-        print(f"Paso {ciclo}: Estado de la carga: {estado_carga}")
         self.datos['carga'].append(estado_carga)
 
         datos_paso = {
@@ -178,18 +169,13 @@ class Simulacion(QObject):
         
   
     def simular_paso_timer(self):
-        print("Simulando paso timer")
         # Simula un paso de la simulación
         if self.paso_actual <= self.ciclos:
-            print(f"Simulando paso {self.paso_actual}")
             if not self.continuar_simulacion:
-                print("Simulación pausada por el usuario")
                 while self.graficadora: # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
                     self.graficadora.procesar_eventos()   # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
             if not self.continuar_simulacion:
-                print("Simulación detenida por el usuario")
                 self.timer.stop()
-            print("Simulando paso eeee", self.paso_actual)
             self.y_salida = self.simular_paso(self.y_salida, self.paso_actual)
             self.paso_actual += 1
         else:
@@ -198,17 +184,14 @@ class Simulacion(QObject):
             return self.datos  # Retornar los datos al final
     
     def simular_sistema_tiempo_real(self,velocidad):
-        print("Simulando sistema en tiempo real")
         self.paso_actual = 1  # Reiniciar el contador de pasos
         self.y_salida = self.salida_cero  # Reiniciar el valor de salida
         self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
-        print("Simulando paso 0")
         self.timer.setInterval(int(velocidad))
         self.timer.start()  # Iniciar el temporizador con el intervalo (milisegundos)
 
         #if self.continuar_simulacion and self.graficadora and not self.cerrando:
         #    self.graficadora.show()  # Asegura que la gráfica sea visible al final
-        print("Simulación iniciada")        
         return self.datos
     
 
@@ -219,19 +202,16 @@ class Simulacion(QObject):
     
     def detener_simulacion(self):
         self.graficadora.close()
-        print("Simulación detenida")
         return self.datos
     
     def pausar_simulacion(self):
         self.timer.stop()
         self.graficadora.resume_button_change()
-        print("Simulación pausada")
         return self.datos
     
     def reanudar_simulacion(self):
         self.timer.start()
         self.graficadora.pause_button_change()
-        print("Simulación reanudada")
         return self.datos
     
     def parar(self):

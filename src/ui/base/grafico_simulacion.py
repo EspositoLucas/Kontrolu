@@ -368,7 +368,6 @@ class InterpretacionDatos(QDialog):
                     return 1
                 elif estado == 1:
                     return 0
-            print(f"Estado no reconocido: {estado}")  # Para depuración
             return -1  # Estado desconocido
 
         estado_anterior = calificar_estado(estados_carga[0])

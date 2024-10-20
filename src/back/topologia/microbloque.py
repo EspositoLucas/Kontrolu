@@ -123,7 +123,6 @@ class MicroBloque(Hoja):
         s,t = symbols('s t')
 
         tf_sympy = latex2sympy(self.funcion_transferencia)
-        print(f"La función de transferencia es: {tf_sympy}")
 
         operacion_laplace = tf_sympy
 
@@ -133,14 +132,10 @@ class MicroBloque(Hoja):
             entrada_con_error = self.configuracion_entrada.actualizar(entrada,tiempo)
 
             entrada_micro_bloque = laplace_transform(entrada_con_error,t,s)[0]
-            print(f"La entrada es: {entrada_micro_bloque}")
             operacion_laplace = entrada_micro_bloque * tf_sympy
-            print(f"La operación de Laplace es: {operacion_laplace}")
         
         operacion_tiempo = inverse_laplace_transform(operacion_laplace,s,t)
-        print(f"La operación en tiempo es: {operacion_tiempo}")
         salida_micro_bloque = operacion_tiempo.subs(t,tiempo)
-        print(f"La salida en tiempo es: {salida_micro_bloque}")
 
         salida_con_error = self.configuracion_salida.actualizar(salida_micro_bloque,tiempo)
 
@@ -171,7 +166,6 @@ class MicroBloque(Hoja):
         self.configuracion_entrada = Configuracion(from_json=json['configuracion_entrada'])
         self.configuracion_salida = Configuracion(from_json=json['configuracion_salida'])
         self.color = QColor(json['color'])
-        print(f"Se ha creado el microbloque {self.nombre} con la configuración de entrada {self.configuracion_entrada} y la configuración de salida {self.configuracion_salida}")
 
     @staticmethod
     def validar_dict(datos: dict) -> bool:
