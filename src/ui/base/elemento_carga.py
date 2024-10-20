@@ -54,6 +54,26 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         
         layout = QtWidgets.QVBoxLayout()
 
+        help_button = QPushButton("?", self)
+        help_button.setToolTip("La entrada sirve/es...")  # Mensaje de ayuda
+        help_button.setFixedSize(30, 30)  # Tamaño del botón
+        help_button.move(50, 50)  # Posición del botón en la ventana
+
+        # Estilo del botón para darle apariencia de botón de ayuda
+        help_button.setStyleSheet("""
+            QToolTip { background-color: #ffffe0; color: #000000; border: 1px solid black; }
+            QPushButton {
+                border: 1px solid gray;
+                border-radius: 15px;
+                background-color: #f0f0f0;
+                font-weight: bold;
+                color: black
+            }
+            QPushButton:hover {
+                background-color: #e0e0e0;
+            }
+        """)
+        layout.addWidget(help_button)
         # Campo para el nombre
         nombre_layout = QtWidgets.QHBoxLayout()
         nombre_layout.addWidget(QtWidgets.QLabel("Nombre:"))

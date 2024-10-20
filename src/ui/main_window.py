@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QPushButton, QVBoxLayout, QDialog, 
                              QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, 
                              QToolBar, QAction, 
-                             QTableWidgetItem, QTableWidget, QFrame,QGraphicsView)
+                                                                                       QTableWidgetItem, QTableWidget, QFrame,QGraphicsView)
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
@@ -53,6 +53,7 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QtGui.QIcon(icon))
 
         new_project_btn = QPushButton('Crear proyecto nuevo')
+       
         new_project_btn.clicked.connect(self.new_project_from_menu)
         layout.addWidget(new_project_btn)
 
