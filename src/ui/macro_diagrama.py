@@ -190,10 +190,14 @@ class MacroDiagrama(QGraphicsView):
 
     def agregar_botones(self):
 
-        circulo = QGraphicCircleItem(20,350,40,'fa5s.cog',self.main_window.configurar_simulacion,self)
+        circulo = QGraphicCircleItem(20,350,40,'fa5s.cog',self.main_window.configurar_simulacion,self,message="Configurar simulación")
         self.scene.addItem(circulo)
-        icono_analisis = QGraphicCircleItem(20, 450, 40, 'fa5s.chart-line', self.main_window.mostrar_analisis_estabilidad, self)
+        icono_analisis = QGraphicCircleItem(20, 450, 40, 'fa5s.chart-line', self.main_window.mostrar_analisis_estabilidad, self,message="Análisis de estabilidad")
         self.scene.addItem(icono_analisis)
+        #json_button = QGraphicCircleItem(20, 550, 40, 'fa5s.file-code', self.main_window.ver_json, self, message="Ver JSON")
+        #self.scene.addItem(json_button)
+        #archivo_button = QGraphicCircleItem(20, 650, 40, 'fa5s.chart-line', self.main_window.mostrar_analisis_estabilidad, self,message="Archivo")
+        #self.scene.addItem(archivo_button)
         
 
     def update_model_title(self, event):
