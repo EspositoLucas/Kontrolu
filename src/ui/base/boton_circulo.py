@@ -11,7 +11,7 @@ LETRA_COLOR = QColor("#2B2D42")
 TEXTO_BLANCO = QColor("#FFFDF5")
 
 class QGraphicCircleItem(QGraphicsEllipseItem):
-    def __init__(self, x, y, radius, icono, metodo, parent=None,toggle=False):
+    def __init__(self, x, y, radius, icono, metodo, parent=None,toggle=False, message=None):
         super().__init__(x - radius, y - radius, 2 * radius, 2 * radius)
         self.parent = parent
         self.brush_claro = QBrush(ACLARADO)
@@ -28,6 +28,7 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
         self.icon_item = QGraphicsPixmapItem(pixmap, self)
         self.icon_item.setOffset(x - radius + 2, y - radius + 2)
         self.selected = False
+        self.message = message
 
     def set_color(self, color):
         self.setBrush(QBrush(color))
@@ -69,3 +70,5 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
     def hoverMoveEvent(self, event):
         # Cambia el cursor a una mano al pasar el mouse sobre el rectángulo
         self.setCursor(Qt.PointingHandCursor)
+        if self.message:
+            self.setToolTip(self.message)
