@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
     def show_initial_menu(self):
         self.initial_menu = self.create_initial_menu()
         self.initial_menu.show()
-
+        
     def create_initial_menu(self):
         initial_menu = QDialog(self)
         initial_menu.setWindowTitle('Menú Inicial - Kontrolu')
