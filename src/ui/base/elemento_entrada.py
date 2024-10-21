@@ -46,6 +46,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
     def initUI(self):
 
         layout = QtWidgets.QVBoxLayout()
+        self.setStyleSheet(ESTILO)
         
         help_button = QPushButton("?", self)
         help_button.setToolTip("La entrada sirve/es...")  # Mensaje de ayuda
@@ -53,19 +54,6 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         help_button.move(50, 50)  # Posición del botón en la ventana
 
         # Estilo del botón para darle apariencia de botón de ayuda
-        help_button.setStyleSheet("""
-            QToolTip { background-color: #ffffe0; color: #000000; border: 1px solid black; }
-            QPushButton {
-                border: 1px solid gray;
-                border-radius: 15px;
-                background-color: #f0f0f0;
-                font-weight: bold;
-                color: black
-            }
-            QPushButton:hover {
-                background-color: #e0e0e0;
-            }
-        """)
         layout.addWidget(help_button)
 
         # Configurar el icono de la ventana
@@ -79,7 +67,6 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         nombre_layout = QtWidgets.QHBoxLayout()
         nombre_layout.addWidget(QtWidgets.QLabel("Nombre:"))
         self.nombre_input = QtWidgets.QLineEdit(self.entrada.nombre)
-        self.nombre_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         nombre_layout.addWidget(self.nombre_input)
         layout.addLayout(nombre_layout)
 
@@ -89,7 +76,6 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.tipo_entrada_combo = QtWidgets.QComboBox()
         self.tipo_entrada_combo.addItems(["Personalizada", "Escalón", "Rampa", "Parábola"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
-        self.tipo_entrada_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
         layout.addLayout(tipo_entrada_layout)
@@ -99,7 +85,6 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         coeficiente_layout.addWidget(QtWidgets.QLabel("Coeficiente:"))
         self.coeficiente_input = QtWidgets.QLineEdit(self.coeficiente)
         self.coeficiente_input.setValidator(QtGui.QDoubleValidator())
-        self.coeficiente_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.coeficiente_input.textChanged.connect(self.actualizar_funcion_transferencia)
         coeficiente_layout.addWidget(self.coeficiente_input)
         layout.addLayout(coeficiente_layout)
@@ -125,7 +110,6 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         button_box.addButton(self.boton_editar_json, QtWidgets.QDialogButtonBox.ActionRole)
         layout.addWidget(button_box)
         self.setLayout(layout)
-        self.setStyleSheet("background-color: #333; color: white;")
         
         # Actualizamos la interfaz según el tipo de entrada inicial
         self.actualizar_interfaz()
@@ -193,3 +177,64 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
             self.entrada.funcion_transferencia = self.latex_editor.get_latex()
         
         super().accept()
+ESTILO = """
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;  /* Tamaño de botón más grande */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+    }
+
+    QLineEdit {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #F1F1F1;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: white;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+"""

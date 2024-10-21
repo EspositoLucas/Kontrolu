@@ -13,6 +13,8 @@ from .crear_microbloque import CrearMicroBloque
 from .vista_json import VistaJson
 from .editar_perturbacion import EditarPerturbacion
 from ..base.punto_suma import PuntoSuma
+from ..base.boton_circulo import QGraphicCircleItem
+
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
@@ -103,6 +105,22 @@ class DrawingArea(QGraphicsView):
         self.update_scene_rect(self.scene.itemsBoundingRect()) # actualiza el rectangulo de la escena en funcion de lo dibujado
         self.update()
         self.draw_title()
+
+        RADIO_C = 40
+        scene_width = self.scene.width()
+        scene_height = self.scene.height()
+        y = scene_height-RADIO_C*9
+        
+        
+
+        self.clear_button = QGraphicCircleItem(RADIO_C*3, y, RADIO_C, 'fa5s.trash-alt', self.clear_all, self)
+        self.scene.addItem(self.clear_button)
+        self.select_button = QGraphicCircleItem(RADIO_C*6, y, RADIO_C, 'fa5s.mouse-pointer', self.set_seleccion_multiple, self,toggle = True)
+        self.scene.addItem(self.select_button)
+        self.json_button = QGraphicCircleItem(RADIO_C*9, y, RADIO_C, 'fa5s.file-code', self.vista_json, self)
+        self.scene.addItem(self.json_button)
+        self.help_button = QGraphicCircleItem(RADIO_C*12, y, RADIO_C, 'fa5s.question-circle', self.show_help, self)
+        self.scene.addItem(self.help_button)
 
         
     def draw_title(self):

@@ -20,7 +20,7 @@ class CrearMicroBloque(QDialog):
         self.new_microbloque = micro_bloque
         self.padre = parent
         self.setWindowTitle("Nuevo Micro Bloque")
-        self.setStyleSheet("background-color: #333; color: white;")
+        self.setStyleSheet(ESTILO)
         self.create_new_microbloque(tab)
 
 
@@ -34,20 +34,6 @@ class CrearMicroBloque(QDialog):
 
         # Crear el tab principal para "Nuevo Microbloque" y "Presets"
         main_tab = QTabWidget()
-        main_tab.setStyleSheet("""
-            QTabWidget::pane { 
-                border: 1px solid #555; 
-                background-color: #333;
-            }
-            QTabBar::tab { 
-                background-color: #444; 
-                color: white; 
-                padding: 5px;
-            }
-            QTabBar::tab:selected { 
-                background-color: #555;
-            }
-        """)
         self.tabs = main_tab
 
         # Crear la pestaña "Presets"
@@ -77,13 +63,11 @@ class CrearMicroBloque(QDialog):
 
         # Label de Presets
         preset_label = QLabel("Seleccionar Preset:")
-        preset_label.setStyleSheet("color: white;")
         presets_layout.addWidget(preset_label)
 
         # Crear QTreeWidget para mostrar los presets en forma de diccionario jerárquico
         presets_tree = QTreeWidget()
         presets_tree.setHeaderLabels(["Preset", "Seleccionar"])
-        presets_tree.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
 
         try:
 
@@ -95,9 +79,7 @@ class CrearMicroBloque(QDialog):
 
             error_layout = QHBoxLayout()
             error_label = QLabel("El archivo de presets falló.")
-            error_label.setStyleSheet("color: red;")
             recreate_button = QPushButton("Recrear Archivo de Presets")
-            recreate_button.setStyleSheet("background-color: #444; color: white;")
             recreate_button.clicked.connect(self.recreate_presets_file)
             error_layout.addWidget(error_label)
             error_layout.addWidget(recreate_button)
@@ -106,7 +88,6 @@ class CrearMicroBloque(QDialog):
         
         # Botón "Crear Microbloque"
         create_button = QPushButton("Crear Microbloque Desde 0")
-        create_button.setStyleSheet("background-color: #444; color: white;")
         create_button.clicked.connect(self.go_to_create_microbloque_tab)  # Conectar el botón a la función que cambia la pestaña
         presets_layout.addWidget(create_button)
         
@@ -255,36 +236,29 @@ class CrearMicroBloque(QDialog):
 
         # Nombre del microbloque
         nombre_label = QLabel("Nombre:")
-        nombre_label.setStyleSheet("color: white;")
         name_input = QLineEdit(self.new_microbloque.nombre)
         name_input.setPlaceholderText("Nombre del microbloque")
-        name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         new_microbloque_layout.addWidget(nombre_label)
         new_microbloque_layout.addWidget(name_input)
         self.name_input = name_input
 
         # Nombre del microbloque
         desc_label = QLabel("Descripcion:")
-        desc_label.setStyleSheet("color: white;")
         descripcion_input = QLineEdit(self.new_microbloque.descripcion)
         descripcion_input.setPlaceholderText("Descripcion:")
-        descripcion_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         new_microbloque_layout.addWidget(desc_label)
         new_microbloque_layout.addWidget(descripcion_input)
         self.descripcion_input = descripcion_input
 
         # Botón para seleccionar color
         self.color_button = QPushButton("Seleccionar Color")
-        self.color_button.setStyleSheet(f"background-color: {self.new_microbloque.color.name()}; color: {self.calcular_color(self.new_microbloque.color).name()};")
         self.color_button.setProperty("selected_color", self.new_microbloque.color)
         self.color_button.clicked.connect(lambda: self.select_color(self.color_button))
         new_microbloque_layout.addWidget(self.color_button)
 
         # Función de transferencia
         transfer_label = QLabel("Función de Transferencia:")
-        transfer_label.setStyleSheet("color: white;")
         latex_editor = LatexEditor(self.new_microbloque.funcion_transferencia)
-        latex_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         new_microbloque_layout.addWidget(transfer_label)
         new_microbloque_layout.addWidget(latex_editor)
         self.latex_editor = latex_editor
@@ -294,17 +268,14 @@ class CrearMicroBloque(QDialog):
         new_microbloque_layout.addWidget(config_tab)
 
         guardar_preset = QPushButton("Guardar Preset")
-        guardar_preset.setStyleSheet("background-color: #444; color: white;")
         guardar_preset.clicked.connect(self.guardar_preset)  # Conectar el botón a la función que cambia la pestaña
         new_microbloque_layout.addWidget(guardar_preset)
 
         create_button = QPushButton("Aplicar")
-        create_button.setStyleSheet("background-color: #444; color: white;")
         create_button.clicked.connect(self.crear_microbloque_nuevo)  # Conectar el botón a la función que cambia la pestaña
         new_microbloque_layout.addWidget(create_button)
 
         edit_json_button = QPushButton("Editar JSON")
-        edit_json_button.setStyleSheet("background-color: #444; color: white;")
         edit_json_button.clicked.connect(self.editar_json)  # Conectar el botón al método editar_json
         new_microbloque_layout.addWidget(edit_json_button)
         
@@ -354,8 +325,8 @@ class CrearMicroBloque(QDialog):
         presets = obtener_microbloques_de_una_macro(self.tipo)
 
         dialog = QDialog()
+        dialog.setStyleSheet(ESTILO)
         dialog.setWindowTitle(f"Guardar preset de {self.new_microbloque.nombre}")
-        dialog.setStyleSheet("background-color: #333; color: white;")
         layout = QVBoxLayout()
         
         # Configurar el icono de la ventana
@@ -367,7 +338,6 @@ class CrearMicroBloque(QDialog):
 
          # Primer desplegable: Dominio
         dominio_combo = QComboBox()
-        dominio_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         dominio_combo.addItems(list(map(lambda x: x.nombre, presets)))  # Añadir los dominios existentes
         dominio_combo.setEditable(True)  # Permitir escribir uno nuevo
 
@@ -377,7 +347,6 @@ class CrearMicroBloque(QDialog):
 
         # Segundo desplegable: Tipo
         tipo_combo = QComboBox()
-        tipo_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         tipo_combo.setEditable(True)  # Permitir escribir uno nuevo
         layout.addWidget(QLabel("Tipo"))
         layout.addWidget(tipo_combo)
@@ -386,7 +355,6 @@ class CrearMicroBloque(QDialog):
 
         # Botón para guardar el preset
         save_button = QPushButton("Guardar Preset")
-        save_button.setStyleSheet("background-color: #444; color: white;")
         save_button.clicked.connect(lambda: self.save_preset(tipo_combo.currentText(),dominio_combo.currentText(),dialog))  # Conectar el botón a la función que cambia la pestaña
         layout.addWidget(save_button)
 
@@ -471,20 +439,6 @@ class CrearMicroBloque(QDialog):
         Crea la pestaña interna de configuraciones para entrada y salida.
         """
         config_tab = QTabWidget()
-        config_tab.setStyleSheet("""
-            QTabWidget::pane { 
-                border: 1px solid #555; 
-                background-color: #333;
-            }
-            QTabBar::tab { 
-                background-color: #444; 
-                color: white; 
-                padding: 5px;
-            }
-            QTabBar::tab:selected { 
-                background-color: #555;
-            }
-        """)
 
         # Contenido de configuraciones
         config_content = QWidget()
@@ -492,38 +446,32 @@ class CrearMicroBloque(QDialog):
 
         # Configuración de entrada
         entrada_name_input = QLineEdit(self.new_microbloque.configuracion_entrada.nombre)
-        entrada_name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         config_layout.addWidget(QLabel("Nombre de la configuración de entrada:"), 0, 0)
         config_layout.addWidget(entrada_name_input, 0, 1)
         self.entrada_name_input = entrada_name_input
 
         entrada_unidad_input = QLineEdit(self.new_microbloque.configuracion_entrada.unidad)
-        entrada_unidad_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         config_layout.addWidget(QLabel("Unidad de entrada:"), 0, 2)
         config_layout.addWidget(entrada_unidad_input, 0, 3)
         self.entrada_unidad_input = entrada_unidad_input
 
         input_button = QPushButton("Configurar Entrada")
-        input_button.setStyleSheet("background-color: #444; color: white;")
         input_button.clicked.connect(lambda: self.edit_configuration(self.new_microbloque.configuracion_entrada, "entrada"))
         config_layout.addWidget(input_button, 0, 4)
         self.input_button = input_button
 
         # Configuración de salida
         salida_name_input = QLineEdit(self.new_microbloque.configuracion_salida.nombre)
-        salida_name_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         config_layout.addWidget(QLabel("Nombre de la configuración de salida:"), 1, 0)
         config_layout.addWidget(salida_name_input, 1, 1)
         self.salida_name_input = salida_name_input
 
         salida_unidad_input = QLineEdit(self.new_microbloque.configuracion_salida.unidad)
-        salida_unidad_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         config_layout.addWidget(QLabel("Unidad de salida:"), 1, 2)
         config_layout.addWidget(salida_unidad_input, 1, 3)
         self.salida_unidad_input = salida_unidad_input
 
         output_button = QPushButton("Configurar Salida")
-        output_button.setStyleSheet("background-color: #444; color: white;")
         output_button.clicked.connect(lambda: self.edit_configuration(self.new_microbloque.configuracion_salida, "salida"))
         config_layout.addWidget(output_button, 1, 4)
 
@@ -547,3 +495,65 @@ class CrearMicroBloque(QDialog):
         es_claro = self.es_color_claro(fondo_color)
         color_texto = LETRA_COLOR if es_claro else TEXTO_BLANCO
         return color_texto
+
+ESTILO = """
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;  /* Tamaño de botón más grande */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+    }
+
+    QLineEdit {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #F1F1F1;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: white;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+"""

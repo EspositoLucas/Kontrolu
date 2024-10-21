@@ -12,10 +12,9 @@ class VistaJson(QDialog):
         self.microbloque = microbloque
         self.setWindowTitle("Json")
         self.layout = QVBoxLayout()
-        self.setStyleSheet("background-color: #333; color: white;")
+        self.setStyleSheet(ESTILO)
         self.setLayout(self.layout)
         self.text_edit = QTextEdit()
-        self.text_edit.setStyleSheet("background-color: white;")
         self.layout.addWidget(self.text_edit)
         pretty_json = json.dumps(self.microbloque.to_json(), indent=4)
         self.text_edit.setPlainText(pretty_json)
@@ -128,3 +127,66 @@ class VistaJson(QDialog):
         self.resize(int(document_size.width()) + 50, int(document_size.height()) + 100)
         """
         self.setMinimumSize(400, 400)
+
+
+ESTILO = """
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;  /* Tamaño de botón más grande */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+    }
+
+    QLineEdit {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #F1F1F1;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: white;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+"""

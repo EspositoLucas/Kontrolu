@@ -194,51 +194,7 @@ class MacroDiagrama(QGraphicsView):
         self.scene.addItem(circulo)
         icono_analisis = QGraphicCircleItem(20, 450, 40, 'fa5s.chart-line', self.main_window.mostrar_analisis_estabilidad, self)
         self.scene.addItem(icono_analisis)
-        return
-
-        recuadro = QGroupBox()
-        recuadro.setStyleSheet("""
-            QGroupBox {
-                background-color: #A8DADC;
-                border: 3px solid #457B9D;
-                border-radius: 5px;
-            }
-        """)
-
-        layout = QVBoxLayout()
-        estilos_botones = """
-            QPushButton {
-                    background-color: #A8DADC;  
-                    color: #2B2D42;
-                    font-weight: bold;
-                    border: 3px solid #457B9D;
-                    padding: 5px;
-                    border-radius: 3px;
-                }
-                QPushButton:hover {
-                    background-color: #F1FAEE;
-                }
-        """
-        boton_config_sim = QPushButton("Configurar Simulación")
-        boton_config_sim.setStyleSheet(estilos_botones)
-        boton_config_sim.clicked.connect(self.main_window.configurar_simulacion)
-        layout.addWidget(boton_config_sim)
-
-        boton_iniciar_sim = QPushButton("Iniciar Simulación")
-        boton_iniciar_sim.setStyleSheet(estilos_botones)
-        boton_iniciar_sim.clicked.connect(self.simular_button)
-        layout.addWidget(boton_iniciar_sim)
-
-        boton_estabilidad = QPushButton("Análisis de Estabilidad")
-        boton_estabilidad.setStyleSheet(estilos_botones)
-        boton_estabilidad.clicked.connect(self.main_window.mostrar_analisis_estabilidad)
-        layout.addWidget(boton_estabilidad)
         
-        recuadro.setLayout(layout)
-        #recuadro.setGeometry(int(self.ANCHO_TOTAL - recuadro_width - 10),int(self.ALTO_TOTAL - recuadro_height - 10), 200, 150)
-        recuadro.setGeometry(5,5, 200, 150)
-
-        self.scene.addWidget(recuadro)
 
     def update_model_title(self, event):
         new_title = self.title_item.toPlainText()  # Obtener el texto actualizado del título

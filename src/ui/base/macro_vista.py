@@ -6,6 +6,8 @@ from .drawing_area import DrawingArea
 from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsTextItem
 from PyQt5.QtGui import QBrush, QPen, QColor, QFont,QFontMetrics
 from PyQt5.QtCore import Qt, QRectF
+from ..base.boton_circulo import QGraphicCircleItem
+
 
 
 class MacroVista(QGraphicsRectItem):
@@ -71,8 +73,9 @@ class MacroVista(QGraphicsRectItem):
         self.drawing_area = DrawingArea(self, self.ventana)
         self.ventana.setCentralWidget(self.drawing_area)
         
-        self.init_tool_bar()
+        #self.init_tool_bar()
         self.ventana.show()
+
         self.ventana.setStyleSheet("background-color: #F1FAEE;")  # Color azul claro
         # Ruta de la imagen del logo
         path =  os.path.dirname(os.path.abspath(__file__))
@@ -84,6 +87,8 @@ class MacroVista(QGraphicsRectItem):
         QTimer.singleShot(100, self.drawing_area.load_microbloques)
         
     def init_tool_bar(self):
+        
+        return
         toolbar = QToolBar("Herramientas", self.ventana)
         self.ventana.addToolBar(Qt.LeftToolBarArea, toolbar)
 
@@ -162,9 +167,6 @@ class MacroVista(QGraphicsRectItem):
         toolbar.addWidget(help_button)
 
         toolbar.setStyleSheet("QToolBar { background-color: #333; }")  # Establece el color de fondo de la barra de herramientas
-
-    def activar_seleccion_multiple(self, checked):
-        self.drawing_area.set_seleccion_multiple(checked)
 
     def configure_microbloque(self):
         self.drawing_area.create_new_microbloque()

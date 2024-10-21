@@ -19,6 +19,8 @@ class LatexEditor(QWidget):
         self.validation_timer.timeout.connect(self.delayed_validation)
 
     def init_ui(self, initial_latex):
+        self.setStyleSheet(ESTILO)
+
         layout = QVBoxLayout()
 
         self.preview_label = QLabel("Vista previa:")
@@ -233,3 +235,44 @@ class LatexEditor(QWidget):
             return True
         except (SympifyError, TypeError, ValueError):
             return False
+        
+
+ESTILO = """
+            QDialog {
+                background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+                border-radius: 15px;  /* Bordes redondeados */
+                padding: 20px;  /* Espaciado interior */
+                border: 2px solid #505050;  /* Borde gris más oscuro */
+            }
+
+            QPushButton {
+                background-color: #808080;  /* Botones en gris oscuro pastel */
+                color: white;  /* Texto en blanco */
+                border: 2px solid #505050;  /* Borde gris oscuro */
+                border-radius: 10px;
+                padding: 10px 20px;  /* Tamaño de botón más grande */
+                font-size: 16px;  /* Tipografía más grande */
+                font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+            }
+
+            QPushButton:hover {
+                background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+            }
+
+            QLineEdit {
+                background-color: #D0D0D0;  /* Fondo gris claro */
+                border: 2px solid #505050;  /* Borde gris oscuro */
+                border-radius: 10px;
+                padding: 8px;
+                color: #2B2D42;  /* Texto gris oscuro */
+                font-size: 14px;  /* Tipografía más grande */
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+
+            QLabel {
+                color: #2B2D42;  /* Texto gris oscuro */
+                background-color: transparent;
+                font-size: 16px;  /* Tipografía más grande */
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+        """

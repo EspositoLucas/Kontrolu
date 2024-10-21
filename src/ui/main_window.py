@@ -15,7 +15,7 @@ from back.simulacion import Simulacion
 from back.estabilidad import Estabilidad
 from ui.base.grafico_simulacion import Graficadora
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QApplication,QMessageBox
+from PyQt5.QtWidgets import QApplication
 import sympy as sp
 import sys
 class MainWindow(QMainWindow):
@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
     def create_initial_menu(self):
         initial_menu = QDialog(self)
         initial_menu.setWindowTitle('Menú Inicial - Kontrolu')
-        initial_menu.setStyleSheet("background-color: #333; color: white;")
+        initial_menu.setStyleSheet(ESTILO)
         initial_menu.resize(400, 150)
         layout = QVBoxLayout()
         
@@ -130,7 +130,7 @@ class MainWindow(QMainWindow):
     def configurar_simulacion(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Configuración de Simulación")
-        dialog.setStyleSheet("background-color: #333; color: white;")
+        dialog.setStyleSheet(ESTILO)
         layout = QVBoxLayout()
 
         # Configurar el icono de la ventana
@@ -154,7 +154,6 @@ class MainWindow(QMainWindow):
             layout_h.addWidget(QLabel(label))
             input_field = QLineEdit()
             input_field.setText(value)
-            input_field.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
             layout_h.addWidget(input_field)
             inputs[key] = input_field
             layout.addLayout(layout_h)
@@ -233,7 +232,7 @@ class MainWindow(QMainWindow):
     def mostrar_analisis_estabilidad(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Análisis de Estabilidad")
-        dialog.setStyleSheet("background-color: #333; color: white;")
+        dialog.setStyleSheet(ESTILO)
         layout = QVBoxLayout()
 
         # Configurar el icono de la ventana
@@ -349,7 +348,7 @@ class MainWindow(QMainWindow):
     def calcular_y_mostrar_error_estado_estable(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Error en Estado Estable")
-        dialog.setStyleSheet("background-color: #333; color: white;")
+        dialog.setStyleSheet(ESTILO)
         layout = QVBoxLayout()
 
         # Configurar el icono de la ventana
@@ -361,7 +360,6 @@ class MainWindow(QMainWindow):
 
         tipo_entrada = QComboBox()
         tipo_entrada.addItems(["escalon", "rampa", "parabola"])
-        tipo_entrada.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(QLabel("Seleccione el tipo de entrada:"))
         layout.addWidget(tipo_entrada)
 
@@ -370,12 +368,10 @@ class MainWindow(QMainWindow):
 
         resultado_frame = QFrame()
         resultado_frame.setFrameShape(QFrame.StyledPanel)
-        resultado_frame.setStyleSheet("background-color: #f0f0f0; padding: 10px; border-radius: 5px;")
         resultado_layout = QVBoxLayout(resultado_frame)
         
         resultado_label = QLabel()
         resultado_label.setAlignment(Qt.AlignCenter)
-        resultado_label.setStyleSheet("font-weight: bold; font-size: 16px;")
         resultado_layout.addWidget(resultado_label)
         
         layout.addWidget(resultado_frame)
@@ -398,52 +394,34 @@ class MainWindow(QMainWindow):
     
 
     def closeEvent(self, event):
-        dialog = QMessageBox(self)
+        dialog = QDialog(self)
         dialog.setWindowTitle('Confirmar salida')
-        dialog.setText('¿Está seguro de que desea salir?')
-        dialog.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        dialog.setDefaultButton(QMessageBox.No)
-        
+        dialog.setStyleSheet(ESTILO)
+        layout = QVBoxLayout()
+
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
-        
-        # Establecer el estilo de la ventana
-        dialog.setStyleSheet("""
-            QMessageBox {
-                background-color: #333;
-                color: white;
-            }
-            
-            QMessageBox QLabel {
-            color: white;
-            background-color: black;
-            padding: 10px;
-        }
-        
-        """)
-        
-        # Cambiar el texto del botón "Yes" a "Si"
-        yes_button = dialog.button(QMessageBox.Yes)
-        if yes_button:
-            yes_button.setText("Si")
 
-            # Aplicar estilo a los botones específicos
-        for button in dialog.buttons():
-            button.setStyleSheet("""
-                background-color: black;
-                color: white;
-                min-width: 80px;
-                min-height: 30px;
-                border: none;
-                border-radius: 3px;
-            """)
+        label = QLabel('¿Está seguro de que desea salir?')
+        layout.addWidget(label)
+
+        button_box = QDialogButtonBox(QDialogButtonBox.Yes | QDialogButtonBox.No)
+        button_box.button(QDialogButtonBox.Yes).setText("Si")
+        button_box.button(QDialogButtonBox.No).setText("No")
+
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        layout.addWidget(button_box)
+
+        dialog.setLayout(layout)
+
         reply = dialog.exec_()
 
-        if reply == QMessageBox.Yes:
+        if reply == QDialog.Accepted:
             event.accept()
             QApplication.quit()
         else:
@@ -455,3 +433,93 @@ class MainWindow(QMainWindow):
         self.init_macrobloques()
         
         self.statusBar().showMessage('Sesión actualizada')
+
+
+ESTILO = """
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;  /* Tamaño de botón más grande */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+    }
+
+    QLineEdit {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #F1F1F1;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: white;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+
+    QMessageBox {
+        background-color: #B0B0B0;  /* Fondo gris pastel oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+    }
+
+    QMessageBox QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QMessageBox QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QMessageBox QPushButton:hover {
+        background-color: #606060;  /* Botón más oscuro al pasar el cursor */
+    }
+"""

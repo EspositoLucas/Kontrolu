@@ -4,25 +4,30 @@ from PyQt5.QtCore import Qt
 import qtawesome as qta
 
 LINEA_GROSOR = 6
-LINEA_COLOR = QColor("#457B9D")
-FONDO_CICULO_COLOR = QColor("#A8DADC")
-ACLARADO = QColor("#F1FAEE")
+LINEA_COLOR = QColor("#A9A9A9")
+FONDO_CICULO_COLOR = QColor("#D3D3D3")
+ACLARADO = FONDO_CICULO_COLOR.lighter(150)
 LETRA_COLOR = QColor("#2B2D42")
 TEXTO_BLANCO = QColor("#FFFDF5")
 
 class QGraphicCircleItem(QGraphicsEllipseItem):
-    def __init__(self, x, y, radius, icono, metodo, parent=None):
+    def __init__(self, x, y, radius, icono, metodo, parent=None,toggle=False):
         super().__init__(x - radius, y - radius, 2 * radius, 2 * radius)
         self.parent = parent
-        self.setBrush(QBrush(FONDO_CICULO_COLOR))
+        self.brush_claro = QBrush(ACLARADO)
+        self.brush_normal = QBrush(FONDO_CICULO_COLOR)
+        self.default_brush = self.brush_normal
+        self.setBrush(self.default_brush)
         self.setPen(QPen(LINEA_COLOR, LINEA_GROSOR))
         self.setAcceptHoverEvents(True)
         self.metodo = metodo
+        self.toggle = toggle
         # Add gear icon
         icon = qta.icon(icono, color=LINEA_COLOR)
         pixmap = icon.pixmap(int(2 * radius - 4), int(2 * radius - 4))
         self.icon_item = QGraphicsPixmapItem(pixmap, self)
         self.icon_item.setOffset(x - radius + 2, y - radius + 2)
+        self.selected = False
 
     def set_color(self, color):
         self.setBrush(QBrush(color))
@@ -38,14 +43,26 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
         self.setPen(pen)
 
     def hoverEnterEvent(self, event):
-        self.setBrush(QBrush(ACLARADO))
+        self.setBrush(self.brush_claro)
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        self.setBrush(QBrush(FONDO_CICULO_COLOR))
+        self.setBrush(self.default_brush)
         super().hoverLeaveEvent(event)
 
     def mousePressEvent(self, event):
+        if self.toggle:
+            if self.selected:
+                self.selected = False
+                self.default_brush = self.brush_normal
+                self.setBrush(self.default_brush)
+            else:
+                self.selected = True
+                self.default_brush = self.brush_claro
+                self.setBrush(self.default_brush)
+            self.metodo(self.selected)
+            return
+
         self.metodo()
         super().mousePressEvent(event)
     

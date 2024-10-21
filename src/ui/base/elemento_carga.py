@@ -94,7 +94,6 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         nombre_layout = QtWidgets.QHBoxLayout()
         nombre_layout.addWidget(QtWidgets.QLabel("Nombre:"))
         self.nombre_input = QtWidgets.QLineEdit(self.carga.nombre)
-        self.nombre_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         nombre_layout.addWidget(self.nombre_input)
         layout.addLayout(nombre_layout)
 
@@ -103,20 +102,19 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         tipo_carga_layout.addWidget(QtWidgets.QLabel("Tipo de carga:"))
         self.tipo_carga_combo = QtWidgets.QComboBox()
         self.tipo_carga_combo.addItems([tipo.value for tipo in TipoCarga])
-        self.tipo_carga_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.tipo_carga_combo.setCurrentText(self.carga.tipo_carga.value)
         tipo_carga_layout.addWidget(self.tipo_carga_combo)
         layout.addLayout(tipo_carga_layout)
         
         # Añadimos el campo para el coeficiente
-        coeficiente_layout = QtWidgets.QHBoxLayout()
-        coeficiente_layout.addWidget(QtWidgets.QLabel("Coeficiente:"))
+        self.coeficiente_layout = QtWidgets.QHBoxLayout()
+        self.coeficiente_text =  QtWidgets.QLabel("Coeficiente:")
+        self.coeficiente_layout.addWidget(self.coeficiente_text)
         self.coeficiente_input = QtWidgets.QLineEdit(self.coeficiente)
         self.coeficiente_input.setValidator(QtGui.QDoubleValidator())
-        self.coeficiente_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.coeficiente_input.textChanged.connect(self.actualizar_funcion_transferencia)
-        coeficiente_layout.addWidget(self.coeficiente_input)
-        layout.addLayout(coeficiente_layout)
+        self.coeficiente_layout.addWidget(self.coeficiente_input)
+        layout.addLayout(self.coeficiente_layout)
 
         # Tipo de entrada
         tipo_entrada_layout = QtWidgets.QHBoxLayout()
@@ -124,7 +122,6 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.tipo_entrada_combo = QtWidgets.QComboBox()
         self.tipo_entrada_combo.addItems(["Misma que entrada","Personalizada", "Escalón", "Rampa", "Parábola"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
-        self.tipo_entrada_combo.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
         layout.addLayout(tipo_entrada_layout)
@@ -141,7 +138,6 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         estados_layout = QtWidgets.QVBoxLayout()
         estados_layout.addWidget(QtWidgets.QLabel("Estados:"))
         self.estados_list = QtWidgets.QListWidget()
-        self.estados_list.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.actualizar_lista_estados()
         estados_layout.addWidget(self.estados_list)
 
@@ -166,7 +162,6 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         es_layout = QtWidgets.QHBoxLayout()
         es_layout.addWidget(QtWidgets.QLabel("Escalamiento sigmoide:"))
         self.escalamiento_sigmoide_input = QtWidgets.QLineEdit(str(self.carga.escalamiento_sigmoide))
-        self.escalamiento_sigmoide_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         es_layout.addWidget(self.escalamiento_sigmoide_input)
         layout.addLayout(es_layout)
 
@@ -174,7 +169,6 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         ds_layout = QtWidgets.QHBoxLayout()
         ds_layout.addWidget(QtWidgets.QLabel("Desplazamiento sigmoide:"))
         self.desplazamiento_sigmoide_input = QtWidgets.QLineEdit(str(self.carga.desplazamiento_sigmoide))
-        self.desplazamiento_sigmoide_input.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         ds_layout.addWidget(self.desplazamiento_sigmoide_input)
         layout.addLayout(ds_layout)
         # Botones OK, Cancelar y Editar JSON
@@ -189,8 +183,8 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.btn_editar_json.clicked.connect(self.editar_json)
         
         layout.addWidget(button_box)
+        self.setStyleSheet(ESTILO)
 
-        self.setStyleSheet("background-color: #333; color: white;")
         self.setLayout(layout)
         
         # Actualizamos la interfaz según el tipo de entrada inicial
@@ -262,7 +256,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.latex_editor.setEnabled(es_personalizada)
 
         self.coeficiente_input.setVisible((not es_personalizada) and (not es_entrada))
-        
+        self.coeficiente_text.setVisible((not es_personalizada) and (not es_entrada))
 
         self.actualizar_funcion_transferencia()
 
@@ -328,6 +322,8 @@ class EditarEstadoDialog(QtWidgets.QDialog):
     def initUI(self):
         layout = QtWidgets.QVBoxLayout()
 
+        self.setStyleSheet(ESTILO)
+
         # Nombre del estado
         nombre_layout = QtWidgets.QHBoxLayout()
         nombre_layout.addWidget(QtWidgets.QLabel("Nombre:"))
@@ -358,3 +354,64 @@ class EditarEstadoDialog(QtWidgets.QDialog):
         self.setLayout(layout)
 
 
+ESTILO = """
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;  /* Tamaño de botón más grande */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+    }
+
+    QLineEdit {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #F1F1F1;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: white;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+"""
