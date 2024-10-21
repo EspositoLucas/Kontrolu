@@ -39,7 +39,7 @@ COLOR_FONDO = QColor("#F1FAEE")
 class MacroDiagrama(QGraphicsView):
 
     def __init__(self, mainWindow):
-        super().__init__()
+        super().__init__(mainWindow)
         
         self.main_window = mainWindow
 
@@ -50,12 +50,9 @@ class MacroDiagrama(QGraphicsView):
         self.setBackgroundBrush(COLOR_FONDO)
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
+        self.mostrar_diagrama()
 
-        # Establecer los límites de la escena
-        self.scene.setSceneRect(0, 0, 1600, 1000)
-
-        #self.scene.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(255, 255, 255)))
-        # Calcular el medio de la QGraphicsScene
+    def mostrar_diagrama(self):
         scene_rect = self.sceneRect()
         self.ANCHO_TOTAL = scene_rect.width()
         self.ALTO_TOTAL = scene_rect.height()
@@ -153,27 +150,8 @@ class MacroDiagrama(QGraphicsView):
         # Evitar que la vista se desplace
         self.setDragMode(QGraphicsView.NoDrag)
 
-        self.agregar_botones()
+        #self.agregar_botones()
 
-        pos_simular = QRectF(self.ANCHO_TOTAL-200, self.ALTO_TOTAL-150, 300, 75)
-
-        self.simular_buton = BotonSimular(pos_simular,self)
-        self.scene.addItem(self.simular_buton)
-
-        pos_pausar = QRectF(self.ANCHO_TOTAL-200 - 325 , self.ALTO_TOTAL-150, 300, 75)
-
-        self.pausar_buton = BotonPausar(pos_pausar,self)
-        self.scene.addItem(self.pausar_buton)
-        self.pausar_buton.hide()
-
-
-        self.reanudar_boton = BotonReanudar(pos_pausar,self)
-        self.scene.addItem(self.reanudar_boton)
-        self.reanudar_boton.hide()
-
-        self.boton_detener = BotonDetener(pos_simular,self)
-        self.scene.addItem(self.boton_detener)
-        self.boton_detener.hide()
 
     def draw_title(self):
 
@@ -233,50 +211,6 @@ class MacroDiagrama(QGraphicsView):
             if isinstance(item, QtWidgets.QWidget):
                 item.show()
     
-    def simular_button(self):
-        self.simulando_buttons()
-        self.main_window.iniciar_simulacion()
     
-    def simulando_buttons(self):
-        self.simular_buton.hide()
-        self.pausar_buton.show()
-        self.boton_detener.show()
-        self.reanudar_boton.hide()
-
-    def deteniendo_buttons(self):
-        self.simular_buton.show()
-        self.pausar_buton.hide()
-        self.boton_detener.hide()
-        self.reanudar_boton.hide()
-
-    def detener_button(self):
-        self.deteniendo_buttons()
-        self.main_window.detener_simulacion()
-    
-    def pausar_button(self):
-        self.pausando_buttons()
-        self.main_window.pausar_simulacion()
-    
-    def pausando_buttons(self):
-        self.simular_buton.hide()
-        self.pausar_buton.hide()
-        self.boton_detener.show()
-        self.reanudar_boton.show()
-
-    def reanudar_button(self):
-        self.reanudando_buttons()
-        self.main_window.reanudar_simulacion()
-    
-    def reanudando_buttons(self):
-        self.simular_buton.hide()
-        self.pausar_buton.show()
-        self.boton_detener.show()
-        self.reanudar_boton.hide()
-    
-    def no_buttons(self):
-        self.simular_buton.hide()
-        self.pausar_buton.hide()
-        self.boton_detener.hide()
-        self.reanudar_boton.hide()
 
         

@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QPushButton, QVBoxLayout, QDialog, 
                              QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, 
-                             QToolBar, QAction, 
-                                                                                       QTableWidgetItem, QTableWidget, QFrame,QGraphicsView)
+                             QToolBar, QAction,QTableWidgetItem, QTableWidget, QFrame,QGraphicsView,QWidget)
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
@@ -10,6 +9,7 @@ import os
 from .menu.menu_bar import Menu
 from .macro_diagrama import MacroDiagrama
 from .menu.archivo import Archivo
+from .base.floating_buttons_main import FloatingButtonsMainView
 from back.simulacion import Simulacion
 from back.simulacion import Simulacion
 from back.estabilidad import Estabilidad
@@ -22,6 +22,7 @@ class MainWindow(QMainWindow):
     
     def __init__(self, sesion):
         super().__init__()
+
         self.sesion = sesion
         self.estabilidad = Estabilidad(sesion)
         self.archivo = Archivo(self, self.sesion)
@@ -82,7 +83,10 @@ class MainWindow(QMainWindow):
     
     def initUI(self):
         self.setWindowTitle('Kontrolu')
-        self.setStyleSheet("background-color: #ADD8E6;")  # Color azul claro
+        self.floating_ellipses_view = None
+        screen = QtGui.QGuiApplication.primaryScreen().geometry()
+        self.setGeometry(screen)
+        self.showMaximized()
         # Ruta de la imagen del logo
         path = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path, 'base/imgs', 'logo.png')
@@ -92,7 +96,6 @@ class MainWindow(QMainWindow):
         menuBar = Menu(self,self.sesion)
         self.setMenuBar(menuBar)
         self.init_macrobloques() 
-        self.showMaximized()
     
     def new_project_from_main(self):
         if self.archivo.new_project(from_menu=False):
@@ -103,11 +106,34 @@ class MainWindow(QMainWindow):
     
         
     def init_macrobloques(self):
+
+        screen = QtGui.QGuiApplication.primaryScreen().geometry()
+        self.central_widget = QWidget(self)
+        self.setGeometry(screen)
+        self.setCentralWidget(self.central_widget)
+
+        layout = QVBoxLayout(self.central_widget)
         self.diagrama = MacroDiagrama(self)
+        layout.addWidget(self.diagrama)
+        self.diagrama.setGeometry(self.central_widget.geometry())
 
+        # Crear la segunda QGraphicsView que contendrá los elipses
+        self.floating_ellipses_view = FloatingButtonsMainView(self.central_widget,padre=self)
+        self.floating_ellipses_view.raise_()
 
-        self.diagrama.mostrarElementos()
-        self.setCentralWidget(self.diagrama)
+        # Establecer la posición de la vista de elipses flotantes en la esquina inferior izquierda
+        height = self.size().height()
+        width = self.size().width()
+        self.floating_ellipses_view.setGeometry(0, height-200, width, 150)    
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.floating_ellipses_view:
+            print("resize")
+            height = self.size().height()
+            width = self.size().width()
+            print(height)
+            self.floating_ellipses_view.setGeometry(0, height-200, width, 150)
+
     
     def new_project(self):
         self.statusBar().showMessage('Nuevo proyecto creado')
@@ -202,7 +228,7 @@ class MainWindow(QMainWindow):
             salida_cero=self.sesion.salida_inicial,
             carga=self.sesion.carga,
             graficadora=self.graficadora,
-            window= self.diagrama
+            window= self.floating_ellipses_view
         )
         
         self.simulacion.ejecutar_simulacion(self.sesion.velocidad)
