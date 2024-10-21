@@ -35,7 +35,7 @@ class BotonReanudar(QGraphicsRectItem):
         self.setRect(qrect)  # Establecer el tamaño del rectángulo
 
         self.text = "REANUDAR"
-        self.font = QFont("Arial", 32, QFont.Bold)  # Estilo del texto
+        self.font = QFont("Arial", 28, QFont.Bold)  # Estilo del texto
         self.setAcceptHoverEvents(True)
 
         # Crear el icono de QtAwesome como pixmap
@@ -52,11 +52,11 @@ class BotonReanudar(QGraphicsRectItem):
         painter.setFont(self.font)
         painter.setPen(self.color_texto)  # Color del texto
         margin = 10  # Margen entre el texto y las paredes del rectángulo
-        text_rect = QRectF(self.rect().left() + margin, self.rect().top(), self.rect().width() * 0.75 - margin, self.rect().height())
+        text_rect = QRectF(self.rect().left() + margin, self.rect().top(), self.rect().width() * 0.77 - margin, self.rect().height())
         painter.drawText(text_rect, Qt.AlignCenter, self.text)
 
         # Dibujar el icono en el último 1/4 del rectángulo
-        icon_x = self.rect().left() + self.rect().width() * 0.75  # Inicio del último 1/4
+        icon_x = self.rect().left() + self.rect().width() * 0.77  # Inicio del último 1/4
         icon_y = (self.rect().height() - self.icon.height()) / 2 + self.rect().top()  # Centrando verticalmente
         painter.drawPixmap(int(icon_x), int(icon_y), self.icon)  # Dibujar el ícono
 
