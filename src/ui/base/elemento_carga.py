@@ -407,7 +407,7 @@ ESTILO = """
         background-color: #F1F1F1;  /* Fondo de la lista desplegable */
         border: 2px solid #505050;  /* Borde gris oscuro */
         selection-background-color: #808080;  /* Selección gris oscuro */
-        color: white;  /* Texto blanco en selección */
+        color: #000000;  /* Texto blanco en selección */
     }
 
     QVBoxLayout {
