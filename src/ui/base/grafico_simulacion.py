@@ -15,10 +15,75 @@ import numpy as np
 import csv
 import os
 
+ESTILO = """
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;  /* Tamaño de botón más grande */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+    }
+
+    QLineEdit {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #F1F1F1;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: #000000;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+"""
+
 
 class Graficadora(QMainWindow):
     def __init__(self):
         super().__init__()
+        # Aplicar el estilo global
+        self.setStyleSheet(ESTILO)
+        
         self.setAttribute(Qt.WA_DeleteOnClose, False)
         self.setWindowTitle("Gráfico y Datos de Simulación en Tiempo Real")
         self.setGeometry(100, 100, 1200, 800)
@@ -27,8 +92,6 @@ class Graficadora(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.layout = QVBoxLayout(self.central_widget)
-        
-        
         
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
@@ -111,6 +174,39 @@ class Graficadora(QMainWindow):
         self.lineas = {}
         self.checkboxes = {}
         self.colores = plt.cm.get_cmap('Set1')(np.linspace(0, 1, 10))
+        
+        self.data_table.setStyleSheet("""
+        QTableWidget {
+            background-color: #D0D0D0;
+            border: 2px solid #505050;
+            border-radius: 10px;
+            color: #2B2D42;
+            font-size: 14px;
+            font-family: "Segoe UI", "Arial", sans-serif;
+        }
+        QHeaderView::section {
+            background-color: #808080;
+            color: white;
+            padding: 5px;
+            border: 1px solid #505050;
+        }
+    """)
+
+        # Agregar después de la creación del QListWidget
+        self.column_list.setStyleSheet("""
+            QListWidget {
+                background-color: #D0D0D0;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                color: #2B2D42;
+                font-size: 14px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            QListWidget::item:selected {
+                background-color: #808080;
+                color: white;
+            }
+        """)
 
         self.export_manager = ExportManager(self)
 
@@ -122,14 +218,17 @@ class Graficadora(QMainWindow):
     def setup_controls(self):
         export_button = QPushButton("Exportar Datos")
         export_button.clicked.connect(self.export_manager.export_data)
+        export_button.setCursor(Qt.PointingHandCursor)  # Cambiar el cursor al pasar por encima
         self.controls_layout.addWidget(export_button)
         
         interpret_button = QPushButton("Interpretar Datos")
         interpret_button.clicked.connect(self.mostrar_interpretacion)
+        interpret_button.setCursor(Qt.PointingHandCursor)
         self.controls_layout.addWidget(interpret_button)
         
-        self.pause_button = QPushButton("Pausar Simulacion")
+        self.pause_button = QPushButton("Pausar Simulación")
         self.pause_button.clicked.connect(self.toggle_pause)
+        self.pause_button.setCursor(Qt.PointingHandCursor)
         self.controls_layout.addWidget(self.pause_button)
     
     def toggle_pause(self):
@@ -282,12 +381,34 @@ class ExportManager:
 class InterpretacionDatos(QDialog):
     def __init__(self, datos):
         super().__init__()
+        self.setStyleSheet(ESTILO)  # Aplicar el estilo
         self.setWindowTitle("Interpretación de Datos")
         self.setGeometry(200, 200, 800, 600)
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(QtGui.QIcon(icon))
 
+
+        
+        # Personalizar el QTextEdit
         layout = QVBoxLayout()
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)
+        self.text_edit.setStyleSheet("""
+            QTextEdit {
+                background-color: #D0D0D0;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px;
+                color: #2B2D42;
+                font-size: 14px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+        """)
         layout.addWidget(self.text_edit)
         self.setLayout(layout)
 

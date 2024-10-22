@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         initial_menu = QDialog(self)
         initial_menu.setWindowTitle('Menú Inicial - Kontrolu')
         initial_menu.setStyleSheet(ESTILO)
-        initial_menu.resize(400, 150)
+        initial_menu.resize(400, 400)  # Aumentamos el tamaño para acomodar el logo
         layout = QVBoxLayout()
         
         # Configurar el icono de la ventana
@@ -53,8 +53,21 @@ class MainWindow(QMainWindow):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QtGui.QIcon(icon))
 
+        # Agregar logo grande
+        logo_label = QLabel()
+        pixmap = QtGui.QPixmap(image_path)
+        scaled_pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        logo_label.setPixmap(scaled_pixmap)
+        logo_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(logo_label)
+
+        # Agregar mensaje de bienvenida
+        welcome_label = QLabel('¡Bienvenido a Kontrolu!')
+        welcome_label.setAlignment(Qt.AlignCenter)
+        welcome_label.setStyleSheet("font-size: 30px; font-weight: bold; margin: 20px 0;")
+        layout.addWidget(welcome_label)
+
         new_project_btn = QPushButton('Crear proyecto nuevo')
-       
         new_project_btn.clicked.connect(self.new_project_from_menu)
         layout.addWidget(new_project_btn)
 
