@@ -169,13 +169,43 @@ class DrawingArea(QGraphicsView):
         help_dialog = QDialog(self)
         help_dialog.setWindowTitle("Ayuda")
         
-        help_dialog.setStyleSheet("background-color: #333; color: white;")
+        help_dialog.setStyleSheet("""
+            QDialog {
+                background-color: #B0B0B0;
+                border-radius: 15px;
+                padding: 20px;
+                border: 2px solid #505050;
+            }
+            QTextEdit {
+                background-color: #D0D0D0;
+                color: #2B2D42;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 8px;
+                font-size: 14px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            QPushButton:hover {
+                background-color: #606060;
+            }
+        """)
+        
         layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
 
         help_text = QTextEdit()
         help_text.setReadOnly(True)
         
-        # Leer el contenido HTML del archivo externo
         current_dir = os.path.dirname(os.path.abspath(__file__))
         help_file_path = os.path.join(current_dir, 'help_content.html')
         with open(help_file_path, 'r', encoding='utf-8') as help_file:
@@ -281,17 +311,37 @@ class DrawingArea(QGraphicsView):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
         
-        # Establecer el estilo de la ventana
+        # Establecer el estilo de la ventana con el nuevo diseño
         dialog.setStyleSheet("""
             QMessageBox {
-                background-color: #333;
-                color: white;
+                background-color: #B0B0B0;
+                border: 2px solid #505050;
+                border-radius: 15px;
+                padding: 20px;
             }
             
             QMessageBox QLabel {
-                color: white;
-                background-color: black;
+                color: #2B2D42;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                background-color: transparent;
                 padding: 10px;
+            }
+            
+            QMessageBox QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                min-width: 80px;
+                min-height: 30px;
+            }
+            
+            QMessageBox QPushButton:hover {
+                background-color: #606060;
             }
         """)
         
@@ -299,17 +349,6 @@ class DrawingArea(QGraphicsView):
         yes_button = dialog.button(QMessageBox.Yes)
         if yes_button:
             yes_button.setText("Si")
-
-        # Aplicar estilo a los botones específicos
-        for button in dialog.buttons():
-            button.setStyleSheet("""
-                background-color: black;
-                color: white;
-                min-width: 80px;
-                min-height: 30px;
-                border: none;
-                border-radius: 3px;
-            """)
 
         reply = dialog.exec_()
         
@@ -918,17 +957,37 @@ class DrawingArea(QGraphicsView):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
         
-        # Establecer el estilo de la ventana
+        # Establecer el estilo de la ventana con el nuevo diseño
         dialog.setStyleSheet("""
             QMessageBox {
-                background-color: #333;
-                color: white;
+                background-color: #B0B0B0;
+                border: 2px solid #505050;
+                border-radius: 15px;
+                padding: 20px;
             }
             
             QMessageBox QLabel {
-                color: white;
-                background-color: black;
+                color: #2B2D42;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                background-color: transparent;
                 padding: 10px;
+            }
+            
+            QMessageBox QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                min-width: 80px;
+                min-height: 30px;
+            }
+            
+            QMessageBox QPushButton:hover {
+                background-color: #606060;
             }
         """)
         
@@ -936,17 +995,38 @@ class DrawingArea(QGraphicsView):
         yes_button = dialog.button(QMessageBox.Yes)
         if yes_button:
             yes_button.setText("Si")
-
-        # Aplicar estilo a los botones específicos
+            
+        # Aplicar efectos hover a los botones
         for button in dialog.buttons():
-            button.setStyleSheet("""
-                background-color: black;
-                color: white;
-                min-width: 80px;
-                min-height: 30px;
-                border: none;
-                border-radius: 3px;
-            """)
+            # Crear función de hover para cada botón
+            def enterEvent(e, button=button):
+                button.setStyleSheet("""
+                    background-color: #606060;
+                    color: white;
+                    border: 2px solid #505050;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    font-family: "Segoe UI", "Arial", sans-serif;
+                    min-width: 80px;
+                    min-height: 30px;
+                """)
+            
+            def leaveEvent(e, button=button):
+                button.setStyleSheet("""
+                    background-color: #808080;
+                    color: white;
+                    border: 2px solid #505050;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    font-family: "Segoe UI", "Arial", sans-serif;
+                    min-width: 80px;
+                    min-height: 30px;
+                """)
+            
+            button.enterEvent = enterEvent
+            button.leaveEvent = leaveEvent
 
         reply = dialog.exec_()
         
@@ -961,7 +1041,6 @@ class DrawingArea(QGraphicsView):
 
 
     def delete_selected_microbloques(self):
-        
         dialog = QMessageBox(None)
         dialog.setWindowTitle('Confirmar eliminación')
         dialog.setText('¿Está seguro que desea eliminar los microbloques seleccionados?')
@@ -975,17 +1054,34 @@ class DrawingArea(QGraphicsView):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
         
-        # Establecer el estilo de la ventana
+        # Aplicar el nuevo estilo
         dialog.setStyleSheet("""
             QMessageBox {
-                background-color: #333;
-                color: white;
+                background-color: #B0B0B0;
+                border: 2px solid #505050;
+                border-radius: 15px;
+                padding: 20px;
             }
-            
             QMessageBox QLabel {
-                color: white;
-                background-color: black;
+                color: #2B2D42;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                background-color: transparent;
                 padding: 10px;
+            }
+            QMessageBox QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                min-width: 80px;
+                min-height: 30px;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #606060;
             }
         """)
         
@@ -993,17 +1089,6 @@ class DrawingArea(QGraphicsView):
         yes_button = dialog.button(QMessageBox.Yes)
         if yes_button:
             yes_button.setText("Si")
-
-        # Aplicar estilo a los botones específicos
-        for button in dialog.buttons():
-            button.setStyleSheet("""
-                background-color: black;
-                color: white;
-                min-width: 80px;
-                min-height: 30px;
-                border: none;
-                border-radius: 3px;
-            """)
 
         reply = dialog.exec_()
         

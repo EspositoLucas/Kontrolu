@@ -105,7 +105,7 @@ class Simulacion(QObject):
     def confirmar_cierre(self, event):
         self.timer.stop()
         self.window.no_buttons()
-        if self.cerrando:  # Si ya estamos en proceso de cierre, aceptar el evento
+        if self.cerrando:
             self.window.deteniendo_buttons()
             event.accept()
             return
@@ -123,17 +123,34 @@ class Simulacion(QObject):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
         
-        # Establecer el estilo de la ventana
+        # Aplicar el nuevo estilo
         dialog.setStyleSheet("""
             QMessageBox {
-                background-color: #333;
-                color: white;
+                background-color: #B0B0B0;
+                border: 2px solid #505050;
+                border-radius: 15px;
+                padding: 20px;
             }
-            
             QMessageBox QLabel {
-                color: white;
-                background-color: black;
+                color: #2B2D42;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                background-color: transparent;
                 padding: 10px;
+            }
+            QMessageBox QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+                min-width: 80px;
+                min-height: 30px;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #606060;
             }
         """)
         
@@ -142,29 +159,18 @@ class Simulacion(QObject):
         if yes_button:
             yes_button.setText("Si")
 
-        # Aplicar estilo a los botones específicos
-        for button in dialog.buttons():
-            button.setStyleSheet("""
-                background-color: black;
-                color: white;
-                min-width: 80px;
-                min-height: 30px;
-                border: none;
-            """)
-
         reply = dialog.exec_()
 
         if reply == QMessageBox.Yes:
             self.window.deteniendo_buttons()
             self.timer.stop()
             self.continuar_simulacion = False
-            self.cerrando = True  # Marcamos que estamos en proceso de cierre
-            self.graficadora.close()  # Cerramos la ventana del gráfico
+            self.cerrando = True
+            self.graficadora.close()
         else:
             self.window.reanudando_buttons()
             self.timer.start()
             event.ignore()
-            
 
         
   

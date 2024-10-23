@@ -21,66 +21,123 @@ class EditarPerturbacion(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Editar Perturbación")
-        layout = QVBoxLayout()
+        
+        # Establecer el estilo general del diálogo
+        self.setStyleSheet("""
+            QDialog {
+                background-color: #B0B0B0;
+                border-radius: 15px;
+                padding: 20px;
+                border: 2px solid #505050;
+            }
+            
+            QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            
+            QPushButton:hover {
+                background-color: #606060;
+            }
+            
+            QLabel {
+                color: #2B2D42;
+                background-color: transparent;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            
+            QCheckBox {
+                color: #2B2D42;
+                font-size: 14px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            
+            QSpinBox {
+                background-color: #D0D0D0;
+                color: #2B2D42;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 8px;
+                font-size: 14px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+        """)
 
+        layout = QVBoxLayout()
+        layout.setSpacing(10)  # Espaciado entre widgets
+        layout.setContentsMargins(20, 20, 20, 20)  # Márgenes del layout
+
+        # Función de Transferencia
         self.ft_label = QLabel("Función de Transferencia:")
-        self.ft_label.setStyleSheet("color: white;")
         self.ft_editor = LatexEditor(self.perturbacion_back.funcion_transferencia)
-        self.ft_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
+        self.ft_editor.setStyleSheet("""
+            background-color: #D0D0D0;
+            color: #2B2D42;
+            border: 2px solid #505050;
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 14px;
+            font-family: "Segoe UI", "Arial", sans-serif;
+        """)
         layout.addWidget(self.ft_label)
         layout.addWidget(self.ft_editor)
 
-        # Checkbox para "Perturbar ahora"
+        # Checkbox Perturbar ahora
         self.perturbar_ahora_checkbox = QCheckBox("Perturbar ahora")
         self.perturbar_ahora_checkbox.setChecked(self.perturbacion_back.ahora)
-        self.perturbar_ahora_checkbox.setStyleSheet("color: white;")
         layout.addWidget(self.perturbar_ahora_checkbox)
 
-        # Editor de inicio de self.ciclos
+        # Tiempo de inicio
         self.ciclos = QLabel("Tiempo de inicio (s):")
-        self.ciclos.setStyleSheet("color: white;")
         self.ciclos_editor = QSpinBox()
         self.ciclos_editor.setValue(self.perturbacion_back.inicio)
-        self.ciclos_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         self.ciclos_editor.setMinimum(0)
         layout.addWidget(self.ciclos)
         layout.addWidget(self.ciclos_editor)
 
-        # Editor de duración
+        # Duración
         self.dentro_de_label = QLabel("Duración (s):")
         self.dentro_de_editor = QSpinBox()
         self.dentro_de_editor.setValue(self.perturbacion_back.duracion)
         self.dentro_de_editor.setMinimum(0)
-        self.dentro_de_editor.setStyleSheet("background-color: #444; color: white; border: 1px solid #555;")
         layout.addWidget(self.dentro_de_label)
         layout.addWidget(self.dentro_de_editor)
 
-        # Conectar el checkbox para ocultar/mostrar el editor de inicio
+        # Función para toggle de visibilidad
         def toggle_inicio_editor():
             self.ciclos.setVisible(not self.perturbar_ahora_checkbox.isChecked())
             self.ciclos_editor.setVisible(not self.perturbar_ahora_checkbox.isChecked())
 
-        # Conectar el checkbox a la función para que oculte el editor de inicio
+        # Conectar checkbox
         self.perturbar_ahora_checkbox.stateChanged.connect(toggle_inicio_editor)
-        toggle_inicio_editor()  # Para que se oculte/visualice según el estado inicial del checkbox
+        toggle_inicio_editor()
 
+        # Botones
         buttons = QHBoxLayout()
+        buttons.setSpacing(10)  # Espaciado entre botones
+        
         ok_button = QPushButton("Aceptar")
         cancel_button = QPushButton("Cancelar")
+        editar_json_button = QPushButton("Editar JSON")
+
         buttons.addWidget(ok_button)
         buttons.addWidget(cancel_button)
-        layout.addLayout(buttons)
-        # Botón para editar JSON
-        editar_json_button = QPushButton("Editar JSON")
         buttons.addWidget(editar_json_button)
+        
+        layout.addLayout(buttons)
 
+        # Conectar señales de los botones
         editar_json_button.clicked.connect(self.editar_json)
-
-        self.setStyleSheet("background-color: #333; color: white;")
-        self.setLayout(layout)
-
         ok_button.clicked.connect(self.aceptar)
         cancel_button.clicked.connect(self.reject)
+
+        self.setLayout(layout)
 
     def aceptar(self):
         

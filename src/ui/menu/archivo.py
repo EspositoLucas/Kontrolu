@@ -56,29 +56,38 @@ class Archivo(QMenu):
             yesButton = msgBox.button(QMessageBox.Yes)
             yesButton.setText('Si')
             
-            # Aplicar estilo
+            # Aplicar el nuevo estilo
             msgBox.setStyleSheet("""
                 QMessageBox {
-                    background-color: #333;
-                    color: white;
+                    background-color: #B0B0B0;
+                    border: 2px solid #505050;
+                    border-radius: 15px;
+                    padding: 20px;
                 }
+
                 QMessageBox QLabel {
-                color: white;
-                background-color: black;
-                padding: 10px;
-            }
-            """)
-            
-            # Aplicar estilo a los botones específicos
-            for button in msgBox.buttons():
-                button.setStyleSheet("""
-                    background-color: black;
+                    color: #2B2D42;
+                    font-size: 16px;
+                    font-family: "Segoe UI", "Arial", sans-serif;
+                    background-color: transparent;
+                }
+
+                QMessageBox QPushButton {
+                    background-color: #808080;
                     color: white;
+                    border: 2px solid #505050;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    font-family: "Segoe UI", "Arial", sans-serif;
                     min-width: 80px;
                     min-height: 30px;
-                    border: none;
-                    border-radius: 3px;
-                """)
+                }
+
+                QMessageBox QPushButton:hover {
+                    background-color: #606060;
+                }
+            """)
             
             reply = msgBox.exec_()
             
@@ -89,7 +98,6 @@ class Archivo(QMenu):
                 return True
             return False
         else:
-            # Si se llama desde el menú inicial, no mostrar confirmación
             self.sesion.nueva_sesion()
             return True
 
