@@ -36,6 +36,7 @@ class ModificarConfiguracion(QDialog):
         
         checkbox_style = """
             color: #2B2D42;
+            background-color:#FAF8F6;
             font-size: 14px;
             font-family: "Segoe UI", "Arial", sans-serif;
         """
@@ -265,6 +266,10 @@ class ModificarConfiguracion(QDialog):
                 padding: 20px;
                 border: 2px solid #505050;
             }
+            
+            QTextEdit {
+        background-color: #FAF8F6;  /* Fondo blanco pastel */
+    }
         """)
 
         self.setLayout(self.layout)

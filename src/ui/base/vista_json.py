@@ -160,6 +160,9 @@ ESTILO = """
         font-size: 14px;  /* Tipografía más grande */
         font-family: "Segoe UI", "Arial", sans-serif;
     }
+    QTextEdit {
+        background-color: #FAF8F6;  /* Fondo blanco pastel */
+    }
 
     QLabel {
         color: #2B2D42;  /* Texto gris oscuro */

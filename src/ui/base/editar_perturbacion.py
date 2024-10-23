@@ -45,6 +45,10 @@ class EditarPerturbacion(QDialog):
                 background-color: #606060;
             }
             
+            QTextEdit {
+        background-color: #FAF8F6;  /* Fondo blanco pastel */
+    }
+            
             QLabel {
                 color: #2B2D42;
                 background-color: transparent;
@@ -56,6 +60,7 @@ class EditarPerturbacion(QDialog):
                 color: #2B2D42;
                 font-size: 14px;
                 font-family: "Segoe UI", "Arial", sans-serif;
+                background-color: #FAF8F6;
             }
             
             QSpinBox {

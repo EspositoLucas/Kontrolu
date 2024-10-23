@@ -64,6 +64,10 @@ class Archivo(QMenu):
                     border-radius: 15px;
                     padding: 20px;
                 }
+                
+                QTextEdit {
+                    background-color: #FAF8F6;  /* Fondo blanco pastel */
+    }
 
                 QMessageBox QLabel {
                     color: #2B2D42;

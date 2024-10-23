@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QPushButton, QVBoxLayout,
                              QToolBar, QAction,QTableWidgetItem, QTableWidget, QFrame,QGraphicsView,QWidget)
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,QEvent
 from PyQt5.QtGui import QIcon
 import os
 from .menu.menu_bar import Menu
@@ -104,26 +104,47 @@ class MainWindow(QMainWindow):
     def initUI(self):
         self.setWindowTitle('Kontrolu')
         self.floating_ellipses_view = None
+        
+        # Debug de información de pantalla
         screen = QtGui.QGuiApplication.primaryScreen().geometry()
-        self.setGeometry(screen)
+        print("\n=== PANTALLA DEBUG ===")
+        print(f"Resolución de pantalla: {screen.width()}x{screen.height()}")
+        print(f"DPI de pantalla: {QtGui.QGuiApplication.primaryScreen().logicalDotsPerInch()}")
+        print(f"Factor de escalado: {QtGui.QGuiApplication.primaryScreen().devicePixelRatio()}")
+        
+        self.setMinimumSize(800, 600)
+        
+        # Print tamaño inicial de ventana
+        print(f"Tamaño mínimo establecido: 800x600")
+        print(f"Geometría inicial: {self.geometry().width()}x{self.geometry().height()}")
+        print("=====================\n")
+        
+        # self.setGeometry(screen)
         self.showMaximized()
-        # Ruta de la imagen del logo
+        
         path = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path, 'base/imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QIcon(icon))
-        # menuBar = Menu(self,self.sesion)
-        # self.setMenuBar(menuBar)
-        self.init_macrobloques() 
+        self.init_macrobloques()
+
+    def changeEvent(self, event):
+        super().changeEvent(event)
+        if event.type() == QEvent.WindowStateChange:  # Cambiado de Qt.WindowStateChange a QEvent.WindowStateChange
+            print("Estado actual:")
+            print(f"- Minimizado: {bool(self.windowState() & Qt.WindowMinimized)}")
+            print(f"- Maximizado: {bool(self.windowState() & Qt.WindowMaximized)}")
+            print(f"- Pantalla completa: {bool(self.windowState() & Qt.WindowFullScreen)}")
+            print("===========================\n")
     
+        
     def new_project_from_main(self):
         if self.archivo.new_project(from_menu=False):
             self.actualizar_sesion()
             self.actualizar_sesion()
     
             self.actualizar_sesion() 
-    
         
     def init_macrobloques(self):
 
@@ -144,15 +165,29 @@ class MainWindow(QMainWindow):
         # Establecer la posición de la vista de elipses flotantes en la esquina inferior izquierda
         height = self.size().height()
         width = self.size().width()
-        self.floating_ellipses_view.setGeometry(0, height-200, width, 150)    
+        self.floating_ellipses_view.setGeometry(0, height-200, width, 150)
+            
     def resizeEvent(self, event):
         super().resizeEvent(event)
         if self.floating_ellipses_view:
-            print("resize")
+            # Prints para debugging de dimensiones
+            print("\n=== RESIZE EVENT DEBUG ===")
+            print(f"Ventana actual - Ancho: {self.size().width()}, Alto: {self.size().height()}")
+            print(f"Evento resize - Antiguo tamaño: {event.oldSize().width()}x{event.oldSize().height()}")
+            print(f"Evento resize - Nuevo tamaño: {event.size().width()}x{event.size().height()}")
+            
+            # Calcular dimensiones
             height = self.size().height()
             width = self.size().width()
-            print(height)
-            self.floating_ellipses_view.setGeometry(0, height-200, width, 150)
+            floating_height = min(150, height * 0.2)
+            floating_y = height - floating_height
+            
+            # Print de cálculos de posicionamiento
+            print(f"Floating view - Altura: {floating_height}, Posición Y: {floating_y}")
+            print(f"Ratio de escalado - Altura: {floating_height/height:.2%}")
+            print("========================\n")
+            
+            # self.floating_ellipses_view.setGeometry(0, floating_y, width, floating_height)
 
     
     def new_project(self):
@@ -517,6 +552,10 @@ ESTILO = """
         color: #2B2D42;  /* Texto gris oscuro */
         font-size: 14px;  /* Tipografía más grande */
         font-family: "Segoe UI", "Arial", sans-serif;
+    }
+    
+    QTextEdit {
+        background-color: #FAF8F6;  /* Fondo blanco pastel */
     }
 
     QLabel {

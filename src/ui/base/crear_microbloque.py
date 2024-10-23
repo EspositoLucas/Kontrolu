@@ -519,13 +519,17 @@ ESTILO = """
     }
 
     QLineEdit {
-        background-color: #D0D0D0;  /* Fondo gris claro */
+        background-color: #FAF8F6;  /* Fondo gris claro */
         border: 2px solid #505050;  /* Borde gris oscuro */
         border-radius: 10px;
         padding: 8px;
         color: #2B2D42;  /* Texto gris oscuro */
         font-size: 14px;  /* Tipografía más grande */
         font-family: "Segoe UI", "Arial", sans-serif;
+    }
+    
+    QTextEdit {
+        background-color: #FAF8F6;  /* Fondo blanco pastel */
     }
 
     QLabel {
