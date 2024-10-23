@@ -5,6 +5,10 @@ from .pausar_button import BotonPausar
 from .reanudar_button import BotonReanudar
 from .detener_button import BotonDetener
 from PyQt5.QtCore import QRectF
+from ..menu.archivo import Archivo
+from .vista_json import VistaJson
+from PyQt5.QtWidgets import (QPushButton, QWidget,QMenu,QHBoxLayout)
+from PyQt5.QtCore import Qt
 
 
 class FloatingButtonsMainView(QtWidgets.QGraphicsView):
@@ -25,27 +29,48 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         RADIO_C = 40
         scene_width = self.scene.width()
         scene_height = self.scene.height()
-        y = scene_height-RADIO_C*9
+        y = scene_height
 
-        x = -1000  # Starting x position for the first button
-        y = scene_height  # y position for the buttons
+        x = -1000  # Posición x inicial para el primer botón
+        spacing = RADIO_C * 2 + 40  # Espacio entre botones
 
-        # Create and add the first button
-        circulo = QGraphicCircleItem(x, y, RADIO_C, 'fa5s.cog', self.padre.configurar_simulacion, self, message="Configurar simulación")
+        # Botón de configuración
+        circulo = QGraphicCircleItem(x, y, RADIO_C, 'fa5s.cog', 
+                                    self.padre.configurar_simulacion, 
+                                    self, 
+                                    message="Configurar simulación")
         self.scene.addItem(circulo)
 
-        # Update x position for the next button
-        x += RADIO_C * 2 + 40  # Add some spacing between buttons
-
-        # Create and add the second button
-        icono_analisis = QGraphicCircleItem(x, y, RADIO_C, 'fa5s.chart-line', self.padre.mostrar_analisis_estabilidad, self, message="Análisis de estabilidad")
+        # Botón de análisis
+        x += spacing  # Actualizar x para el siguiente botón
+        icono_analisis = QGraphicCircleItem(x, y, RADIO_C, 
+                                        'fa5s.chart-line', 
+                                        self.padre.mostrar_analisis_estabilidad, 
+                                        self, 
+                                        message="Análisis de estabilidad")
         self.scene.addItem(icono_analisis)
-        #json_button = QGraphicCircleItem(RADIO_C*9, y, RADIO_C, 'fa5s.file-code', self.padre.ver_json, self, message="Ver JSON")
-        #self.scene.addItem(json_button)
-        #archivo_button = QGraphicCircleItem(RADIO_C*12, y, RADIO_C, 'fa5s.chart-line', self.padre.mostrar_analisis_estabilidad, self,message="Archivo")
-        #self.scene.addItem(archivo_button)
+        
+        # Botón de archivo
+        x += spacing  # Actualizar x para el siguiente botón
+        archivo_menu = self.create_archivo_menu()
+        archivo_button = QGraphicCircleItem(x, y, RADIO_C, 
+                                        'fa5s.file', 
+                                        lambda: None,
+                                        self, 
+                                        message="Archivo",
+                                        menu=archivo_menu)
+        self.scene.addItem(archivo_button)
 
-        self.draw_simu_buttons(scene_width,scene_height)
+        self.draw_simu_buttons(scene_width, scene_height)
+
+        # Botón de JSON
+        x += spacing  # Actualizar x para el siguiente botón
+        json_button = QGraphicCircleItem(x, y, RADIO_C, 
+                                    'fa5s.file-code', 
+                                    self.padre.vista_json,
+                                    self, 
+                                    message=" Editar JSON")
+        self.scene.addItem(json_button)
 
     
     def draw_simu_buttons(self,sene_width,scene_height):
@@ -117,3 +142,46 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         self.pausar_buton.hide()
         self.boton_detener.hide()
         self.reanudar_boton.hide()
+    
+    def nuevo_archivo(self):
+        # Implementa la lógica del archivo original en menu_bar.txt
+        archivo = Archivo(self.padre, self.padre.sesion)
+        archivo.new_project()
+
+    def abrir_archivo(self):
+        archivo = Archivo(self.padre, self.padre.sesion)
+        archivo.open_project()
+
+    def guardar_archivo(self):
+        archivo = Archivo(self.padre, self.padre.sesion)
+        archivo.save_project()
+
+    def create_archivo_menu(self):
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("""
+            QMenu {
+                background-color: #444;
+                color: white;
+                border: 1px solid #2B2D42;
+                border-radius: 10px;
+            }
+            QMenu::item {
+                background-color: #666;
+                padding: 5px 20px;
+                border-radius: 5px;
+                margin: 2px;
+            }
+            QMenu::item:selected {
+                background-color: #777;
+            }
+        """)
+        
+        nuevo_action = menu.addAction("Nuevo Archivo")
+        abrir_action = menu.addAction("Abrir Archivo")
+        guardar_action = menu.addAction("Guardar Archivo")
+        
+        nuevo_action.triggered.connect(self.nuevo_archivo)
+        abrir_action.triggered.connect(self.abrir_archivo)
+        guardar_action.triggered.connect(self.guardar_archivo)
+        
+        return menu

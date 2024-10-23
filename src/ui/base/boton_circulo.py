@@ -11,7 +11,7 @@ LETRA_COLOR = QColor("#2B2D42")
 TEXTO_BLANCO = QColor("#FFFDF5")
 
 class QGraphicCircleItem(QGraphicsEllipseItem):
-    def __init__(self, x, y, radius, icono, metodo, parent=None,toggle=False, message=None):
+    def __init__(self, x, y, radius, icono, metodo, parent=None,toggle=False, message=None,menu=None):
         super().__init__(x - radius, y - radius, 2 * radius, 2 * radius)
         self.parent = parent
         self.brush_claro = QBrush(ACLARADO)
@@ -29,6 +29,7 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
         self.icon_item.setOffset(x - radius + 2, y - radius + 2)
         self.selected = False
         self.message = message
+        self.menu= menu
 
     def set_color(self, color):
         self.setBrush(QBrush(color))
@@ -52,7 +53,11 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
         super().hoverLeaveEvent(event)
 
     def mousePressEvent(self, event):
-        if self.toggle:
+        if self.menu is not None:
+            # Si tiene un menú asociado, lo muestra
+            self.menu.exec_(event.screenPos())
+        elif self.toggle:
+            # Código existente para toggle
             if self.selected:
                 self.selected = False
                 self.default_brush = self.brush_normal
@@ -62,9 +67,9 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
                 self.default_brush = self.brush_claro
                 self.setBrush(self.default_brush)
             self.metodo(self.selected)
-            return
-
-        self.metodo()
+        else:
+            # Código existente para otros casos
+            self.metodo()
         super().mousePressEvent(event)
     
     def hoverMoveEvent(self, event):
@@ -72,3 +77,7 @@ class QGraphicCircleItem(QGraphicsEllipseItem):
         self.setCursor(Qt.PointingHandCursor)
         if self.message:
             self.setToolTip(self.message)
+    
+    def show_popup_menu(self, menu, event):
+        pos = event.screenPos()
+        menu.exec_(pos)

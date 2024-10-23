@@ -16,6 +16,7 @@ from back.estabilidad import Estabilidad
 from ui.base.grafico_simulacion import Graficadora
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication
+from .base.vista_json import VistaJson
 import sympy as sp
 import sys
 class MainWindow(QMainWindow):
@@ -48,15 +49,21 @@ class MainWindow(QMainWindow):
         
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path,'base','imgs', 'logo.png')
+        image_path = os.path.join(path,'base','imgs','logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QtGui.QIcon(icon))
+        
+        # Configurar el icono del menu inicial
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path_2 = os.path.join(path,'base','imgs','kontrolu_azul_oscuro.png')
+        icon_2 = QtGui.QIcon()
+        icon_2.addPixmap(QtGui.QPixmap(image_path_2), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 
         # Agregar logo grande
         logo_label = QLabel()
-        pixmap = QtGui.QPixmap(image_path)
-        scaled_pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        pixmap = QtGui.QPixmap(image_path_2)
+        scaled_pixmap = pixmap.scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         logo_label.setPixmap(scaled_pixmap)
         logo_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(logo_label)
@@ -106,8 +113,8 @@ class MainWindow(QMainWindow):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QIcon(icon))
-        menuBar = Menu(self,self.sesion)
-        self.setMenuBar(menuBar)
+        # menuBar = Menu(self,self.sesion)
+        # self.setMenuBar(menuBar)
         self.init_macrobloques() 
     
     def new_project_from_main(self):
@@ -164,6 +171,12 @@ class MainWindow(QMainWindow):
         if file_name:
             self.statusBar().showMessage(f'Proyecto guardado en {file_name}')
             # Lógica para guardar un proyecto
+    
+    def vista_json(self):
+        vista = VistaJson(self.sesion, self)
+        vista.exec_()
+        if vista.result():
+            self.actualizar_sesion()
 
     # Agregar este nuevo método
     def configurar_simulacion(self):
