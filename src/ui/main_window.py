@@ -112,14 +112,12 @@ class MainWindow(QMainWindow):
         print(f"DPI de pantalla: {QtGui.QGuiApplication.primaryScreen().logicalDotsPerInch()}")
         print(f"Factor de escalado: {QtGui.QGuiApplication.primaryScreen().devicePixelRatio()}")
         
-        self.setMinimumSize(800, 600)
         
         # Print tamaño inicial de ventana
         print(f"Tamaño mínimo establecido: 800x600")
         print(f"Geometría inicial: {self.geometry().width()}x{self.geometry().height()}")
         print("=====================\n")
         
-        # self.setGeometry(screen)
         self.showMaximized()
         
         path = os.path.dirname(os.path.abspath(__file__))
@@ -177,17 +175,12 @@ class MainWindow(QMainWindow):
             print(f"Evento resize - Nuevo tamaño: {event.size().width()}x{event.size().height()}")
             
             # Calcular dimensiones
+            print("resize")
             height = self.size().height()
             width = self.size().width()
-            floating_height = min(150, height * 0.2)
-            floating_y = height - floating_height
+            print(height)
             
-            # Print de cálculos de posicionamiento
-            print(f"Floating view - Altura: {floating_height}, Posición Y: {floating_y}")
-            print(f"Ratio de escalado - Altura: {floating_height/height:.2%}")
-            print("========================\n")
-            
-            # self.floating_ellipses_view.setGeometry(0, floating_y, width, floating_height)
+            self.floating_ellipses_view.setGeometry(0, height-200, width, 150)
 
     
     def new_project(self):
