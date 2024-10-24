@@ -1,6 +1,6 @@
 
 from PyQt5.QtGui import QColor
-from sympy import  inverse_laplace_transform, symbols,laplace_transform
+from sympy import  inverse_laplace_transform, symbols,laplace_transform,simplify,latex
 from latex2sympy2 import latex2sympy
 from back.topologia.configuraciones import Configuracion,TipoError
 from .hoja import Hoja
@@ -212,3 +212,9 @@ class MicroBloque(Hoja):
             raise Exception(f"El color de {datos['nombre']} debe ser un string")
         
         return True
+    
+
+
+    def operar_fdt(self,input):
+
+        return self.calcular_fdt() * input

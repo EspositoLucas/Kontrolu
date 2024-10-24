@@ -4,6 +4,8 @@ from .macros.macro_medidor import MacroMedidor
 from .macros.macro_proceso import MacroProceso
 from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
+from sympy import simplify, latex
+from sympy.abc import s
 
 
 
@@ -137,3 +139,100 @@ class Sesion():
             raise Exception(f"Error en la carga: {e}")
         
         return True
+    
+    def operar_fdt(self,input):
+
+        return self.calcular_fdt() * input
+    
+
+    def calcular_fdt_lazo_abierto(self):
+
+        return self.controlador.calcular_fdt() * self.actuador.calcular_fdt() * self.proceso.calcular_fdt()
+    
+    def obtener_fdt_lazo_abierto_simpy(self):
+
+        return simplify(self.calcular_fdt_lazo_abierto())
+    
+    def obtener_fdt_lazo_abierto_latex(self):
+
+        return latex(self.obtener_fdt_lazo_abierto_simpy())
+    
+    def calcular_fdt_realimentacion(self):
+
+        return self.medidor.calcular_fdt()
+    
+    def obtener_fdt_realimentacion_simpy(self):
+
+        return simplify(self.calcular_fdt_realimentacion())
+    
+    def obtener_fdt_realimentacion_latex(self):
+
+        return latex(self.obtener_fdt_realimentacion_simpy())
+    
+    def calcular_fdt_global(self):
+
+        return self.obtener_fdt_lazo_abierto_simpy() / (1 + self.obtener_fdt_lazo_abierto_simpy() * self.obtener_fdt_realimentacion_simpy())
+    
+    def obtener_fdt_global_simpy(self):
+
+        return self.calcular_fdt_global()
+    
+    def obtener_fdt_global_latex(self):
+
+        return latex(self.obtener_fdt_global_simpy())
+    
+    def calcular_fdt_con_entrada(self):
+
+        return self.calcular_fdt_global() * self.entrada.calcular_fdt()
+
+    def obtener_fdt_con_entrada_simpy(self):
+            
+        return self.calcular_fdt_con_entrada()
+    
+    def obtener_fdt_con_entrada_latex(self):
+
+        return latex(self.obtener_fdt_con_entrada_simpy())
+    
+    def calcular_abierta_si_unitario(self):
+
+        return self.calcular_fdt_lazo_abierto()/(1+self.calcular_fdt_lazo_abierto()*(self.calcular_fdt_realimentacion()-1))
+    
+    def obtener_abierta_si_unitario_simpy(self):
+
+        return simplify(self.calcular_abierta_si_unitario())
+    
+    def obtener_abierta_si_unitario_latex(self):
+
+        return latex(self.obtener_abierta_si_unitario_simpy())
+    
+    def calcular_sistema_unitario(self):
+
+        return 1/(1+self.calcular_abierta_si_unitario())
+    
+    def obtener_sistema_unitario_simpy(self):
+
+        return simplify(self.calcular_sistema_unitario())
+    
+    def obtener_sistema_unitario_latex(self):
+
+        return latex(self.obtener_sistema_unitario_simpy())
+    
+    def calcular_calculo_error_en_estado_estable(self):
+
+        return s*self.entrada.calcular_fdt()*self.obtener_sistema_unitario_simpy()
+    
+    def obtener_calculo_error_en_estado_estable_simpy(self):
+
+        return simplify(self.calcular_calculo_error_en_estado_estable())
+    
+    def obtener_calculo_error_en_estado_estable_latex(self):
+
+        return latex(self.obtener_calculo_error_en_estado_estable_simpy())
+    
+    def calcular_error_en_estado_estable(self):
+
+        return self.calcular_calculo_error_en_estado_estable().limit(s,0).evalf()
+
+
+
+    

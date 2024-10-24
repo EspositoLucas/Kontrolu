@@ -1,6 +1,8 @@
 from __future__ import annotations
 from typing import Tuple
 import itertools
+from sympy import simplify,latex
+
 class InterfazTopologia():
 
     def __init__(self,padre:InterfazTopologia=None) -> None:
@@ -62,4 +64,20 @@ class InterfazTopologia():
     def unidad_salida(self)->str:
         pass
     def simular(self, tiempo, entrada=None)->float:
+        pass
+
+    def calcular_fdt(self):
+
+        pass
+    
+    def obtener_fdt_simpy(self):
+
+        return simplify(self.calcular_fdt())
+    
+    def obtener_fdt_latex(self):
+
+        return latex(self.obtener_fdt_simpy())
+    
+    def operar_fdt(self,input):
+
         pass

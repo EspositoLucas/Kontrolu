@@ -117,3 +117,14 @@ class MacroBloque(InterfazTopologia):
             raise Exception(f"Error en la topología de {datos['nombre']}: {e}")
         
         return True
+    
+    
+    def calcular_fdt(self):
+
+        return self.topologia.calcular_fdt()
+    
+
+    
+    def operar_fdt(self,input):
+
+        return self.calcular_fdt() * input

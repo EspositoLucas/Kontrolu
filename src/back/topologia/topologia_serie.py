@@ -4,6 +4,7 @@ from back.topologia.perturbacion import Perturbacion
 from .perturbacion import Perturbacion
 from .hoja import Hoja
 from .microbloque import MicroBloque
+from sympy import latex,simplify
 
 ANCHO = 150
 ALTO = 80
@@ -195,6 +196,20 @@ class TopologiaSerie(InterfazTopologia):
         return True
 
 
+    def calcular_fdt(self):
+
+        fdt = 1
+
+        [fdt := block.operar_fdt(fdt) for block in self.hijos]
+
+        return fdt
+    
+
+    
+    def operar_fdt(self,input):
+
+        return self.calcular_fdt() + input
+
     
 
 class TopologiaParalelo(InterfazTopologia):
@@ -315,3 +330,18 @@ class TopologiaParalelo(InterfazTopologia):
                 raise Exception(f"Tipo de hijo desconocido: {hijo['tipo']}")
 
         return True
+    
+
+    
+    def calcular_fdt(self):
+
+        fdt = 0
+
+        [fdt := block.operar_fdt(fdt) for block in self.hijos]
+
+        return fdt
+    
+    
+    def operar_fdt(self,input):
+
+        return self.calcular_fdt() * input

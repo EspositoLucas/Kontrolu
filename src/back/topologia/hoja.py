@@ -80,3 +80,7 @@ class Hoja(InterfazTopologia):
     
     def unidad_salida(self):
         pass
+
+    def calcular_fdt(self):
+
+        return latex2sympy(self.funcion_transferencia)
