@@ -77,6 +77,31 @@ class EditarPerturbacion(QDialog):
         layout = QVBoxLayout()
         layout.setSpacing(10)  # Espaciado entre widgets
         layout.setContentsMargins(20, 20, 20, 20)  # Márgenes del layout
+        
+        # Agregar botón de ayuda en la parte superior
+        help_button = QPushButton("?")
+        help_button.setFixedSize(30, 30)
+        help_button.setToolTip("Ayuda sobre la configuración de perturbaciones")
+        help_button.setStyleSheet("""
+            QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 15px;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #606060;
+            }
+        """)
+        help_button.clicked.connect(self.mostrar_ayuda)
+
+        # Crear un layout horizontal para el botón de ayuda
+        help_layout = QHBoxLayout()
+        help_layout.addStretch()
+        help_layout.addWidget(help_button)
+        layout.addLayout(help_layout)
 
         # Función de Transferencia
         self.ft_label = QLabel("Función de Transferencia:")
@@ -144,6 +169,73 @@ class EditarPerturbacion(QDialog):
 
         self.setLayout(layout)
 
+    def mostrar_ayuda(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Configuración de Perturbación")
+        help_dialog.setStyleSheet(self.styleSheet())
+        help_dialog.setMinimumWidth(500)
+        layout = QVBoxLayout()
+        
+        # Título principal
+        titulo = QLabel("Guía de Configuración de Perturbación")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+        
+        # Contenido organizado en secciones
+        contenido = [
+            ("<b>¿Qué es una perturbación?</b>", 
+            "La perturbación representa una señal externa no deseada que afecta al sistema de control y debe ser compensada."),
+            
+            ("<b>Configuración temporal:</b>",
+            "<ul>"
+            "<li><b>Perturbar ahora:</b> Activa la perturbación inmediatamente al iniciar la simulación</li>"
+            "<li><b>Tiempo de inicio:</b> Define cuando comenzará a actuar la perturbación (en segundos)</li>"
+            "<li><b>Duración:</b> Establece por cuánto tiempo actuará la perturbación (en segundos)</li>"
+            "</ul>"),
+            
+            ("<b>Función de Transferencia:</b>",
+            "<ul>"
+            "<li>Define matemáticamente cómo la perturbación afecta al sistema</li>"
+            "<li>Se escribe usando notación LaTeX para expresiones matemáticas</li>"
+            "<li>Puede incluir variables s, exponentes, fracciones y otros operadores</li>"
+            "<li>Ejemplo: Una perturbación constante sería 1/s</li>"
+            "</ul>"),
+            
+            ("<b>Editor JSON:</b>",
+            "Permite modificar directamente la configuración en formato JSON.")
+        ]
+        
+        for titulo, texto in contenido:
+            seccion = QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 5px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+        
+        # Botón de cerrar
+        cerrar_btn = QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+        
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
+        
     def aceptar(self):
         
         if not self.ft_editor.es_funcion_valida(self.ft_editor.get_latex()):

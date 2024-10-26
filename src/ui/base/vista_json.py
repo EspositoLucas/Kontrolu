@@ -1,7 +1,7 @@
 import json
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QApplication
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QTextEdit, QPushButton, QApplication,QLabel
 from PyQt5.QtGui import QColor, QTextCursor, QTextCharFormat
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegExp,Qt
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtWidgets import QFileDialog
@@ -14,6 +14,21 @@ class VistaJson(QDialog):
         self.layout = QVBoxLayout()
         self.setStyleSheet(ESTILO)
         self.setLayout(self.layout)
+        
+        # Agregar botón de ayuda
+        help_button = QPushButton("?")
+        help_button.setFixedSize(30, 30)
+        help_button.clicked.connect(self.mostrar_ayuda_json)
+        help_button.setStyleSheet("""
+            QPushButton {
+                border-radius: 15px;
+                background-color: #808080;
+                color: white;
+                font-weight: bold;
+            }
+        """)
+        self.layout.addWidget(help_button, alignment=Qt.AlignRight)
+        
         self.text_edit = QTextEdit()
         self.layout.addWidget(self.text_edit)
         pretty_json = json.dumps(self.microbloque.to_json(), indent=4)
@@ -34,6 +49,84 @@ class VistaJson(QDialog):
         self.boton_descargar = QPushButton("Descargar JSON")
         self.boton_descargar.clicked.connect(self.descargar_json)
         self.layout.addWidget(self.boton_descargar)
+    
+    def mostrar_ayuda_json(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Editor JSON")
+        help_dialog.setStyleSheet(ESTILO)
+        help_dialog.setMinimumWidth(500)
+
+        layout = QVBoxLayout()
+
+        # Título principal
+        titulo = QLabel("Guía del Editor JSON")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+
+        # Contenido organizado en secciones
+        contenido = [
+            ("<b>¿Qué es el Editor JSON?</b>", 
+            "El editor JSON es una herramienta que permite visualizar, editar y gestionar la configuración "
+            "de los microbloques en formato JSON. Este formato estructurado facilita la manipulación y "
+            "almacenamiento de los parámetros del sistema."),
+            
+            ("<b>Funcionalidades Principales:</b>",
+            "<ul>"
+            "<li><b>Copiar:</b> Copia el contenido JSON actual al portapapeles para su uso en otras aplicaciones</li>"
+            "<li><b>Aplicar:</b> Guarda los cambios realizados en el editor y los aplica al microbloque</li>"
+            "<li><b>Cargar JSON:</b> Permite importar una configuración JSON desde un archivo externo</li>"
+            "<li><b>Descargar JSON:</b> Guarda la configuración actual en un archivo JSON en su computadora</li>"
+            "</ul>"),
+            
+            ("<b>Formato JSON:</b>",
+            "El JSON se muestra con formato indentado para mejor legibilidad. Los elementos principales son:"
+            "<ul>"
+            "<li>Propiedades del microbloque en pares clave-valor</li>"
+            "<li>Valores numéricos sin comillas</li>"
+            "<li>Textos entre comillas dobles</li>"
+            "<li>Arrays entre corchetes [ ]</li>"
+            "<li>Objetos entre llaves { }</li>"
+            "</ul>"),
+            
+            ("<b>Recomendaciones de Uso:</b>",
+            "<ul>"
+            "<li>Verifique la sintaxis JSON antes de aplicar cambios</li>"
+            "<li>Mantenga copias de seguridad de configuraciones importantes</li>"
+            "<li>Use la función de copiar para compartir configuraciones</li>"
+            "<li>Respete el formato y estructura del JSON original</li>"
+            "</ul>")
+        ]
+
+        for titulo, texto in contenido:
+            seccion = QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 5px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+
+        # Botón de cerrar
+        cerrar_btn = QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
 
     def cargar_json(self):
         options = QFileDialog.Options()

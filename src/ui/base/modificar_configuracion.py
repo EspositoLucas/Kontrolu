@@ -14,6 +14,101 @@ class ModificarConfiguracion(QDialog):
         self.setStyleSheet("background-color: #333; color: white;")
         self.edit_configuration()
         
+    
+    def mostrar_ayuda(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Configuración")
+        help_dialog.setStyleSheet("""
+            QDialog {
+                background-color: #B0B0B0;
+                border-radius: 15px;
+                padding: 20px;
+                border: 2px solid #505050;
+            }
+        """)
+        help_dialog.setMinimumWidth(600)
+        layout = QVBoxLayout()
+
+        # Título principal
+        titulo = QLabel("Guía de Configuración")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+
+        # Contenido específico de configuraciones
+        contenido = [
+            ("<b>Configuraciones de Entrada/Salida:</b>",
+            "<ul>"
+            "<li><b>Nombre de entrada/salida:</b> Identifica las variables de entrada y salida</li>"
+            "<li><b>Unidades:</b> Especifica las unidades físicas de las variables</li>"
+            "<li><b>Configuración avanzada:</b> Permite ajustar parámetros específicos mediante los botones 'Configurar'</li>"
+            "</ul>"),
+            
+            ("<b>Configuración Avanzada:</b>",
+            "<ul>"
+            "<li><b>Límite inferior:</b> Define el valor mínimo permitido para la variable. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
+            "<li><b>Límite superior:</b> Define el valor máximo permitido para la variable. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
+            "<li><b>Límite por ciclo:</b> Establece la máxima variación permitida por ciclo de simulación. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
+            "<li><b>Error máximo:</b> Define la tolerancia máxima de error permitida en los cálculos. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
+            "<li><b>Proporción:</b> Factor de escala aplicado a los valores. Si se marca 'Default', se usa 1 como valor predeterminado.</li>"
+            "<li><b>Último valor:</b> Almacena el último valor calculado para la variable. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
+            "<li><b>Probabilidad:</b> Define la probabilidad de ocurrencia de ciertos eventos en la simulación. Si se marca 'Default', se usa 1 como valor predeterminado.</li>"
+            "<li><b>Tipo de error:</b> Especifica cómo se manejan y calculan los errores en la simulación. Puede seleccionarse de una lista predefinida de tipos de error.</li>"
+            "</ul>"
+            "<br>"
+            "<b>Notas importantes:</b>"
+            "<ul>"
+            "<li>Cada parámetro puede configurarse con un valor específico o usar su valor predeterminado mediante la casilla 'Default'.</li>"
+            "<li>Los valores numéricos deben ser válidos para evitar errores en la configuración.</li>"
+            "<li>La interfaz proporciona validación para asegurar que solo se ingresen valores numéricos válidos.</li>"
+            "<li>Los cambios se aplican al presionar el botón 'Guardar cambios' y solo se guardarán si todos los valores son válidos.</li>"
+            "</ul>")
+        ]
+
+        for titulo, texto in contenido:
+            seccion = QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 10px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+
+        # Botón de cerrar
+        cerrar_btn = QPushButton("Cerrar")
+        cerrar_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            QPushButton:hover {
+                background-color: #606060;
+            }
+        """)
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
+        
 
 
     def edit_configuration(self):
@@ -64,6 +159,31 @@ class ModificarConfiguracion(QDialog):
         self.layout = QVBoxLayout()
         self.layout.setSpacing(10)
         self.layout.setContentsMargins(20, 20, 20, 20)
+        
+        # Agregar botón de ayuda en la parte superior
+        help_button = QPushButton("?")
+        help_button.setFixedSize(30, 30)
+        help_button.setToolTip("Ayuda sobre la configuración del microbloque")
+        help_button.setStyleSheet("""
+            QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 15px;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #606060;
+            }
+        """)
+        help_button.clicked.connect(self.mostrar_ayuda)
+        
+        # Crear un layout horizontal para el botón de ayuda
+        help_layout = QHBoxLayout()
+        help_layout.addStretch()
+        help_layout.addWidget(help_button)
+        self.layout.addLayout(help_layout)
 
         # Limite inferior
         self.limite_inf_row = QHBoxLayout()

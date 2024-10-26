@@ -219,6 +219,21 @@ class MainWindow(QMainWindow):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
+        
+
+        # Agregar botón de ayuda
+        help_button = QPushButton("?")
+        help_button.setFixedSize(30, 30)
+        help_button.clicked.connect(self.mostrar_ayuda_simulacion)
+        help_button.setStyleSheet("""
+            QPushButton {
+                border-radius: 15px;
+                background-color: #808080;
+                color: white;
+                font-weight: bold;
+            }
+        """)
+        layout.addWidget(help_button, alignment=Qt.AlignRight)
 
         # Campos de configuración
         campos = {
@@ -264,7 +279,78 @@ class MainWindow(QMainWindow):
             self.sesion.tiempo_total = tiempo_total
             self.sesion.salida_inicial = salida_inicial
             self.sesion.velocidad = velocidad
+            
+    def mostrar_ayuda_simulacion(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Configuración de Simulación")
+        help_dialog.setStyleSheet(ESTILO)
+        help_dialog.setMinimumWidth(500)
 
+        layout = QVBoxLayout()
+
+        # Título principal
+        titulo = QLabel("Guía de Configuración de Simulación")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+
+        # Contenido organizado en secciones
+        contenido = [
+            ("<b>¿Qué es la Configuración de Simulación?</b>", 
+            "La configuración de simulación permite establecer los parámetros fundamentales que determinan "
+            "cómo se ejecutará la simulación del sistema de control. Estos parámetros afectan directamente "
+            "la precisión y el comportamiento de la simulación."),
+            
+            ("<b>Parámetros Principales:</b>",
+            "<ul>"
+            "<li><b>Tiempo total (s):</b> Duración total de la simulación en segundos. Define cuánto tiempo se "
+            "simulará el comportamiento del sistema.</li>"
+            "<li><b>Variable a controlar en tiempo 0:</b> Valor inicial de la variable que se desea controlar. "
+            "Representa el punto de partida del sistema.</li>"
+            "<li><b>Intervalo de tiempo (dt):</b> Paso de tiempo entre cada cálculo de la simulación. Un valor "
+            "más pequeño aumenta la precisión pero requiere más recursos computacionales.</li>"
+            "<li><b>Duración de simulación de cada ciclo:</b> Tiempo en milisegundos que tarda cada ciclo de "
+            "simulación. Afecta la velocidad de visualización de la simulación.</li>"
+            "</ul>"),
+            
+            ("<b>Recomendaciones:</b>",
+            "<ul>"
+            "<li>Use intervalos de tiempo pequeños para sistemas rápidos o que requieran alta precisión</li>"
+            "<li>Ajuste el tiempo total según la dinámica específica de su sistema</li>"
+            "<li>Balance la duración de ciclo entre fluidez visual y capacidad de procesamiento</li>"
+            "<li>Configure la variable inicial según las condiciones reales de su sistema</li>"
+            "</ul>")
+        ]
+
+        for titulo, texto in contenido:
+            seccion = QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 5px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+
+        # Botón de cerrar
+        cerrar_btn = QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
 
     # Modificar el método iniciar_simulacion existente
     def iniciar_simulacion(self):
@@ -322,6 +408,20 @@ class MainWindow(QMainWindow):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
         
+        # Agregar botón de ayuda
+        help_button = QPushButton("?")
+        help_button.setFixedSize(30, 30)
+        help_button.clicked.connect(self.mostrar_ayuda_estabilidad)
+        help_button.setStyleSheet("""
+            QPushButton {
+                border-radius: 15px;
+                background-color: #808080;
+                color: white;
+                font-weight: bold;
+            }
+        """)
+        layout.addWidget(help_button, alignment=Qt.AlignRight)
+        
             # Función de transferencia
         ft_label = QLabel("Función de Transferencia de Lazo Cerrado:")
         layout.addWidget(ft_label)
@@ -372,6 +472,86 @@ class MainWindow(QMainWindow):
 
         dialog.setLayout(layout)
         dialog.exec_()
+    
+    def mostrar_ayuda_estabilidad(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Análisis de Estabilidad")
+        help_dialog.setStyleSheet(ESTILO)
+        help_dialog.setMinimumWidth(600)
+
+        layout = QVBoxLayout()
+
+        # Título principal
+        titulo = QLabel("Guía de Análisis de Estabilidad")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+
+        # Contenido organizado en secciones
+        contenido = [
+            ("<b>¿Qué es el Análisis de Estabilidad?</b>", 
+            "El análisis de estabilidad es una herramienta fundamental que permite determinar si un sistema de control "
+            "mantendrá un comportamiento controlado y predecible en el tiempo. Un sistema estable eventualmente "
+            "alcanzará un estado de equilibrio, mientras que uno inestable puede presentar oscilaciones crecientes "
+            "o comportamientos erráticos."),
+            
+            ("<b>Función de Transferencia de Lazo Cerrado:</b>",
+            "Representa matemáticamente el comportamiento completo del sistema, incluyendo todos sus componentes "
+            "y sus interacciones. Se muestra en formato LaTeX para una mejor visualización de las expresiones matemáticas."),
+            
+            ("<b>Matriz de Routh-Hurwitz:</b>",
+            "Es una herramienta matemática que permite determinar la estabilidad del sistema sin necesidad de calcular "
+            "las raíces del denominador de la función de transferencia. La presencia de cambios de signo en la primera "
+            "columna de la matriz indica inestabilidad."),
+            
+            ("<b>Cálculo de Estabilidad:</b>",
+            "<ul>"
+            "<li><b>Sistema Estable:</b> Todos los valores en la primera columna de la matriz son positivos</li>"
+            "<li><b>Sistema Inestable:</b> Hay cambios de signo en la primera columna de la matriz</li>"
+            "<li>El resultado se muestra en verde (estable) o rojo (inestable)</li>"
+            "</ul>"),
+            
+            ("<b>Error en Estado Estable:</b>",
+            "Es la diferencia entre el valor deseado y el valor real que alcanza el sistema cuando el tiempo tiende "
+            "a infinito. Se puede calcular para diferentes tipos de entrada:"
+            "<ul>"
+            "<li><b>Escalón:</b> Mide la precisión para alcanzar un valor constante</li>"
+            "<li><b>Rampa:</b> Evalúa la capacidad de seguir una señal que aumenta linealmente</li>"
+            "<li><b>Parábola:</b> Analiza el seguimiento de señales con aceleración constante</li>"
+            "</ul>"
+            "Un error de cero (verde) indica seguimiento perfecto, mientras que un error no nulo (rojo) indica "
+            "una desviación permanente del valor deseado.")
+        ]
+
+        for titulo, texto in contenido:
+            seccion = QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 5px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+
+        # Botón de cerrar
+        cerrar_btn = QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
 
     def calcular_y_mostrar_estabilidad(self):
         matriz_routh, es_estable = self.estabilidad.calcular_estabilidad()

@@ -48,11 +48,24 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         layout = QtWidgets.QVBoxLayout()
         self.setStyleSheet(ESTILO)
         
+        # Agregar botón de ayuda
         help_button = QPushButton("?", self)
-        help_button.setToolTip("La entrada sirve/es...")  # Mensaje de ayuda
-        help_button.setFixedSize(30, 30)  # Tamaño del botón
+        help_button.setFixedSize(30, 30)
         help_button.move(50, 50)  # Posición del botón en la ventana
-
+        help_button.setStyleSheet("""
+            QPushButton {
+                background-color: #808080;
+                color: white;
+                border-radius: 15px;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #606060;
+            }
+        """)
+        
+        help_button.clicked.connect(self.mostrar_ayuda)
         # Estilo del botón para darle apariencia de botón de ayuda
         layout.addWidget(help_button)
 
@@ -113,6 +126,75 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         
         # Actualizamos la interfaz según el tipo de entrada inicial
         self.actualizar_interfaz()
+    
+    def mostrar_ayuda(self):
+        help_dialog = QtWidgets.QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Configuración de Entrada")
+        help_dialog.setStyleSheet(ESTILO)
+        help_dialog.setMinimumWidth(500)
+
+        layout = QtWidgets.QVBoxLayout()
+
+        # Título principal
+        titulo = QtWidgets.QLabel("Guía de Configuración de Entrada")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+
+        # Contenido organizado en secciones
+        contenido = [
+            ("<b>¿Qué es una entrada?</b>", 
+             "La entrada representa la señal que excita o estimula al sistema de control."),
+            
+            ("<b>Tipos de entrada disponibles:</b>",
+             "<ul>"
+             "<li><b>Escalón:</b> Cambio instantáneo y constante (ejemplo: encender un interruptor)</li>"
+             "<li><b>Rampa:</b> Cambio que aumenta linealmente con el tiempo (ejemplo: acelerador de un auto)</li>"
+             "<li><b>Parábola:</b> Cambio que aumenta cuadráticamente con el tiempo</li>"
+             "<li><b>Personalizada:</b> Cualquier otra función definida por el usuario</li>"
+             "</ul>"),
+            
+            ("<b>Campos de configuración:</b>",
+             "<ul>"
+             "<li><b>Nombre:</b> Identificador único para la entrada</li>"
+             "<li><b>Tipo de entrada:</b> Selecciona el comportamiento de la señal</li>"
+             "<li><b>Coeficiente:</b> Ajusta la magnitud de la señal (actúa como un multiplicador)</li>"
+             "<li><b>Función de transferencia:</b> Fórmula matemática que describe el comportamiento</li>"
+             "</ul>"),
+             
+            ("<b>Editor LaTeX:</b>",
+             "Permite escribir funciones matemáticas usando notación LaTeX. Incluye botones para símbolos comunes como exponentes, fracciones y variables.")
+        ]
+
+        for titulo, texto in contenido:
+            seccion = QtWidgets.QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 5px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+
+        # Botón de cerrar
+        cerrar_btn = QtWidgets.QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
 
     def actualizar_campos_con_microbloque(self, microbloque):
         self.nombre_input.setText(microbloque.nombre)

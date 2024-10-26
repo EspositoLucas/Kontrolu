@@ -71,22 +71,21 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         layout = QtWidgets.QVBoxLayout()
 
         help_button = QPushButton("?", self)
-        help_button.setToolTip("La entrada sirve/es...")  # Mensaje de ayuda
+        help_button.setToolTip("Haga clic para ver información detallada sobre la configuración de carga")  # Mensaje de ayuda
         help_button.setFixedSize(30, 30)  # Tamaño del botón
         help_button.move(50, 50)  # Posición del botón en la ventana
-
+        help_button.clicked.connect(self.mostrar_ayuda) 
         # Estilo del botón para darle apariencia de botón de ayuda
         help_button.setStyleSheet("""
-            QToolTip { background-color: #ffffe0; color: #000000; border: 1px solid black; }
             QPushButton {
-                border: 1px solid gray;
+                background-color: #808080;
+                color: white;
                 border-radius: 15px;
-                background-color: #f0f0f0;
                 font-weight: bold;
-                color: black
+                font-size: 16px;
             }
             QPushButton:hover {
-                background-color: #e0e0e0;
+                background-color: #606060;
             }
         """)
         layout.addWidget(help_button)
@@ -190,7 +189,85 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         # Actualizamos la interfaz según el tipo de entrada inicial
         self.actualizar_interfaz()
     
+    def mostrar_ayuda(self):
+        help_dialog = QtWidgets.QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Configuración de Carga")
+        help_dialog.setStyleSheet(ESTILO)
+        help_dialog.setMinimumWidth(500)
+        layout = QtWidgets.QVBoxLayout()
 
+        titulo = QtWidgets.QLabel("Guía de Configuración de Carga")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+
+        contenido = [
+            ("<b>¿Qué es una carga?</b>",
+            "La carga representa cómo se evalúa el desempeño del sistema, comparando la salida real con la esperada. "
+            "Es fundamental para medir la calidad de la respuesta del sistema."),
+            
+            ("<b>Tipos de carga disponibles:</b>",
+            "<ul>"
+            "<li><b>Error:</b> Mide la diferencia directa entre el valor deseado y el obtenido</li>"
+            "<li><b>Error Proporcional:</b> Calcula el error relativo al valor deseado</li>"
+            "<li><b>Integral:</b> Suma la acumulación del error a lo largo del tiempo</li>"
+            "<li><b>Integral Proporcional:</b> Acumula el error relativo en el tiempo</li>"
+            "<li><b>Final:</b> Evalúa el estado final del sistema</li>"
+            "</ul>"),
+            
+            ("<b>Configuración de estados:</b>",
+            "<ul>"
+            "<li><b>Estados:</b> Define niveles de desempeño (Excelente, Bueno, Regular, etc.)</li>"
+            "<li><b>Mínimo:</b> Valor límite para clasificar en cada estado</li>"
+            "<li><b>Prioridad:</b> Orden de importancia entre estados</li>"
+            "</ul>"),
+            
+            ("<b>Función de transferencia:</b>",
+            "<ul>"
+            "<li><b>Misma que entrada:</b> Replica el comportamiento de la entrada</li>"
+            "<li><b>Escalón:</b> Evaluación instantánea del error</li>"
+            "<li><b>Rampa:</b> Evaluación con cambio lineal</li>"
+            "<li><b>Parábola:</b> Evaluación con cambio cuadrático</li>"
+            "<li><b>Personalizada:</b> Función definida por el usuario</li>"
+            "</ul>"),
+            
+            ("<b>Parámetros adicionales:</b>",
+            "<ul>"
+            "<li><b>Escalamiento sigmoide:</b> Ajusta la sensibilidad de la evaluación</li>"
+            "<li><b>Desplazamiento sigmoide:</b> Modifica el punto medio de evaluación</li>"
+            "<li><b>Coeficiente:</b> Factor multiplicador para la función de transferencia</li>"
+            "</ul>")
+        ]
+
+        for titulo, texto in contenido:
+            seccion = QtWidgets.QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 5px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+            
+        # Botón de cerrar
+        cerrar_btn = QtWidgets.QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
     
     def actualizar_campos(self):
         self.nombre_input.setText(self.carga.nombre)

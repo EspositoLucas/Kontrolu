@@ -28,9 +28,15 @@ class CrearMicroBloque(QDialog):
         """
         Función principal para crear un nuevo microbloque o seleccionar un preset.
         """
-        
 
         layout = QVBoxLayout()
+        
+        # Agregar botón de ayuda en la parte superior
+        help_button = QPushButton("?")
+        help_button.setFixedSize(30, 30)  # Hacer el botón circular
+        help_button.setToolTip("Ayuda sobre la configuración del microbloque")
+        help_button.clicked.connect(self.mostrar_ayuda)
+        layout.addWidget(help_button, alignment=Qt.AlignRight)
 
         # Crear el tab principal para "Nuevo Microbloque" y "Presets"
         main_tab = QTabWidget()
@@ -280,6 +286,79 @@ class CrearMicroBloque(QDialog):
         new_microbloque_layout.addWidget(edit_json_button)
         
         return new_microbloque_tab
+
+    def mostrar_ayuda(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Configuración del Microbloque")
+        help_dialog.setStyleSheet(ESTILO)
+        help_dialog.setMinimumWidth(600)
+        layout = QVBoxLayout()
+
+        # Título principal
+        titulo = QLabel("Guía de Configuración del Microbloque")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+
+        # Contenido organizado en secciones
+        contenido = [
+            ("<b>¿Qué es un Microbloque?</b>",
+            "Un microbloque es un componente fundamental que representa una función de transferencia específica en un sistema de control. "
+            "Permite modelar el comportamiento de diferentes partes del sistema."),
+            
+            ("<b>Elementos principales:</b>",
+            "<ul>"
+            "<li><b>Nombre:</b> Identificador único del microbloque</li>"
+            "<li><b>Descripción:</b> Breve explicación del propósito o funcionamiento</li>"
+            "<li><b>Color:</b> Identificador visual para el microbloque en el diagrama</li>"
+            "<li><b>Función de transferencia:</b> Expresión matemática que, a través de un cociente, relaciona la respuesta de un sistema (modelada o señal de salida) con una señal de entrada o excitación (también modelada). Se usa para caracterizar las relaciones de entrada y salida de componentes o de sistemas que se describen mediante ecuaciones diferenciales lineales e invariantes en el tiempo</li>"
+            "</ul>"),
+            
+            ("<b>Presets:</b>",
+            "Los presets son configuraciones predefinidas que pueden reutilizarse:"
+            "<ul>"
+            "<li><b>Dominio:</b> Categoría principal del microbloque (ej: Mecánico, Eléctrico)</li>"
+            "<li><b>Tipo:</b> Subcategoría específica dentro del dominio</li>"
+            "<li><b>Guardar preset:</b> Permite almacenar la configuración actual como plantilla</li>"
+            "</ul>"),
+            
+            ("<b>Funcionalidades adicionales:</b>",
+            "<ul>"
+            "<li><b>Editor JSON:</b> Permite modificar la configuración en formato JSON</li>"
+            "<li><b>Editor LaTeX:</b> Interface para escribir funciones matemáticas con notación LaTeX</li>"
+            "<li><b>Vista previa:</b> Muestra cómo se verá el microbloque en el sistema</li>"
+            "</ul>")
+        ]
+
+        for titulo, texto in contenido:
+            seccion = QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 10px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+
+        # Botón de cerrar
+        cerrar_btn = QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
     
     def actualizar_campos(self):
         """
