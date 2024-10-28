@@ -232,19 +232,19 @@ class Graficadora(QMainWindow):
         self.controls_layout.addWidget(self.pause_button)
     
     def toggle_pause(self):
-        if self.pause_button.text() == "Pausar Simulacion":
-            self.pause_button.setText("Reanudar Simulacion")
+        if self.pause_button.text() == "Pausar Simulación":
+            self.pause_button.setText("Reanudar Simulación")
             self.simulacion.parar()
         else:
-            self.pause_button.setText("Pausar Simulacion")
+            self.pause_button.setText("Pausar Simulación")
             self.simulacion.reanudar()
 
 
     def pause_button_change(self):
-        self.pause_button.setText("Pausar Simulacion")
+        self.pause_button.setText("Pausar Simulación")
     
     def resume_button_change(self):
-        self.pause_button.setText("Reanudar Simulacion")
+        self.pause_button.setText("Reanudar Simulación")
 
 
     def mostrar_interpretacion(self):
