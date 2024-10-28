@@ -145,25 +145,21 @@ class Estabilidad:
     def calcular_error_estado_estable(self):
         """
         Calcula el error en estado estable basándose en la entrada configurada
+        usando el teorema del valor final.
         """
-        G_ol_latex = self.obtener_funcion_transferencia_lazo_abierto()
-        G_ol = self.parse_latex_to_sympy(G_ol_latex)
-        
         s = sp.Symbol('s')
+        G_ol = self.parse_latex_to_sympy(self.obtener_funcion_transferencia_lazo_abierto())
         
         # Obtenemos la entrada del sistema
         entrada_ft = self.parse_latex_to_sympy(self.sesion.entrada.funcion_transferencia)
         
-        # Calculamos la función de transferencia a lazo cerrado
-        G_cl = G_ol / (1 + G_ol)
+        # Calculamos el error usando la fórmula E(s) = θi(s)[1/(1+G₀(s))]
+        error_funcion = entrada_ft * (1 / (1 + G_ol))
         
-        # La salida teórica es la entrada multiplicada por la función de transferencia a lazo cerrado
-        salida_teorica = entrada_ft * G_cl
+        # Aplicamos el teorema del valor final: e_ss = lim[s->0] s·E(s)
+        error_estado_estable = sp.limit(s * error_funcion, s, 0)
         
-        # El error en estado estable es el límite cuando s tiende a 0 de la diferencia entre entrada y salida
-        error = sp.limit(entrada_ft - salida_teorica, s, 0)
-        
-        return error
+        return sp.simplify(error_estado_estable)
 
     def obtener_funcion_transferencia_lazo_abierto(self):
         ft_controlador = self.calcular_ft_macrobloque(self.sesion.controlador)
