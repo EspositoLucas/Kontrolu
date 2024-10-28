@@ -39,37 +39,55 @@ class Simulacion(QObject):
 
 
 
-            
     def simular_paso(self, y_actual, ciclo):
-
         tiempo = ciclo * self.delta
-
+        
+        print(f"\n{'='*50}")
+        print(f"CICLO DE SIMULACIÓN: {ciclo}")
+        print(f"Tiempo actual: {tiempo}")
+        print(f"Valor de salida actual (y_actual): {y_actual}")
+        print(f"{'='*50}\n")
+        
         y_medidor = self.medidor.simular(tiempo, y_actual)
         self.datos['medidor'].append(y_medidor)
+        print(f"Medición actual: {y_medidor}")
+        print(f"Histórico de mediciones: {self.datos['medidor']}")
 
-        y_entrada =  self.entrada.simular(tiempo)
+        y_entrada = self.entrada.simular(tiempo)
         self.datos['entrada'].append(y_entrada)
+        print(f"Entrada actual: {y_entrada}")
+        print(f"Histórico de entradas: {self.datos['entrada']}")
 
-        # Calcula el error actual
         error = y_entrada - y_medidor        
         self.datos['error'].append(error)
+        print(f"Error calculado: {error}")
+        print(f"Histórico de errores: {self.datos['error']}")
         
-        # Simula cada componente del sistema en secuencia
-        # Cada componente recibe el mismo vector de tiempo
         y_controlador = self.controlador.simular(tiempo, error)
         self.datos['controlador'].append(y_controlador)
+        print(f"Salida del controlador: {y_controlador}")
+        print(f"Histórico del controlador: {self.datos['controlador']}")
         
         y_actuador = self.actuador.simular(tiempo, y_controlador)
         self.datos['actuador'].append(y_actuador)
+        print(f"Salida del actuador: {y_actuador}")
+        print(f"Histórico del actuador: {self.datos['actuador']}")
 
         y_proceso = self.proceso.simular(tiempo, y_actuador)
         self.datos['proceso'].append(y_proceso)
+        print(f"Salida del proceso: {y_proceso}")
+        print(f"Histórico del proceso: {self.datos['proceso']}")
 
-        y_actual += y_proceso
+        print("\nIniciando cálculo de convolución...")
+        y_actual = self.calcular_salida_convolucion(y_proceso)
         self.datos['salida'].append(y_actual)
+        print(f"Salida después de convolución: {y_actual}")
+        print(f"Histórico de salidas: {self.datos['salida']}")
 
         estado_carga = self.carga.simular(tiempo, y_actual)
         self.datos['carga'].append(estado_carga)
+        print(f"Estado de carga: {estado_carga}")
+        print(f"Histórico de estados de carga: {self.datos['carga']}")
 
         datos_paso = {
             'tiempo': tiempo,
@@ -80,27 +98,53 @@ class Simulacion(QObject):
             'entrada': y_entrada,
             'error': error,
             'salida': y_actual,
-            'carga': estado_carga  # Añadimos el estado de la carga
+            'carga': estado_carga
         }
 
         if self.graficadora:
             self.graficadora.agregar_datos(datos_paso)
             self.graficadora.procesar_eventos()
-            
-        # Añadir impresión detallada de los valores
-        print(f"\nCiclo {ciclo}:")
-        print(f"Tiempo: {tiempo}")
-        print(f"Entrada: {y_entrada}")
-        print(f"Medidor: {y_medidor}")
-        print(f"Error: {error}")
-        print(f"Controlador: {y_controlador}")
-        print(f"Actuador: {y_actuador}")
-        print(f"Proceso: {y_proceso}")
-        print(f"Salida actual: {y_actual}")
-        print(f"Estado de la carga: {estado_carga}")
-        print("-" * 30)
-
+        
+        print(f"\n{'='*50}")
+        print(f"FIN DEL CICLO {ciclo}")
+        print(f"{'='*50}\n")
+        
         return y_actual
+
+    def calcular_salida_convolucion(self, y_proceso):
+        """
+        Calcula la salida usando convolución pero respetando la estructura actual
+        """
+        print("\nDETALLES DE LA CONVOLUCIÓN:")
+        print(f"Valor actual del proceso: {y_proceso}")
+        
+        max_historic_samples = 1000
+        
+        if len(self.datos['proceso']) > max_historic_samples:
+            historical_values = self.datos['proceso'][-max_historic_samples:]
+            print(f"Histórico limitado a {max_historic_samples} muestras")
+        else:
+            historical_values = self.datos['proceso']
+            print(f"Usando histórico completo: {len(historical_values)} muestras")
+        
+        print("\nCálculo de convolución paso a paso:")
+        salida = y_proceso  # Inicializar con el valor actual
+        print(f"Valor inicial (y_proceso actual): {salida}")
+        
+        for i, valor in enumerate(historical_values[:-1]):
+            peso = (i + 1) / len(historical_values)
+            contribucion = valor * peso * self.delta
+            salida += contribucion
+            print(f"Paso {i+1}:")
+            print(f"  - Valor histórico: {valor}")
+            print(f"  - Peso aplicado: {peso:.4f}")
+            print(f"  - Delta tiempo: {self.delta}")
+            print(f"  - Contribución: {contribucion:.4f}")
+            print(f"  - Salida acumulada: {salida:.4f}")
+        
+        print(f"\nSalida final después de la convolución: {salida}")
+        return salida
+    
     
     def confirmar_cierre(self, event):
         self.timer.stop()
