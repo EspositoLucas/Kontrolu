@@ -48,20 +48,21 @@ class Simulacion(QObject):
         self.cerrando = False  # Nueva variable para controlar el cierre
 
 
-
             
     def simular_paso(self, y_actual, ciclo):
-
         tiempo = ciclo * self.delta
 
         y_medidor = self.medidor.simular(tiempo, self.delta, y_actual)
         
         self.datos['medidor'].append(y_medidor)
+        print(f"Medición actual: {y_medidor}")
+        print(f"Histórico de mediciones: {self.datos['medidor']}")
 
         y_entrada =  self.entrada.simular(tiempo, self.delta)
         self.datos['entrada'].append(y_entrada)
+        print(f"Entrada actual: {y_entrada}")
+        print(f"Histórico de entradas: {self.datos['entrada']}")
 
-        # Calcula el error actual
         error = y_entrada - y_medidor        
         self.datos['error'].append(error*self.multiplicador)
         
@@ -80,6 +81,8 @@ class Simulacion(QObject):
 
         estado_carga = self.carga.simular(tiempo, self.delta, y_proceso)
         self.datos['carga'].append(estado_carga)
+        print(f"Estado de carga: {estado_carga}")
+        print(f"Histórico de estados de carga: {self.datos['carga']}")
 
         datos_paso = {
             'tiempo': tiempo,

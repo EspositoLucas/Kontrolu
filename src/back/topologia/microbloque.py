@@ -6,7 +6,7 @@ from .hoja import Hoja
 from back.json_manager.dtos import MicroBloqueDto
 
 class MicroBloque(Hoja):
-    def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 255), funcion_transferencia: str="1", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
+    def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 255), funcion_transferencia: str="\\frac{1}{s}", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
         super().__init__(nombre=nombre, funcion_transferencia=funcion_transferencia)
         if from_json:
             self.from_json(from_json)
