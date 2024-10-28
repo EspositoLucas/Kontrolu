@@ -54,9 +54,9 @@ class MacroBloque(InterfazTopologia):
             padre=self
             )
     
-    def simular(self, tiempo, entrada):
+    def simular(self, tiempo, delta, entrada):
 
-        salida =  self.topologia.simular(tiempo, entrada)
+        salida =  self.topologia.simular(tiempo, delta, entrada)
         
         return salida
     
@@ -123,7 +123,8 @@ class MacroBloque(InterfazTopologia):
 
         return self.topologia.calcular_fdt()
     
-
+    def vaciar_datos(self):
+        self.topologia.vaciar_datos()
     
     def operar_fdt(self,input):
 

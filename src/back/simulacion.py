@@ -14,19 +14,29 @@ class Simulacion(QObject):
     
     def __init__(self, controlador :MacroControlador= None, actuador:MacroActuador = None, proceso:MacroProceso =None, medidor:MacroMedidor =None, delta =1, ciclos=10, entrada:MicroBloque=None,salida_cero=10,carga:MicroBloque= None,graficadora =None,window = None):
         super().__init__()
+        self.controlador : MacroControlador = controlador
+        self.actuador : MacroActuador = actuador
+        self.proceso : MacroProceso = proceso
+        self.medidor : MacroMedidor = medidor        
+        self.entrada : MicroBloque = entrada
+        self.carga : Carga = carga
+
+        self.controlador.vaciar_datos()
+        self.actuador.vaciar_datos()
+        self.proceso.vaciar_datos()
+        self.medidor.vaciar_datos()
+        self.entrada.vaciar_datos()
+        self.carga.vaciar_datos()
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.simular_paso_timer)
 
         self.paso_actual = 0
-        self.controlador : MacroControlador = controlador
-        self.actuador : MacroActuador = actuador
-        self.proceso : MacroProceso = proceso
-        self.medidor : MacroMedidor = medidor
+
         self.delta = delta
+        self.multiplicador = 2/self.delta
         self.ciclos = ciclos
-        self.entrada : MicroBloque = entrada
         self.salida_cero = salida_cero
-        self.carga :Carga = carga
         self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
         self.graficadora = graficadora
         self.graficadora.add_simulacion(self)
@@ -44,42 +54,42 @@ class Simulacion(QObject):
 
         tiempo = ciclo * self.delta
 
-        y_medidor = self.medidor.simular(tiempo, y_actual)
+        y_medidor = self.medidor.simular(tiempo, self.delta, y_actual)
+        
         self.datos['medidor'].append(y_medidor)
 
-        y_entrada =  self.entrada.simular(tiempo)
+        y_entrada =  self.entrada.simular(tiempo, self.delta)
         self.datos['entrada'].append(y_entrada)
 
         # Calcula el error actual
         error = y_entrada - y_medidor        
-        self.datos['error'].append(error)
+        self.datos['error'].append(error*self.multiplicador)
         
         # Simula cada componente del sistema en secuencia
         # Cada componente recibe el mismo vector de tiempo
-        y_controlador = self.controlador.simular(tiempo, error)
-        self.datos['controlador'].append(y_controlador)
+        y_controlador = self.controlador.simular(tiempo, self.delta, error)
+        self.datos['controlador'].append(y_controlador*self.multiplicador)
         
-        y_actuador = self.actuador.simular(tiempo, y_controlador)
-        self.datos['actuador'].append(y_actuador)
+        y_actuador = self.actuador.simular(tiempo, self.delta, y_controlador)
+        self.datos['actuador'].append(y_actuador*self.multiplicador)
 
-        y_proceso = self.proceso.simular(tiempo, y_actuador)
-        self.datos['proceso'].append(y_proceso)
+        y_proceso = self.proceso.simular(tiempo, self.delta, y_actuador)
+        self.datos['proceso'].append(y_proceso*self.multiplicador)
 
-        y_actual += y_proceso
-        self.datos['salida'].append(y_actual)
+        self.datos['salida'].append(y_proceso*self.multiplicador)
 
-        estado_carga = self.carga.simular(tiempo, y_actual)
+        estado_carga = self.carga.simular(tiempo, self.delta, y_proceso)
         self.datos['carga'].append(estado_carga)
 
         datos_paso = {
             'tiempo': tiempo,
-            'controlador': y_controlador,
-            'actuador': y_actuador,
-            'proceso': y_proceso,
-            'medidor': y_medidor,
-            'entrada': y_entrada,
-            'error': error,
-            'salida': y_actual,
+            'controlador': y_controlador*self.multiplicador,
+            'actuador': y_actuador*self.multiplicador,
+            'proceso': y_proceso*self.multiplicador,
+            'medidor': y_medidor*self.multiplicador,
+            'entrada': y_entrada*self.multiplicador,
+            'error': error*self.multiplicador,
+            'salida': y_proceso*self.multiplicador,
             'carga': estado_carga  # Añadimos el estado de la carga
         }
 
@@ -96,11 +106,11 @@ class Simulacion(QObject):
         print(f"Controlador: {y_controlador}")
         print(f"Actuador: {y_actuador}")
         print(f"Proceso: {y_proceso}")
-        print(f"Salida actual: {y_actual}")
+        print(f"Salida actual: {y_proceso}")
         print(f"Estado de la carga: {estado_carga}")
         print("-" * 30)
 
-        return y_actual
+        return y_proceso
     
     def confirmar_cierre(self, event):
         self.timer.stop()

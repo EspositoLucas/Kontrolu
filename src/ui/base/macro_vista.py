@@ -120,7 +120,5 @@ class MacroVistaMainWindow(QMainWindow):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         if self.floating_ellipses_view:
-            print("resize")
             height = self.size().height()
-            print(height)
             self.floating_ellipses_view.setGeometry(0, height-200, 600, 150)

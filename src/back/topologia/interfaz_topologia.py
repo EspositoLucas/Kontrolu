@@ -49,9 +49,6 @@ class InterfazTopologia():
     def agregar_arriba_de(self,microbloque,actual):
         pass
 
-    def simular(self,tiempo,entrada):
-        pass
-
     def validar_entrada(self)->bool:
         pass
 
@@ -63,7 +60,7 @@ class InterfazTopologia():
 
     def unidad_salida(self)->str:
         pass
-    def simular(self, tiempo, entrada=None)->float:
+    def simular(self, tiempo, delta, entrada=None)->float:
         pass
 
     def calcular_fdt(self):

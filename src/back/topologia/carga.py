@@ -3,6 +3,7 @@ from sympy import  inverse_laplace_transform, symbols,laplace_transform
 from latex2sympy2 import latex2sympy
 import numpy as np
 from enum import Enum
+from ..topologia.hoja import Hoja
 
 class TipoCarga(Enum):
     INTEGRAL = "integral"
@@ -40,14 +41,15 @@ estados = [
     }
 ]
 
-class Carga:
-    def __init__(self,funcion_de_transferencia="",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None,from_json= None):
+class Carga(Hoja):
+    def __init__(self,funcion_transferencia="",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None,from_json= None):
+        super().__init__(nombre=nombre, funcion_transferencia=funcion_transferencia)
         if from_json:
             self.from_json(from_json)
             return
         self.entrada = entrada
         self.nombre = nombre
-        self.funcion_de_transferencia = funcion_de_transferencia
+        self.funcion_transferencia = funcion_transferencia
         self.tipo_carga = tipo_carga
         self.escalamiento_sigmoide = escalamiento_sigmoide
         self.desplazamiento_sigmoide = desplazamiento_sigmoide
@@ -120,29 +122,10 @@ class Carga:
         self.errores += abs((salida_real - valor_esperado)/valor_esperado)
         return self.normalizar(self.total - self.errores,0,self.total)
 
-    def salida_esperada(self,tiempo):
 
+    def simular(self,tiempo,delta,salida_real):
 
-        
-        funcion = self.funcion_de_transferencia
-        print(f"Funcion de transferencia: {funcion}")
-        
-        if ((not funcion) or (funcion == " ")):
-            funcion = self.entrada.funcion_transferencia
-            print(f"Funcion de transferencia: {funcion}")
-
-        s,t = symbols('s t')
-        funcion_transferencia = latex2sympy(funcion)
-        salida = inverse_laplace_transform(funcion_transferencia,s,t)
-        return salida.subs(t,tiempo)
-
-    def simular(self,tiempo,salida_real):
-
-        valor_esperado = self.salida_esperada(tiempo)
-
-        print(f"Valor esperado: {valor_esperado}")
-        print(f"Salida real: {salida_real}")
-
+        valor_esperado = super().simular(tiempo,delta)
 
         if self.tipo_carga == TipoCarga.INTEGRAL:
             carga = self.salida_integral(salida_real,valor_esperado)
@@ -168,7 +151,7 @@ class Carga:
     def to_json(self):
         return {
             "nombre": self.nombre,
-            "funcion_de_transferencia": self.funcion_de_transferencia,
+            "funcion_transferencia": self.funcion_transferencia,
             "tipo_carga": self.tipo_carga.value,
             "escalamiento_sigmoide": self.escalamiento_sigmoide,
             "desplazamiento_sigmoide": self.desplazamiento_sigmoide,
@@ -177,7 +160,7 @@ class Carga:
         }
 
     def from_json(self, json):
-        self.funcion_de_transferencia = json['funcion_de_transferencia']
+        self.funcion_transferencia = json['funcion_transferencia']
         self.tipo_carga = TipoCarga(json['tipo_carga'])
         self.escalamiento_sigmoide = json['escalamiento_sigmoide']
         self.desplazamiento_sigmoide = json['desplazamiento_sigmoide']
@@ -188,7 +171,7 @@ class Carga:
     
     @staticmethod
     def validar_dict(datos: dict) -> bool:
-        required_keys = ["nombre", "funcion_de_transferencia", "tipo_carga", "escalamiento_sigmoide", "desplazamiento_sigmoide", "estados"]
+        required_keys = ["nombre", "funcion_transferencia", "tipo_carga", "escalamiento_sigmoide", "desplazamiento_sigmoide", "estados"]
         for key in required_keys:
             if key not in datos:
                 raise Exception(f"El diccionario no contiene la clave {key}")
@@ -196,7 +179,7 @@ class Carga:
         if not isinstance(datos["nombre"], str):
             raise Exception(f"El nombre debe ser una cadena de caracteres")
 
-        if not isinstance(datos["funcion_de_transferencia"], str):
+        if not isinstance(datos["funcion_transferencia"], str):
             raise Exception(f"La función de transferencia debe ser una cadena de caracteres")
 
         if datos["tipo_carga"] not in TipoCarga._value2member_map_:
@@ -224,3 +207,8 @@ class Carga:
                 raise Exception(f"El valor de 'prioridad' debe ser un entero")
 
         return True
+    
+    def get_funcion_transferencia(self):
+        if self.funcion_transferencia == None or self.funcion_transferencia == "" or self.funcion_transferencia == " ":
+            return self.entrada.get_funcion_transferencia()
+        return self.funcion_transferencia
