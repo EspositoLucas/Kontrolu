@@ -142,23 +142,26 @@ class Estabilidad:
         
         return matriz_routh, es_estable
     
-    def calcular_error_estado_estable(self, tipo_entrada):
+    def calcular_error_estado_estable(self):
+        """
+        Calcula el error en estado estable basándose en la entrada configurada
+        """
         G_ol_latex = self.obtener_funcion_transferencia_lazo_abierto()
         G_ol = self.parse_latex_to_sympy(G_ol_latex)
         
         s = sp.Symbol('s')
         
-        if tipo_entrada == "escalon":
-            Kp = sp.limit(G_ol, s, 0)
-            error = 1 / (1 + Kp)
-        elif tipo_entrada == "rampa":
-            Kv = sp.limit(s * G_ol, s, 0)
-            error = 1 / Kv if Kv != 0 else sp.oo
-        elif tipo_entrada == "parabola":
-            Ka = sp.limit(s**2 * G_ol, s, 0)
-            error = 1 / Ka if Ka != 0 else sp.oo
-        else:
-            raise ValueError("Tipo de entrada no válido")
+        # Obtenemos la entrada del sistema
+        entrada_ft = self.parse_latex_to_sympy(self.sesion.entrada.funcion_transferencia)
+        
+        # Calculamos la función de transferencia a lazo cerrado
+        G_cl = G_ol / (1 + G_ol)
+        
+        # La salida teórica es la entrada multiplicada por la función de transferencia a lazo cerrado
+        salida_teorica = entrada_ft * G_cl
+        
+        # El error en estado estable es el límite cuando s tiende a 0 de la diferencia entre entrada y salida
+        error = sp.limit(entrada_ft - salida_teorica, s, 0)
         
         return error
 

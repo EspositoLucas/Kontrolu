@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import QApplication
 from .base.vista_json import VistaJson
 import sympy as sp
 import sys
+from latex2sympy2 import latex2sympy
 class MainWindow(QMainWindow):
     
     def __init__(self, sesion):
@@ -618,11 +619,6 @@ class MainWindow(QMainWindow):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
 
-        tipo_entrada = QComboBox()
-        tipo_entrada.addItems(["escalon", "rampa", "parabola"])
-        layout.addWidget(QLabel("Seleccione el tipo de entrada:"))
-        layout.addWidget(tipo_entrada)
-
         calcular_button = QPushButton("Calcular")
         layout.addWidget(calcular_button)
 
@@ -637,9 +633,8 @@ class MainWindow(QMainWindow):
         layout.addWidget(resultado_frame)
 
         def calcular():
-            tipo = tipo_entrada.currentText()
-            error = self.estabilidad.calcular_error_estado_estable(tipo)
-            resultado_label.setText(f"Error en estado estable para entrada {tipo}:\n{error}")
+            error = self.estabilidad.calcular_error_estado_estable()
+            resultado_label.setText(f"Error en estado estable para entrada {latex2sympy(self.sesion.entrada.funcion_transferencia)}:\n{error}")
             if error == 0:
                 resultado_frame.setStyleSheet("background-color: #d4edda; padding: 2px; border-radius: 2px;")
                 resultado_label.setStyleSheet("font-weight: bold; font-size: 16px; color: #155724;")
