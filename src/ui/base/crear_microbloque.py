@@ -629,10 +629,10 @@ ESTILO = """
     }
 
     QComboBox QAbstractItemView {
-        background-color: #F1F1F1;  /* Fondo de la lista desplegable */
+        background-color: #D0D0D0;  /* Fondo de la lista desplegable */
         border: 2px solid #505050;  /* Borde gris oscuro */
         selection-background-color: #808080;  /* Selección gris oscuro */
-        color: white;  /* Texto blanco en selección */
+        color: #2B2D42;  /* Texto blanco en selección */
     }
 
     QVBoxLayout {
