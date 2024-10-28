@@ -1,9 +1,9 @@
 
 from PyQt5.QtGui import QColor
-from sympy import  inverse_laplace_transform, symbols,laplace_transform,simplify,latex
 from back.topologia.configuraciones import Configuracion,TipoError
 from .hoja import Hoja
 from back.json_manager.dtos import MicroBloqueDto
+from latex2sympy2 import latex2sympy
 
 class MicroBloque(Hoja):
     def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 255), funcion_transferencia: str="\\frac{1}{s}", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:

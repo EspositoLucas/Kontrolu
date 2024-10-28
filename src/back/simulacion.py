@@ -48,7 +48,7 @@ class Simulacion(QObject):
         self.cerrando = False  # Nueva variable para controlar el cierre
 
 
-            
+
     def simular_paso(self, y_actual, ciclo):
         tiempo = ciclo * self.delta
 
@@ -114,6 +114,41 @@ class Simulacion(QObject):
         print("-" * 30)
 
         return y_proceso
+    
+    def calcular_salida_convolucion(self, y_proceso):
+        """
+        Calcula la salida usando convolución pero respetando la estructura actual
+        """
+        print("\nDETALLES DE LA CONVOLUCIÓN:")
+        print(f"Valor actual del proceso: {y_proceso}")
+        
+        max_historic_samples = 1000
+        
+        if len(self.datos['proceso']) > max_historic_samples:
+            historical_values = self.datos['proceso'][-max_historic_samples:]
+            print(f"Histórico limitado a {max_historic_samples} muestras")
+        else:
+            historical_values = self.datos['proceso']
+            print(f"Usando histórico completo: {len(historical_values)} muestras")
+        
+        print("\nCálculo de convolución paso a paso:")
+        salida = y_proceso  # Inicializar con el valor actual
+        print(f"Valor inicial (y_proceso actual): {salida}")
+        
+        for i, valor in enumerate(historical_values[:-1]):
+            peso = (i + 1) / len(historical_values)
+            contribucion = valor * peso * self.delta
+            salida += contribucion
+            print(f"Paso {i+1}:")
+            print(f"  - Valor histórico: {valor}")
+            print(f"  - Peso aplicado: {peso:.4f}")
+            print(f"  - Delta tiempo: {self.delta}")
+            print(f"  - Contribución: {contribucion:.4f}")
+            print(f"  - Salida acumulada: {salida:.4f}")
+        
+        print(f"\nSalida final después de la convolución: {salida}")
+        return salida
+    
     
     def confirmar_cierre(self, event):
         self.timer.stop()
