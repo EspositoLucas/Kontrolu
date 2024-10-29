@@ -14,8 +14,8 @@ from PyQt5.QtCore import QRectF
 
 class ElementoEntrada(MacroVista):
     
-    def __init__(self, entrada,pos):
-        MacroVista.__init__(self, entrada, pos)
+    def __init__(self, entrada,pos,padre):
+        MacroVista.__init__(self, entrada, pos,padre)
         self.entrada = entrada
         self.tipo_entrada = "Personalizada"  # Añadimos este atributo
         self.coeficiente = "1"  # Añadimos este atributo
@@ -31,6 +31,7 @@ class ElementoEntrada(MacroVista):
             self.tipo_entrada = dialog.tipo_entrada
             self.coeficiente = dialog.coeficiente
             self.updateText()
+
                 
 class ConfiguracionEntradaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, entrada=None, tipo_entrada="Personalizada",coeficiente="1"):
@@ -257,7 +258,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         else:
             self.coeficiente = self.coeficiente_input.text() or "1"
             self.entrada.funcion_transferencia = self.latex_editor.get_latex()
-        
+        self.padre.update_fdt()
         super().accept()
 ESTILO = """
     QDialog {

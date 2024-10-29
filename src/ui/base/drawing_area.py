@@ -1,8 +1,8 @@
 import os
-from PyQt5.QtWidgets import QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem
+from PyQt5.QtWidgets import QGraphicsProxyWidget,QTextBrowser, QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
+from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer,pyqtSignal
 from .micro_bloque import Microbloque
 from .add_button import AddButton
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo,  ANCHO, ALTO
@@ -14,7 +14,12 @@ from .vista_json import VistaJson
 from .editar_perturbacion import EditarPerturbacion
 from ..base.punto_suma import PuntoSuma
 from ..base.boton_circulo import QGraphicCircleItem
-
+import tempfile
+import matplotlib.pyplot as plt
+from PyQt5.QtSvg import QGraphicsSvgItem
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+import io
+from ..base.text2svg import SVGView
 
 MARGEN_HORIZONTAL = 200
 MARGEN_VERTICAL = 50
@@ -32,6 +37,7 @@ TEXTO_BLANCO = QColor("#FFFDF5")
 
 
 class DrawingArea(QGraphicsView):
+
     def __init__(self, macrobloque=None, ventana=None):
         super().__init__(ventana)
         self.scene = QGraphicsScene(self)
@@ -105,6 +111,26 @@ class DrawingArea(QGraphicsView):
         self.update_scene_rect(self.scene.itemsBoundingRect()) # actualiza el rectangulo de la escena en funcion de lo dibujado
         self.update()
         self.draw_title()
+        self.draw_fdt()
+
+    def update_fdt(self):
+        self.scene.removeItem(self.svg)
+        self.draw_fdt()
+
+    def draw_fdt(self):
+        
+        print("Dibujando FDT")
+        texto = "F(s) = " + self.macrobloque.modelo.obtener_fdt_latex()
+
+        self.svg = SVGView(self.macrobloque.modelo)
+
+        self.scene.addItem(self.svg)
+
+        text_rect = self.title_item.boundingRect()
+
+        self.svg.setPos((self.scene.width() - self.svg.boundingRect().width()) / 2, 20 + text_rect.height())
+
+        self.macrobloque.update_fdt()
 
         
     def draw_title(self):

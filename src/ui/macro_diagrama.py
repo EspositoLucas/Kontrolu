@@ -18,6 +18,7 @@ from .base.pausar_button import BotonPausar
 from .base.detener_button import BotonDetener
 from .base.reanudar_button import BotonReanudar
 from .base.boton_circulo import QGraphicCircleItem
+from .base.text2svgMain import SVGView
 
 #DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL = 75
 #DISTANCIA_ENTRE_ELEMENTOS_VERTICAL = 32.5
@@ -62,42 +63,42 @@ class MacroDiagrama(QGraphicsView):
         x_actuador = self.X_MEDIO - ANCHO_ELEMENTO / 2
         y_actuador = self.Y_MEDIO
         pos_act = QRectF(x_actuador, y_actuador, ANCHO_ELEMENTO, ALTO_ELEMENTO)
-        actuador = ElementoActuador(self.sesion.actuador, pos_act)
+        actuador = ElementoActuador(self.sesion.actuador, pos_act,self)
         self.scene.addItem(actuador)
 
         # CONTROLADOR
         x_controlador = x_actuador - DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL - ANCHO_ELEMENTO
         y_controlador = self.Y_MEDIO
         pos_con = QRectF(x_controlador, y_controlador, ANCHO_ELEMENTO, ALTO_ELEMENTO)
-        controlador = ElementoControl(self.sesion.controlador, pos_con)
+        controlador = ElementoControl(self.sesion.controlador, pos_con,self)
         self.scene.addItem(controlador)
 
         # ENTRADA
         x_entrada = x_controlador - DISTANCIA_HORIZONTAL_EXTRA - ANCHO_ELEMENTO
         y_entrada = self.Y_MEDIO
         pos_ent = QRectF(x_entrada, y_entrada, ANCHO_ELEMENTO, ALTO_ELEMENTO)
-        entrada = ElementoEntrada(self.sesion.entrada, pos_ent)
+        entrada = ElementoEntrada(self.sesion.entrada, pos_ent,self)
         self.scene.addItem(entrada)
 
         # PROCESO
         x_proceso = self.X_MEDIO + ANCHO_ELEMENTO / 2 + DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL
         y_proceso = self.Y_MEDIO
         pos_pro = QRectF(x_proceso, y_proceso, ANCHO_ELEMENTO, ALTO_ELEMENTO)
-        proceso = ElementoProceso(self.sesion.proceso, pos_pro)
+        proceso = ElementoProceso(self.sesion.proceso, pos_pro,self)
         self.scene.addItem(proceso)
 
         # MEDIDOR
         x_medidor = x_actuador
         y_medidor = self.Y_MEDIO + ALTO_ELEMENTO + DISTANCIA_ENTRE_ELEMENTOS_VERTICAL
         pos_med = QRectF(x_medidor, y_medidor, ANCHO_ELEMENTO, ALTO_ELEMENTO)
-        medidor = ElementoMedicion(self.sesion.medidor, pos_med)
+        medidor = ElementoMedicion(self.sesion.medidor, pos_med,self)
         self.scene.addItem(medidor)
 
         # CARGA
         x_carga = x_proceso + ANCHO_ELEMENTO + DISTANCIA_HORIZONTAL_EXTRA
         y_carga = self.Y_MEDIO
         pos_car = QRectF(x_carga, y_carga, ANCHO_ELEMENTO, ALTO_ELEMENTO)
-        carga = ElementoCarga(self.sesion.carga, pos_car)
+        carga = ElementoCarga(self.sesion.carga, pos_car,self)
         self.scene.addItem(carga)
 
         y_linea_1 = self.Y_MEDIO + ALTO_ELEMENTO / 2
@@ -142,6 +143,7 @@ class MacroDiagrama(QGraphicsView):
         self.scene.addItem(puntoSuma)
 
         self.draw_title()
+        self.draw_fdt()
 
         # Deshabilitar el desplazamiento
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -152,16 +154,30 @@ class MacroDiagrama(QGraphicsView):
 
         #self.agregar_botones()
 
+    def update_fdt(self):
+        self.scene.removeItem(self.svg)
+        self.draw_fdt()
+
+    def draw_fdt(self):
+        print("Dibujando FDT")
+
+        self.svg = SVGView(self.sesion)
+
+        self.scene.addItem(self.svg)
+
+        text_rect = self.svg.boundingRect()
+
+        self.svg.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
 
     def draw_title(self):
 
         self.title_item = QGraphicsTextItem(self.sesion.nombre)
         self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
-        font = QtGui.QFont("Arial", 20, QtGui.QFont.Bold)
+        font = QtGui.QFont("Arial", 50, QtGui.QFont.Bold)
         self.title_item.setFont(font)
         self.title_item.setDefaultTextColor(LETRA_COLOR)
         text_rect = self.title_item.boundingRect()
-        self.title_item.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL)
+        self.title_item.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*10)
         self.title_item.focusOutEvent = self.update_model_title
         self.title_item.mousePressEvent = self.enable_text_editing
         self.scene.addItem(self.title_item)

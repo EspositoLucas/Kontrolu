@@ -2,6 +2,10 @@ from __future__ import annotations
 from typing import Tuple
 import itertools
 from sympy import simplify,latex
+from sympy.abc import s,t,z
+from sympy import inverse_laplace_transform
+
+
 
 class InterfazTopologia():
 
@@ -74,6 +78,12 @@ class InterfazTopologia():
     def obtener_fdt_latex(self):
 
         return latex(self.obtener_fdt_simpy())
+    
+    def obtener_fdt_tiempo(self):
+        return inverse_laplace_transform(self.obtener_fdt_simpy(),s,t)
+    
+    def obtener_fdt_tiempo_latex(self):
+        return latex(self.obtener_fdt_tiempo())
     
     def operar_fdt(self,input):
 

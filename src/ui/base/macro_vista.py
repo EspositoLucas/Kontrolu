@@ -12,8 +12,9 @@ from .floating_buttons import FloatingButtons
 
 
 class MacroVista(QGraphicsRectItem):
-    def __init__(self, elementoBack,  pos):
+    def __init__(self, elementoBack,  pos,padre):
         qrect = pos
+        self.padre = padre
         super().__init__(qrect)
         self.modelo = elementoBack
         self.default_brush = QBrush(QColor("#A8DADC"))  # Fondo celeste suave
@@ -62,6 +63,9 @@ class MacroVista(QGraphicsRectItem):
 
     def update_nombre(self):
         self.updateText()
+    
+    def update_fdt(self):
+        self.padre.update_fdt()
     
     def click(self):
         self.macro_vista_window = MacroVistaMainWindow(self, self.modelo)

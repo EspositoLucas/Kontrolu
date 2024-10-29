@@ -11,9 +11,9 @@ import re
 
 
 class ElementoCarga(MacroVista):
-    def __init__(self, carga,pos):
+    def __init__(self, carga,pos,padre):
 
-        MacroVista.__init__(self, carga, pos)
+        MacroVista.__init__(self, carga, pos,padre)
         self.carga = carga
         self.coeficiente = "1"  # Añadimos este atributo
         self.estado_seleccionado = self.carga.estados[0]["nombre"]  # Inicializamos con el primer estado

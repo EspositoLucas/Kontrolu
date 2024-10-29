@@ -4,8 +4,8 @@ from .macros.macro_medidor import MacroMedidor
 from .macros.macro_proceso import MacroProceso
 from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
-from sympy import simplify, latex
-from sympy.abc import s
+from sympy import simplify, latex,inverse_laplace_transform
+from sympy.abc import s,z,t
 
 
 
@@ -157,6 +157,13 @@ class Sesion():
 
         return latex(self.obtener_fdt_lazo_abierto_simpy())
     
+    def obtener_fdt_lazo_abierto_simpy_tiempo(self):
+            
+        return inverse_laplace_transform(self.obtener_fdt_lazo_abierto_simpy(),s,t)
+
+    def obtener_fdt_lazo_abierto_latex_tiempo(self):
+        return latex(self.obtener_fdt_lazo_abierto_simpy_tiempo())
+        
     def calcular_fdt_realimentacion(self):
 
         return self.medidor.calcular_fdt()
@@ -164,6 +171,8 @@ class Sesion():
     def obtener_fdt_realimentacion_simpy(self):
 
         return simplify(self.calcular_fdt_realimentacion())
+    
+
     
     def obtener_fdt_realimentacion_latex(self):
 
@@ -173,6 +182,14 @@ class Sesion():
 
         return self.obtener_fdt_lazo_abierto_simpy() / (1 + self.obtener_fdt_lazo_abierto_simpy() * self.obtener_fdt_realimentacion_simpy())
     
+    def calcular_fdt_realimentacion_tiempo(self):
+            
+        return inverse_laplace_transform(self.obtener_fdt_realimentacion_simpy(),s,t)
+    
+    def obtener_fdt_realimentacion_latex_tiempo(self):
+
+        return latex(self.calcular_fdt_realimentacion_tiempo())
+    
     def obtener_fdt_global_simpy(self):
 
         return self.calcular_fdt_global()
@@ -180,6 +197,14 @@ class Sesion():
     def obtener_fdt_global_latex(self):
 
         return latex(self.obtener_fdt_global_simpy())
+    
+    def obtener_fdt_global_tiempo(self):
+            
+        return inverse_laplace_transform(self.obtener_fdt_global_simpy(),s,t)
+    
+    def obtener_fdt_global_latex_tiempo(self):
+
+        return latex(self.obtener_fdt_global_tiempo())
     
     def calcular_fdt_con_entrada(self):
 
@@ -193,6 +218,14 @@ class Sesion():
 
         return latex(self.obtener_fdt_con_entrada_simpy())
     
+    def obtener_fdt_con_entrada_tiempo(self):
+
+        return inverse_laplace_transform(self.obtener_fdt_con_entrada_simpy(),s,t)
+    
+    def obtener_fdt_con_entrada_latex_tiempo(self):
+
+        return latex(self.obtener_fdt_con_entrada_tiempo())
+    
     def calcular_abierta_si_unitario(self):
 
         return self.calcular_fdt_lazo_abierto()/(1+self.calcular_fdt_lazo_abierto()*(self.calcular_fdt_realimentacion()-1))
@@ -204,6 +237,14 @@ class Sesion():
     def obtener_abierta_si_unitario_latex(self):
 
         return latex(self.obtener_abierta_si_unitario_simpy())
+    
+    def obtener_abierta_si_unitario_sympy_tiempo(self):
+            
+        return inverse_laplace_transform(self.obtener_abierta_si_unitario_simpy(),s,t)
+    
+    def obtener_abierta_si_unitario_latex_tiempo(self):
+
+        return latex(self.obtener_abierta_si_unitario_sympy_tiempo())
     
     def calcular_sistema_unitario(self):
 
@@ -217,6 +258,14 @@ class Sesion():
 
         return latex(self.obtener_sistema_unitario_simpy())
     
+    def obtener_sistema_unitario_tiempo(self):
+
+        return inverse_laplace_transform(self.obtener_sistema_unitario_simpy(),s,t)
+    
+    def obtener_sistema_unitario_latex_tiempo(self):
+
+        return latex(self.obtener_sistema_unitario_tiempo())
+    
     def calcular_calculo_error_en_estado_estable(self):
 
         return s*self.entrada.calcular_fdt()*self.obtener_sistema_unitario_simpy()
@@ -228,6 +277,14 @@ class Sesion():
     def obtener_calculo_error_en_estado_estable_latex(self):
 
         return latex(self.obtener_calculo_error_en_estado_estable_simpy())
+    
+    def obtener_calculo_error_en_estado_estable_tiempo(self):
+
+        return inverse_laplace_transform(self.obtener_calculo_error_en_estado_estable_simpy(),s,t)
+    
+    def obtener_calculo_error_en_estado_estable_latex_tiempo(self):
+
+        return latex(self.obtener_calculo_error_en_estado_estable_tiempo())
     
     def calcular_error_en_estado_estable(self):
 
