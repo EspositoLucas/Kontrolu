@@ -4,6 +4,8 @@ from back.topologia.microbloque import MicroBloque
 from back.topologia.perturbacion import Perturbacion
 from back.topologia.hoja import Hoja
 from latex2sympy2 import latex2sympy
+import numpy as np
+import math
 
 class Estabilidad:
     def __init__(self, sesion):
@@ -45,7 +47,7 @@ class Estabilidad:
 
     def calcular_ft_macrobloque(self, macrobloque):
         return self.calcular_ft_topologia(macrobloque.topologia)
-
+        
     def calcular_ft_topologia(self, topologia):
         if isinstance(topologia, TopologiaSerie):
             return self.calcular_ft_serie(topologia)
@@ -88,6 +90,12 @@ class Estabilidad:
                 # If it's not a fraction, return the string as a symbol
                 return sp.Symbol(latex_str)
 
+    def get_expr(self, raw_expr: str) -> sp.Expr:
+        """
+        Convert string to SymPy expression.
+        """
+        return sp.simplify(sp.parse_expr(raw_expr))
+
     def calcular_estabilidad(self):
         G_cl_latex = self.obtener_funcion_transferencia()
         G_cl = self.parse_latex_to_sympy(G_cl_latex)
@@ -98,48 +106,42 @@ class Estabilidad:
         
         # Manejar el caso de función de transferencia constante
         if len(coeficientes) == 1:
-            # Si es una constante, el sistema es estable si es positiva
             es_estable = sp.sympify(coeficientes[0]).is_positive
             return [[coeficientes[0]]], es_estable
 
-        n = len(coeficientes) - 1
-        cols = n // 2 + 1
-        matriz_routh = [[0 for j in range(cols)] for i in range(n+1)]
+        coeficientes_str = list(map(str, coeficientes))
+        grado = len(coeficientes_str) - 1
+        filas = grado + 1
+        columnas = math.ceil((grado + 1) / 2)
+        matriz_routh = np.full((filas, columnas), self.get_expr('0'), dtype=object)
         
-        # Llenar las dos primeras filas
-        for i in range(2):
-            for j in range(cols):
-                if i + 2*j < len(coeficientes):
-                    matriz_routh[i][j] = coeficientes[i + 2*j]
+        # Rellenar la primera y segunda fila de la matriz de Routh
+        for i in range(0, columnas):
+            if 2 * i <= grado:
+                matriz_routh[0, i] = self.get_expr(coeficientes_str[2 * i])
+            if 2 * i + 1 <= grado:
+                matriz_routh[1, i] = self.get_expr(coeficientes_str[2 * i + 1])
+        
+        # Calcular las filas restantes de la matriz de Routh
+        for fila in range(2, filas):
+            for columna in range(columnas - 1):
+                a = matriz_routh[fila - 1, 0]
+                b = matriz_routh[fila - 2, columna + 1]
+                c = matriz_routh[fila - 2, 0]
+                d = matriz_routh[fila - 1, columna + 1]
+
+                # Verificar si hay una fila completa de ceros y tratar el caso especial
+                if all(matriz_routh[fila - 1, j] == self.get_expr('0') for j in range(columnas)):
+                    # Rellenar fila con derivada de los coeficientes anteriores
+                    for k in range(columnas):
+                        matriz_routh[fila, k] = self.get_expr(str((grado - fila + 1 - 2 * k) * sp.sympify(coeficientes_str[k])))
+                    break
                 else:
-                    matriz_routh[i][j] = 0
+                    matriz_routh[fila, columna] = sp.simplify((b * a - c * d) / a if a != 0 else self.get_expr('0'))
         
-        # Calcular el resto de las filas
-        for i in range(2, n+1):
-            if matriz_routh[i-1][0] == 0:
-                # Manejar el caso de fila cero
-                grado = n - i + 2
-                coefs_aux = [c for c in matriz_routh[i-2] if c != 0]
-                poli_aux = sum(c * s**(grado-2*j) for j, c in enumerate(coefs_aux))
-                derivada = sp.diff(poli_aux, s)
-                coefs_derivada = sp.Poly(derivada, s).all_coeffs()
-                matriz_routh[i-1] = coefs_derivada + [0] * (cols - len(coefs_derivada))
-            
-            for j in range(cols - 1):
-                if matriz_routh[i-1][0] != 0:
-                    det = (matriz_routh[i-1][0] * matriz_routh[i-2][j+1] - 
-                        matriz_routh[i-2][0] * matriz_routh[i-1][j+1])
-                    matriz_routh[i][j] = det / matriz_routh[i-1][0]
-                else:
-                    matriz_routh[i][j] = 0
-        
-        # Asegurar que el último elemento sea el último coeficiente del polinomio si todos los demás son 0
-        if all(matriz_routh[-1][j] == 0 for j in range(cols - 1)):
-            matriz_routh[-1][0] = coeficientes[-1]
-        
-        # Verificar estabilidad considerando todas las columnas
-        es_estable = all(sp.sympify(matriz_routh[i][0]).is_positive for i in range(n+1) if matriz_routh[i][0] != 0)
-        
+        # Verificar si todos los elementos de la primera columna son positivos
+        es_estable = all(sp.sympify(element).is_positive for element in matriz_routh[:, 0])
+
         return matriz_routh, es_estable
     
     def calcular_error_estado_estable(self):
