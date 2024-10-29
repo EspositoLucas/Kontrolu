@@ -109,10 +109,10 @@ class TopologiaSerie(InterfazTopologia):
     def __str__(self):
         return "SERIE: " + str(list(map(lambda hijo: str(hijo),self.hijos)))
     
-    def simular(self, tiempo, entrada=None):
+    def simular(self, tiempo, delta, entrada=None):
 
         for hijo in self.hijos:
-                entrada = hijo.simular(tiempo, entrada)
+                entrada = hijo.simular(tiempo, delta, entrada)
     
         return entrada
     
@@ -209,6 +209,10 @@ class TopologiaSerie(InterfazTopologia):
     def operar_fdt(self,input):
 
         return self.calcular_fdt() + input
+    
+    def vaciar_datos(self):
+        for hijo in self.hijos:
+            hijo.vaciar_datos()
 
     
 
@@ -262,16 +266,16 @@ class TopologiaParalelo(InterfazTopologia):
     def __str__(self):
         return "PARALELO: " + str(list(map(lambda hijo: hijo.__str__(),self.hijos)))
     
-    def simular(self, tiempo, entrada=None):
+    def simular(self, tiempo, delta, entrada=None):
 
         # Simula todos los hijos con la misma entrada
-        salidas = [hijo.simular(tiempo, entrada) for hijo in self.hijos]
+        salidas = [hijo.simular(tiempo, delta, entrada) for hijo in self.hijos]
         # Suma las salidas de todos los hijos
         salida =  sum(salidas)
         
         return salida
     
-    
+
     def validar_entrada(self, unidad) -> bool:
         return self.padre.validar_entrada(self, unidad)
     
@@ -345,3 +349,7 @@ class TopologiaParalelo(InterfazTopologia):
     def operar_fdt(self,input):
 
         return self.calcular_fdt() * input
+    
+    def vaciar_datos(self):
+        for hijo in self.hijos:
+            hijo.vaciar_datos()

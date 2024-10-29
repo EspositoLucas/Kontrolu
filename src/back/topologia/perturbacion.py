@@ -27,21 +27,14 @@ class Perturbacion(Hoja):
             except Exception as e:
                 print("Error al notificar: ", e)
 
-    def simular(self,tiempo,entrada):
+    def simular(self, tiempo, delta, entrada):
 
         if (not self.get_estado(tiempo)):
             self.notificar(False)
             return entrada
         self.notificar(True)
 
-
-        s,t = symbols('s t')
-
-        perturbacion_laplace = latex2sympy(self.funcion_transferencia)
-
-        perturbacion_tiempo = inverse_laplace_transform(perturbacion_laplace,s,t)
-
-        perturbado = perturbacion_tiempo.subs(t,tiempo)
+        perturbado = super().simular(tiempo,delta)
 
 
         nuevo_valor = perturbado + entrada

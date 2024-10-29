@@ -1,13 +1,13 @@
 
 from PyQt5.QtGui import QColor
-from sympy import  inverse_laplace_transform, symbols,laplace_transform,simplify,latex
-from latex2sympy2 import latex2sympy
 from back.topologia.configuraciones import Configuracion,TipoError
 from .hoja import Hoja
 from back.json_manager.dtos import MicroBloqueDto
+from latex2sympy2 import latex2sympy
 
 class MicroBloque(Hoja):
-    def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 255), funcion_transferencia: str="1", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
+    def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 255), funcion_transferencia: str="\\frac{1}{s}", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
+        super().__init__(nombre=nombre, funcion_transferencia=funcion_transferencia)
         if from_json:
             self.from_json(from_json)
             self.padre = padre
@@ -16,7 +16,7 @@ class MicroBloque(Hoja):
         self.descripcion = descripcion
         self.configuracion_entrada = Configuracion(nombre="Configuracion Entrada")
         self.configuracion_salida = Configuracion(nombre="Configuracion Salida")
-        super().__init__(nombre=nombre, funcion_transferencia=funcion_transferencia)
+        
         if datos:
             self.set_dto(datos)
     
@@ -118,40 +118,7 @@ class MicroBloque(Hoja):
     def obtener_micros(self):
         return [self]
         
-    def simular(self, tiempo, entrada=None):
 
-        print(f"Simulando microbloque: {self.nombre}")
-        print(f"Tiempo: {tiempo}")
-        print(f"Entrada: {entrada}")
-        print(f"Función de transferencia: {self.funcion_transferencia}")
-
-        s,t = symbols('s t')
-
-        tf_sympy = latex2sympy(self.funcion_transferencia)
-
-        operacion_laplace = tf_sympy
-
-        if entrada!=None:
-
-
-            entrada_con_error = self.configuracion_entrada.actualizar(entrada,tiempo)
-            print(f"Entrada con error: {entrada_con_error}")
-
-            entrada_micro_bloque = laplace_transform(entrada_con_error,t,s)[0]
-            print(f"Entrada en laplace: {entrada_micro_bloque}")
-            operacion_laplace = entrada_micro_bloque * tf_sympy
-            print(f"Operación en laplace: {operacion_laplace}")
-        
-        operacion_tiempo = inverse_laplace_transform(operacion_laplace,s,t)
-        #print(f"Operación en tiempo: {operacion_tiempo}")
-        salida_micro_bloque = operacion_tiempo.subs(t,tiempo)
-        #print(f"Salida: {salida_micro_bloque}")
-
-        salida_con_error = self.configuracion_salida.actualizar(salida_micro_bloque,tiempo)
-        #print(f"Salida con error: {salida_con_error}")
-
-
-        return salida_con_error
 
     def unidad_entrada(self):
         return self.configuracion_entrada.unidad

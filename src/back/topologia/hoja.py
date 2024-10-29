@@ -1,14 +1,21 @@
 from __future__ import annotations
 from .interfaz_topologia import InterfazTopologia
-from sympy import  inverse_laplace_transform, symbols,laplace_transform
+from sympy import  inverse_laplace_transform, symbols,laplace_transform,simplify
 from latex2sympy2 import latex2sympy
-
+from sympy.abc import s,t,z
+from latex2sympy2 import latex2sympy
+from scipy.signal import bilinear,dlsim,dlti,dimpulse
 class Hoja(InterfazTopologia):
     
     def __init__(self, nombre: str= "Hoja", funcion_transferencia: str="1", padre=None) -> None:
         self.nombre = nombre
         self.funcion_transferencia = funcion_transferencia
         self.padre = padre
+        self.fdt_calculated = None
+        self.delta_calculated = None
+        self.system = None
+        self.entradas = [0]
+        self.tiempos = [0]
 
     def agregar_perturbacion_antes(self, actual: Hoja, perturbacion):
         self.padre.agregar_perturbacion_antes(actual, perturbacion)
@@ -66,8 +73,6 @@ class Hoja(InterfazTopologia):
             nivel += 1
         return parents
     
-    def simular(self, tiempo, entrada=None):
-        pass
 
     def validar_entrada(self):
         return self.padre.validar_entrada(self,self.unidad_entrada())
@@ -83,4 +88,59 @@ class Hoja(InterfazTopologia):
 
     def calcular_fdt(self):
 
-        return latex2sympy(self.funcion_transferencia)
+        return latex2sympy(self.get_funcion_transferencia())
+    
+    def simular(self, tiempo, delta, entrada=None):
+        
+        if not self.system or self.delta_calculated != delta or self.fdt_calculated != self.get_funcion_transferencia():
+            self.set_simu_fdt(delta)
+        
+        self.tiempos.append(tiempo)
+
+        if entrada == None:
+            print("ENTRADA")
+            print(self.tiempos)
+            print(self.system)
+
+            _,y = dimpulse(self.system,t = self.tiempos)
+        else:
+            self.entradas.append(entrada)
+            print("BLOQUE")
+            print(self.entradas)
+            print(self.tiempos)
+            print(self.system)
+            _,y = dlsim(self.system,u = self.entradas,t = self.tiempos)
+
+        print("SALIDA")
+        print(y[-1][0])
+        return float(y[-1][0])
+    
+    def get_simu_fdt(self,delta):
+
+        sympy_fdt = latex2sympy(self.get_funcion_transferencia())
+
+        expr_simplified = simplify(sympy_fdt)
+
+        numerador,denominador = expr_simplified.as_numer_denom()
+
+        num_coef = numerador.as_poly(s).all_coeffs()
+        den_coef = denominador.as_poly(s).all_coeffs()
+
+        num_coef = [float(x) for x in num_coef]
+        den_coef = [float(x) for x in den_coef]
+
+        num_entrada_z, den_entrada_z = bilinear(num_coef,den_coef,fs=1/delta)
+
+        return dlti(num_entrada_z,den_entrada_z,dt=delta)
+    
+    def set_simu_fdt(self,delta):
+        self.fdt_calculated = self.get_funcion_transferencia()
+        self.delta_calculated = delta
+        self.system = self.get_simu_fdt(delta)
+
+    def vaciar_datos(self):
+        self.entradas = [0]
+        self.tiempos = [0]
+
+    def get_funcion_transferencia(self):
+        return self.funcion_transferencia

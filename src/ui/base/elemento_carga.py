@@ -38,7 +38,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.padre = parent
         self.setWindowTitle("Configuración de Carga")
         self.carga = carga
-        self.tipo_entrada, self.coeficiente = self.determinar_tipo_funcion(carga.funcion_de_transferencia)
+        self.tipo_entrada, self.coeficiente = self.determinar_tipo_funcion(carga.funcion_transferencia)
         self.estado_seleccionado = estado_seleccionado
         self.initUI()
     
@@ -129,7 +129,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         ft_layout = QtWidgets.QVBoxLayout()
         ft_layout.addWidget(QtWidgets.QLabel("Función de transferencia:"))
         self.latex_editor = LatexEditor()
-        self.latex_editor.set_latex(self.carga.funcion_de_transferencia)
+        self.latex_editor.set_latex(self.carga.funcion_transferencia)
         ft_layout.addWidget(self.latex_editor)
         layout.addLayout(ft_layout)
 
@@ -272,7 +272,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def actualizar_campos(self):
         self.nombre_input.setText(self.carga.nombre)
         self.tipo_carga_combo.setCurrentText(self.carga.tipo_carga.value)
-        self.latex_editor.set_latex(self.carga.funcion_de_transferencia)
+        self.latex_editor.set_latex(self.carga.funcion_transferencia)
         self.escalamiento_sigmoide_input.setText(str(self.carga.escalamiento_sigmoide))
         self.desplazamiento_sigmoide_input.setText(str(self.carga.desplazamiento_sigmoide))
         self.actualizar_lista_estados()
@@ -351,7 +351,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         elif tipo_entrada == "Misma que entrada":
             latex = f"{self.carga.entrada.funcion_transferencia}"
         else:
-            latex = self.carga.funcion_de_transferencia
+            latex = self.carga.funcion_transferencia
         
         self.latex_editor.set_latex(latex)
 
@@ -371,12 +371,12 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         # Actualizamos los valores de la carga con los nuevos datos
         self.carga.nombre = self.nombre_input.text()
         self.carga.tipo_carga = TipoCarga(self.tipo_carga_combo.currentText())
-        self.carga.funcion_de_transferencia = self.latex_editor.get_latex()
+        self.carga.funcion_transferencia = self.latex_editor.get_latex()
         self.carga.escalamiento_sigmoide = float(self.escalamiento_sigmoide_input.text())
         self.carga.desplazamiento_sigmoide = float(self.desplazamiento_sigmoide_input.text())
 
         if self.tipo_entrada == "Misma que entrada":
-                self.carga.funcion_de_transferencia = ""
+                self.carga.funcion_transferencia = ""
 
             
         # Guardamos el estado seleccionado
