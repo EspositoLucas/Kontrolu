@@ -265,6 +265,7 @@ class CrearMicroBloque(QDialog):
         # Función de transferencia
         transfer_label = QLabel("Función de Transferencia:")
         latex_editor = LatexEditor(self.new_microbloque.funcion_transferencia)
+        latex_editor.set_latex(self.new_microbloque.funcion_transferencia)
         new_microbloque_layout.addWidget(transfer_label)
         new_microbloque_layout.addWidget(latex_editor)
         self.latex_editor = latex_editor
