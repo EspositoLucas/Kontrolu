@@ -1,6 +1,4 @@
 
-from sympy import  inverse_laplace_transform, symbols,laplace_transform
-from latex2sympy2 import latex2sympy
 import numpy as np
 from enum import Enum
 from ..topologia.hoja import Hoja

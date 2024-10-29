@@ -1,6 +1,4 @@
 from __future__ import annotations
-from latex2sympy2 import latex2sympy
-from sympy import  inverse_laplace_transform, symbols,laplace_transform,simplify
 from .hoja import Hoja
 
 class Perturbacion(Hoja):

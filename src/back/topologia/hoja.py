@@ -1,6 +1,6 @@
 from __future__ import annotations
 from .interfaz_topologia import InterfazTopologia
-from sympy import  inverse_laplace_transform, symbols,laplace_transform,simplify
+from sympy import  simplify
 from latex2sympy2 import latex2sympy
 from sympy.abc import s,t,z
 from latex2sympy2 import latex2sympy

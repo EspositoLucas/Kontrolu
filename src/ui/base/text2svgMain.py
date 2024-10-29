@@ -82,44 +82,67 @@ class SVGView(QGraphicsSvgItem):
     def __init__(self, macro, parent=None):
         super().__init__(parent)
         self.macro = macro
-        self.laplace = "Y(s) = " + self.macro.obtener_fdt_con_entrada_latex()
-        self.tiempo = "y(t) = " + self.macro.obtener_fdt_con_entrada_latex_tiempo()
-        self.total_laplace = "\\frac{Y(s)}{R(s)} = " + self.macro.obtener_fdt_global_latex()
-        self.total_tiempo = "\\frac{y(s)}{r(t)} = " + self.macro.obtener_fdt_global_latex_tiempo()
-        self.global_laplace = "G(s) = " + self.macro.obtener_fdt_global_latex()
-        self.global_tiempo = "g(t) = " + self.macro.obtener_fdt_global_latex_tiempo()
+
+        plt.rc('mathtext', fontset='cm')
+
+        self.funciones = []
+
+        self.graficos = []
 
         self.fdt_sympy_laplace = self.macro.obtener_fdt_con_entrada_simpy()
-        self.fdt_sympy_tiempo = self.macro.obtener_fdt_con_entrada_tiempo()
-        self.fdt_sympy_laplace_total = self.macro.obtener_fdt_global_simpy()
-        self.fdt_sympy_tiempo_total = self.macro.obtener_fdt_global_tiempo()
-        self.fdt_sympy_global_laplace = self.macro.obtener_fdt_global_simpy()
-        self.fdt_sympy_global_tiempo = self.macro.obtener_fdt_global_tiempo()
+        if self.fdt_sympy_laplace != None:
+            self.laplace = "Y(s) = " + self.macro.obtener_fdt_con_entrada_latex()
+            bytess_laplace = self.tex2svg(self.laplace)
+            self.renderer_laplace = QSvgRenderer(bytess_laplace)
+            self.funciones.append(self.renderer_laplace)
+            self.graficos.append((self.fdt_sympy_laplace,True,"Y(s)"))
 
-        # Configurar matplotlib para usar la fuente Computer Modern
-        plt.rc('mathtext', fontset='cm')
+        self.fdt_sympy_tiempo = self.macro.obtener_fdt_con_entrada_tiempo()
+        if self.fdt_sympy_tiempo != None:
+            self.tiempo = "y(t) = " + self.macro.obtener_fdt_con_entrada_latex_tiempo()
+            bytess_tiempo = self.tex2svg(self.tiempo)
+            self.renderer_tiempo = QSvgRenderer(bytess_tiempo)
+            self.funciones.append(self.renderer_tiempo)
+            self.graficos.append((self.fdt_sympy_tiempo,False,"y(t)"))
         
-        # Generar el SVG a partir de la fórmula LaTeX
-        bytess_laplace = self.tex2svg(self.laplace)
-        bytess_tiempo = self.tex2svg(self.tiempo)
-        bytess_laplace_total = self.tex2svg(self.total_laplace)
-        bytess_tiempo_total = self.tex2svg(self.total_tiempo)
-        bytess_global_laplace = self.tex2svg(self.global_laplace)
-        bytess_global_tiempo = self.tex2svg(self.global_tiempo)
-        
-        # Cargar el SVG en el renderer
-        self.renderer_laplace = QSvgRenderer(bytess_laplace)
-        self.renderer_tiempo = QSvgRenderer(bytess_tiempo)
-        self.renderer_laplace_total = QSvgRenderer(bytess_laplace_total)
-        self.renderer_tiempo_total = QSvgRenderer(bytess_tiempo_total)
-        self.renderer_global_laplace = QSvgRenderer(bytess_global_laplace)
-        self.renderer_global_tiempo = QSvgRenderer(bytess_global_tiempo)
+        self.fdt_sympy_laplace_total = self.macro.obtener_fdt_global_simpy()
+        if self.fdt_sympy_laplace_total != None:
+            self.total_laplace = "\\frac{Y(s)}{R(s)} = " + self.macro.obtener_fdt_global_latex()
+            bytess_laplace_total = self.tex2svg(self.total_laplace)
+            self.renderer_laplace_total = QSvgRenderer(bytess_laplace_total)
+            self.funciones.append(self.renderer_laplace_total)
+            self.graficos.append((self.fdt_sympy_laplace_total,True,"Y(s)/R(s)"))
+
+
+        self.fdt_sympy_tiempo_total = self.macro.obtener_fdt_global_tiempo()
+        if self.fdt_sympy_tiempo_total != None:
+            self.total_tiempo = "\\frac{y(s)}{r(t)} = " + self.macro.obtener_fdt_global_latex_tiempo()
+            bytess_tiempo_total = self.tex2svg(self.total_tiempo)
+            self.renderer_tiempo_total = QSvgRenderer(bytess_tiempo_total)
+            self.funciones.append(self.renderer_tiempo_total)
+            self.graficos.append((self.fdt_sympy_tiempo_total,False,"y(t)/r(t)"))
+
+        self.fdt_sympy_global_laplace = self.macro.obtener_fdt_lazo_abierto_simpy()
+        if self.fdt_sympy_global_laplace != None:
+            self.global_laplace = "G(s) = " + self.macro.obtener_fdt_lazo_abierto_latex()
+            bytess_global_laplace = self.tex2svg(self.global_laplace)
+            self.renderer_global_laplace = QSvgRenderer(bytess_global_laplace)
+            self.funciones.append(self.renderer_global_laplace)
+            self.graficos.append((self.fdt_sympy_global_laplace,True,"G(s)"))
+
+        self.fdt_sympy_global_tiempo = self.macro.obtener_fdt_lazo_abierto_simpy_tiempo()
+        if self.fdt_sympy_global_tiempo != None:
+            self.global_tiempo = "g(t) = " + self.macro.obtener_fdt_lazo_abierto_latex_tiempo()
+            bytess_global_tiempo = self.tex2svg(self.global_tiempo)
+            self.renderer_global_tiempo = QSvgRenderer(bytess_global_tiempo)
+            self.funciones.append(self.renderer_global_tiempo)      
+            self.graficos.append((self.fdt_sympy_global_tiempo,False,"g(t)"))  
 
         self.laplace_mode = 0
-        self.setSharedRenderer(self.renderer_laplace)
-
-        # Permitir eventos de hover
-        self.setAcceptHoverEvents(True)
+        if len(self.funciones) > 0:
+            self.setSharedRenderer(self.funciones[0])
+            # Permitir eventos de hover
+            self.setAcceptHoverEvents(True)
 
     def tex2svg(self, formula, fontsize=50, dpi=300):
         """Render TeX formula to SVG."""
@@ -145,24 +168,12 @@ class SVGView(QGraphicsSvgItem):
             self.open_graph_window(self.laplace_mode)
         if event.button() == Qt.RightButton:
             print("Clic derecho detectado en SVG.")
-            if self.laplace_mode == 0:
-                self.laplace_mode = 1
-                self.setSharedRenderer(self.renderer_tiempo)
-            elif self.laplace_mode == 1:
-                self.laplace_mode = 2
-                self.setSharedRenderer(self.renderer_laplace_total)
-            elif self.laplace_mode == 2:
-                self.laplace_mode = 3
-                self.setSharedRenderer(self.renderer_tiempo_total)
-            elif self.laplace_mode == 3:
-                self.laplace_mode = 4
-                self.setSharedRenderer(self.renderer_global_laplace)
-            elif self.laplace_mode == 4:
-                self.laplace_mode = 5
-                self.setSharedRenderer(self.renderer_global_tiempo)
-            elif self.laplace_mode == 5:
+
+            self.laplace_mode += 1
+
+            if self.laplace_mode >= len(self.funciones):
                 self.laplace_mode = 0
-                self.setSharedRenderer(self.renderer_laplace)
+            self.setSharedRenderer(self.funciones[self.laplace_mode])
         # Llamar al método base para manejar otros eventos
         super().mousePressEvent(event)
 
@@ -203,40 +214,15 @@ class SVGView(QGraphicsSvgItem):
 
         tab_widget = QTabWidget()
 
-        # Crear la pestaña para el dominio de Laplace
-        laplace_tab = QLabel()
-        laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(self.fdt_sympy_laplace))
-        laplace_tab.setPixmap(laplace_pixmap)
-        tab_widget.addTab(laplace_tab, "Y(s)")
-
-        # Crear la pestaña para el dominio de tiempo
-        tiempo_tab = QLabel()
-        tiempo_pixmap = self.get_plot_pixmap(self.plot_tiempo(self.fdt_sympy_tiempo))
-        tiempo_tab.setPixmap(tiempo_pixmap)
-        tab_widget.addTab(tiempo_tab, "y(t)")
-
-        # Crear la pestaña para el dominio de Laplace
-        laplace_tab = QLabel()
-        laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(self.fdt_sympy_laplace_total))
-        laplace_tab.setPixmap(laplace_pixmap)
-        tab_widget.addTab(laplace_tab, "Y(s)/R(s)")
-
-        # Crear la pestaña para el dominio de tiempo
-        tiempo_tab = QLabel()
-        tiempo_pixmap = self.get_plot_pixmap(self.plot_tiempo(self.fdt_sympy_tiempo_total))
-        tiempo_tab.setPixmap(tiempo_pixmap)
-        tab_widget.addTab(tiempo_tab, "y(t)/r(t)")
-
-        laplace_tab = QLabel()
-        laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(self.fdt_sympy_global_laplace))
-        laplace_tab.setPixmap(laplace_pixmap)
-        tab_widget.addTab(laplace_tab, "G(s)")
-
-        # Crear la pestaña para el dominio de tiempo
-        tiempo_tab = QLabel()
-        tiempo_pixmap = self.get_plot_pixmap(self.plot_tiempo(self.fdt_sympy_global_tiempo))
-        tiempo_tab.setPixmap(tiempo_pixmap)
-        tab_widget.addTab(tiempo_tab, "g(t)")
+        for fdt, is_laplace, title in self.graficos:
+            # Crear la pestaña para el dominio de Laplace
+            laplace_tab = QLabel()
+            if is_laplace:
+                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt))
+            else:
+                laplace_pixmap = self.get_plot_pixmap(self.plot_tiempo(fdt))
+            laplace_tab.setPixmap(laplace_pixmap)
+            tab_widget.addTab(laplace_tab, title)
 
         # Seleccionar la pestaña activa dependiendo del valor de `cual`
         tab_widget.setCurrentIndex(cual)

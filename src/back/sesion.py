@@ -4,7 +4,7 @@ from .macros.macro_medidor import MacroMedidor
 from .macros.macro_proceso import MacroProceso
 from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
-from sympy import simplify, latex,inverse_laplace_transform
+from sympy import simplify, latex,inverse_laplace_transform,degree
 from sympy.abc import s,z,t
 
 
@@ -158,6 +158,14 @@ class Sesion():
         return latex(self.obtener_fdt_lazo_abierto_simpy())
     
     def obtener_fdt_lazo_abierto_simpy_tiempo(self):
+
+        _,denom = self.obtener_fdt_lazo_abierto_simpy().as_numer_denom()
+
+        degree_denom = degree(denom,s)
+
+        if degree_denom >= 4:
+            return None
+
             
         return inverse_laplace_transform(self.obtener_fdt_lazo_abierto_simpy(),s,t)
 
@@ -183,6 +191,13 @@ class Sesion():
         return self.obtener_fdt_lazo_abierto_simpy() / (1 + self.obtener_fdt_lazo_abierto_simpy() * self.obtener_fdt_realimentacion_simpy())
     
     def calcular_fdt_realimentacion_tiempo(self):
+
+        _,denom = self.obtener_fdt_realimentacion_simpy().as_numer_denom()
+
+        degree_denom = degree(denom,s)
+
+        if degree_denom >= 4:
+            return None
             
         return inverse_laplace_transform(self.obtener_fdt_realimentacion_simpy(),s,t)
     
@@ -199,6 +214,13 @@ class Sesion():
         return latex(self.obtener_fdt_global_simpy())
     
     def obtener_fdt_global_tiempo(self):
+        
+        _,denom = self.obtener_fdt_global_simpy().as_numer_denom()
+
+        degree_denom = degree(denom,s)
+
+        if degree_denom >= 4:
+            return None
             
         return inverse_laplace_transform(self.obtener_fdt_global_simpy(),s,t)
     
@@ -220,6 +242,14 @@ class Sesion():
     
     def obtener_fdt_con_entrada_tiempo(self):
 
+        _,denom = self.obtener_fdt_con_entrada_simpy().as_numer_denom()
+
+        degree_denom = degree(denom,s)
+
+        if degree_denom >= 4:
+            return None
+
+
         return inverse_laplace_transform(self.obtener_fdt_con_entrada_simpy(),s,t)
     
     def obtener_fdt_con_entrada_latex_tiempo(self):
@@ -239,6 +269,14 @@ class Sesion():
         return latex(self.obtener_abierta_si_unitario_simpy())
     
     def obtener_abierta_si_unitario_sympy_tiempo(self):
+
+        _,denom = self.obtener_abierta_si_unitario_simpy().as_numer_denom()
+
+        degree_denom = degree(denom,s)
+
+        if degree_denom >= 4:
+            return None
+
             
         return inverse_laplace_transform(self.obtener_abierta_si_unitario_simpy(),s,t)
     
@@ -260,6 +298,13 @@ class Sesion():
     
     def obtener_sistema_unitario_tiempo(self):
 
+        _,denom = self.obtener_sistema_unitario_simpy().as_numer_denom()
+
+        degree_denom = degree(denom,s)
+
+        if degree_denom >= 4:
+            return None
+
         return inverse_laplace_transform(self.obtener_sistema_unitario_simpy(),s,t)
     
     def obtener_sistema_unitario_latex_tiempo(self):
@@ -279,6 +324,14 @@ class Sesion():
         return latex(self.obtener_calculo_error_en_estado_estable_simpy())
     
     def obtener_calculo_error_en_estado_estable_tiempo(self):
+
+        
+        _,denom = self.obtener_calculo_error_en_estado_estable_simpy().as_numer_denom()
+
+        degree_denom = degree(denom,s)
+
+        if degree_denom >= 4:
+            return None
 
         return inverse_laplace_transform(self.obtener_calculo_error_en_estado_estable_simpy(),s,t)
     

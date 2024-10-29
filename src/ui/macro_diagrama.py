@@ -155,12 +155,12 @@ class MacroDiagrama(QGraphicsView):
         #self.agregar_botones()
 
     def update_fdt(self):
+        
         self.scene.removeItem(self.svg)
         self.draw_fdt()
 
     def draw_fdt(self):
-        print("Dibujando FDT")
-
+    
         self.svg = SVGView(self.sesion)
 
         self.scene.addItem(self.svg)

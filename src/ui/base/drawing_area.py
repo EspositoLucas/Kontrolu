@@ -119,8 +119,6 @@ class DrawingArea(QGraphicsView):
 
     def draw_fdt(self):
         
-        print("Dibujando FDT")
-        texto = "F(s) = " + self.macrobloque.modelo.obtener_fdt_latex()
 
         self.svg = SVGView(self.macrobloque.modelo)
 
