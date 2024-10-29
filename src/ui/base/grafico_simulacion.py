@@ -296,7 +296,7 @@ class Graficadora(QMainWindow):
             'bueno': QColor(144, 238, 144),  # Verde claro apenas notorio
             'regular': QColor(255, 255, 0),  # Amarillo
             'malo': QColor(255, 99, 71),  # Rojo claro
-            'pesimo': QColor(255, 0, 0)  # Rojo fuerte
+            'pésimo': QColor(255, 0, 0)  # Rojo fuerte
         }
         return colores_estado.get(nombre_estado, QColor(255, 255, 255))  # Blanco por defecto
 
