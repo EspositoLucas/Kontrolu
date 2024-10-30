@@ -416,7 +416,7 @@ class CrearMicroBloque(QDialog):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
 
-         # Primer desplegable: Dominio
+        # Primer desplegable: Dominio
         dominio_combo = QComboBox()
         dominio_combo.addItems(list(map(lambda x: x.nombre, presets)))  # Añadir los dominios existentes
         dominio_combo.setEditable(True)  # Permitir escribir uno nuevo
