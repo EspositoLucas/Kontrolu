@@ -182,6 +182,6 @@ class MicroBloque(Hoja):
     
 
 
-    def operar_fdt(self,input):
+    def operar_fdt(self,input,tiempo=0):
 
-        return self.calcular_fdt() * input
+        return self.calcular_fdt(tiempo=tiempo) * input

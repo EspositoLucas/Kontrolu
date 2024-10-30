@@ -152,11 +152,11 @@ class Simulacion(QObject):
             event.ignore() 
 
     def calcular_ft_global(self):
-        ft_controlador = self.controlador.obtener_fdt_simpy()
-        ft_actuador = self.actuador.obtener_fdt_simpy()
-        ft_proceso = self.proceso.obtener_fdt_simpy()
+        ft_controlador = self.controlador.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
+        ft_actuador = self.actuador.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
+        ft_proceso = self.proceso.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
         ft_lazo_directo = ft_controlador * ft_actuador * ft_proceso
-        ft_medidor = self.medidor.obtener_fdt_simpy()
+        ft_medidor = self.medidor.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
         ft_global = ft_lazo_directo / (1 + (ft_lazo_directo * ft_medidor))
         ft_global_simplificada = simplify(ft_global)
         return ft_global_simplificada

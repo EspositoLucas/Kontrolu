@@ -124,6 +124,11 @@ class Perturbacion(Hoja):
 
         return True
     
-    def operar_fdt(self,input):
+    def operar_fdt(self,input,tiempo=0):
 
-        return self.calcular_fdt() + input
+        if (not self.get_estado(tiempo)):
+            self.notificar(False)
+            return input
+        self.notificar(True)
+
+        return self.calcular_fdt(tiempo=tiempo) + input

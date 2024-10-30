@@ -67,17 +67,17 @@ class InterfazTopologia():
     def simular(self, tiempo, delta, entrada=None)->float:
         pass
 
-    def calcular_fdt(self):
+    def calcular_fdt(self,tiempo=0):
 
         pass
     
-    def obtener_fdt_simpy(self):
+    def obtener_fdt_simpy(self,tiempo=0):
 
-        return simplify(self.calcular_fdt())
+        return simplify(self.calcular_fdt(tiempo=tiempo))
     
-    def obtener_fdt_latex(self):
+    def obtener_fdt_latex(self,tiempo=0):
 
-        return latex(self.obtener_fdt_simpy())
+        return latex(self.obtener_fdt_simpy(tiempo))
     
     def obtener_fdt_tiempo(self):
         return inverse_laplace_transform(self.obtener_fdt_simpy(),s,t)
@@ -85,6 +85,6 @@ class InterfazTopologia():
     def obtener_fdt_tiempo_latex(self):
         return latex(self.obtener_fdt_tiempo())
     
-    def operar_fdt(self,input):
+    def operar_fdt(self,input,tiempo):
 
         pass

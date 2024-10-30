@@ -126,7 +126,7 @@ class EditarPerturbacion(QDialog):
         # Tiempo de inicio
         self.ciclos = QLabel("Tiempo de inicio (s):")
         self.ciclos_editor = QSpinBox()
-        self.ciclos_editor.setValue(self.perturbacion_back.inicio)
+        self.ciclos_editor.setValue(int(self.perturbacion_back.inicio))
         self.ciclos_editor.setMinimum(0)
         layout.addWidget(self.ciclos)
         layout.addWidget(self.ciclos_editor)
@@ -251,7 +251,7 @@ class EditarPerturbacion(QDialog):
         self.accept()
 
     def actualizar_campos(self):
-        self.ciclos_editor.setValue(self.perturbacion_back.inicio)
+        self.ciclos_editor.setValue(int(self.perturbacion_back.inicio))
         self.dentro_de_editor.setValue(self.perturbacion_back.duracion)
         self.perturbar_ahora_checkbox.setChecked(self.perturbacion_back.ahora)
     

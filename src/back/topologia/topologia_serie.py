@@ -196,19 +196,19 @@ class TopologiaSerie(InterfazTopologia):
         return True
 
 
-    def calcular_fdt(self):
+    def calcular_fdt(self,tiempo=0):
 
         fdt = 1
 
-        [fdt := block.operar_fdt(fdt) for block in self.hijos]
+        [fdt := block.operar_fdt(fdt,tiempo=tiempo) for block in self.hijos]
 
         return fdt
     
 
     
-    def operar_fdt(self,input):
+    def operar_fdt(self,input,tiempo=0):
 
-        return self.calcular_fdt() + input
+        return self.calcular_fdt(tiempo=tiempo) + input
     
     def vaciar_datos(self):
         for hijo in self.hijos:
@@ -337,18 +337,18 @@ class TopologiaParalelo(InterfazTopologia):
     
 
     
-    def calcular_fdt(self):
+    def calcular_fdt(self,tiempo=0):
 
         fdt = 0
 
-        [fdt := block.operar_fdt(fdt) for block in self.hijos]
+        [fdt := block.operar_fdt(fdt,tiempo=tiempo) for block in self.hijos]
 
         return fdt
     
     
-    def operar_fdt(self,input):
+    def operar_fdt(self,input,tiempo=0):
 
-        return self.calcular_fdt() * input
+        return self.calcular_fdt(tiempo=tiempo) * input
     
     def vaciar_datos(self):
         for hijo in self.hijos:
