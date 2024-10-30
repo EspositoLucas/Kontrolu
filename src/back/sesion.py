@@ -4,7 +4,7 @@ from .macros.macro_medidor import MacroMedidor
 from .macros.macro_proceso import MacroProceso
 from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
-from sympy import simplify, latex,inverse_laplace_transform,degree
+from sympy import simplify, latex,inverse_laplace_transform,degree,solve, Poly
 from sympy.abc import s,z,t
 
 
@@ -347,7 +347,26 @@ class Sesion():
     def calcular_error_en_estado_estable(self):
 
         return self.calcular_calculo_error_en_estado_estable().limit(s,0).evalf()
+    
+    def calcular_estabilidad(self):
 
+        fdt = self.calcular_fdt_global()
+
+        # Extraer el denominador de la función de transferencia
+        denominador = fdt.as_numer_denom()[1]
+        
+        # Calcular los polos resolviendo el denominador igualado a cero
+        denominator_poly = Poly(denominador, s)
+        poles = solve(denominator_poly, s)
+        
+        # Clasificar la estabilidad
+        if all(pole.as_real_imag()[0] < 0 for pole in poles):
+            return "ESTABLE"
+        elif all(pole.as_real_imag()[0] <= 0 for pole in poles) and any(pole.as_real_imag()[0] == 0 for pole in poles) and \
+            not any(pole.as_real_imag()[1] == 0 and poles.count(pole) > 1 for pole in poles):
+            return "CRITICAMENTE_ESTABLE"
+        else:
+            return "INESTABLE"
 
 
     

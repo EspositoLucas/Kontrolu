@@ -67,6 +67,7 @@ class MacroVista(QGraphicsRectItem):
     def update_fdt(self):
         self.padre.update_fdt()
         self.padre.update_error()
+        self.padre.update_estabilidad_state()
     
     def click(self):
         self.macro_vista_window = MacroVistaMainWindow(self, self.modelo)
