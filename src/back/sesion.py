@@ -6,7 +6,7 @@ from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
 from sympy import simplify, latex,inverse_laplace_transform,degree,solve, Poly
 from sympy.abc import s,z,t
-
+import numpy as np
 
 
 class Sesion():
@@ -155,7 +155,7 @@ class Sesion():
     
     def obtener_fdt_lazo_abierto_latex(self):
 
-        return latex(self.obtener_fdt_lazo_abierto_simpy())
+        return latex(self.calcular_fdt_lazo_abierto())
     
     def obtener_fdt_lazo_abierto_simpy_tiempo(self):
 
@@ -184,7 +184,7 @@ class Sesion():
     
     def obtener_fdt_realimentacion_latex(self):
 
-        return latex(self.obtener_fdt_realimentacion_simpy())
+        return latex(self.calcular_fdt_realimentacion())
     
     def calcular_fdt_global(self):
 
@@ -258,6 +258,8 @@ class Sesion():
     
     def calcular_abierta_si_unitario(self):
 
+        return (self.calcular_fdt_global()/(1-self.calcular_fdt_global()))
+
         return self.calcular_fdt_lazo_abierto()/(1+self.calcular_fdt_lazo_abierto()*(self.calcular_fdt_realimentacion()-1))
     
     def obtener_abierta_si_unitario_simpy(self):
@@ -266,7 +268,7 @@ class Sesion():
     
     def obtener_abierta_si_unitario_latex(self):
 
-        return latex(self.obtener_abierta_si_unitario_simpy())
+        return latex(self.calcular_abierta_si_unitario())
     
     def obtener_abierta_si_unitario_sympy_tiempo(self):
 
@@ -294,7 +296,7 @@ class Sesion():
     
     def obtener_sistema_unitario_latex(self):
 
-        return latex(self.obtener_sistema_unitario_simpy())
+        return latex(self.calcular_sistema_unitario())
     
     def obtener_sistema_unitario_tiempo(self):
 
@@ -313,6 +315,7 @@ class Sesion():
     
     def calcular_calculo_error_en_estado_estable(self):
 
+        return s*self.entrada.calcular_fdt()*(1/(1+self.calcular_abierta_si_unitario()))
         return s*self.entrada.calcular_fdt()*self.obtener_sistema_unitario_simpy()
     
     def obtener_calculo_error_en_estado_estable_simpy(self):
@@ -321,7 +324,7 @@ class Sesion():
     
     def obtener_calculo_error_en_estado_estable_latex(self):
 
-        return latex(self.obtener_calculo_error_en_estado_estable_simpy())
+        return latex(self.calcular_calculo_error_en_estado_estable())
     
     def calcular_calculo_error_en_estado_estable_tiempo_previo(self):
 
@@ -369,4 +372,112 @@ class Sesion():
             return "INESTABLE"
 
 
+    def calcular_tabla_routh(self):
+        """
+        Calcula la tabla de Routh-Hurwitz para analizar la estabilidad del sistema.
+        Returns:
+            Tuple[np.ndarray, Dict[str, str]]: Tabla de Routh y diagnóstico de estabilidad
+        """
+        try:
+            # Obtener el denominador de la función de transferencia
+            fdt = self.calcular_fdt_global()
+            denominador = fdt.as_numer_denom()[1]
+            
+            # Obtener coeficientes del polinomio
+            coeficientes = Poly(denominador, s).all_coeffs()
+            
+            # Verificar que hay suficientes coeficientes
+            if len(coeficientes) < 2:
+                return np.array([[coeficientes[0]]]), {
+                    "estabilidad": "INDEFINIDO",
+                    "mensaje": "El polinomio es de orden 0."
+                }
+            
+            orden = len(coeficientes) - 1
+            
+            # Inicializar la tabla de Routh
+            filas = orden + 1
+            columnas = (orden + 1) // 2 + 1
+            tabla = np.zeros((filas, columnas))
+            
+            # Llenar las dos primeras filas con los coeficientes
+            primera_fila = coeficientes[::2]  # Coeficientes pares
+            segunda_fila = coeficientes[1::2]  # Coeficientes impares
+            
+            # Rellenar con ceros si es necesario
+            if len(segunda_fila) < len(primera_fila):
+                segunda_fila = np.pad(segunda_fila, (0, len(primera_fila) - len(segunda_fila)))
+            
+            tabla[0, :len(primera_fila)] = primera_fila
+            tabla[1, :len(segunda_fila)] = segunda_fila
+            
+            # Calcular el resto de la tabla
+            diagnostico = {"estabilidad": "ESTABLE", "mensaje": ""}
+            
+            try:
+                for i in range(2, filas):
+                    for j in range(columnas - 1):
+                        if abs(tabla[i-1, 0]) < 1e-10:
+                            # Caso especial: división por cero
+                            tabla[i-1, 0] = 1e-10
+                            diagnostico["mensaje"] += "Se encontró un cero en la primera columna. "
+                        
+                        numerador = (tabla[i-1, 0] * tabla[i-2, j+1] - 
+                                    tabla[i-2, 0] * tabla[i-1, j+1])
+                        denominador = tabla[i-1, 0]
+                        
+                        if abs(denominador) < 1e-10:
+                            tabla[i, j] = 0
+                        else:
+                            tabla[i, j] = numerador / denominador
+                
+                # Analizar cambios de signo en la primera columna
+                primera_columna = tabla[:, 0]
+                primera_columna_no_cero = primera_columna[abs(primera_columna) > 1e-10]
+                
+                if len(primera_columna_no_cero) > 1:
+                    cambios_signo = sum(1 for i in range(len(primera_columna_no_cero)-1) 
+                                    if primera_columna_no_cero[i] * primera_columna_no_cero[i+1] < 0)
+                    
+                    if cambios_signo > 0:
+                        diagnostico["estabilidad"] = "INESTABLE"
+                        diagnostico["mensaje"] += f"Se encontraron {cambios_signo} cambios de signo en la primera columna. "
+                    
+                    if np.any(abs(primera_columna) < 1e-10):
+                        diagnostico["estabilidad"] = "CRITICAMENTE_ESTABLE"
+                        diagnostico["mensaje"] += "Se encontraron ceros en la primera columna. "
+                else:
+                    diagnostico["estabilidad"] = "INDEFINIDO"
+                    diagnostico["mensaje"] += "No hay suficientes elementos para analizar la estabilidad. "
+                
+            except Exception as e:
+                diagnostico["mensaje"] = f"Error en el cálculo: {str(e)}"
+                diagnostico["estabilidad"] = "ERROR"
+            
+            return tabla, diagnostico
+            
+        except Exception as e:
+            # Devolver una tabla mínima en caso de error
+            return np.array([[0]]), {
+                "estabilidad": "ERROR",
+                "mensaje": f"Error al calcular la tabla: {str(e)}"
+            }
     
+    def obtener_polos_ceros(self):
+        """
+        Calcula los polos y ceros de la función de transferencia.
+        Returns:
+            Tuple[List[complex], List[complex]]: Lista de polos y ceros
+        """
+        fdt = self.calcular_fdt_global()
+        numerador, denominador = fdt.as_numer_denom()
+        
+        # Calcular polos
+        poly_den = Poly(denominador, s)
+        polos = solve(poly_den, s)
+        
+        # Calcular ceros
+        poly_num = Poly(numerador, s)
+        ceros = solve(poly_num, s)
+        
+        return polos, ceros

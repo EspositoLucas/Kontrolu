@@ -140,7 +140,15 @@ class SVGView(QGraphicsSvgItem):
             bytess_global_tiempo = self.tex2svg(self.global_tiempo)
             self.renderer_global_tiempo = QSvgRenderer(bytess_global_tiempo)
             self.funciones.append(self.renderer_global_tiempo)      
-            self.graficos.append((self.fdt_sympy_global_tiempo,False,"g(t)"))  
+            self.graficos.append((self.fdt_sympy_global_tiempo,False,"g(t)"))
+        
+        self.fdt_sympy_global_unitaria = self.macro.obtener_abierta_si_unitario_simpy()
+        if self.fdt_sympy_global_unitaria != None:
+            self.global_unitaria = "G_{0}(s) = " + self.macro.obtener_abierta_si_unitario_latex()
+            bytess_global_unitaria = self.tex2svg(self.global_unitaria)
+            self.renderer_global_unitaria = QSvgRenderer(bytess_global_unitaria)
+            self.funciones.append(self.renderer_global_unitaria)      
+            self.graficos.append((self.fdt_sympy_global_unitaria,True,"G_{0}(s)"))
 
         self.laplace_mode = 0
         if len(self.funciones) > 0:

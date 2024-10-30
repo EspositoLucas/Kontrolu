@@ -90,6 +90,9 @@ class SVGViewError(QGraphicsSvgItem):
         self.graficos = []
 
         self.error_estado_estable = self.macro.calcular_error_en_estado_estable()
+        if self.error_estado_estable.is_real:
+            #limitar cantidad de decimales
+            self.error_estado_estable = N(self.error_estado_estable, 2)
         self.error_estado_estable_texto = 'e_{ss} = ' + latex(self.error_estado_estable)
         bytess_error_estado_estable = self.tex2svg(self.error_estado_estable_texto)
         self.renderer_error_estado_estable = QSvgRenderer(bytess_error_estado_estable)
