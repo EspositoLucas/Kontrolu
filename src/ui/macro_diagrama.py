@@ -19,6 +19,7 @@ from .base.detener_button import BotonDetener
 from .base.reanudar_button import BotonReanudar
 from .base.boton_circulo import QGraphicCircleItem
 from .base.text2svgMain import SVGView
+from .text2svgError import SVGViewError
 
 #DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL = 75
 #DISTANCIA_ENTRE_ELEMENTOS_VERTICAL = 32.5
@@ -144,6 +145,7 @@ class MacroDiagrama(QGraphicsView):
 
         self.draw_title()
         self.draw_fdt()
+        self.draw_error()
 
         # Deshabilitar el desplazamiento
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -168,6 +170,32 @@ class MacroDiagrama(QGraphicsView):
         text_rect = self.svg.boundingRect()
 
         self.svg.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+    
+    def error_update_pos(self):
+        
+        fdt_rect = self.svg.boundingRect()
+
+        text_rect = self.error_svg.boundingRect()
+
+        self.error_svg.setPos(self.X_MEDIO - (text_rect.width() / 2) - fdt_rect.width() - DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL*2 , self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+
+
+    def update_error(self):
+            
+        self.scene.removeItem(self.error_svg)
+        self.draw_error()
+
+    def draw_error(self):
+
+        self.error_svg = SVGViewError(self.sesion,self)
+
+        self.scene.addItem(self.error_svg)
+
+        fdt_rect = self.svg.boundingRect()
+
+        text_rect = self.error_svg.boundingRect()
+
+        self.error_svg.setPos(self.X_MEDIO - (text_rect.width() / 2) - fdt_rect.width() - DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL*2 , self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
 
     def draw_title(self):
 
