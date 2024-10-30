@@ -144,7 +144,7 @@ class MacroDiagrama(QGraphicsView):
         self.draw_title()
         self.draw_fdt()
         self.draw_error()
-        self.draw_estabilidad()
+        #self.draw_estabilidad()
 
         # Deshabilitar el desplazamiento
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -156,19 +156,23 @@ class MacroDiagrama(QGraphicsView):
 
 
     def update_estabilidad(self):
+        return
         self.scene.removeItem(self.estabilidad)
         self.draw_estabilidad()
 
     def update_estabilidad_state(self):
+        return
         self.estabilidad.update_text()
         self.estabilidad_update_pos()
     
     def draw_estabilidad(self):
+        return
         self.estabilidad = EstabilidadTexto(self.sesion)
         self.scene.addItem(self.estabilidad)
         self.estabilidad_update_pos()
     
     def estabilidad_update_pos(self):
+        return
         text_rect = self.estabilidad.boundingRect()
         self.estabilidad.setPos(self.X_MEDIO - text_rect.width() / 2, self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
     
