@@ -25,7 +25,8 @@ class FloatingButtons(QtWidgets.QGraphicsView):
         self.scene.addItem(self.clear_button)
         self.select_button = QGraphicCircleItem(RADIO_C*6, y, RADIO_C, 'fa5s.mouse-pointer', self.padre.set_seleccion_multiple, self,toggle = True,message='Seleccionar varios microbloques')
         self.scene.addItem(self.select_button)
-        self.json_button = QGraphicCircleItem(RADIO_C*9, y, RADIO_C, 'fa5s.file-code', self.padre.vista_json, self,message='Editar JSON')
-        self.scene.addItem(self.json_button)
         self.help_button = QGraphicCircleItem(RADIO_C*12, y, RADIO_C, 'fa5s.question-circle', self.padre.show_help, self,message='Ayuda')
         self.scene.addItem(self.help_button)
+        self.json_button = QGraphicCircleItem(RADIO_C*9, y, RADIO_C, 'fa5s.file-code', self.padre.vista_json, self,message='Editar JSON')
+        self.scene.addItem(self.json_button)
+
