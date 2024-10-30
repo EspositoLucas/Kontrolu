@@ -214,14 +214,14 @@ class Simulacion(QObject):
             event.ignore() 
 
     def calcular_ft_global(self):
-        ft_controlador = self.controlador.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
-        ft_actuador = self.actuador.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
-        ft_proceso = self.proceso.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
-        ft_lazo_directo = ft_controlador * ft_actuador * ft_proceso
-        ft_medidor = self.medidor.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
-        ft_global = ft_lazo_directo / (1 + (ft_lazo_directo * ft_medidor))
-        ft_global_simplificada = simplify(ft_global)
-        return ft_global_simplificada
+        self.ft_controlador = self.controlador.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
+        self.ft_actuador = self.actuador.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
+        self.ft_proceso = self.proceso.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
+        self.ft_lazo_directo = self.ft_controlador * self.ft_actuador * self.ft_proceso
+        self.ft_medidor = self.medidor.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
+        self.ft_global = self.ft_lazo_directo / (1 + (self.ft_lazo_directo * self.ft_medidor))
+        self.ft_global_simplificada = simplify(self.ft_global)
+        return self.ft_global_simplificada
 
     def crear_state_space(self, ft_global):
         numerador,denominador = ft_global.as_numer_denom()
@@ -233,14 +233,17 @@ class Simulacion(QObject):
         self.H = ctrl.tf(num_coef, den_coef)
         self.system_ss = ctrl.tf2ss(self.H)
         self.system_d = ctrl.sample_system(self.system_ss, self.delta, method='zoh')
+
+        numerador,denominador = self.ft_medidor.as_numer_denom()
+        num_coef = numerador.as_poly(s).all_coeffs()
+        den_coef = denominador.as_poly(s).all_coeffs()
+        num_coef = [float(x) for x in num_coef]
+        den_coef = [float(x) for x in den_coef]
+
+        self.H_medidor = ctrl.tf(num_coef, den_coef)
+        self.system_ss_medidor = ctrl.tf2ss(self.H_medidor)
+        self.system_d_medidor = ctrl.sample_system(self.system_ss_medidor, self.delta, method='zoh')
         
-    def calcular_entrada(self, tiempo):
-        ft_entrada = self.entrada.funcion_transferencia
-        entrada_simpy = latex2sympy(ft_entrada)
-        inversa_entrada = inverse_laplace_transform(entrada_simpy, s, t)
-        u = inversa_entrada.subs(t, tiempo)
-        return float(u)
-    
         
   
     def simular_paso_timer(self):
@@ -267,24 +270,37 @@ class Simulacion(QObject):
     def simular_paso_preciso(self):
         tiempo = self.paso_actual * self.delta
         try:
-            u = self.calcular_entrada(tiempo)
+            u = self.entrada.simular(tiempo, self.delta)
             # Verificar dimensiones antes de realizar operaciones
             if self.x.shape[0] != self.system_d.A.shape[0]:
                 self.x = self.redimensionar_estado(self.system_d.A.shape[0], self.x)
             
             self.x = np.dot(self.system_d.A, self.x) + np.dot(self.system_d.B, u)
             y = np.dot(self.system_d.C, self.x) + np.dot(self.system_d.D, u)
+
+            # Verificar dimensiones antes de realizar operaciones
+            if self.x_medidor.shape[0] != self.system_d_medidor.A.shape[0]:
+                self.x_medidor = self.redimensionar_estado(self.system_d_medidor.A.shape[0], self.x_medidor)
             
+            self.x_medidor = np.dot(self.system_d_medidor.A, self.x_medidor) + np.dot(self.system_d_medidor.B, y)
+            y_medidor = np.dot(self.system_d_medidor.C, self.x_medidor) + np.dot(self.system_d_medidor.D, y)
+
+            estado_carga = self.carga.simular(tiempo, self.delta, y[0, 0])
+            
+            self.datos['carga'].append(estado_carga)
             self.datos['tiempo'].append(tiempo)
             self.datos['entrada'].append(u)
             self.datos['salida'].append(y[0, 0])
             self.datos['error'].append(u - y[0, 0])
+            self.datos['medidor'].append(y_medidor[0, 0])
             
             datos_paso = {
                 'tiempo': tiempo,
                 'entrada': u,
                 'salida': y[0, 0],
-                'error': u - y[0, 0]
+                'error': u - y[0, 0],
+                'carga': estado_carga,
+                'medidor': y_medidor[0, 0]
             }
 
             if self.graficadora:
@@ -315,10 +331,14 @@ class Simulacion(QObject):
         # Guardar el estado anterior si existe
         estado_anterior = self.x if hasattr(self, 'x') else None
         tam_anterior = estado_anterior.shape[0] if estado_anterior is not None else 0
+
+        estado_medidor_anterior = self.x_medidor if hasattr(self, 'x_medidor') else None
+        tam_medidor_anterior = estado_medidor_anterior.shape[0] if estado_medidor_anterior is not None else 0
         
         # Crear el nuevo sistema
         self.crear_state_space(ft_global)
         nuevo_tam = self.system_d.A.shape[0]
+        nuevo_tam_medidor = self.system_d_medidor.A.shape[0]
         
         # Si tenemos un estado anterior y las dimensiones cambiaron
         if estado_anterior is not None and tam_anterior != nuevo_tam:
@@ -327,9 +347,16 @@ class Simulacion(QObject):
         else:
             # Primera inicialización
             self.x = np.zeros((nuevo_tam, 1))
+
+        if estado_medidor_anterior is not None and tam_medidor_anterior != nuevo_tam_medidor:
+            self.x_medidor = self.redimensionar_estado(nuevo_tam_medidor, estado_medidor_anterior)
+            print(f"Sistema redimensionado: {tam_medidor_anterior} -> {nuevo_tam_medidor} estados")
+        else:
+            # Primera inicialización
+            self.x_medidor = np.zeros((nuevo_tam_medidor, 1))
             
         if not hasattr(self, 'datos'):
-            self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'error': []}
+            self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'error': [], 'carga': [], 'medidor': []}
         
         self.paso_actual = len(self.datos['tiempo'])  # Mantener el paso actual basado en los datos
 
