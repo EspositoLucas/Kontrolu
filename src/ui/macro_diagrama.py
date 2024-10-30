@@ -9,7 +9,7 @@ from .base.elemento_carga import ElementoCarga
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QGraphicsTextItem,QGraphicsView,QGraphicsScene
+from PyQt5.QtWidgets import QGraphicsTextItem,QGraphicsView,QGraphicsScene, QFileDialog
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QRectF

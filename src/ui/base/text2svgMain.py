@@ -98,7 +98,8 @@ class SVGView(QGraphicsSvgItem):
             self.funciones.append(self.renderer_laplace)
             self.graficos.append((self.fdt_sympy_laplace,True,"Y(s)"))
 
-        self.fdt_sympy_tiempo = self.macro.obtener_fdt_con_entrada_tiempo()
+        #self.fdt_sympy_tiempo = self.macro.obtener_fdt_con_entrada_tiempo()
+        self.fdt_sympy_tiempo = None
         if self.fdt_sympy_tiempo != None:
             self.tiempo = "y(t) = " + self.macro.obtener_fdt_con_entrada_latex_tiempo()
             bytess_tiempo = self.tex2svg(self.tiempo)
@@ -115,7 +116,8 @@ class SVGView(QGraphicsSvgItem):
             self.graficos.append((self.fdt_sympy_laplace_total,True,"Y(s)/R(s)"))
 
 
-        self.fdt_sympy_tiempo_total = self.macro.obtener_fdt_global_tiempo()
+        #self.fdt_sympy_tiempo_total = self.macro.obtener_fdt_global_tiempo()
+        self.fdt_sympy_tiempo_total = None
         if self.fdt_sympy_tiempo_total != None:
             self.total_tiempo = "\\frac{y(s)}{r(t)} = " + self.macro.obtener_fdt_global_latex_tiempo()
             bytess_tiempo_total = self.tex2svg(self.total_tiempo)
@@ -131,7 +133,8 @@ class SVGView(QGraphicsSvgItem):
             self.funciones.append(self.renderer_global_laplace)
             self.graficos.append((self.fdt_sympy_global_laplace,True,"G(s)"))
 
-        self.fdt_sympy_global_tiempo = self.macro.obtener_fdt_lazo_abierto_simpy_tiempo()
+        #self.fdt_sympy_global_tiempo = self.macro.obtener_fdt_lazo_abierto_simpy_tiempo()
+        self.fdt_sympy_global_tiempo = None
         if self.fdt_sympy_global_tiempo != None:
             self.global_tiempo = "g(t) = " + self.macro.obtener_fdt_lazo_abierto_latex_tiempo()
             bytess_global_tiempo = self.tex2svg(self.global_tiempo)

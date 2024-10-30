@@ -104,8 +104,11 @@ class SVGViewError(QGraphicsSvgItem):
             self.renderer_calculo = QSvgRenderer(bytess_calculo)
             self.renders.append(self.renderer_calculo)
             self.graficos.append((self.calculo_simpy,True,'lim_{s \\to 0}'))
+
         
-        self.calculo_tiempo_simpy = self.macro.obtener_calculo_error_en_estado_estable_tiempo()
+        
+        #self.calculo_tiempo_simpy = self.macro.obtener_calculo_error_en_estado_estable_tiempo()
+        self.calculo_tiempo_simpy = None
         if self.calculo_tiempo_simpy != None:
             self.calculo_tiempo = self.macro.obtener_calculo_error_en_estado_estable_latex_tiempo()
             self.calculo_tiempo_texto = 'lim_{t \\to \\infty}' + self.calculo_tiempo + ' = ' + latex(self.error_estado_estable)
@@ -113,6 +116,7 @@ class SVGViewError(QGraphicsSvgItem):
             self.renderer_calculo_tiempo = QSvgRenderer(bytess_calculo_tiempo)
             self.renders.append(self.renderer_calculo_tiempo)
             self.graficos.append((self.calculo_tiempo_simpy,False,'lim_{t \\to \\infty}'))
+
 
 
         if len(self.renders) > 0:

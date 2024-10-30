@@ -82,26 +82,44 @@ class SVGView(QGraphicsSvgItem):
     def __init__(self, macro, parent=None):
         super().__init__(parent)
         self.macro = macro
-        self.laplace = "F(s) = " + self.macro.obtener_fdt_latex()
-        self.tiempo = "f(t) = " + self.macro.obtener_fdt_tiempo_latex()
+
+        self.graficos = []
+        self.renders = []
+
         self.fdt_sympy_laplace = self.macro.obtener_fdt_simpy()
-        self.fdt_sympy_tiempo = self.macro.obtener_fdt_tiempo()
+        if self.fdt_sympy_laplace != None:
+            self.laplace = "F(s) = " + self.macro.obtener_fdt_latex()
+            bytess_laplace = self.tex2svg(self.laplace)
+            self.renderer_laplace = QSvgRenderer(bytess_laplace)
+            self.renders.append(self.renderer_laplace)
+            self.graficos.append((self.fdt_sympy_laplace,True,"F(s)"))
+
+
+
+
+
+        #self.fdt_sympy_tiempo = self.macro.obtener_fdt_tiempo()
+        self.fdt_sympy_tiempo = None
+        if self.fdt_sympy_tiempo != None:
+            self.tiempo = "f(t) = " + self.macro.obtener_fdt_tiempo_latex()
+            bytess_tiempo = self.tex2svg(self.tiempo)
+            self.renderer_tiempo = QSvgRenderer(bytess_tiempo)
+            self.renders.append(self.renderer_tiempo)
+            self.graficos.append((self.fdt_sympy_tiempo,False,"f(t)"))
+
+
 
         # Configurar matplotlib para usar la fuente Computer Modern
         plt.rc('mathtext', fontset='cm')
         
         # Generar el SVG a partir de la fórmula LaTeX
-        bytess_laplace = self.tex2svg(self.laplace)
-        bytess_tiempo = self.tex2svg(self.tiempo)
-        
-        # Cargar el SVG en el renderer
-        self.renderer_laplace = QSvgRenderer(bytess_laplace)
-        self.renderer_tiempo = QSvgRenderer(bytess_tiempo)
-        self.laplace_mode = True
-        self.setSharedRenderer(self.renderer_laplace)
+        if len(self.renders) > 0:
+            # Cargar el SVG en el renderer
+            self.laplace_mode = 0
+            self.setSharedRenderer(self.renders[self.laplace_mode])
 
-        # Permitir eventos de hover
-        self.setAcceptHoverEvents(True)
+            # Permitir eventos de hover
+            self.setAcceptHoverEvents(True)
 
     def tex2svg(self, formula, fontsize=50, dpi=300):
         """Render TeX formula to SVG."""
@@ -120,19 +138,19 @@ class SVGView(QGraphicsSvgItem):
         # Obtener la posición del clic
         pos = event.pos()
         print(f"Clic en posición: {pos.x()}, {pos.y()}")  # Mostrar la posición en la consola
-        
-        # Verificar si el clic fue con el botón izquierdo
-        if event.button() == Qt.LeftButton:
-            print("Clic izquierdo detectado en SVG.")
-            self.open_graph_window(self.laplace)
-        if event.button() == Qt.RightButton:
-            print("Clic derecho detectado en SVG.")
-            if self.laplace:
-                self.setSharedRenderer(self.renderer_tiempo)
-                self.laplace = False
-            else:
-                self.setSharedRenderer(self.renderer_laplace)
-                self.laplace = True
+        if len(self.renders) > 0 :
+            # Verificar si el clic fue con el botón izquierdo
+            if event.button() == Qt.LeftButton:
+                print("Clic izquierdo detectado en SVG.")
+                self.open_graph_window(self.laplace_mode)
+            if event.button() == Qt.RightButton:
+                if len(self.renders) != 1:
+                    print("Clic derecho detectado en SVG.")
+                    self.laplace_mode +=1
+                    if self.laplace_mode >= len(self.renders):
+                        self.laplace_mode = 0
+                    self.setSharedRenderer(self.renders[self.laplace_mode])
+                    self.update()
 
         # Llamar al método base para manejar otros eventos
         super().mousePressEvent(event)
@@ -174,23 +192,19 @@ class SVGView(QGraphicsSvgItem):
 
         tab_widget = QTabWidget()
 
-        # Crear la pestaña para el dominio de Laplace
-        laplace_tab = QLabel()
-        laplace_pixmap = self.get_plot_pixmap(self.plot_laplace())
-        laplace_tab.setPixmap(laplace_pixmap)
-        tab_widget.addTab(laplace_tab, "Dominio de Laplace")
+        for fdt_sympy, is_laplace, title in self.graficos:
 
-        # Crear la pestaña para el dominio de tiempo
-        tiempo_tab = QLabel()
-        tiempo_pixmap = self.get_plot_pixmap(self.plot_tiempo())
-        tiempo_tab.setPixmap(tiempo_pixmap)
-        tab_widget.addTab(tiempo_tab, "Dominio Tiempo")
+            # Crear la pestaña para el dominio de Laplace
+            laplace_tab = QLabel()
+            if is_laplace:
+                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt_sympy))
+            else:
+                laplace_pixmap = self.get_plot_pixmap(self.plot_tiempo(fdt_sympy))
+            laplace_tab.setPixmap(laplace_pixmap)
+            tab_widget.addTab(laplace_tab, title)
 
-        # Seleccionar la pestaña activa dependiendo del valor de `cual`
-        if cual:
-            tab_widget.setCurrentIndex(0)  # Activa la primera pestaña (Dominio de Laplace)
-        else:
-            tab_widget.setCurrentIndex(1)  # Activa la segunda pestaña (Dominio Tiempo)
+
+        tab_widget.setCurrentIndex(cual)
 
         layout.addWidget(tab_widget)
         dialog.setLayout(layout)
@@ -281,10 +295,10 @@ class SVGView(QGraphicsSvgItem):
         buf.close()
         return pixmap
         
-    def plot_laplace(self):
+    def plot_laplace(self,fdt_sympy):
         """Generar y mostrar el gráfico del dominio de Laplace."""
         s = symbols('s')
-        f_laplace = sympify(self.fdt_sympy_laplace)  # Asegúrate de que `self.fdt_sympy_laplace` esté definida
+        f_laplace = sympify(fdt_sympy)  # Asegúrate de que `self.fdt_sympy_laplace` esté definida
         F_laplace = lambdify(s, f_laplace, 'numpy')
 
         s_vals = np.linspace(0, 10, 100)
@@ -304,10 +318,10 @@ class SVGView(QGraphicsSvgItem):
         plt.grid(True)
         return plt.gcf()
 
-    def plot_tiempo(self):
+    def plot_tiempo(self,fdt_sympy):
         """Generar y mostrar el gráfico del dominio del tiempo, con manejo especial para DiracDelta."""
         t = symbols('t')
-        f_tiempo = sympify(self.fdt_sympy_tiempo)  # Supone que `self.fdt_sympy_tiempo` esté definida
+        f_tiempo = sympify(fdt_sympy)  # Supone que `self.fdt_sympy_tiempo` esté definida
         
         # Verificar si hay una DiracDelta en la función
         if f_tiempo.has(DiracDelta(t)):
