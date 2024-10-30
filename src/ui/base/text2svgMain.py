@@ -79,7 +79,8 @@ ESTILO = """
 """
 
 class SVGView(QGraphicsSvgItem):
-    def __init__(self, macro, parent=None):
+    def __init__(self, macro, padre, parent=None):
+        self.padre = padre
         super().__init__(parent)
         self.macro = macro
 
@@ -174,6 +175,7 @@ class SVGView(QGraphicsSvgItem):
             if self.laplace_mode >= len(self.funciones):
                 self.laplace_mode = 0
             self.setSharedRenderer(self.funciones[self.laplace_mode])
+            self.padre.fdt_update_pos()
         # Llamar al método base para manejar otros eventos
         super().mousePressEvent(event)
 

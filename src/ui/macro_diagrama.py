@@ -140,6 +140,8 @@ class MacroDiagrama(QGraphicsView):
         self.scene.addItem(self.line_5)
 
         # PUNTO SUMA
+        self.x_subida = x_subida
+        self.x_bajada = x_bajada
         puntoSuma = PuntoSuma(x_medio=x_subida, y_medio=y_linea_1, RADIO_PERTURBACION=20, izq=2, abajo=1)
         self.scene.addItem(puntoSuma)
 
@@ -163,21 +165,26 @@ class MacroDiagrama(QGraphicsView):
 
     def draw_fdt(self):
     
-        self.svg = SVGView(self.sesion)
+        self.svg = SVGView(self.sesion,self)
 
         self.scene.addItem(self.svg)
 
+        self.fdt_update_pos()
+
+
+
+    def fdt_update_pos(self):
+
         text_rect = self.svg.boundingRect()
 
-        self.svg.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+        self.svg.setPos(self.x_bajada - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+
     
     def error_update_pos(self):
         
-        fdt_rect = self.svg.boundingRect()
-
         text_rect = self.error_svg.boundingRect()
 
-        self.error_svg.setPos(self.X_MEDIO - (text_rect.width() / 2) - fdt_rect.width() - DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL*2 , self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+        self.error_svg.setPos(self.x_subida -  (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
 
 
     def update_error(self):
@@ -191,11 +198,7 @@ class MacroDiagrama(QGraphicsView):
 
         self.scene.addItem(self.error_svg)
 
-        fdt_rect = self.svg.boundingRect()
-
-        text_rect = self.error_svg.boundingRect()
-
-        self.error_svg.setPos(self.X_MEDIO - (text_rect.width() / 2) - fdt_rect.width() - DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL*2 , self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+        self.error_update_pos()
 
     def draw_title(self):
 
