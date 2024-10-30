@@ -15,6 +15,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QRectF
 from .base.text2svgMain import SVGView
 from .text2svgError import SVGViewError
+from .base.estabilidad_texto import EstabilidadTexto
 
 #DISTANCIA_ENTRE_ELEMENTOS_HORIZONTAL = 75
 #DISTANCIA_ENTRE_ELEMENTOS_VERTICAL = 32.5
@@ -143,6 +144,7 @@ class MacroDiagrama(QGraphicsView):
         self.draw_title()
         self.draw_fdt()
         self.draw_error()
+        self.draw_estabilidad()
 
         # Deshabilitar el desplazamiento
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -151,7 +153,28 @@ class MacroDiagrama(QGraphicsView):
         # Evitar que la vista se desplace
         self.setDragMode(QGraphicsView.NoDrag)
 
-   
+
+
+    def update_estabilidad(self):
+        self.scene.removeItem(self.estabilidad)
+        self.draw_estabilidad()
+
+    def update_estabilidad_state(self):
+        self.estabilidad.update_text()
+        self.estabilidad_update_pos()
+    
+    def draw_estabilidad(self):
+        self.estabilidad = EstabilidadTexto(self.sesion)
+        self.scene.addItem(self.estabilidad)
+        self.estabilidad_update_pos()
+    
+    def estabilidad_update_pos(self):
+        text_rect = self.estabilidad.boundingRect()
+        self.estabilidad.setPos(self.X_MEDIO - text_rect.width() / 2, self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+    
+
+
+
     def update_fdt(self):
         
         self.scene.removeItem(self.svg)
