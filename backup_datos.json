@@ -512,7 +512,7 @@
                 "micro_bloques": {
                     "rele_basico": {
                         "nombre": "Relé Básico",
-                        "descripcion": "Un relé básico que actúa como un interruptor controlado electrónicamente.",
+                        "descripcion": "Un relé básico que actúa como un interruptor controlado ELECTRONICAmente.",
                         "fdt": "\\frac{1}{1 + 0.1*s}",
                         "entrada_limite_inferior": "0",
                         "entrada_limite_superior": "5",

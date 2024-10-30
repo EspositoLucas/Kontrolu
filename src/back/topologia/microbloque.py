@@ -14,8 +14,8 @@ class MicroBloque(Hoja):
             return        
         self.color = color
         self.descripcion = descripcion
-        self.configuracion_entrada = Configuracion(nombre="Configuracion Entrada")
-        self.configuracion_salida = Configuracion(nombre="Configuracion Salida")
+        self.configuracion_entrada = Configuracion(nombre="Configuración Entrada")
+        self.configuracion_salida = Configuracion(nombre="Configuración Salida")
         
         if datos:
             self.set_dto(datos)

@@ -167,7 +167,7 @@ class SVGViewError(QGraphicsSvgItem):
         
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'imgs', 'logo.png')
+        image_path = os.path.join(path, 'base','imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
@@ -222,7 +222,7 @@ class SVGViewError(QGraphicsSvgItem):
         
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'imgs', 'logo.png')
+        image_path = os.path.join(path, 'base','imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         help_dialog.setWindowIcon(icon)
@@ -241,42 +241,35 @@ class SVGViewError(QGraphicsSvgItem):
         layout.addWidget(titulo)
         
         contenido = [
-            ("<b>Visualización del Sistema:</b>", 
-            "Esta ventana permite analizar el sistema de control de múltiples formas, mostrando diferentes representaciones "
-            "tanto en el dominio de Laplace como en el dominio del tiempo."),
-            
-            ("<b>Representaciones Disponibles:</b>",
-            "<ul>"
-            "<li><b>Y(s):</b> Salida del sistema en el dominio de Laplace</li>"
-            "<li><b>y(t):</b> Salida del sistema en el dominio del tiempo</li>"
-            "<li><b>Y(s)/R(s):</b> Función de transferencia total del sistema en Laplace</li>"
-            "<li><b>y(t)/r(t):</b> Relación entrada-salida en el dominio del tiempo</li>"
-            "<li><b>G(s):</b> Función de transferencia global en Laplace</li>"
-            "<li><b>g(t):</b> Respuesta al impulso del sistema</li>"
-            "</ul>"),
-            
-            ("<b>Interpretación de Gráficos:</b>",
-            "<ul>"
-            "<li><b>Dominio de Laplace:</b> Muestra la magnitud de la función vs. la frecuencia</li>"
-            "<li><b>Dominio del Tiempo:</b> Muestra la evolución temporal de la señal</li>"
-            "<li><b>Ejes:</b> Las unidades dependen de la magnitud física representada</li>"
-            "<li><b>Cuadrícula:</b> Facilita la lectura de valores específicos</li>"
-            "</ul>"),
-            
-            ("<b>Navegación e Interacción:</b>",
-            "<ul>"
-            "<li><b>Clic Derecho:</b> Cambia entre las diferentes representaciones en el siguiente orden:"
-            "<br>Y(s) → y(t) → Y(s)/R(s) → y(t)/r(t) → G(s) → g(t)</li>"
-            "<li><b>Clic Izquierdo:</b> Abre la ventana de gráficos detallados</li>"
-            "<li><b>Pestañas:</b> Permiten alternar entre diferentes vistas del sistema</li>"
-            "</ul>"),
-
-            ("<b>Análisis del Sistema:</b>",
-            "<ul>"
-            "<li><b>Respuesta en Frecuencia:</b> Analizar G(s) para entender el comportamiento frecuencial</li>"
-            "<li><b>Respuesta Temporal:</b> Examinar g(t) para ver la respuesta al impulso</li>"
-            "<li><b>Relación E/S:</b> Y(s)/R(s) muestra cómo el sistema procesa la entrada</li>"
-            "</ul>")
+            ("<b>Visualización del Error en Estado Estable:</b>",
+         "Esta ventana permite analizar el error en estado estable del sistema de control a través de diferentes representaciones, tanto en el dominio de Laplace como en el dominio del tiempo."),
+        
+        ("<b>Representaciones Disponibles:</b>",
+         "<ul>"
+         "<li><b>e_ss:</b> Error en estado estable en el dominio de Laplace</li>"
+         "<li><b>lim_{s->0} (G(s)):</b> Representación algebraica del error en estado estable en Laplace</li>"
+         "<li><b>lim_{t->inf} (g(t)):</b> Representación de la respuesta temporal del error en estado estable</li>"
+         "</ul>"),
+        
+        ("<b>Interpretación de Gráficos:</b>",
+         "<ul>"
+         "<li><b>Dominio de Laplace:</b> Muestra el valor del error en estado estable y su cálculo algebraico</li>"
+         "<li><b>Dominio del Tiempo:</b> Muestra la evolución temporal del error en estado estable</li>"
+         "</ul>"),
+        
+        ("<b>Navegación e Interacción:</b>",
+         "<ul>"
+         "<li><b>Clic Derecho:</b> Alterna entre las diferentes representaciones del error en estado estable</li>"
+         "<li><b>Clic Izquierdo:</b> Abre una ventana con gráficos detallados de las representaciones</li>"
+         "<li><b>Pestañas:</b> Permiten cambiar entre las diferentes vistas de la visualización</li>"
+         "</ul>"),
+        
+        ("<b>Análisis del Error en Estado Estable:</b>",
+         "<ul>"
+         "<li><b>Valor Numérico:</b> Consultar el valor exacto del error en estado estable</li>"
+         "<li><b>Cálculo Algebraico:</b> Examinar la expresión matemática que define el error</li>"
+         "<li><b>Comportamiento Temporal:</b> Observar la evolución del error a lo largo del tiempo</li>"
+         "</ul>")
         ]
         
         for titulo, texto in contenido:
