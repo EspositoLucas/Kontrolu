@@ -1,8 +1,8 @@
 import os
-from PyQt5.QtWidgets import QGraphicsProxyWidget,QTextBrowser, QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem
+from PyQt5.QtWidgets import QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer,pyqtSignal
+from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
 from .add_button import AddButton
 from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo,  ANCHO, ALTO
@@ -13,11 +13,6 @@ from .crear_microbloque import CrearMicroBloque
 from .vista_json import VistaJson
 from .editar_perturbacion import EditarPerturbacion
 from ..base.punto_suma import PuntoSuma
-from ..base.boton_circulo import QGraphicCircleItem
-import tempfile
-import matplotlib.pyplot as plt
-from PyQt5.QtSvg import QGraphicsSvgItem
-from PyQt5.QtWebEngineWidgets import QWebEngineView
 import io
 from ..base.text2svg import SVGView
 

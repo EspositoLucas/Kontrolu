@@ -323,6 +323,11 @@ class Sesion():
 
         return latex(self.obtener_calculo_error_en_estado_estable_simpy())
     
+    def calcular_calculo_error_en_estado_estable_tiempo_previo(self):
+
+        return simplify(self.entrada.calcular_fdt()*self.obtener_sistema_unitario_simpy())
+    
+    
     def obtener_calculo_error_en_estado_estable_tiempo(self):
 
         
@@ -333,7 +338,7 @@ class Sesion():
         if degree_denom >= 4:
             return None
 
-        return inverse_laplace_transform(self.obtener_calculo_error_en_estado_estable_simpy(),s,t)
+        return inverse_laplace_transform(self.calcular_calculo_error_en_estado_estable_tiempo_previo(),s,t)
     
     def obtener_calculo_error_en_estado_estable_latex_tiempo(self):
 

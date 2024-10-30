@@ -9,15 +9,10 @@ from .base.elemento_carga import ElementoCarga
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QGraphicsTextItem, QGroupBox, QVBoxLayout, QPushButton,QGraphicsView,QGraphicsScene
+from PyQt5.QtWidgets import QGraphicsTextItem,QGraphicsView,QGraphicsScene
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import QRectF
-from .base.simular_button import BotonSimular
-from .base.pausar_button import BotonPausar
-from .base.detener_button import BotonDetener
-from .base.reanudar_button import BotonReanudar
-from .base.boton_circulo import QGraphicCircleItem
 from .base.text2svgMain import SVGView
 from .text2svgError import SVGViewError
 
@@ -156,8 +151,7 @@ class MacroDiagrama(QGraphicsView):
         # Evitar que la vista se desplace
         self.setDragMode(QGraphicsView.NoDrag)
 
-        #self.agregar_botones()
-
+   
     def update_fdt(self):
         
         self.scene.removeItem(self.svg)
@@ -213,16 +207,6 @@ class MacroDiagrama(QGraphicsView):
         self.title_item.mousePressEvent = self.enable_text_editing
         self.scene.addItem(self.title_item)
 
-    def agregar_botones(self):
-
-        circulo = QGraphicCircleItem(20,350,40,'fa5s.cog',self.main_window.configurar_simulacion,self,message="Configurar simulación")
-        self.scene.addItem(circulo)
-        icono_analisis = QGraphicCircleItem(20, 450, 40, 'fa5s.chart-line', self.main_window.mostrar_analisis_estabilidad, self,message="Análisis de estabilidad")
-        self.scene.addItem(icono_analisis)
-        #json_button = QGraphicCircleItem(20, 550, 40, 'fa5s.file-code', self.main_window.ver_json, self, message="Ver JSON")
-        #self.scene.addItem(json_button)
-        #archivo_button = QGraphicCircleItem(20, 650, 40, 'fa5s.chart-line', self.main_window.mostrar_analisis_estabilidad, self,message="Archivo")
-        #self.scene.addItem(archivo_button)
         
 
     def update_model_title(self, event):
