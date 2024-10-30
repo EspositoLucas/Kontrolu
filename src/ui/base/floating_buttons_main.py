@@ -1,3 +1,4 @@
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 from ..base.boton_circulo import QGraphicCircleItem
 from .simular_button import BotonSimular
@@ -71,6 +72,14 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
                                     self, 
                                     message=" Editar JSON")
         self.scene.addItem(json_button)
+
+        x += spacing  # Actualizar x para el siguiente botón
+        copy_button = QGraphicCircleItem(x, y, RADIO_C, 
+                                    'fa5s.copy', 
+                                    self.padre.copy_image,
+                                    self, 
+                                    message="Copiar y guardar diagrama")
+        self.scene.addItem(copy_button)
 
     
     def draw_simu_buttons(self,sene_width,scene_height):

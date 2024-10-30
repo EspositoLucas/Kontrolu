@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QPushButton, QVBoxLayout,
                              QToolBar, QAction,QTableWidgetItem, QTableWidget, QFrame,QGraphicsView,QWidget)
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt,QEvent
-from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt,QEvent,QRectF
+from PyQt5.QtGui import QIcon, QImage, QPainter
 import os
 from .menu.menu_bar import Menu
 from .macro_diagrama import MacroDiagrama
@@ -20,6 +20,7 @@ from .base.vista_json import VistaJson
 import sympy as sp
 import sys
 from latex2sympy2 import latex2sympy
+
 class MainWindow(QMainWindow):
     
     def __init__(self, sesion):
@@ -394,6 +395,32 @@ class MainWindow(QMainWindow):
         # This is a placeholder. You'll need to implement proper LaTeX parsing.
         # For now, we'll assume the LaTeX is a valid Python expression
         return lambda t: eval(latex_func.replace('t', 'math.t'))
+    
+    def copy_image(self):
+
+        # Determine the bounding rectangle of the scene
+        rect = self.diagrama.scene.itemsBoundingRect()
+        
+        # Create an image with the same size as the scene
+        image = QImage(rect.size().toSize(), QImage.Format_ARGB32)
+        image.fill(0)  # Fill with a transparent background
+
+        # Render the scene onto the image
+        painter = QPainter(image)
+        self.diagrama.scene.render(painter, target=QRectF(image.rect()), source=rect)
+        painter.end()
+
+        # Access the system clipboard and set the image
+        clipboard = QApplication.clipboard()
+        clipboard.setImage(image)
+
+            # Open a file dialog to select the save location
+        save_path, _ = QFileDialog.getSaveFileName(None, "Save Image", "", "PNG Files (*.png);;All Files (*)")
+
+        # Save the image if a path is selected
+        if save_path:
+            image.save(save_path)
+            print(f"Image saved to {save_path}")
 
 
     def mostrar_analisis_estabilidad(self):
@@ -598,7 +625,7 @@ class MainWindow(QMainWindow):
 
         # Interpretar el resultado
         if rows == 1 and cols == 1:
-            resultado = f"La función de transferencia es una constante: {matriz_routh[0][0]}. "
+            resultado = f"La función de transferencia de lazo cerrado es una constante. "
             resultado += "El sistema es estable." if es_estable else "El sistema es inestable."
         else:
             resultado = "El sistema es estable." if es_estable else "El sistema es inestable."

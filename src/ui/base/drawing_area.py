@@ -1,6 +1,6 @@
 import os
-from PyQt5.QtWidgets import QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem
-from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont
+from PyQt5.QtWidgets import QFileDialog, QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont,QImage
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
 from .micro_bloque import Microbloque
@@ -13,7 +13,6 @@ from .crear_microbloque import CrearMicroBloque
 from .vista_json import VistaJson
 from .editar_perturbacion import EditarPerturbacion
 from ..base.punto_suma import PuntoSuma
-import io
 from ..base.text2svg import SVGView
 
 MARGEN_HORIZONTAL = 200
@@ -1120,6 +1119,33 @@ class DrawingArea(QGraphicsView):
             self.selected_microbloques.clear()
             self.load_microbloques()
             self.update()
+    
+    def copy_image(self):
+
+        # Determine the bounding rectangle of the scene
+        rect = self.scene.itemsBoundingRect()
+        
+        # Create an image with the same size as the scene
+        image = QImage(rect.size().toSize(), QImage.Format_ARGB32)
+        image.fill(0)  # Fill with a transparent background
+
+        # Render the scene onto the image
+        painter = QPainter(image)
+        self.scene.render(painter, target=QRectF(image.rect()), source=rect)
+        painter.end()
+
+        # Access the system clipboard and set the image
+        clipboard = QApplication.clipboard()
+        clipboard.setImage(image)
+
+            # Open a file dialog to select the save location
+        save_path, _ = QFileDialog.getSaveFileName(None, "Save Image", "", "PNG Files (*.png);;All Files (*)")
+
+        # Save the image if a path is selected
+        if save_path:
+            image.save(save_path)
+            print(f"Image saved to {save_path}")
+
 
     def set_seleccion_multiple(self, valor):
         self.seleccion_multiple = valor # seteamos el valor
@@ -1231,4 +1257,3 @@ class DrawingArea(QGraphicsView):
                 
                 self.load_microbloques()
                 self.update()
-
