@@ -18,8 +18,8 @@ from latex2sympy2 import latex2sympy
 
 class Simulacion(QObject):
     
-    def __init__(self,graficadora =None,window = None,sesion = None):
-        super().__init__()
+    def _init_(self,graficadora =None,window = None,sesion = None):
+        super()._init_()
 
         
         self.sesion = sesion
@@ -158,7 +158,7 @@ class Simulacion(QObject):
         dialog.setDefaultButton(QMessageBox.No)
         
         # Configurar el icono de la ventana
-        path = os.path.dirname(os.path.abspath(__file__))
+        path = os.path.dirname(os.path.abspath(_file_))
         image_path = os.path.join(path,'imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
