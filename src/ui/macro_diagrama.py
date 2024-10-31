@@ -9,9 +9,9 @@ from .base.elemento_carga import ElementoCarga
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QGraphicsTextItem,QGraphicsView,QGraphicsScene, QFileDialog
+from PyQt5.QtWidgets import QGraphicsTextItem,QGraphicsView,QGraphicsScene
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor,QBrush
 from PyQt5.QtCore import QRectF
 from .base.text2svgMain import SVGView
 from .text2svgError import SVGViewError
@@ -56,6 +56,9 @@ class MacroDiagrama(QGraphicsView):
         self.ALTO_TOTAL = scene_rect.height()
         self.X_MEDIO = scene_rect.width() / 2
         self.Y_MEDIO = scene_rect.height() / 2
+
+        self.scene.setBackgroundBrush(QBrush(COLOR_FONDO))
+
         # ACTUADOR
         x_actuador = self.X_MEDIO - ANCHO_ELEMENTO / 2
         y_actuador = self.Y_MEDIO
