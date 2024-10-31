@@ -24,6 +24,98 @@ LONGITUD_FLECHA = 10
 VERDE = QColor("#55AA55")
 ROJO = QColor("#CC6666")
 LINEA_COLOR = QColor("#457B9D")
+ESTILO_DIALOG = """
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;  /* Tamaño de botón más grande */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+    }
+
+    QLineEdit {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+    
+    QTextEdit {
+        background-color: #FAF8F6;  /* Fondo blanco pastel */
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #D0D0D0;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: #2B2D42;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+
+    QMessageBox {
+        background-color: #B0B0B0;  /* Fondo gris pastel oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+    }
+
+    QMessageBox QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QMessageBox QPushButton {
+        background-color: #808080;  /* Botones en gris oscuro pastel */
+        color: white;  /* Texto blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QMessageBox QPushButton:hover {
+        background-color: #606060;  /* Botón más oscuro al pasar el cursor */
+    }
+"""
 
 class PerturbacionVisual(QGraphicsItemGroup):
     def __init__(self, perturbacion_back, drawing_area):
@@ -129,34 +221,12 @@ class PerturbacionVisual(QGraphicsItemGroup):
         dialog.setWindowIcon(QtGui.QIcon(icon))
         
         # Establecer el estilo de la ventana
-        dialog.setStyleSheet("""
-            QMessageBox {
-                background-color: #333;
-                color: white;
-            }
-            
-            QMessageBox QLabel {
-                color: white;
-                background-color: black;
-                padding: 10px;
-            }
-        """)
+        dialog.setStyleSheet(ESTILO_DIALOG)
         
         # Cambiar el texto del botón "Yes" a "Si"
         yes_button = dialog.button(QMessageBox.Yes)
         if yes_button:
             yes_button.setText("Si")
-
-        # Aplicar estilo a los botones específicos
-        for button in dialog.buttons():
-            button.setStyleSheet("""
-                background-color: black;
-                color: white;
-                min-width: 80px;
-                min-height: 30px;
-                border: none;
-                border-radius: 3px;
-            """)
 
         reply = dialog.exec_()
         
