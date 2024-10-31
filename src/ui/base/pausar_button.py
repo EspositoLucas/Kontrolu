@@ -46,7 +46,7 @@ class BotonPausar(QGraphicsRectItem):
         self.setAcceptHoverEvents(True)
 
         # Crear el icono de QtAwesome como pixmap
-        self.icon = qta.icon('fa5s.pause').pixmap(48, 48)  # Tamaño del ícono en 64x64 px
+        self.icon = qta.icon('fa5s.pause', color = LETRA_COLOR).pixmap(48, 48)  # Tamaño del ícono en 64x64 px
 
     def paint(self, painter, option, widget=None):
         # Dibujar un rectángulo con esquinas redondeadas

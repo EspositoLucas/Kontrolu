@@ -27,6 +27,7 @@ class ModificarConfiguracion(QDialog):
             }
         """)
         help_dialog.setMinimumWidth(600)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
 
         # Título principal

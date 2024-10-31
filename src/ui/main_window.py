@@ -46,6 +46,7 @@ class MainWindow(QMainWindow):
         initial_menu.setWindowTitle('Menú Inicial - Kontrolu')
         initial_menu.setStyleSheet(ESTILO)
         initial_menu.resize(400, 400)  # Aumentamos el tamaño para acomodar el logo
+        initial_menu.setWindowFlags(initial_menu.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
         
         # Configurar el icono de la ventana
@@ -212,6 +213,7 @@ class MainWindow(QMainWindow):
         dialog = QDialog(self)
         dialog.setWindowTitle("Configuración de Simulación")
         dialog.setStyleSheet(ESTILO)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
 
         # Configurar el icono de la ventana
@@ -299,6 +301,7 @@ class MainWindow(QMainWindow):
         help_dialog.setWindowTitle("Ayuda - Configuración de Simulación")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(500)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         layout = QVBoxLayout()
 
@@ -431,6 +434,7 @@ class MainWindow(QMainWindow):
         dialog = QDialog(self)
         dialog.setWindowTitle("Análisis de Estabilidad")
         dialog.setStyleSheet(ESTILO)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
 
         # Configurar el icono de la ventana
@@ -510,6 +514,7 @@ class MainWindow(QMainWindow):
         help_dialog.setWindowTitle("Ayuda - Análisis de Estabilidad")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(600)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         layout = QVBoxLayout()
 
@@ -641,6 +646,7 @@ class MainWindow(QMainWindow):
         dialog = QDialog(self)
         dialog.setWindowTitle("Error en Estado Estable")
         dialog.setStyleSheet(ESTILO)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
 
         # Configurar el icono de la ventana
@@ -683,6 +689,7 @@ class MainWindow(QMainWindow):
         dialog = QDialog(self)
         dialog.setWindowTitle('Confirmar salida')
         dialog.setStyleSheet(ESTILO)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
 
         # Configurar el icono de la ventana

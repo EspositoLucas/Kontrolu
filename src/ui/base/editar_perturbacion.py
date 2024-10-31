@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (
 )
 from .latex_editor import LatexEditor
 from .vista_json import VistaJson
+from PyQt5.QtCore import Qt
 
 class EditarPerturbacion(QDialog):
 
@@ -176,6 +177,7 @@ class EditarPerturbacion(QDialog):
         help_dialog.setWindowTitle("Ayuda - Configuración de Perturbación")
         help_dialog.setStyleSheet(self.styleSheet())
         help_dialog.setMinimumWidth(500)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
         
         # Título principal

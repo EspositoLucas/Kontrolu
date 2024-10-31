@@ -112,7 +112,7 @@ class EstabilidadDialog(QDialog):
 
         self.matriz_routh_obtenida,self.nombre_estabilidad = self.estabilidad.calcular_routh_con_libreria()
         self.polinomio = latex(self.estabilidad.polinomio_caracteristico())
-
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
 
         

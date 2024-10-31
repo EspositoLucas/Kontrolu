@@ -143,7 +143,6 @@ class Simulacion(QObject):
     
     def confirmar_cierre(self, event):
         self.timer.stop()
-        self.window.no_buttons()
         if self.cerrando:
             self.window.deteniendo_buttons()
             event.accept()

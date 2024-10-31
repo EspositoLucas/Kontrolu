@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QFileDialog, QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsPixmapItem
+from PyQt5.QtWidgets import QFileDialog, QColorDialog , QDialog, QVBoxLayout, QPushButton, QLabel, QMenu, QAction, QTextEdit, QApplication, QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsTextItem, QGraphicsItem
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush, QPixmap, QCursor,QFont,QImage
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QPointF, QRectF,QPoint,QTimer
@@ -189,6 +189,7 @@ class DrawingArea(QGraphicsView):
     def show_help(self):
         help_dialog = QDialog(self)
         help_dialog.setWindowTitle("Ayuda")
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
         help_dialog.setStyleSheet("""
             QDialog {
@@ -431,11 +432,23 @@ class DrawingArea(QGraphicsView):
         # Dibujar el botón "+" en el medio
         center = QPointF((entrada.x() + salida.x()) / 2, self.height() / 2)
         button = QGraphicsEllipseItem(center.x() - BUTTON_SIZE/2, center.y() - BUTTON_SIZE/2, BUTTON_SIZE, BUTTON_SIZE)
+
+        button.setAcceptHoverEvents(True)
+        button.hoverEnterEvent = lambda event: QApplication.setOverrideCursor(Qt.PointingHandCursor)
+        button.hoverLeaveEvent = lambda event: QApplication.restoreOverrideCursor()
+
+
         button.setBrush(QBrush(FONDO_CICULO_COLOR))
         button.setPen(qpen)
         self.scene.addItem(button)
 
         text = QGraphicsTextItem("+")
+
+        text.setAcceptHoverEvents(True)
+        text.hoverEnterEvent = lambda event: QApplication.setOverrideCursor(Qt.PointingHandCursor)
+        text.hoverLeaveEvent = lambda event: QApplication.restoreOverrideCursor()
+
+
         text.setFont(QFont("Arial", 12, QFont.Bold))
         text.setDefaultTextColor(LETRA_COLOR)
         text.setPos(center.x() - text.boundingRect().width() / 2, center.y() - text.boundingRect().height() / 2)
@@ -867,6 +880,7 @@ class DrawingArea(QGraphicsView):
         if not hasattr(self, 'preview_dialog'):
             self.preview_dialog = QDialog(self) # crea un diálogo
             self.preview_dialog.setWindowFlags(Qt.Popup | Qt.FramelessWindowHint) # le quita el borde
+            self.preview_dialog.setWindowFlags(self.preview_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
             layout = QVBoxLayout() # crea un layout vertical
             self.preview_label = QLabel() # crea un label
             self.description_label = QLabel() # crea otro label

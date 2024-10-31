@@ -8,6 +8,7 @@ from ..base.macro_vista import MacroVista
 import os
 from PyQt5.QtCore import QRectF
 import re
+from PyQt5.QtCore import Qt
 
 
 class ElementoCarga(MacroVista):
@@ -26,6 +27,7 @@ class ElementoCarga(MacroVista):
 
     def mostrar_configuracion_carga(self):
         dialog = ConfiguracionCargaDialog(self, self.carga, self.estado_seleccionado)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         if dialog.exec_():
             self.carga = dialog.carga
             self.tipo_entrada = dialog.tipo_entrada
@@ -195,6 +197,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         help_dialog.setWindowTitle("Ayuda - Configuración de Carga")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(500)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QtWidgets.QVBoxLayout()
 
         titulo = QtWidgets.QLabel("Guía de Configuración de Carga")
@@ -296,6 +299,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
 
     def agregar_estado(self):
         dialog = EditarEstadoDialog(self)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         if dialog.exec_():
             nuevo_estado = {
                 "nombre": dialog.nombre_input.text(),
@@ -311,6 +315,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
             index = self.estados_list.row(current_item)
             estado_actual = self.carga.estados[index]
             dialog = EditarEstadoDialog(self, estado_actual)
+            dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
             if dialog.exec_():
                 estado_actual["nombre"] = dialog.nombre_input.text()
                 estado_actual["minimo"] = float(dialog.minimo_input.text())

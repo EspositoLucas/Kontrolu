@@ -151,9 +151,8 @@ class Carga(Hoja):
             "nombre": self.nombre,
             "funcion_transferencia": self.funcion_transferencia,
             "tipo_carga": self.tipo_carga.value,
-            "escalamiento_sigmoide": self.escalamiento_sigmoide,
-            "desplazamiento_sigmoide": self.desplazamiento_sigmoide,
-            "datos": self.datos,
+            "escalamiento_sigmoide": float(self.escalamiento_sigmoide),
+            "desplazamiento_sigmoide": float(self.desplazamiento_sigmoide),
             "estados": self.estados
         }
 
@@ -163,7 +162,6 @@ class Carga(Hoja):
         self.escalamiento_sigmoide = json['escalamiento_sigmoide']
         self.desplazamiento_sigmoide = json['desplazamiento_sigmoide']
         self.nombre = json['nombre']
-        self.datos = json['datos']
         self.estados = json['estados']
         return self
     

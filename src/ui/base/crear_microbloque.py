@@ -293,6 +293,7 @@ class CrearMicroBloque(QDialog):
         help_dialog.setWindowTitle("Ayuda - Configuración del Microbloque")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(600)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
 
         # Título principal
@@ -407,6 +408,7 @@ class CrearMicroBloque(QDialog):
         dialog = QDialog()
         dialog.setStyleSheet(ESTILO)
         dialog.setWindowTitle(f"Guardar preset de {self.new_microbloque.nombre}")
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QVBoxLayout()
         
         # Configurar el icono de la ventana

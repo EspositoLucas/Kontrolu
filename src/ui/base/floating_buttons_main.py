@@ -102,12 +102,14 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         self.padre.iniciar_simulacion()
     
     def simulando_buttons(self):
+        self.deshoverar()
         self.simular_buton.hide()
         self.pausar_buton.show()
         self.boton_detener.show()
         self.reanudar_boton.hide()
 
     def deteniendo_buttons(self):
+        self.deshoverar()
         self.simular_buton.show()
         self.pausar_buton.hide()
         self.boton_detener.hide()
@@ -122,6 +124,7 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         self.padre.pausar_simulacion()
     
     def pausando_buttons(self):
+        self.deshoverar()
         self.simular_buton.hide()
         self.pausar_buton.hide()
         self.boton_detener.show()
@@ -132,12 +135,20 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         self.padre.reanudar_simulacion()
     
     def reanudando_buttons(self):
+        self.deshoverar()
         self.simular_buton.hide()
         self.pausar_buton.show()
         self.boton_detener.show()
         self.reanudar_boton.hide()
+
+    def deshoverar(self):
+        self.simular_buton.hoverLeaveEvent(None)
+        self.pausar_buton.hoverLeaveEvent(None)
+        self.boton_detener.hoverLeaveEvent(None)
+        self.reanudar_boton.hoverLeaveEvent(None)
     
     def no_buttons(self):
+        self.deshoverar()
         self.simular_buton.hide()
         self.pausar_buton.hide()
         self.boton_detener.hide()

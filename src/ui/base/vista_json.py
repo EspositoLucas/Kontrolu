@@ -31,7 +31,12 @@ class VistaJson(QDialog):
         
         self.text_edit = QTextEdit()
         self.layout.addWidget(self.text_edit)
-        pretty_json = json.dumps(self.microbloque.to_json(), indent=4)
+
+        json_a = self.microbloque.to_json()
+
+        print(json_a)
+
+        pretty_json = json.dumps(json_a, indent=4)
         self.text_edit.setPlainText(pretty_json)
         self.highlight_json()
         self.adjust_dialog_size()
@@ -55,6 +60,7 @@ class VistaJson(QDialog):
         help_dialog.setWindowTitle("Ayuda - Editor JSON")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(500)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         layout = QVBoxLayout()
 

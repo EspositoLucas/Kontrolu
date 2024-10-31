@@ -161,6 +161,7 @@ class SVGView(QGraphicsSvgItem):
         dialog = QDialog()
         dialog.setWindowTitle("Dominio de Laplace y Dominio de Tiempo")
         dialog.setStyleSheet(ESTILO)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))
@@ -217,6 +218,7 @@ class SVGView(QGraphicsSvgItem):
         help_dialog.setWindowTitle("Ayuda - Visualización de Funciones de Transferencia")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(500)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))

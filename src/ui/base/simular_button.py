@@ -39,7 +39,7 @@ class BotonSimular(QGraphicsRectItem):
         self.setAcceptHoverEvents(True)
 
         # Crear el icono de QtAwesome como pixmap
-        self.icon = qta.icon('fa5s.play').pixmap(48, 48)  # Tamaño del ícono en 48x48 px
+        self.icon = qta.icon('fa5s.play', color = LETRA_COLOR).pixmap(48, 48)  # Tamaño del ícono en 48x48 px
 
     def paint(self, painter, option, widget=None):
         # Dibujar un rectángulo con esquinas redondeadas

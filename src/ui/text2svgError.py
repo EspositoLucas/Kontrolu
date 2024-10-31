@@ -168,6 +168,7 @@ class SVGViewError(QGraphicsSvgItem):
         dialog = QDialog()
         dialog.setWindowTitle("Dominio de Laplace y Dominio de Tiempo")
         dialog.setStyleSheet(ESTILO)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))
@@ -224,6 +225,7 @@ class SVGViewError(QGraphicsSvgItem):
         help_dialog.setWindowTitle("Ayuda - Visualización del Sistema")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(500)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))

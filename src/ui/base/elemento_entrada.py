@@ -8,6 +8,7 @@ import os
 from ..base.vista_json import VistaJson
 from ..base.macro_vista import MacroVista
 from PyQt5.QtCore import QRectF
+from PyQt5.QtCore import Qt
 
 
 
@@ -26,6 +27,7 @@ class ElementoEntrada(MacroVista):
 
     def mostrar_configuracion_entrada(self):
         dialog = ConfiguracionEntradaDialog(self, self.entrada, self.tipo_entrada, self.coeficiente)
+        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         if dialog.exec_():
             self.entrada = dialog.entrada
             self.tipo_entrada = dialog.tipo_entrada
@@ -134,6 +136,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         help_dialog.setWindowTitle("Ayuda - Configuración de Entrada")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(500)
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
         layout = QtWidgets.QVBoxLayout()
 
