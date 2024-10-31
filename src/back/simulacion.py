@@ -46,7 +46,7 @@ class Simulacion(QObject):
         self.t_total = sesion.tiempo_total
         self.ciclos = self.t_total/self.delta
         self.salida_cero = sesion.salida_inicial
-        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
+        self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'carga': [], 'medidor': [], 'controlador': [], 'actuador': [], 'error_real': [], 'error_medido': []}
         self.graficadora = graficadora
         self.graficadora.add_simulacion(self)
         self.continuar_simulacion = True
@@ -235,7 +235,7 @@ class Simulacion(QObject):
         Returns:
         bool: True if improper, False if proper
         """
-        return len(num_coef) >= len(den_coef)
+        return len(num_coef) > len(den_coef)
     
     def make_tf_proper(self,num_coef, den_coef):
         # Perform polynomial division
@@ -285,6 +285,9 @@ class Simulacion(QObject):
         static_gain = 1.0
 
         if self.is_improper_tf(num_coef, den_coef):
+            print("Transfer function is improper. Preprocessing...")
+            print(f"Original numerator: {num_coef}")
+            print(f"Original denominator: {den_coef}")
             num_coef, den_coef, static_gain = self.preprocess_tf(num_coef, den_coef)
 
         self.H = ctrl.tf(num_coef, den_coef) * static_gain
@@ -299,6 +302,9 @@ class Simulacion(QObject):
         static_gain = 1.0
 
         if self.is_improper_tf(num_coef, den_coef):
+            print("Transfer function is improper. Preprocessing...")
+            print(f"Original numerator: {num_coef}")
+            print(f"Original denominator: {den_coef}")
             num_coef, den_coef, static_gain = self.preprocess_tf(num_coef, den_coef)
 
         self.H_medidor = ctrl.tf(num_coef, den_coef) * static_gain
@@ -494,7 +500,7 @@ class Simulacion(QObject):
             self.x_actuador = np.zeros((nuevo_tam_actuador, 1))
             
         if not hasattr(self, 'datos'):
-            self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'error': [], 'carga': [], 'medidor': [], 'controlador': [], 'actuador': []}
+            self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'carga': [], 'medidor': [], 'controlador': [], 'actuador': [], 'error_real': [], 'error_medido': []}
         
         self.paso_actual = len(self.datos['tiempo'])  # Mantener el paso actual basado en los datos
 
