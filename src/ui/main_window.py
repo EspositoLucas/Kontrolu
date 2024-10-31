@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QPushButton, QVBoxLayout, QDialog, 
                              QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, 
-                             QToolBar, QAction,QTableWidgetItem, QTableWidget, QFrame,QGraphicsView,QWidget)
+                             QToolBar, QAction,QTableWidgetItem, QTableWidget, QFrame,QGraphicsView,QWidget,QCheckBox)
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt,QEvent,QRectF
@@ -255,6 +255,17 @@ class MainWindow(QMainWindow):
             inputs[key] = input_field
             layout.addLayout(layout_h)
 
+        #aramem un check item que diga Simulacion Precisa quiero que sea para tildar o no
+        self.precisa = QHBoxLayout()
+        self.precisa.addWidget(QLabel("Simulacion Precisa"))
+        self.check = QCheckBox()
+        self.precisa.addWidget(self.check)
+        layout.addLayout(self.precisa)
+        self.check.setChecked(self.sesion.precisa)
+
+        
+
+        
         # Crear el QDialogButtonBox con los botones estándar
         button_box = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
 
@@ -275,12 +286,14 @@ class MainWindow(QMainWindow):
             tiempo_total = float(inputs['tiempo_total'].text())
             salida_inicial = float(inputs['salida_inicial'].text())
             velocidad = float(inputs['velocidad'].text())
+            precisa = self.check.isChecked()
 
 
             self.sesion.delta_t = delta_t
             self.sesion.tiempo_total = tiempo_total
             self.sesion.salida_inicial = salida_inicial
             self.sesion.velocidad = velocidad
+            self.sesion.precisa = precisa
             
     def mostrar_ayuda_simulacion(self):
         help_dialog = QDialog(self)
@@ -360,17 +373,9 @@ class MainWindow(QMainWindow):
         self.graficadora.show()
         
         self.simulacion = Simulacion(
-            controlador=self.sesion.controlador, 
-            actuador=self.sesion.actuador,
-            proceso=self.sesion.proceso,
-            medidor=self.sesion.medidor,
-            delta=self.sesion.delta_t,
-            ciclos=int(self.sesion.tiempo_total/self.sesion.delta_t),
-            entrada=self.sesion.entrada,
-            salida_cero=self.sesion.salida_inicial,
-            carga=self.sesion.carga,
             graficadora=self.graficadora,
-            window= self.floating_ellipses_view
+            window= self.floating_ellipses_view,
+            sesion=self.sesion
         )
         
         self.simulacion.ejecutar_simulacion(self.sesion.velocidad)

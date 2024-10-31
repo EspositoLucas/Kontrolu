@@ -25,6 +25,7 @@ class Sesion():
         self.delta_t = 1
         self.velocidad = 1000
         self.nombre = "Sistema de Control"
+        self.precisa = True
 
     def validar_entrada_controlador(self, unidad: str)-> bool:
         return self.medidor.unidad_salida() == unidad
@@ -76,7 +77,8 @@ class Sesion():
             "salida_inicial": self.salida_inicial,
             "delta_t": self.delta_t,
             "velocidad": self.velocidad,
-            "nombre": self.nombre
+            "nombre": self.nombre,
+            "precisa": self.precisa
         }
     
     def from_json(self, datos: dict):
@@ -96,10 +98,11 @@ class Sesion():
         self.delta_t = float(datos["delta_t"])
         self.velocidad = float(datos["velocidad"])
         self.nombre = datos["nombre"]
+        self.precisa = datos["precisa"]
 
     @staticmethod
     def validar_dict(datos: dict) -> bool:
-        required_keys = ["entrada", "controlador", "actuador", "proceso", "medidor", "carga", "nombre", "tiempo_total", "salida_inicial", "delta_t", "velocidad"]
+        required_keys = ["entrada", "controlador", "actuador", "proceso", "medidor", "carga", "nombre", "tiempo_total", "salida_inicial", "delta_t", "velocidad","precisa"]
         for key in required_keys:
             if key not in datos:
                 raise Exception(f"El diccionario no contiene la clave {key}")
@@ -137,6 +140,21 @@ class Sesion():
             Carga.validar_dict(datos["carga"])
         except Exception as e:
             raise Exception(f"Error en la carga: {e}")
+        
+        if not isinstance(datos["tiempo_total"], (int, float)):
+            raise Exception("El tiempo total debe ser un número")
+        
+        if not isinstance(datos["salida_inicial"], (int, float)):
+            raise Exception("La salida inicial debe ser un número")
+        
+        if not isinstance(datos["delta_t"], (int, float)):
+            raise Exception("El delta t debe ser un número")
+        
+        if not isinstance(datos["velocidad"], (int, float)):
+            raise Exception("La velocidad debe ser un número")
+        
+        if not isinstance(datos["precisa"], bool):
+            raise Exception("La precisión debe ser un booleano")
         
         return True
     

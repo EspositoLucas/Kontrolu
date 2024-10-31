@@ -12,14 +12,18 @@ from PyQt5.QtCore import QTimer
 
 class Simulacion(QObject):
     
-    def __init__(self, controlador :MacroControlador= None, actuador:MacroActuador = None, proceso:MacroProceso =None, medidor:MacroMedidor =None, delta =1, ciclos=10, entrada:MicroBloque=None,salida_cero=10,carga:MicroBloque= None,graficadora =None,window = None):
+    def __init__(self,graficadora =None,window = None,sesion = None):
         super().__init__()
-        self.controlador : MacroControlador = controlador
-        self.actuador : MacroActuador = actuador
-        self.proceso : MacroProceso = proceso
-        self.medidor : MacroMedidor = medidor        
-        self.entrada : MicroBloque = entrada
-        self.carga : Carga = carga
+
+        
+        self.sesion = sesion
+        self.controlador : MacroControlador = sesion.controlador
+        self.actuador : MacroActuador = sesion.actuador
+        self.proceso : MacroProceso = sesion.proceso
+        self.medidor : MacroMedidor = sesion.medidor        
+        self.entrada : MicroBloque = sesion.entrada
+        self.carga : Carga = sesion.carga
+        self.entrada = sesion.entrada
 
         self.controlador.vaciar_datos()
         self.actuador.vaciar_datos()
@@ -33,15 +37,17 @@ class Simulacion(QObject):
 
         self.paso_actual = 0
 
-        self.delta = delta
+        self.delta = sesion.delta_t
         self.multiplicador= 2/self.delta
-        self.ciclos = ciclos
-        self.salida_cero = salida_cero
+        self.t_total = sesion.tiempo_total
+        self.ciclos = self.t_total/self.delta
+        self.salida_cero = sesion.salida_inicial
         self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
         self.graficadora = graficadora
         self.graficadora.add_simulacion(self)
         self.continuar_simulacion = True
         self.window = window
+        self.precisa = sesion.precisa
         
         if self.graficadora:
             self.graficadora.closeEvent = self.confirmar_cierre  # Reemplaza el evento de cierre
@@ -186,6 +192,9 @@ class Simulacion(QObject):
             self.timer.start()
             event.ignore()
 
+    
+    def simular_paso_preciso(self, y_actual, ciclo):
+        pass
         
   
     def simular_paso_timer(self):
@@ -196,7 +205,10 @@ class Simulacion(QObject):
                     self.graficadora.procesar_eventos()   # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
             if not self.continuar_simulacion:
                 self.timer.stop()
-            self.y_salida = self.simular_paso(self.y_salida, self.paso_actual)
+            if self.precisa:
+                pass
+            else:
+                self.y_salida = self.simular_paso(self.y_salida, self.paso_actual)
             self.paso_actual += 1
         else:
             self.timer.stop()  # Detener el temporizador cuando la simulación termine
