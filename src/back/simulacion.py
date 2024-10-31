@@ -17,11 +17,9 @@ import time
 from latex2sympy2 import latex2sympy
 
 class Simulacion(QObject):
-    
-    def _init_(self,graficadora =None,window = None,sesion = None):
-        super()._init_()
 
-        
+    def __init__(self,graficadora =None,window = None,sesion = None):
+        super().__init__()      
         self.sesion = sesion
         self.controlador : MacroControlador = sesion.controlador
         self.actuador : MacroActuador = sesion.actuador
@@ -158,7 +156,7 @@ class Simulacion(QObject):
         dialog.setDefaultButton(QMessageBox.No)
         
         # Configurar el icono de la ventana
-        path = os.path.dirname(os.path.abspath(_file_))
+        path = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path,'imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)

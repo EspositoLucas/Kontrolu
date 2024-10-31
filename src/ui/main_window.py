@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QMainWindow, QFileDialog, QPushButton, QVBoxLayout, QDialog, 
-                             QHBoxLayout, QLabel, QLineEdit, QComboBox, QDialogButtonBox, 
-                             QToolBar, QAction,QTableWidgetItem, QTableWidget, QFrame,QGraphicsView,QWidget,QCheckBox)
+                             QHBoxLayout, QLabel, QLineEdit, QDialogButtonBox, 
+                             QToolBar, QAction,QTableWidgetItem, QTableWidget, QFrame,QWidget,QCheckBox)
 from PyQt5 import QtGui
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt,QEvent,QRectF
@@ -10,7 +10,6 @@ from .menu.menu_bar import Menu
 from .macro_diagrama import MacroDiagrama
 from .menu.archivo import Archivo
 from .base.floating_buttons_main import FloatingButtonsMainView
-from back.simulacion import Simulacion
 from back.simulacion import Simulacion
 from back.estabilidad import Estabilidad
 from ui.base.grafico_simulacion import Graficadora
