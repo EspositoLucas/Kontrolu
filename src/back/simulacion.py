@@ -220,6 +220,61 @@ class Simulacion(QObject):
         self.ft_global = self.ft_lazo_directo / (1 + (self.ft_lazo_directo * self.ft_medidor))
         self.ft_global_simplificada = simplify(self.ft_global)
         return self.ft_global_simplificada
+    
+    def is_improper_tf(self,num_coef, den_coef):
+        """
+        Check if a transfer function is improper.
+        
+        An improper transfer function has a numerator degree 
+        greater than or equal to the denominator degree.
+        
+        Args:
+        num_coef (array-like): Numerator coefficients
+        den_coef (array-like): Denominator coefficients
+        
+        Returns:
+        bool: True if improper, False if proper
+        """
+        return len(num_coef) >= len(den_coef)
+    
+    def make_tf_proper(self,num_coef, den_coef):
+        # Perform polynomial division
+        quotient, remainder = np.polydiv(num_coef, den_coef)
+        
+        # The first coefficient of quotient is the static gain
+        static_gain = quotient[0] if len(quotient) > 0 else 0
+        
+        # Remainder becomes the new numerator
+        new_num_coef = remainder
+        
+        return new_num_coef, den_coef, static_gain
+    def match_polynomial_degrees(self,num_coef, den_coef):
+        if len(num_coef) > len(den_coef):
+            # Pad denominator with leading zeros
+            den_coef = np.pad(den_coef, (len(num_coef) - len(den_coef), 0), mode='constant')
+        elif len(den_coef) > len(num_coef):
+            # Pad numerator with leading zeros
+            num_coef = np.pad(num_coef, (len(den_coef) - len(num_coef), 0), mode='constant')
+        
+        return num_coef, den_coef
+    
+    def truncate_to_proper(self,num_coef, den_coef):
+        return num_coef[-len(den_coef):], den_coef
+
+    def preprocess_tf(self,num_coef,den_coef):
+        # Option 1: Try polynomial division first
+        try:
+            new_num, new_den, static_gain = self.make_tf_proper(num_coef, den_coef)
+            return new_num, new_den, static_gain
+        except:
+            # Option 2: Try degree matching
+            try:
+                new_num, new_den = self.match_polynomial_degrees(num_coef, den_coef)
+                return new_num, new_den, 1.0
+            except:
+                # Option 3: Truncation as last resort
+                new_num, new_den = self.truncate_to_proper(num_coef, den_coef)
+                return new_num, new_den, 1.0
 
     def crear_state_space(self, ft_global):
         numerador,denominador = ft_global.as_numer_denom()
@@ -227,8 +282,12 @@ class Simulacion(QObject):
         den_coef = denominador.as_poly(s).all_coeffs()
         num_coef = [float(x) for x in num_coef]
         den_coef = [float(x) for x in den_coef]
+        static_gain = 1.0
 
-        self.H = ctrl.tf(num_coef, den_coef)
+        if self.is_improper_tf(num_coef, den_coef):
+            num_coef, den_coef, static_gain = self.preprocess_tf(num_coef, den_coef)
+
+        self.H = ctrl.tf(num_coef, den_coef) * static_gain
         self.system_ss = ctrl.tf2ss(self.H)
         self.system_d = ctrl.sample_system(self.system_ss, self.delta, method='zoh')
 
@@ -237,10 +296,42 @@ class Simulacion(QObject):
         den_coef = denominador.as_poly(s).all_coeffs()
         num_coef = [float(x) for x in num_coef]
         den_coef = [float(x) for x in den_coef]
+        static_gain = 1.0
 
-        self.H_medidor = ctrl.tf(num_coef, den_coef)
+        if self.is_improper_tf(num_coef, den_coef):
+            num_coef, den_coef, static_gain = self.preprocess_tf(num_coef, den_coef)
+
+        self.H_medidor = ctrl.tf(num_coef, den_coef) * static_gain
         self.system_ss_medidor = ctrl.tf2ss(self.H_medidor)
         self.system_d_medidor = ctrl.sample_system(self.system_ss_medidor, self.delta, method='zoh')
+
+        numerador,denominador = self.ft_controlador.as_numer_denom()
+        num_coef = numerador.as_poly(s).all_coeffs()
+        den_coef = denominador.as_poly(s).all_coeffs()
+        num_coef = [float(x) for x in num_coef]
+        den_coef = [float(x) for x in den_coef]
+        static_gain = 1.0
+
+        if self.is_improper_tf(num_coef, den_coef):
+            num_coef, den_coef, static_gain = self.preprocess_tf(num_coef, den_coef)
+
+        self.H_controlador = ctrl.tf(num_coef, den_coef)*static_gain
+        self.system_ss_controlador = ctrl.tf2ss(self.H_controlador)
+        self.system_d_controlador = ctrl.sample_system(self.system_ss_controlador, self.delta, method='zoh')
+
+        numerador,denominador = self.ft_actuador.as_numer_denom()
+        num_coef = numerador.as_poly(s).all_coeffs()
+        den_coef = denominador.as_poly(s).all_coeffs()
+        num_coef = [float(x) for x in num_coef]
+        den_coef = [float(x) for x in den_coef]
+        static_gain = 1.0
+
+        if self.is_improper_tf(num_coef, den_coef):
+            num_coef, den_coef, static_gain = self.preprocess_tf(num_coef, den_coef)
+
+        self.H_actuador = ctrl.tf(num_coef, den_coef) * static_gain
+        self.system_ss_actuador = ctrl.tf2ss(self.H_actuador)
+        self.system_d_actuador = ctrl.sample_system(self.system_ss_actuador, self.delta, method='zoh')
         
         
   
@@ -280,8 +371,27 @@ class Simulacion(QObject):
             if self.x_medidor.shape[0] != self.system_d_medidor.A.shape[0]:
                 self.x_medidor = self.redimensionar_estado(self.system_d_medidor.A.shape[0], self.x_medidor)
             
-            self.x_medidor = np.dot(self.system_d_medidor.A, self.x_medidor) + np.dot(self.system_d_medidor.B, y)
-            y_medidor = np.dot(self.system_d_medidor.C, self.x_medidor) + np.dot(self.system_d_medidor.D, y)
+            self.x_medidor = np.dot(self.system_d_medidor.A, self.x_medidor) + np.dot(self.system_d_medidor.B, y[0,0])
+            y_medidor = np.dot(self.system_d_medidor.C, self.x_medidor) + np.dot(self.system_d_medidor.D, y[0,0])
+
+            error = u - y_medidor[0, 0]
+
+            # Verificar dimensiones antes de realizar operaciones
+            if self.x_controlador.shape[0] != self.system_d_controlador.A.shape[0]:
+                self.x_controlador = self.redimensionar_estado(self.system_d_controlador.A.shape[0], self.x_controlador)
+            
+            self.x_controlador = np.dot(self.system_d_controlador.A, self.x_controlador) + np.dot(self.system_d_controlador.B, error)
+            y_controlador = np.dot(self.system_d_controlador.C, self.x_controlador) + np.dot(self.system_d_controlador.D, error)
+
+            # Verificar dimensiones antes de realizar operaciones
+            if self.x_actuador.shape[0] != self.system_d_actuador.A.shape[0]:
+                self.x_actuador = self.redimensionar_estado(self.system_d_actuador.A.shape[0], self.x_actuador)
+            
+            self.x_actuador = np.dot(self.system_d_actuador.A, self.x_actuador) + np.dot(self.system_d_actuador.B, y_controlador)
+            y_actuador = np.dot(self.system_d_actuador.C, self.x_actuador) + np.dot(self.system_d_actuador.D, y_controlador)
+
+
+            
 
             estado_carga = self.carga.simular(tiempo, self.delta, y[0, 0])
             
@@ -291,6 +401,8 @@ class Simulacion(QObject):
             self.datos['salida'].append(y[0, 0])
             self.datos['error'].append(u - y[0, 0])
             self.datos['medidor'].append(y_medidor[0, 0])
+            self.datos['controlador'].append(y_controlador[0, 0])
+            self.datos['actuador'].append(y_actuador[0, 0])
             
             datos_paso = {
                 'tiempo': tiempo,
@@ -298,7 +410,9 @@ class Simulacion(QObject):
                 'salida': y[0, 0],
                 'error': u - y[0, 0],
                 'carga': estado_carga,
-                'medidor': y_medidor[0, 0]
+                'medidor': y_medidor[0, 0],
+                'controlador': y_controlador[0, 0],
+                'actuador': y_actuador[0, 0]
             }
 
             if self.graficadora:
@@ -332,11 +446,21 @@ class Simulacion(QObject):
 
         estado_medidor_anterior = self.x_medidor if hasattr(self, 'x_medidor') else None
         tam_medidor_anterior = estado_medidor_anterior.shape[0] if estado_medidor_anterior is not None else 0
+
+        estado_controlador_anterior = self.x_controlador if hasattr(self, 'x_controlador') else None
+        tam_controlador_anterior = estado_controlador_anterior.shape[0] if estado_controlador_anterior is not None else 0
+
+        estado_actuador_anterior = self.x_actuador if hasattr(self, 'x_actuador') else None
+        tam_actuador_anterior = estado_actuador_anterior.shape[0] if estado_actuador_anterior is not None else 0
+
+
         
         # Crear el nuevo sistema
         self.crear_state_space(ft_global)
         nuevo_tam = self.system_d.A.shape[0]
         nuevo_tam_medidor = self.system_d_medidor.A.shape[0]
+        nuevo_tam_controlador = self.system_d_controlador.A.shape[0]
+        nuevo_tam_actuador = self.system_d_actuador.A.shape[0]
         
         # Si tenemos un estado anterior y las dimensiones cambiaron
         if estado_anterior is not None and tam_anterior != nuevo_tam:
@@ -352,9 +476,23 @@ class Simulacion(QObject):
         else:
             # Primera inicialización
             self.x_medidor = np.zeros((nuevo_tam_medidor, 1))
+
+        if estado_controlador_anterior is not None and tam_controlador_anterior != nuevo_tam_controlador:
+            self.x_controlador = self.redimensionar_estado(nuevo_tam_controlador, estado_controlador_anterior)
+            print(f"Sistema redimensionado: {tam_controlador_anterior} -> {nuevo_tam_controlador} estados")
+        else:
+            # Primera inicialización
+            self.x_controlador = np.zeros((nuevo_tam_controlador, 1))
+
+        if estado_actuador_anterior is not None and tam_actuador_anterior != nuevo_tam_actuador:
+            self.x_actuador = self.redimensionar_estado(nuevo_tam_actuador, estado_actuador_anterior)
+            print(f"Sistema redimensionado: {tam_actuador_anterior} -> {nuevo_tam_actuador} estados")
+        else:
+            # Primera inicialización
+            self.x_actuador = np.zeros((nuevo_tam_actuador, 1))
             
         if not hasattr(self, 'datos'):
-            self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'error': [], 'carga': [], 'medidor': []}
+            self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'error': [], 'carga': [], 'medidor': [], 'controlador': [], 'actuador': []}
         
         self.paso_actual = len(self.datos['tiempo'])  # Mantener el paso actual basado en los datos
 
