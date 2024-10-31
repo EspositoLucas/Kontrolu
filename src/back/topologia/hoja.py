@@ -1,6 +1,6 @@
 from __future__ import annotations
 from .interfaz_topologia import InterfazTopologia
-from sympy import  simplify
+from sympy import  simplify,inverse_laplace_transform
 from latex2sympy2 import latex2sympy
 from sympy.abc import s,t,z
 from latex2sympy2 import latex2sympy
@@ -91,10 +91,7 @@ class Hoja(InterfazTopologia):
         return latex2sympy(self.get_funcion_transferencia())
     
     def simular(self, tiempo, delta, entrada=None):
-        
-        if not self.system or self.delta_calculated != delta or self.fdt_calculated != self.get_funcion_transferencia():
-            self.set_simu_fdt(delta)
-        
+
         self.tiempos.append(tiempo)
 
         if entrada == None:
@@ -102,14 +99,19 @@ class Hoja(InterfazTopologia):
             print(self.tiempos)
             print(self.system)
 
-            _,y = dimpulse(self.system,t = self.tiempos)
-        else:
-            self.entradas.append(entrada)
-            print("BLOQUE")
-            print(self.entradas)
-            print(self.tiempos)
-            print(self.system)
-            _,y = dlsim(self.system,u = self.entradas,t = self.tiempos)
+
+            y = inverse_laplace_transform(latex2sympy(self.get_funcion_transferencia()),s,t).subs(t,tiempo)
+            return y
+        
+        if not self.system or self.delta_calculated != delta or self.fdt_calculated != self.get_funcion_transferencia():
+            self.set_simu_fdt(delta)
+        
+        self.entradas.append(entrada)
+        print("BLOQUE")
+        print(self.entradas)
+        print(self.tiempos)
+        print(self.system)
+        _,y = dlsim(self.system,u = self.entradas,t = self.tiempos)
 
         print("SALIDA")
         print(y[-1][0])

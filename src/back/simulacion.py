@@ -18,14 +18,18 @@ from latex2sympy2 import latex2sympy
 
 class Simulacion(QObject):
     
-    def __init__(self, controlador :MacroControlador= None, actuador:MacroActuador = None, proceso:MacroProceso =None, medidor:MacroMedidor =None, delta =1, ciclos=10, entrada:MicroBloque=None,salida_cero=10,carga:MicroBloque= None,graficadora =None,window = None):
+    def __init__(self,graficadora =None,window = None,sesion = None):
         super().__init__()
-        self.controlador : MacroControlador = controlador
-        self.actuador : MacroActuador = actuador
-        self.proceso : MacroProceso = proceso
-        self.medidor : MacroMedidor = medidor        
-        self.entrada : MicroBloque = entrada
-        self.carga : Carga = carga
+
+        
+        self.sesion = sesion
+        self.controlador : MacroControlador = sesion.controlador
+        self.actuador : MacroActuador = sesion.actuador
+        self.proceso : MacroProceso = sesion.proceso
+        self.medidor : MacroMedidor = sesion.medidor        
+        self.entrada : MicroBloque = sesion.entrada
+        self.carga : Carga = sesion.carga
+        self.entrada = sesion.entrada
 
         self.controlador.vaciar_datos()
         self.actuador.vaciar_datos()
@@ -39,20 +43,23 @@ class Simulacion(QObject):
 
         self.paso_actual = 0
 
-        self.delta = delta
-        self.multiplicador = 2/self.delta
-        self.ciclos = ciclos
-        self.salida_cero = salida_cero
-        self.datos = {'tiempo': [], 'entrada': [], 'error': [], 'salida': []}
+        self.delta = sesion.delta_t
+        self.multiplicador= 2/self.delta
+        self.t_total = sesion.tiempo_total
+        self.ciclos = self.t_total/self.delta
+        self.salida_cero = sesion.salida_inicial
+        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
         self.graficadora = graficadora
         self.graficadora.add_simulacion(self)
         self.continuar_simulacion = True
         self.window = window
+        self.precisa = sesion.precisa
+        self.velocidad = sesion.velocidad
         
         if self.graficadora:
             self.graficadora.closeEvent = self.confirmar_cierre  # Reemplaza el evento de cierre
         self.cerrando = False  # Nueva variable para controlar el cierre
-   
+
     def redimensionar_estado(self, nuevo_tam, estado_anterior):
         """
         Redimensiona el vector de estados preservando los valores anteriores donde sea posible
@@ -64,22 +71,77 @@ class Simulacion(QObject):
             # Copiar los valores que podamos del estado anterior
             nuevo_estado[:min_tam] = estado_anterior[:min_tam]
         return nuevo_estado
-    
-    def simular_paso_timer(self):
-        # Simula un paso de la simulación
-        if self.paso_actual <= self.ciclos:
-            if not self.continuar_simulacion:
-                while self.graficadora: # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
-                    self.graficadora.procesar_eventos()   # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
-            if not self.continuar_simulacion:
-                self.timer.stop()
-            self.paso_actual += 1
-            self.simular()
 
-    def simular(self):
-        self.simular_paso()
-        ft_global = self.calcular_ft_global()
-        self.crear_state_space(ft_global)
+
+
+    def simular_paso(self, y_actual, ciclo):
+        tiempo = ciclo * self.delta
+
+        y_medidor = self.medidor.simular(tiempo, self.delta, y_actual)
+        
+        self.datos['medidor'].append(y_medidor)
+        print(f"Medición actual: {y_medidor}")
+        print(f"Histórico de mediciones: {self.datos['medidor']}")
+
+        y_entrada =  self.entrada.simular(tiempo, self.delta)
+        self.datos['entrada'].append(y_entrada)
+        print(f"Entrada actual: {y_entrada}")
+        print(f"Histórico de entradas: {self.datos['entrada']}")
+
+        error = y_entrada - y_medidor        
+        self.datos['error'].append(error)
+        
+        # Simula cada componente del sistema en secuencia
+        # Cada componente recibe el mismo vector de tiempo
+        y_controlador = self.controlador.simular(tiempo, self.delta, error)
+        self.datos['controlador'].append(y_controlador)
+        
+        y_actuador = self.actuador.simular(tiempo, self.delta, y_controlador)
+        self.datos['actuador'].append(y_actuador)
+
+        y_proceso = self.proceso.simular(tiempo, self.delta, y_actuador)
+        self.datos['proceso'].append(y_proceso)
+
+        self.datos['salida'].append(y_proceso)
+
+        estado_carga = self.carga.simular(tiempo, self.delta, y_proceso)
+        self.datos['carga'].append(estado_carga)
+        print(f"Estado de carga: {estado_carga}")
+        print(f"Histórico de estados de carga: {self.datos['carga']}")
+
+        datos_paso = {
+            'tiempo': tiempo,
+            'controlador': y_controlador,
+            'actuador': y_actuador,
+            'proceso': y_proceso,
+            'medidor': y_medidor,
+            'entrada': y_entrada,
+            'error': error,
+            'salida': y_proceso,
+            'carga': estado_carga  # Añadimos el estado de la carga
+        }
+
+        if self.graficadora:
+            self.graficadora.agregar_datos(datos_paso)
+            self.graficadora.procesar_eventos()
+            
+        # Añadir impresión detallada de los valores
+        print(f"\nCiclo {ciclo}:")
+        print(f"Tiempo: {tiempo}")
+        print(f"Entrada: {y_entrada}")
+        print(f"Medidor: {y_medidor}")
+        print(f"Error: {error}")
+        print(f"Controlador: {y_controlador}")
+        print(f"Actuador: {y_actuador}")
+        print(f"Proceso: {y_proceso}")
+        print(f"Salida actual: {y_proceso}")
+        print(f"Estado de la carga: {estado_carga}")
+        print("-" * 30)
+
+        return y_proceso
+    
+
+
     
     def confirmar_cierre(self, event):
         self.timer.stop()
@@ -178,9 +240,31 @@ class Simulacion(QObject):
         inversa_entrada = inverse_laplace_transform(entrada_simpy, s, t)
         u = inversa_entrada.subs(t, tiempo)
         return float(u)
+    
+        
+  
+    def simular_paso_timer(self):
+        # Simula un paso de la simulación
+        if self.paso_actual <= self.ciclos:
+            if not self.continuar_simulacion:
+                while self.graficadora: # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
+                    self.graficadora.procesar_eventos()   # esto provoca que cuando se pausa la simulacion, se termina y se quiere salir de la aplcacion, en la terminal se sigue igual ejecutando por el multihilo
+            if not self.continuar_simulacion:
+                self.timer.stop()
+            if self.precisa:
+                self.simular_paso_preciso()
+            else:
+                self.y_salida = self.simular_paso(self.y_salida, self.paso_actual)
+            self.paso_actual += 1
+        else:
+            self.timer.stop()  # Detener el temporizador cuando la simulación termine
+            print("Simulación completada:", self.datos)
+            return self.datos  # Retornar los datos al final
+    
 
 
-    def simular_paso(self):
+
+    def simular_paso_preciso(self):
         tiempo = self.paso_actual * self.delta
         try:
             u = self.calcular_entrada(tiempo)
@@ -221,6 +305,9 @@ class Simulacion(QObject):
             if self.graficadora:
                 QMessageBox.warning(self.graficadora, "Error de Simulación",
                                   f"Error durante la simulación: {str(e)}\nLa simulación se ha detenido.")
+        
+        ft_global = self.calcular_ft_global()
+        self.crear_state_space(ft_global)
 
     
     def simular_sistema_completo(self):
@@ -246,10 +333,20 @@ class Simulacion(QObject):
         
         self.paso_actual = len(self.datos['tiempo'])  # Mantener el paso actual basado en los datos
 
-    def ejecutar_simulacion(self, velocidad=5):
-        self.simular_sistema_completo()
-        self.timer.setInterval(int(velocidad))
+    def simulacion_inicio_real(self):
+        if self.precisa:
+            self.simular_sistema_completo()
+        else:
+            self.simular_sistema_tiempo_real()
+        self.timer.setInterval(int(self.velocidad))
         self.timer.start()
+
+
+
+    def simular_sistema_tiempo_real(self):
+        self.paso_actual = 1  # Reiniciar el contador de pasos
+        self.y_salida = self.salida_cero  # Reiniciar el valor de salida
+        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
 
     
     def detener_simulacion(self):

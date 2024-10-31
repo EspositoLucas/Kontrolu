@@ -1257,4 +1257,3 @@ class DrawingArea(QGraphicsView):
                 
                 self.load_microbloques()
                 self.update()
-
