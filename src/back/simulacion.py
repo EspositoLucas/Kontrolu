@@ -190,6 +190,7 @@ class Simulacion(QObject):
             }
             QMessageBox QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
         """)
         

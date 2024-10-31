@@ -242,6 +242,7 @@ ESTILO = """
 
     QPushButton:hover {
         background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+        cursor: pointer;
     }
 
     QLineEdit {

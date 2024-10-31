@@ -47,6 +47,7 @@ class Menu(QMenuBar):
             }
             QPushButton:hover {
                 background-color: #5793C5;
+                cursor: pointer;
             }
         """)
         
@@ -64,6 +65,7 @@ class Menu(QMenuBar):
             }
             QPushButton:hover {
                 background-color: #5793C5;
+                cursor: pointer;
             }
         """)
         

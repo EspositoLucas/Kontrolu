@@ -133,7 +133,9 @@ class DrawingArea(QGraphicsView):
         self.title_item.setFont(font)
         self.title_item.setDefaultTextColor(LETRA_COLOR)
         text_rect = self.title_item.boundingRect()
-        
+        self.title_item.setAcceptHoverEvents(True)
+        self.title_item.hoverEnterEvent = lambda event: QApplication.setOverrideCursor(Qt.PointingHandCursor)
+        self.title_item.hoverLeaveEvent = lambda event: QApplication.restoreOverrideCursor()
         self.title_item.setPos((self.scene.width()-text_rect.width())/2, 5)
         self.title_item.focusOutEvent = self.update_model_title
         self.title_item.mousePressEvent = self.enable_text_editing
@@ -215,6 +217,7 @@ class DrawingArea(QGraphicsView):
             }
             QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
         """)
         
@@ -361,6 +364,7 @@ class DrawingArea(QGraphicsView):
             
             QMessageBox QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
         """)
         
@@ -1007,6 +1011,7 @@ class DrawingArea(QGraphicsView):
             
             QMessageBox QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
         """)
         
@@ -1101,6 +1106,7 @@ class DrawingArea(QGraphicsView):
             }
             QMessageBox QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
         """)
         

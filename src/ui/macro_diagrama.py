@@ -9,7 +9,7 @@ from .base.elemento_carga import ElementoCarga
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QGraphicsTextItem,QGraphicsView,QGraphicsScene
+from PyQt5.QtWidgets import QGraphicsTextItem,QGraphicsView,QGraphicsScene,QApplication
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor,QBrush
 from PyQt5.QtCore import QRectF
@@ -147,7 +147,7 @@ class MacroDiagrama(QGraphicsView):
         self.draw_title()
         self.draw_fdt()
         self.draw_error()
-        #self.draw_estabilidad()
+        self.draw_estabilidad()
 
         # Deshabilitar el desplazamiento
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -159,25 +159,25 @@ class MacroDiagrama(QGraphicsView):
 
 
     def update_estabilidad(self):
-        return
+        
         self.scene.removeItem(self.estabilidad)
         self.draw_estabilidad()
 
     def update_estabilidad_state(self):
-        return
+        
         self.estabilidad.update_text()
         self.estabilidad_update_pos()
     
     def draw_estabilidad(self):
-        return
+        
         self.estabilidad = EstabilidadTexto(self.sesion)
         self.scene.addItem(self.estabilidad)
         self.estabilidad_update_pos()
     
     def estabilidad_update_pos(self):
-        return
+        
         text_rect = self.estabilidad.boundingRect()
-        self.estabilidad.setPos(self.X_MEDIO - text_rect.width() / 2, self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+        self.estabilidad.setPos(self.X_MEDIO - text_rect.width() / 2, self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*8)
     
 
 
@@ -232,6 +232,9 @@ class MacroDiagrama(QGraphicsView):
         self.title_item.setFont(font)
         self.title_item.setDefaultTextColor(LETRA_COLOR)
         text_rect = self.title_item.boundingRect()
+        self.title_item.setAcceptHoverEvents(True)
+        self.title_item.hoverEnterEvent = lambda event: QApplication.setOverrideCursor(Qt.PointingHandCursor)
+        self.title_item.hoverLeaveEvent = lambda event: QApplication.restoreOverrideCursor()
         self.title_item.setPos(self.X_MEDIO - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*10)
         self.title_item.focusOutEvent = self.update_model_title
         self.title_item.mousePressEvent = self.enable_text_editing

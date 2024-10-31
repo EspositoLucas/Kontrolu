@@ -4,6 +4,7 @@ from back.topologia.microbloque import MicroBloque
 from back.topologia.perturbacion import Perturbacion
 from back.topologia.hoja import Hoja
 from latex2sympy2 import latex2sympy
+from tbcontrol.symbolic import routh
 import numpy as np
 import math
 
@@ -144,6 +145,56 @@ class Estabilidad:
 
         return matriz_routh, es_estable
     
+    def calcular_routh_con_libreria(self):
+        den_poly = self.polinomio_caracteristico()
+        coeficientes = den_poly.all_coeffs()
+
+        if len(coeficientes) == 1:
+            es_estable = sp.sympify(coeficientes[0]).is_positive
+            if es_estable:
+                es_estable = "ESTABLE"
+            else:
+                es_estable = "INESTABLE"
+            return sp.Matrix([[coeficientes[0]]]), es_estable
+
+        matriz_routh = routh(den_poly)
+        
+        primera_columna = [matriz_routh[i, 0] for i in range(matriz_routh.rows)]
+        
+        if all(valor > 0 for valor in primera_columna):
+            estabilidad = "ESTABLE"
+        elif any(valor == 0 for valor in primera_columna):
+            estabilidad = "CRITICAMENTE_ESTABLE"
+        elif any(valor < 0 for valor in primera_columna):
+            estabilidad = "INESTABLE"
+        else:
+            estabilidad = "No se puede determinar la estabilidad"
+
+        return matriz_routh, estabilidad
+
+    def polinomio_caracteristico(self):
+        G_cl_latex = self.obtener_funcion_transferencia()
+        G_cl = self.parse_latex_to_sympy(G_cl_latex)
+        s = sp.Symbol('s')
+        den = sp.fraction(G_cl)[1]
+        den_poly = sp.Poly(den, s)
+        return den_poly
+
+    def calcular_polos_y_ceros(self):
+        G_cl_latex = self.obtener_funcion_transferencia()
+        G_cl = self.parse_latex_to_sympy(G_cl_latex)
+        s = sp.Symbol('s')
+        
+        num, den = sp.fraction(G_cl)
+        
+        den_poly = sp.Poly(den, s)
+        polos = sp.roots(den_poly)
+        
+        num_poly = sp.Poly(num, s)
+        ceros = sp.roots(num_poly)
+        
+        return polos, ceros
+
     def calcular_error_estado_estable(self):
         """
         Calcula el error en estado estable basándose en la entrada configurada

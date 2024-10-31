@@ -43,6 +43,7 @@ class EditarPerturbacion(QDialog):
             
             QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
             
             QTextEdit {
@@ -93,6 +94,7 @@ class EditarPerturbacion(QDialog):
             }
             QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
         """)
         help_button.clicked.connect(self.mostrar_ayuda)

@@ -101,6 +101,7 @@ class ModificarConfiguracion(QDialog):
             }
             QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
         """)
         cerrar_btn.clicked.connect(help_dialog.close)
@@ -175,6 +176,7 @@ class ModificarConfiguracion(QDialog):
             }
             QPushButton:hover {
                 background-color: #606060;
+                cursor: pointer;
             }
         """)
         help_button.clicked.connect(self.mostrar_ayuda)
