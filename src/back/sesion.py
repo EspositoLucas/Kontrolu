@@ -369,3 +369,19 @@ class Sesion():
         return self.calcular_calculo_error_en_estado_estable().limit(s,0).evalf()
     
 
+    def obtener_fdts(self):
+
+        global_sympy = self.obtener_fdt_lazo_abierto_simpy()
+        global_latex = latex(global_sympy)
+
+        total_sympy = global_sympy/(1+global_sympy*self.obtener_fdt_realimentacion_simpy())
+        total_latex = latex(total_sympy)
+
+        con_entrada = total_sympy * self.entrada.calcular_fdt()
+        con_entrada_latex = latex(con_entrada)
+
+        abierta_si_unitario = total_sympy/(1-total_sympy)
+        abierta_si_unitario_latex = latex(abierta_si_unitario)
+
+        return con_entrada,con_entrada_latex,total_sympy,total_latex,global_sympy,global_latex,abierta_si_unitario,abierta_si_unitario_latex
+

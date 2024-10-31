@@ -91,65 +91,36 @@ class SVGView(QGraphicsSvgItem):
 
         self.graficos = []
 
-        self.fdt_sympy_laplace = self.macro.obtener_fdt_con_entrada_simpy()
-        if self.fdt_sympy_laplace != None:
-            self.laplace = "Y(s) = " + self.macro.obtener_fdt_con_entrada_latex()
-            bytess_laplace = self.tex2svg(self.laplace)
-            self.renderer_laplace = QSvgRenderer(bytess_laplace)
-            self.funciones.append(self.renderer_laplace)
-            self.graficos.append((self.fdt_sympy_laplace,True,"Y(s)"))
 
-        #self.fdt_sympy_tiempo = self.macro.obtener_fdt_con_entrada_tiempo()
-        self.fdt_sympy_tiempo = None
-        if self.fdt_sympy_tiempo != None:
-            self.tiempo = "y(t) = " + self.macro.obtener_fdt_con_entrada_latex_tiempo()
-            bytess_tiempo = self.tex2svg(self.tiempo)
-            self.renderer_tiempo = QSvgRenderer(bytess_tiempo)
-            self.funciones.append(self.renderer_tiempo)
-            self.graficos.append((self.fdt_sympy_tiempo,False,"y(t)"))
+        self.fdt_sympy_laplace, self.fdt_latex_laplace, self.fdt_sympy_laplace_total, self.fdt_latex_laplace_total, self.fdt_sympy_global_laplace, self.fdt_latex_global_laplace, self.fdt_sympy_global_unitaria, self.fdt_latex_global_unitaria = self.macro.obtener_fdts()
         
-        self.fdt_sympy_laplace_total = self.macro.obtener_fdt_global_simpy()
-        if self.fdt_sympy_laplace_total != None:
-            self.total_laplace = "\\frac{Y(s)}{R(s)} = " + self.macro.obtener_fdt_global_latex()
-            bytess_laplace_total = self.tex2svg(self.total_laplace)
-            self.renderer_laplace_total = QSvgRenderer(bytess_laplace_total)
-            self.funciones.append(self.renderer_laplace_total)
-            self.graficos.append((self.fdt_sympy_laplace_total,True,"Y(s)/R(s)"))
-
-
-        #self.fdt_sympy_tiempo_total = self.macro.obtener_fdt_global_tiempo()
-        self.fdt_sympy_tiempo_total = None
-        if self.fdt_sympy_tiempo_total != None:
-            self.total_tiempo = "\\frac{y(s)}{r(t)} = " + self.macro.obtener_fdt_global_latex_tiempo()
-            bytess_tiempo_total = self.tex2svg(self.total_tiempo)
-            self.renderer_tiempo_total = QSvgRenderer(bytess_tiempo_total)
-            self.funciones.append(self.renderer_tiempo_total)
-            self.graficos.append((self.fdt_sympy_tiempo_total,False,"y(t)/r(t)"))
-
-        self.fdt_sympy_global_laplace = self.macro.obtener_fdt_lazo_abierto_simpy()
-        if self.fdt_sympy_global_laplace != None:
-            self.global_laplace = "G(s) = " + self.macro.obtener_fdt_lazo_abierto_latex()
-            bytess_global_laplace = self.tex2svg(self.global_laplace)
-            self.renderer_global_laplace = QSvgRenderer(bytess_global_laplace)
-            self.funciones.append(self.renderer_global_laplace)
-            self.graficos.append((self.fdt_sympy_global_laplace,True,"G(s)"))
-
-        #self.fdt_sympy_global_tiempo = self.macro.obtener_fdt_lazo_abierto_simpy_tiempo()
-        self.fdt_sympy_global_tiempo = None
-        if self.fdt_sympy_global_tiempo != None:
-            self.global_tiempo = "g(t) = " + self.macro.obtener_fdt_lazo_abierto_latex_tiempo()
-            bytess_global_tiempo = self.tex2svg(self.global_tiempo)
-            self.renderer_global_tiempo = QSvgRenderer(bytess_global_tiempo)
-            self.funciones.append(self.renderer_global_tiempo)      
-            self.graficos.append((self.fdt_sympy_global_tiempo,False,"g(t)"))
         
-        self.fdt_sympy_global_unitaria = self.macro.obtener_abierta_si_unitario_simpy()
-        if self.fdt_sympy_global_unitaria != None:
-            self.global_unitaria = "G_{0}(s) = " + self.macro.obtener_abierta_si_unitario_latex()
-            bytess_global_unitaria = self.tex2svg(self.global_unitaria)
-            self.renderer_global_unitaria = QSvgRenderer(bytess_global_unitaria)
-            self.funciones.append(self.renderer_global_unitaria)      
-            self.graficos.append((self.fdt_sympy_global_unitaria,True,"G_{0}(s)"))
+        self.laplace = "Y(s) = " + self.fdt_latex_laplace
+        bytess_laplace = self.tex2svg(self.laplace)
+        self.renderer_laplace = QSvgRenderer(bytess_laplace)
+        self.funciones.append(self.renderer_laplace)
+        self.graficos.append((self.fdt_sympy_laplace,True,"Y(s)"))
+
+        
+        self.total_laplace = "\\frac{Y(s)}{R(s)} = " + self.fdt_latex_laplace_total
+        bytess_laplace_total = self.tex2svg(self.total_laplace)
+        self.renderer_laplace_total = QSvgRenderer(bytess_laplace_total)
+        self.funciones.append(self.renderer_laplace_total)
+        self.graficos.append((self.fdt_sympy_laplace_total,True,"Y(s)/R(s)"))
+
+
+        self.global_laplace = "G(s) = " + self.fdt_latex_global_laplace
+        bytess_global_laplace = self.tex2svg(self.global_laplace)
+        self.renderer_global_laplace = QSvgRenderer(bytess_global_laplace)
+        self.funciones.append(self.renderer_global_laplace)
+        self.graficos.append((self.fdt_sympy_global_laplace,True,"G(s)"))
+
+        
+        self.global_unitaria = "G_{0}(s) = " + self.fdt_latex_global_unitaria
+        bytess_global_unitaria = self.tex2svg(self.global_unitaria)
+        self.renderer_global_unitaria = QSvgRenderer(bytess_global_unitaria)
+        self.funciones.append(self.renderer_global_unitaria)      
+        self.graficos.append((self.fdt_sympy_global_unitaria,True,"G_{0}(s)"))
 
         self.laplace_mode = 0
         if len(self.funciones) > 0:
