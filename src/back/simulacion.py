@@ -399,7 +399,8 @@ class Simulacion(QObject):
             self.datos['tiempo'].append(tiempo)
             self.datos['entrada'].append(u)
             self.datos['salida'].append(y[0, 0])
-            self.datos['error'].append(u - y[0, 0])
+            self.datos['error_real'].append(u - y[0, 0])
+            self.datos['error_medido'].append(error)
             self.datos['medidor'].append(y_medidor[0, 0])
             self.datos['controlador'].append(y_controlador[0, 0])
             self.datos['actuador'].append(y_actuador[0, 0])
@@ -408,7 +409,8 @@ class Simulacion(QObject):
                 'tiempo': tiempo,
                 'entrada': u,
                 'salida': y[0, 0],
-                'error': u - y[0, 0],
+                'error_real': u - y[0, 0],
+                'error_medido': error,
                 'carga': estado_carga,
                 'medidor': y_medidor[0, 0],
                 'controlador': y_controlador[0, 0],
