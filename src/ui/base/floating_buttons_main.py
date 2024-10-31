@@ -1,3 +1,4 @@
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 from ..base.boton_circulo import QGraphicCircleItem
 from .simular_button import BotonSimular

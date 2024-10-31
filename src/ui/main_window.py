@@ -625,7 +625,7 @@ class MainWindow(QMainWindow):
 
         # Interpretar el resultado
         if rows == 1 and cols == 1:
-            resultado = f"La función de transferencia es una constante: {matriz_routh[0][0]}. "
+            resultado = f"La función de transferencia de lazo cerrado es una constante. "
             resultado += "El sistema es estable." if es_estable else "El sistema es inestable."
         else:
             resultado = "El sistema es estable." if es_estable else "El sistema es inestable."
