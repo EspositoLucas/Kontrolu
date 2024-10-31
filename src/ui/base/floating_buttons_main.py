@@ -41,15 +41,6 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
                                     self, 
                                     message="Configurar simulación")
         self.scene.addItem(circulo)
-
-        # Botón de análisis
-        x += spacing  # Actualizar x para el siguiente botón
-        icono_analisis = QGraphicCircleItem(x, y, RADIO_C, 
-                                        'fa5s.chart-line', 
-                                        self.padre.mostrar_analisis_estabilidad, 
-                                        self, 
-                                        message="Análisis de estabilidad")
-        self.scene.addItem(icono_analisis)
         
         # Botón de archivo
         x += spacing  # Actualizar x para el siguiente botón
