@@ -35,6 +35,7 @@ class DrawingArea(QGraphicsView):
     def __init__(self, macrobloque=None, ventana=None):
         super().__init__(ventana)
         self.scene = QGraphicsScene(self)
+        self.scene.setBackgroundBrush(QBrush(QColor("#F1FAEE")))
         self.setScene(self.scene)
         self.setRenderHint(QPainter.Antialiasing)
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)

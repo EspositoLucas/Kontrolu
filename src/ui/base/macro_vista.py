@@ -1,12 +1,11 @@
 import os
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QPushButton, QMainWindow, QToolBar, QWidget
+from PyQt5.QtWidgets import  QMainWindow,  QWidget
 from .drawing_area import DrawingArea
-from PyQt5.QtWidgets import QApplication, QGraphicsView, QGraphicsScene, QGraphicsRectItem, QGraphicsTextItem
-from PyQt5.QtGui import QBrush, QPen, QColor, QFont,QFontMetrics
-from PyQt5.QtCore import Qt, QRectF
-from ..base.boton_circulo import QGraphicCircleItem
+from PyQt5.QtWidgets import  QGraphicsRectItem
+from PyQt5.QtGui import QBrush, QPen, QColor, QFont
+from PyQt5.QtCore import Qt
 from .floating_buttons import FloatingButtons
 
 
@@ -113,7 +112,6 @@ class MacroVistaMainWindow(QMainWindow):
 
         self.show()
 
-        self.setStyleSheet("background-color: #F1FAEE;")  # Color azul claro
         # Ruta de la imagen del logo
         path =  os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path, 'imgs', 'logo.png')
