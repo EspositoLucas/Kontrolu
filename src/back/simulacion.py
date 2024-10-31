@@ -34,7 +34,7 @@ class Simulacion(QObject):
         self.paso_actual = 0
 
         self.delta = delta
-        self.multiplicador = 2/self.delta
+        self.multiplicador= 2/self.delta
         self.ciclos = ciclos
         self.salida_cero = salida_cero
         self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
@@ -64,20 +64,20 @@ class Simulacion(QObject):
         print(f"Histórico de entradas: {self.datos['entrada']}")
 
         error = y_entrada - y_medidor        
-        self.datos['error'].append(error*self.multiplicador)
+        self.datos['error'].append(error)
         
         # Simula cada componente del sistema en secuencia
         # Cada componente recibe el mismo vector de tiempo
         y_controlador = self.controlador.simular(tiempo, self.delta, error)
-        self.datos['controlador'].append(y_controlador*self.multiplicador)
+        self.datos['controlador'].append(y_controlador)
         
         y_actuador = self.actuador.simular(tiempo, self.delta, y_controlador)
-        self.datos['actuador'].append(y_actuador*self.multiplicador)
+        self.datos['actuador'].append(y_actuador)
 
         y_proceso = self.proceso.simular(tiempo, self.delta, y_actuador)
-        self.datos['proceso'].append(y_proceso*self.multiplicador)
+        self.datos['proceso'].append(y_proceso)
 
-        self.datos['salida'].append(y_proceso*self.multiplicador)
+        self.datos['salida'].append(y_proceso)
 
         estado_carga = self.carga.simular(tiempo, self.delta, y_proceso)
         self.datos['carga'].append(estado_carga)
@@ -86,13 +86,13 @@ class Simulacion(QObject):
 
         datos_paso = {
             'tiempo': tiempo,
-            'controlador': y_controlador*self.multiplicador,
-            'actuador': y_actuador*self.multiplicador,
-            'proceso': y_proceso*self.multiplicador,
-            'medidor': y_medidor*self.multiplicador,
-            'entrada': y_entrada*self.multiplicador,
-            'error': error*self.multiplicador,
-            'salida': y_proceso*self.multiplicador,
+            'controlador': y_controlador,
+            'actuador': y_actuador,
+            'proceso': y_proceso,
+            'medidor': y_medidor,
+            'entrada': y_entrada,
+            'error': error,
+            'salida': y_proceso,
             'carga': estado_carga  # Añadimos el estado de la carga
         }
 
