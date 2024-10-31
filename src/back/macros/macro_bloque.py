@@ -119,13 +119,13 @@ class MacroBloque(InterfazTopologia):
         return True
     
     
-    def calcular_fdt(self,tiempo=0):
+    def calcular_fdt(self,tiempo=None):
 
         return self.topologia.calcular_fdt(tiempo=tiempo)
     
     def vaciar_datos(self):
         self.topologia.vaciar_datos()
     
-    def operar_fdt(self,input,tiempo=0):
+    def operar_fdt(self,input,tiempo=None):
 
         return self.calcular_fdt(tiempo=tiempo) * input

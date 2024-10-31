@@ -158,12 +158,12 @@ class Sesion():
         
         return True
     
-    def operar_fdt(self,input,tiempo=0):
+    def operar_fdt(self,input,tiempo=None):
 
         return self.calcular_fdt(tiempo=tiempo) * input
     
 
-    def calcular_fdt_lazo_abierto(self,tiempo=0):
+    def calcular_fdt_lazo_abierto(self,tiempo=None):
 
         return self.controlador.calcular_fdt(tiempo=tiempo) * self.actuador.calcular_fdt(tiempo=tiempo) * self.proceso.calcular_fdt(tiempo=tiempo)
     
@@ -190,7 +190,7 @@ class Sesion():
     def obtener_fdt_lazo_abierto_latex_tiempo(self):
         return latex(self.obtener_fdt_lazo_abierto_simpy_tiempo())
         
-    def calcular_fdt_realimentacion(self,tiempo=0):
+    def calcular_fdt_realimentacion(self,tiempo=None):
 
         return self.medidor.calcular_fdt(tiempo=tiempo)
     
@@ -246,7 +246,7 @@ class Sesion():
 
         return latex(self.obtener_fdt_global_tiempo())
     
-    def calcular_fdt_con_entrada(self,tiempo=0):
+    def calcular_fdt_con_entrada(self,tiempo=None):
 
         return self.calcular_fdt_global(tiempo=tiempo) * self.entrada.calcular_fdt(tiempo=tiempo)
 
@@ -331,7 +331,7 @@ class Sesion():
 
         return latex(self.obtener_sistema_unitario_tiempo())
     
-    def calcular_calculo_error_en_estado_estable(self,tiempo=0):
+    def calcular_calculo_error_en_estado_estable(self,tiempo=None):
 
         return s*self.entrada.calcular_fdt(tiempo=tiempo)*(1/(1+self.calcular_abierta_si_unitario()))
     
@@ -343,7 +343,7 @@ class Sesion():
 
         return latex(self.calcular_calculo_error_en_estado_estable())
     
-    def calcular_calculo_error_en_estado_estable_tiempo_previo(self,tiempo=0):
+    def calcular_calculo_error_en_estado_estable_tiempo_previo(self,tiempo=None):
 
         return simplify(self.entrada.calcular_fdt(tiempo=tiempo)*self.obtener_sistema_unitario_simpy())
     

@@ -196,7 +196,7 @@ class TopologiaSerie(InterfazTopologia):
         return True
 
 
-    def calcular_fdt(self,tiempo=0):
+    def calcular_fdt(self,tiempo=None):
 
         fdt = 1
 
@@ -206,7 +206,7 @@ class TopologiaSerie(InterfazTopologia):
     
 
     
-    def operar_fdt(self,input,tiempo=0):
+    def operar_fdt(self,input,tiempo=None):
 
         return self.calcular_fdt(tiempo=tiempo) + input
     
@@ -337,7 +337,7 @@ class TopologiaParalelo(InterfazTopologia):
     
 
     
-    def calcular_fdt(self,tiempo=0):
+    def calcular_fdt(self,tiempo=None):
 
         fdt = 0
 
@@ -346,7 +346,7 @@ class TopologiaParalelo(InterfazTopologia):
         return fdt
     
     
-    def operar_fdt(self,input,tiempo=0):
+    def operar_fdt(self,input,tiempo=None):
 
         return self.calcular_fdt(tiempo=tiempo) * input
     

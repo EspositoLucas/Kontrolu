@@ -67,15 +67,15 @@ class InterfazTopologia():
     def simular(self, tiempo, delta, entrada=None)->float:
         pass
 
-    def calcular_fdt(self,tiempo=0):
+    def calcular_fdt(self,tiempo=None):
 
         pass
     
-    def obtener_fdt_simpy(self,tiempo=0):
+    def obtener_fdt_simpy(self,tiempo=None):
 
         return simplify(self.calcular_fdt(tiempo=tiempo))
     
-    def obtener_fdt_latex(self,tiempo=0):
+    def obtener_fdt_latex(self,tiempo=None):
 
         return latex(self.obtener_fdt_simpy(tiempo))
     
