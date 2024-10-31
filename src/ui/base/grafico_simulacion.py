@@ -467,8 +467,12 @@ class InterpretacionDatos(QDialog):
     def analizar_control(self, datos):
         # Implementa lógica para determinar si hubo control efectivo
         # Por ejemplo, comparando el error inicial con el error final
-        error_inicial = abs(datos['error'][0])
-        error_final = abs(datos['error'][-1])
+        try:
+            error_inicial = abs(datos['error'][0])
+            error_final = abs(datos['error'][-1])
+        except KeyError:
+            error_inicial = abs(datos['error_real'][0])
+            error_final = abs(datos['error_real'][-1])
         return error_final < error_inicial / 2  # Control efectivo si el error se reduce a la mitad
     
     def analizar_cambios_bruscos(self, datos):

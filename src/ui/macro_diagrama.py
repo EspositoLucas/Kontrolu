@@ -247,8 +247,7 @@ class MacroDiagrama(QGraphicsView):
         self.sesion.nombre = new_title  # Actualizar el nombre en self.modelo
         current_pos = self.title_item.pos()
         text_rect = self.title_item.boundingRect()
-        new_x = current_pos.x() + (text_rect.width() / 2) - (self.title_item.boundingRect().width() / 2)
-        
+        new_x = self.X_MEDIO - (text_rect.width() / 2)
         self.title_item.setPos(new_x, current_pos.y())
         self.title_item.clearFocus()
         cursor = self.title_item.textCursor()

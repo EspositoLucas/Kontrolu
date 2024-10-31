@@ -42,6 +42,7 @@ estados = [
 class Carga(Hoja):
     def __init__(self,funcion_transferencia="",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None,from_json= None):
         super().__init__(nombre=nombre, funcion_transferencia=funcion_transferencia)
+        self.datos = {'tiempo': [], 'estado': [], 'carga': []}
         if from_json:
             self.from_json(from_json)
             return
@@ -54,7 +55,6 @@ class Carga(Hoja):
         self.estados = estados
         self.errores = 0
         self.total = 0
-        self.datos = {'tiempo': [], 'estado': [], 'carga': []}
     
     
     def sigmoide(self,x, x_min, x_max):
