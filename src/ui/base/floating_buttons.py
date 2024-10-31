@@ -35,9 +35,3 @@ class FloatingButtons(QtWidgets.QGraphicsView):
         self.scene.addItem(copy_button)
         self.help_button = QGraphicCircleItem(RADIO_C*15, y, RADIO_C, 'fa5s.question-circle', self.padre.show_help, self,message='Ayuda')
         self.scene.addItem(self.help_button)
-        copy_button = QGraphicCircleItem(RADIO_C*15, y, RADIO_C, 
-                                    'fa5s.copy', 
-                                    self.padre.copy_image,
-                                    self, 
-                                    message="Copiar y guardar diagrama")
-        self.scene.addItem(copy_button)
