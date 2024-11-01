@@ -388,15 +388,15 @@ class InterpretacionDatos(QDialog):
         
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path,'imgs', 'logo.png')
+        image_path = os.path.join(path, 'imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QtGui.QIcon(icon))
-
-
+        
+        # Configuración del layout
+        layout = QVBoxLayout()
         
         # Personalizar el QTextEdit
-        layout = QVBoxLayout()
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)
         self.text_edit.setStyleSheet("""
@@ -411,9 +411,31 @@ class InterpretacionDatos(QDialog):
             }
         """)
         layout.addWidget(self.text_edit)
+        
+        # Botón para descargar el archivo
+        self.btn_descargar = QPushButton("Descargar como TXT")
+        self.btn_descargar.clicked.connect(self.descargar_archivo)
+        layout.addWidget(self.btn_descargar)
+        
+        # Botón para copiar el texto
+        self.btn_copiar = QPushButton("Copiar al portapapeles")
+        self.btn_copiar.clicked.connect(self.copiar_al_portapapeles)
+        layout.addWidget(self.btn_copiar)
+        
         self.setLayout(layout)
-
+        
         self.interpretar_datos(datos)
+
+    def descargar_archivo(self):
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getSaveFileName(self, "Guardar Interpretación como", "", "Archivos de Texto (*.txt)", options=options)
+        if file_path:
+            with open(file_path, 'w') as file:
+                file.write(self.text_edit.toPlainText())
+
+    def copiar_al_portapapeles(self):
+        clipboard = QApplication.clipboard()
+        clipboard.setText(self.text_edit.toPlainText())
     
     def obtener_nombre_estado(self, prioridad):
         estados = {
