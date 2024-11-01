@@ -88,3 +88,6 @@ class InterfazTopologia():
     def operar_fdt(self,input,tiempo):
 
         pass
+
+    def calcular_indice_de_error(self):
+        pass

@@ -146,3 +146,6 @@ class Hoja(InterfazTopologia):
 
     def get_funcion_transferencia(self):
         return self.funcion_transferencia
+    
+    def calcular_indice_de_error(self):
+        pass

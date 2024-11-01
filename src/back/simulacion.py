@@ -212,6 +212,7 @@ class Simulacion(QObject):
             event.ignore() 
 
     def calcular_ft_global(self):
+        self.sesion.calcular_indice_de_error()
         self.ft_controlador = self.controlador.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
         self.ft_actuador = self.actuador.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)
         self.ft_proceso = self.proceso.obtener_fdt_simpy(tiempo=self.paso_actual*self.delta)

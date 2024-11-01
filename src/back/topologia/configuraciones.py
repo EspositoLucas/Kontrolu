@@ -11,6 +11,7 @@ class TipoError(Enum):
 class Configuracion:
     def __init__(self, nombre="Configuración", limite_inferior=-inf, limite_superior=inf, limite_por_ciclo=inf, error_maximo=inf, proporcion=0, tipo=TipoError.NINGUNO, ultimo_valor=0, probabilidad=1, unidad="V",from_json=None):
         self.datos = {'tiempo': [], 'valor_original': [], 'error_base': [], 'error_limite': [], 'error_total': [], 'resultado': []}
+        self.indice_de_error = 1
         if from_json:
             self.from_json(from_json)
             return
@@ -225,3 +226,35 @@ class Configuracion:
             raise Exception("La unidad debe ser un string")
         
         return True
+    
+
+
+    def calcular_indice_de_error(self):
+
+        probabilidad = np.random.uniform(0, 1)
+
+        if probabilidad > self.probabilidad:
+            self.indice_de_error = 1
+        elif self.tipo == TipoError.NINGUNO:
+            print("No hay error")
+            self.indice_de_error =  1
+        elif self.tipo == TipoError.PROPORCIONAL:
+            print("Error proporcional")
+            self.indice_de_error = 1 - self.proporcion
+        elif self.tipo == TipoError.ALEATORIO:
+            print("Error aleatorio")
+            self.indice_de_error = np.random.uniform(1 - self.proporcion,1+self.proporcion)
+        elif self.tipo == TipoError.GAUSS:
+            print("Error gaussiano")
+            self.indice_de_error = np.random.normal(1, self.proporcion)
+        else:
+            print("Error no definido")
+            self.indice_de_error = 1
+        
+        return self.indice_de_error
+
+
+
+    
+    def get_indice_de_error(self):
+        return self.indice_de_error

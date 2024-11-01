@@ -129,3 +129,6 @@ class MacroBloque(InterfazTopologia):
     def operar_fdt(self,input,tiempo=None):
 
         return self.calcular_fdt(tiempo=tiempo) * input
+    
+    def calcular_indice_de_error(self):
+        self.topologia.calcular_indice_de_error()

@@ -180,8 +180,19 @@ class MicroBloque(Hoja):
         
         return True
     
+    def calcular_indice_de_error(self):
+        print("DEBO CALCULAR EL INDICE DE ERROR")
+        self.configuracion_entrada.calcular_indice_de_error()
+        self.configuracion_salida.calcular_indice_de_error()
 
 
     def operar_fdt(self,input,tiempo=None):
 
-        return self.calcular_fdt(tiempo=tiempo) * input
+        if tiempo != None:
+            entrada = self.configuracion_entrada.get_indice_de_error()
+            salida = self.configuracion_salida.get_indice_de_error()
+            print(f"Entrada INDICE: {entrada}")	
+            print(f"Salida INDICE: {salida}")
+            return (entrada * self.calcular_fdt(tiempo=tiempo) * salida) * input
+        
+        return self.calcular_fdt() * input

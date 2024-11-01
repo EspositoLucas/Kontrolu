@@ -214,6 +214,10 @@ class TopologiaSerie(InterfazTopologia):
         for hijo in self.hijos:
             hijo.vaciar_datos()
 
+    def calcular_indice_de_error(self):
+        for hijo in self.hijos:
+            hijo.calcular_indice_de_error()
+
     
 
 class TopologiaParalelo(InterfazTopologia):
@@ -353,3 +357,7 @@ class TopologiaParalelo(InterfazTopologia):
     def vaciar_datos(self):
         for hijo in self.hijos:
             hijo.vaciar_datos()
+
+    def calcular_indice_de_error(self):
+        for hijo in self.hijos:
+            hijo.calcular_indice_de_error()

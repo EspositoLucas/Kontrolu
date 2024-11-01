@@ -384,4 +384,9 @@ class Sesion():
         abierta_si_unitario_latex = latex(abierta_si_unitario)
 
         return con_entrada,con_entrada_latex,total_sympy,total_latex,global_sympy,global_latex,abierta_si_unitario,abierta_si_unitario_latex
-
+    
+    def calcular_indice_de_error(self):
+        self.medidor.calcular_indice_de_error()
+        self.actuador.calcular_indice_de_error()
+        self.controlador.calcular_indice_de_error()
+        self.proceso.calcular_indice_de_error()
