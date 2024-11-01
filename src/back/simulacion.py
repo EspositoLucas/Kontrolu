@@ -46,7 +46,7 @@ class Simulacion(QObject):
         self.t_total = sesion.tiempo_total
         self.ciclos = self.t_total/self.delta
         self.salida_cero = sesion.salida_inicial
-        self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'carga': [], 'medidor': [], 'controlador': [], 'actuador': [], 'error_real': [], 'error_medido': []}
+        self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'carga': [],'medidor': [], 'controlador': [], 'actuador': [], 'proceso':[],'error_real': [], 'error_medido': []}
         self.graficadora = graficadora
         self.graficadora.add_simulacion(self)
         self.continuar_simulacion = True
@@ -87,7 +87,7 @@ class Simulacion(QObject):
         print(f"Histórico de entradas: {self.datos['entrada']}")
 
         error = y_entrada - y_medidor        
-        self.datos['error'].append(error)
+        self.datos['error_real'].append(error)
         
         # Simula cada componente del sistema en secuencia
         # Cada componente recibe el mismo vector de tiempo
@@ -114,7 +114,7 @@ class Simulacion(QObject):
             'proceso': y_proceso,
             'medidor': y_medidor,
             'entrada': y_entrada,
-            'error': error,
+            'error_real': error,
             'salida': y_proceso,
             'carga': estado_carga  # Añadimos el estado de la carga
         }
@@ -338,6 +338,20 @@ class Simulacion(QObject):
         self.H_actuador = ctrl.tf(num_coef, den_coef) * static_gain
         self.system_ss_actuador = ctrl.tf2ss(self.H_actuador)
         self.system_d_actuador = ctrl.sample_system(self.system_ss_actuador, self.delta, method='zoh')
+
+        numerador,denominador = self.ft_proceso.as_numer_denom()
+        num_coef = numerador.as_poly(s).all_coeffs()
+        den_coef = denominador.as_poly(s).all_coeffs()
+        num_coef = [float(x) for x in num_coef]
+        den_coef = [float(x) for x in den_coef]
+        static_gain = 1.0
+
+        if self.is_improper_tf(num_coef, den_coef):
+            num_coef, den_coef, static_gain = self.preprocess_tf(num_coef, den_coef)
+            
+        self.H_proceso = ctrl.tf(num_coef, den_coef) * static_gain
+        self.system_ss_proceso = ctrl.tf2ss(self.H_proceso)
+        self.system_d_proceso = ctrl.sample_system(self.system_ss_proceso, self.delta, method='zoh')
         
         
   
@@ -389,12 +403,33 @@ class Simulacion(QObject):
             self.x_controlador = np.dot(self.system_d_controlador.A, self.x_controlador) + np.dot(self.system_d_controlador.B, error)
             y_controlador = np.dot(self.system_d_controlador.C, self.x_controlador) + np.dot(self.system_d_controlador.D, error)
 
+            y_controlador_nuevo = y_controlador[0, 0] - self.y_controlador_acumulado
+
+            self.y_controlador_acumulado = y_controlador[0, 0]
+
             # Verificar dimensiones antes de realizar operaciones
             if self.x_actuador.shape[0] != self.system_d_actuador.A.shape[0]:
                 self.x_actuador = self.redimensionar_estado(self.system_d_actuador.A.shape[0], self.x_actuador)
             
-            self.x_actuador = np.dot(self.system_d_actuador.A, self.x_actuador) + np.dot(self.system_d_actuador.B, y_controlador)
-            y_actuador = np.dot(self.system_d_actuador.C, self.x_actuador) + np.dot(self.system_d_actuador.D, y_controlador)
+            self.x_actuador = np.dot(self.system_d_actuador.A, self.x_actuador) + np.dot(self.system_d_actuador.B, y_controlador[0,0])
+            y_actuador = np.dot(self.system_d_actuador.C, self.x_actuador) + np.dot(self.system_d_actuador.D, y_controlador[0,0])
+
+            y_actuador_nuevo = y_actuador[0, 0] - self.y_actuador_acumulado
+
+            self.y_actuador_acumulado = y_actuador[0, 0]
+
+            # Verificar dimensiones antes de realizar operaciones
+            if self.x_proceso.shape[0] != self.system_d_proceso.A.shape[0]:
+                self.x_proceso = self.redimensionar_estado(self.system_d_proceso.A.shape[0], self.x_proceso)
+
+            self.x_proceso = np.dot(self.system_d_proceso.A, self.x_proceso) + np.dot(self.system_d_proceso.B, y_actuador[0,0])
+            y_proceso = np.dot(self.system_d_proceso.C, self.x_proceso) + np.dot(self.system_d_proceso.D, y_actuador[0,0])
+
+            y_proceso_nuevo = y_proceso[0, 0] - self.y_proceso_acumulado
+            
+            self.y_proceso_acumulado = y_proceso[0, 0]
+            
+
 
 
             
@@ -408,8 +443,9 @@ class Simulacion(QObject):
             self.datos['error_real'].append(u - y[0, 0])
             self.datos['error_medido'].append(error)
             self.datos['medidor'].append(y_medidor[0, 0])
-            self.datos['controlador'].append(y_controlador[0, 0])
-            self.datos['actuador'].append(y_actuador[0, 0])
+            self.datos['controlador'].append(y_controlador)
+            self.datos['actuador'].append(y_actuador)
+            self.datos['proceso'].append(y_proceso)
             
             datos_paso = {
                 'tiempo': tiempo,
@@ -419,8 +455,9 @@ class Simulacion(QObject):
                 'error_medido': error,
                 'carga': estado_carga,
                 'medidor': y_medidor[0, 0],
-                'controlador': y_controlador[0, 0],
-                'actuador': y_actuador[0, 0]
+                'controlador': y_controlador_nuevo,
+                'actuador': y_actuador_nuevo,
+                'proceso': y_proceso_nuevo
             }
 
             if self.graficadora:
@@ -447,6 +484,12 @@ class Simulacion(QObject):
 
     
     def simular_sistema_completo(self):
+
+        self.y_controlador_acumulado = 0
+        self.y_actuador_acumulado = 0
+        self.y_proceso_acumulado = 0
+
+
         ft_global = self.calcular_ft_global()
         # Guardar el estado anterior si existe
         estado_anterior = self.x if hasattr(self, 'x') else None
@@ -461,6 +504,9 @@ class Simulacion(QObject):
         estado_actuador_anterior = self.x_actuador if hasattr(self, 'x_actuador') else None
         tam_actuador_anterior = estado_actuador_anterior.shape[0] if estado_actuador_anterior is not None else 0
 
+        estado_proceso_anterior = self.x_proceso if hasattr(self, 'x_proceso') else None
+        tam_proceso_anterior = estado_proceso_anterior.shape[0] if estado_proceso_anterior is not None else 0
+
 
         
         # Crear el nuevo sistema
@@ -469,6 +515,7 @@ class Simulacion(QObject):
         nuevo_tam_medidor = self.system_d_medidor.A.shape[0]
         nuevo_tam_controlador = self.system_d_controlador.A.shape[0]
         nuevo_tam_actuador = self.system_d_actuador.A.shape[0]
+        nuevo_tam_proceso = self.system_d_proceso.A.shape[0]
         
         # Si tenemos un estado anterior y las dimensiones cambiaron
         if estado_anterior is not None and tam_anterior != nuevo_tam:
@@ -498,9 +545,16 @@ class Simulacion(QObject):
         else:
             # Primera inicialización
             self.x_actuador = np.zeros((nuevo_tam_actuador, 1))
+
+        if estado_proceso_anterior is not None and tam_proceso_anterior != nuevo_tam_proceso:
+            self.x_proceso = self.redimensionar_estado(nuevo_tam_proceso, estado_proceso_anterior)
+            print(f"Sistema redimensionado: {tam_proceso_anterior} -> {nuevo_tam_proceso} estados")
+        else:
+            # Primera inicialización
+            self.x_proceso = np.zeros((nuevo_tam_proceso, 1))
             
         if not hasattr(self, 'datos'):
-            self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'carga': [], 'medidor': [], 'controlador': [], 'actuador': [], 'error_real': [], 'error_medido': []}
+            self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'carga': [], 'medidor': [], 'controlador': [], 'proceso':[], 'actuador': [], 'error_real': [], 'error_medido': []}
         
         self.paso_actual = len(self.datos['tiempo'])  # Mantener el paso actual basado en los datos
 
@@ -517,7 +571,7 @@ class Simulacion(QObject):
     def simular_sistema_tiempo_real(self):
         self.paso_actual = 1  # Reiniciar el contador de pasos
         self.y_salida = self.salida_cero  # Reiniciar el valor de salida
-        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
+        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error_real': [], 'salida': [], 'carga': []}
 
     
     def detener_simulacion(self):
