@@ -166,7 +166,7 @@ class SVGViewError(QGraphicsSvgItem):
             return
         
         dialog = QDialog()
-        dialog.setWindowTitle("Dominio de Laplace y Dominio de Tiempo")
+        dialog.setWindowTitle("Dominio de Laplace")
         dialog.setStyleSheet(ESTILO)
         dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
@@ -249,19 +249,17 @@ class SVGViewError(QGraphicsSvgItem):
         
         contenido = [
             ("<b>Visualización del Error en Estado Estable:</b>",
-         "Esta ventana permite analizar el error en estado estable del sistema de control a través de diferentes representaciones, tanto en el dominio de Laplace como en el dominio del tiempo."),
+         "Esta ventana permite analizar el error en estado estable del sistema de control en el dominio de Laplace."),
         
         ("<b>Representaciones Disponibles:</b>",
          "<ul>"
          "<li><b>e_ss:</b> Error en estado estable en el dominio de Laplace</li>"
          "<li><b>lim_{s->0} (G(s)):</b> Representación algebraica del error en estado estable en Laplace</li>"
-         "<li><b>lim_{t->inf} (g(t)):</b> Representación de la respuesta temporal del error en estado estable</li>"
          "</ul>"),
         
         ("<b>Interpretación de Gráficos:</b>",
          "<ul>"
          "<li><b>Dominio de Laplace:</b> Muestra el valor del error en estado estable y su cálculo algebraico</li>"
-         "<li><b>Dominio del Tiempo:</b> Muestra la evolución temporal del error en estado estable</li>"
          "</ul>"),
         
         ("<b>Navegación e Interacción:</b>",
@@ -275,7 +273,6 @@ class SVGViewError(QGraphicsSvgItem):
          "<ul>"
          "<li><b>Valor Numérico:</b> Consultar el valor exacto del error en estado estable</li>"
          "<li><b>Cálculo Algebraico:</b> Examinar la expresión matemática que define el error</li>"
-         "<li><b>Comportamiento Temporal:</b> Observar la evolución del error a lo largo del tiempo</li>"
          "</ul>")
         ]
         

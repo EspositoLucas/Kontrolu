@@ -9,7 +9,10 @@ from matplotlib.figure import Figure
 from back.estabilidad import Estabilidad
 from tbcontrol.symbolic import routh
 import numpy as np
+import os
+from PyQt5 import QtGui
 from sympy import latex
+from PyQt5 import QtWidgets
 
 
 VERDE = QColor("#55AA55")
@@ -45,9 +48,6 @@ class EstabilidadTexto(QGraphicsTextItem):
         self.setFont(font)
 
         self.setAcceptHoverEvents(True)
-
-
-
     
     def mousePressEvent(self, event):
 
@@ -58,8 +58,6 @@ class EstabilidadTexto(QGraphicsTextItem):
 
         # Llamar al método base para manejar otros eventos
         super().mousePressEvent(event)
-
-        
 
 
     def update_text(self):
@@ -124,6 +122,13 @@ class EstabilidadDialog(QDialog):
         # Crear el layout principal
         layout = QVBoxLayout()
         
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path,'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(QtGui.QIcon(icon))
+        
         # Crear label para mostrar el estado de estabilidad
         self.estado_label = QLabel()
         self.estado_label.setAlignment(Qt.AlignCenter)
@@ -167,8 +172,105 @@ class EstabilidadDialog(QDialog):
         layout.addWidget(tab_widget)
         self.setLayout(layout)
         
+        # Agregar el botón de ayuda
+        self.agregar_boton_ayuda()
+        
         # Llenar los datos
         self.actualizar_datos()
+    
+    def agregar_boton_ayuda(self):
+        """Agrega el botón de ayuda a la ventana"""
+        help_button = QtWidgets.QPushButton("?", self)
+        help_button.setFixedSize(30, 30)
+        help_button.setStyleSheet("""
+            QPushButton {
+                border-radius: 15px;
+                background-color: #808080;
+                color: white;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #606060;
+            }
+        """)
+        help_button.clicked.connect(self.mostrar_ayuda)
+        # Posicionar el botón en la esquina superior derecha
+        help_button.move(self.width() - 40, 10)
+
+    def mostrar_ayuda(self):
+        """Muestra el diálogo de ayuda con explicaciones sobre el análisis de estabilidad"""
+        help_dialog = QtWidgets.QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Análisis de Estabilidad")
+        help_dialog.setStyleSheet(ESTILO)
+        help_dialog.setMinimumWidth(600)
+        layout = QtWidgets.QVBoxLayout()
+        
+        # Título principal
+        titulo = QtWidgets.QLabel("Guía de Análisis de Estabilidad")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+        
+        # Contenido organizado en secciones
+        contenido = [
+            ("<b>¿Qué es la estabilidad de un sistema?</b>", 
+            "La estabilidad es una característica fundamental que determina si un sistema de control "
+            "mantendrá un comportamiento acotado ante entradas acotadas. Un sistema estable retornará "
+            "a su estado de equilibrio después de una perturbación."),
+            
+            ("<b>Tabla de Routh:</b>",
+            "<ul>"
+            "<li><b>¿Qué es?</b> Es un método matemático para determinar la estabilidad sin calcular las raíces del sistema</li>"
+            "<li><b>Interpretación:</b> Si no hay cambios de signo en la primera columna, el sistema es estable</li>"
+            "<li><b>Coeficientes:</b> Cada fila representa los coeficientes del polinomio característico</li>"
+            "<li><b>Grados:</b> Los grados 's' en la columna izquierda indican el orden de cada fila</li>"
+            "</ul>"),
+            
+            ("<b>Diagrama de Polos y Ceros:</b>",
+            "<ul>"
+            "<li><b>Polos (X):</b> Raíces del denominador de la función de transferencia</li>"
+            "<li><b>Ceros (O):</b> Raíces del numerador de la función de transferencia</li>"
+            "<li><b>Región Estable:</b> Lado izquierdo del plano complejo (parte real negativa)</li>"
+            "<li><b>Región Inestable:</b> Lado derecho del plano complejo (parte real positiva)</li>"
+            "</ul>"),
+            
+            ("<b>Interpretación de Resultados:</b>",
+            "<ul>"
+            "<li><b>Sistema Estable:</b> Todos los polos están en el lado izquierdo del plano</li>"
+            "<li><b>Sistema Inestable:</b> Uno o más polos están en el lado derecho del plano</li>"
+            "<li><b>Sistema Críticamente Estable:</b> Uno o más polos están sobre el eje imaginario</li>"
+            "</ul>")
+        ]
+        
+        for titulo, texto in contenido:
+            seccion = QtWidgets.QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 5px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+        
+        # Botón de cerrar
+        cerrar_btn = QtWidgets.QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+        
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
 
     def actualizar_estado_label(self):
         """Actualiza el estilo y texto del label según el estado de estabilidad"""
