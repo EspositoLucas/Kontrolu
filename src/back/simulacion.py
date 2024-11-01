@@ -46,7 +46,7 @@ class Simulacion(QObject):
         self.t_total = sesion.tiempo_total
         self.ciclos = self.t_total/self.delta
         self.salida_cero = sesion.salida_inicial
-        self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'carga': [], 'medidor': [], 'controlador': [], 'actuador': [], 'error_real': [], 'error_medido': []}
+        self.datos = {'tiempo': [], 'entrada': [], 'salida': [], 'carga': [],'medidor': [], 'controlador': [], 'actuador': [], 'proceso':[],'error_real': [], 'error_medido': []}
         self.graficadora = graficadora
         self.graficadora.add_simulacion(self)
         self.continuar_simulacion = True
