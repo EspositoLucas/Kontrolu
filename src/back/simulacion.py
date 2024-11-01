@@ -87,7 +87,7 @@ class Simulacion(QObject):
         print(f"Histórico de entradas: {self.datos['entrada']}")
 
         error = y_entrada - y_medidor        
-        self.datos['error'].append(error)
+        self.datos['error_real'].append(error)
         
         # Simula cada componente del sistema en secuencia
         # Cada componente recibe el mismo vector de tiempo
@@ -114,7 +114,7 @@ class Simulacion(QObject):
             'proceso': y_proceso,
             'medidor': y_medidor,
             'entrada': y_entrada,
-            'error': error,
+            'error_real': error,
             'salida': y_proceso,
             'carga': estado_carga  # Añadimos el estado de la carga
         }
@@ -571,7 +571,7 @@ class Simulacion(QObject):
     def simular_sistema_tiempo_real(self):
         self.paso_actual = 1  # Reiniciar el contador de pasos
         self.y_salida = self.salida_cero  # Reiniciar el valor de salida
-        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error': [], 'salida': [], 'carga': []}
+        self.datos = {'tiempo': [], 'controlador': [], 'actuador': [], 'proceso': [], 'medidor': [], 'entrada': [], 'error_real': [], 'salida': [], 'carga': []}
 
     
     def detener_simulacion(self):
