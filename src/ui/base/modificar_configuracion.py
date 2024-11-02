@@ -44,31 +44,39 @@ class ModificarConfiguracion(QDialog):
 
         # Contenido específico de configuraciones
         contenido = [
-            ("<b>Configuraciones de Entrada/Salida:</b>",
+            ("<b>Configuraciones Activas:</b>",
             "<ul>"
-            "<li><b>Nombre de entrada/salida:</b> Identifica las variables de entrada y salida</li>"
-            "<li><b>Unidades:</b> Especifica las unidades físicas de las variables</li>"
-            "<li><b>Configuración avanzada:</b> Permite ajustar parámetros específicos mediante los botones 'Configurar'</li>"
+            "<li><b>Proporción:</b> Factor de escala estático aplicado al error. Si se marca 'Default', se usa 1 como valor predeterminado.</li>"
+            "<li><b>Probabilidad:</b> Factor que influye en la generación del error estocástico (para tipos Gauss y Aleatorio). Si se marca 'Default', se usa 1 como valor predeterminado.</li>"
+            "<li><b>Tipo de error:</b> Define cómo se aplica el error en la simulación:"
+            "<ul>"
+            "<li>Ninguno: Error estático basado solo en la proporción</li>"
+            "<li>Gauss: Error estocástico con distribución gaussiana</li>"
+            "<li>Aleatorio: Error estocástico con distribución uniforme</li>"
+            "</ul></li>"
             "</ul>"),
             
-            ("<b>Configuración Avanzada:</b>",
+            ("<b>Modo de Simulación:</b>",
             "<ul>"
-            "<li><b>Límite inferior:</b> Define el valor mínimo permitido para la variable. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
-            "<li><b>Límite superior:</b> Define el valor máximo permitido para la variable. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
-            "<li><b>Límite por ciclo:</b> Establece la máxima variación permitida por ciclo de simulación. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
-            "<li><b>Error máximo:</b> Define la tolerancia máxima de error permitida en los cálculos. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
-            "<li><b>Proporción:</b> Factor de escala aplicado a los valores. Si se marca 'Default', se usa 1 como valor predeterminado.</li>"
-            "<li><b>Último valor:</b> Almacena el último valor calculado para la variable. Si se marca 'Default', se usa 0 como valor predeterminado.</li>"
-            "<li><b>Probabilidad:</b> Define la probabilidad de ocurrencia de ciertos eventos en la simulación. Si se marca 'Default', se usa 1 como valor predeterminado.</li>"
-            "<li><b>Tipo de error:</b> Especifica cómo se manejan y calculan los errores en la simulación. Puede seleccionarse de una lista predefinida de tipos de error.</li>"
+            "<li><b>Simulación Normal:</b> Modo estándar más rápido pero menos preciso. Los errores se calculan y aplican según las configuraciones anteriores.</li>"
+            "<li><b>Simulación Precisa:</b> Modo optimizado que ofrece mayor precisión en aspectos derivativos del control, sin necesidad de configuraciones adicionales de error.</li>"
+            "</ul>"),
+            
+            ("<b>Campos Informativos:</b>",
+            "<ul>"
+            "<li>Los siguientes campos se mantienen por compatibilidad con la simulación normal y actualmente son solo informativos:</li>"
+            "<li>- Límite inferior</li>"
+            "<li>- Límite superior</li>"
+            "<li>- Límite por ciclo</li>"
+            "<li>- Error máximo</li>"
+            "<li>- Último valor</li>"
             "</ul>"
             "<br>"
             "<b>Notas importantes:</b>"
             "<ul>"
-            "<li>Cada parámetro puede configurarse con un valor específico o usar su valor predeterminado mediante la casilla 'Default'.</li>"
-            "<li>Los valores numéricos deben ser válidos para evitar errores en la configuración.</li>"
-            "<li>La interfaz proporciona validación para asegurar que solo se ingresen valores numéricos válidos.</li>"
-            "<li>Los cambios se aplican al presionar el botón 'Guardar cambios' y solo se guardarán si todos los valores son válidos.</li>"
+            "<li>Los errores se calculan y aplican una vez por ciclo de simulación</li>"
+            "<li>El error se multiplica tanto a la entrada como a la salida de cada función de transferencia</li>"
+            "<li>En la simulación precisa, estas configuraciones de error tienen un impacto reducido ya que el sistema prioriza la precisión matemática</li>"
             "</ul>")
         ]
 

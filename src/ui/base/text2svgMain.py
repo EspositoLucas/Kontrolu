@@ -164,7 +164,7 @@ class SVGView(QGraphicsSvgItem):
 
     def open_graph_window(self, cual):
         dialog = QDialog()
-        dialog.setWindowTitle("Dominio de Laplace y Dominio de Tiempo")
+        dialog.setWindowTitle("Dominio de Laplace")
         dialog.setStyleSheet(ESTILO)
         dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
@@ -248,22 +248,19 @@ class SVGView(QGraphicsSvgItem):
         contenido = [
             ("<b>Visualización del Sistema:</b>", 
             "Esta ventana permite analizar el sistema de control de múltiples formas, mostrando diferentes representaciones "
-            "tanto en el dominio de Laplace como en el dominio del tiempo."),
+            "en el dominio de Laplace."),
             
             ("<b>Representaciones Disponibles:</b>",
             "<ul>"
             "<li><b>Y(s):</b> Salida del sistema en el dominio de Laplace</li>"
-            "<li><b>y(t):</b> Salida del sistema en el dominio del tiempo</li>"
             "<li><b>Y(s)/R(s):</b> Función de transferencia total del sistema en Laplace</li>"
-            "<li><b>y(t)/r(t):</b> Relación entrada-salida en el dominio del tiempo</li>"
             "<li><b>G(s):</b> Función de transferencia global en Laplace</li>"
-            "<li><b>g(t):</b> Respuesta al impulso del sistema</li>"
+            "<li><b>G_{0}(s):</b> Función de transferencia total unitaria en Laplace</li>"
             "</ul>"),
             
             ("<b>Interpretación de Gráficos:</b>",
             "<ul>"
             "<li><b>Dominio de Laplace:</b> Muestra la magnitud de la función vs. la frecuencia</li>"
-            "<li><b>Dominio del Tiempo:</b> Muestra la evolución temporal de la señal</li>"
             "<li><b>Ejes:</b> Las unidades dependen de la magnitud física representada</li>"
             "<li><b>Cuadrícula:</b> Facilita la lectura de valores específicos</li>"
             "</ul>"),
@@ -271,7 +268,7 @@ class SVGView(QGraphicsSvgItem):
             ("<b>Navegación e Interacción:</b>",
             "<ul>"
             "<li><b>Clic Derecho:</b> Cambia entre las diferentes representaciones en el siguiente orden:"
-            "<br>Y(s) → y(t) → Y(s)/R(s) → y(t)/r(t) → G(s) → g(t)</li>"
+            "<br>Y(s) → Y(s)/R(s) → G(s) → G_{0}(s)"
             "<li><b>Clic Izquierdo:</b> Abre la ventana de gráficos detallados</li>"
             "<li><b>Pestañas:</b> Permiten alternar entre diferentes vistas del sistema</li>"
             "</ul>"),
@@ -279,7 +276,6 @@ class SVGView(QGraphicsSvgItem):
             ("<b>Análisis del Sistema:</b>",
             "<ul>"
             "<li><b>Respuesta en Frecuencia:</b> Analizar G(s) para entender el comportamiento frecuencial</li>"
-            "<li><b>Respuesta Temporal:</b> Examinar g(t) para ver la respuesta al impulso</li>"
             "<li><b>Relación E/S:</b> Y(s)/R(s) muestra cómo el sistema procesa la entrada</li>"
             "</ul>")
         ]

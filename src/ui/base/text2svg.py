@@ -159,7 +159,7 @@ class SVGView(QGraphicsSvgItem):
     def open_graph_window(self, cual):
         
         dialog = QDialog()
-        dialog.setWindowTitle("Dominio de Laplace y Dominio de Tiempo")
+        dialog.setWindowTitle("Dominio de Laplace")
         dialog.setStyleSheet(ESTILO)
         dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
@@ -242,7 +242,7 @@ class SVGView(QGraphicsSvgItem):
         
         contenido = [
             ("<b>Visualización de Funciones:</b>", 
-            "Esta ventana permite visualizar la respuesta del sistema en dos dominios diferentes:"),
+            "Esta ventana permite visualizar la respuesta del sistema en el dominio de Laplace."),
             
             ("<b>Dominio de Laplace (F(s)):</b>",
             "<ul>"
@@ -251,16 +251,8 @@ class SVGView(QGraphicsSvgItem):
             "<li><b>Interpretación:</b> Muestra el comportamiento del sistema en el dominio de la frecuencia</li>"
             "</ul>"),
             
-            ("<b>Dominio del Tiempo (f(t)):</b>",
-            "<ul>"
-            "<li><b>Eje X:</b> Tiempo en segundos</li>"
-            "<li><b>Eje Y:</b> Amplitud de la respuesta</li>"
-            "<li><b>Interpretación:</b> Muestra la respuesta temporal del sistema</li>"
-            "</ul>"),
-            
             ("<b>Interacción:</b>",
             "<ul>"
-            "<li><b>Clic Derecho:</b> Alterna entre visualización en tiempo y Laplace</li>"
             "<li><b>Clic Izquierdo:</b> Abre la ventana de gráficos detallados</li>"
             "<li><b>Cursor:</b> El cursor cambia al pasar sobre la función indicando interactividad</li>"
             "</ul>")
