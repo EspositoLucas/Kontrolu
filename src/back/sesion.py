@@ -374,7 +374,10 @@ class Sesion():
         global_sympy = simplify(self.obtener_fdt_lazo_abierto_simpy())
         global_latex = latex(global_sympy)
 
-        total_sympy = simplify(global_sympy/(1+global_sympy*self.obtener_fdt_realimentacion_simpy()))
+        realimentacion = self.obtener_fdt_realimentacion_simpy()
+        realimentacion_latex = latex(realimentacion)
+
+        total_sympy = simplify(global_sympy/(1+global_sympy*realimentacion))
         total_latex = latex(total_sympy)
 
 
@@ -384,7 +387,7 @@ class Sesion():
         abierta_si_unitario = simplify(total_sympy/(1-total_sympy))
         abierta_si_unitario_latex = latex(abierta_si_unitario)
 
-        return con_entrada,con_entrada_latex,total_sympy,total_latex,global_sympy,global_latex,abierta_si_unitario,abierta_si_unitario_latex
+        return con_entrada,con_entrada_latex,total_sympy,total_latex,global_sympy,global_latex,abierta_si_unitario,abierta_si_unitario_latex,realimentacion,realimentacion_latex
     
     def calcular_indice_de_error(self):
         self.medidor.calcular_indice_de_error()

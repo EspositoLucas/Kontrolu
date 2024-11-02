@@ -172,28 +172,28 @@ class SVGView(QGraphicsSvgItem):
         self.graficos = []
 
 
-        self.fdt_sympy_laplace, self.fdt_latex_laplace, self.fdt_sympy_laplace_total, self.fdt_latex_laplace_total, self.fdt_sympy_global_laplace, self.fdt_latex_global_laplace, self.fdt_sympy_global_unitaria, self.fdt_latex_global_unitaria = self.macro.obtener_fdts()
+        self.fdt_sympy_laplace, self.fdt_latex_laplace, self.fdt_sympy_laplace_total, self.fdt_latex_laplace_total, self.fdt_sympy_global_laplace, self.fdt_latex_global_laplace, self.fdt_sympy_global_unitaria, self.fdt_latex_global_unitaria, self.realimentacion, self.realimentacion_latex  = self.macro.obtener_fdts()
         
         
-        self.laplace = "Y(s) = " + self.fdt_latex_laplace
+        self.laplace = "\\theta_{o}(s) = " + self.fdt_latex_laplace
         bytess_laplace = self.tex2svg(self.laplace)
         self.renderer_laplace = QSvgRenderer(bytess_laplace)
         self.funciones.append(self.renderer_laplace)
-        self.graficos.append((self.fdt_sympy_laplace,True,"Y(s)"))
+        self.graficos.append((self.fdt_sympy_laplace,True,"\\theta_{o}(s)"))
 
         
-        self.total_laplace = "\\frac{Y(s)}{R(s)} = " + self.fdt_latex_laplace_total
+        self.total_laplace = "G_{g}(s) = " + self.fdt_latex_laplace_total
         bytess_laplace_total = self.tex2svg(self.total_laplace)
         self.renderer_laplace_total = QSvgRenderer(bytess_laplace_total)
         self.funciones.append(self.renderer_laplace_total)
-        self.graficos.append((self.fdt_sympy_laplace_total,True,"Y(s)/R(s)"))
+        self.graficos.append((self.fdt_sympy_laplace_total,True,"G_{g}(s)"))
 
 
-        self.global_laplace = "G(s) = " + self.fdt_latex_global_laplace
+        self.global_laplace = "G_{t}(s) = " + self.fdt_latex_global_laplace
         bytess_global_laplace = self.tex2svg(self.global_laplace)
         self.renderer_global_laplace = QSvgRenderer(bytess_global_laplace)
         self.funciones.append(self.renderer_global_laplace)
-        self.graficos.append((self.fdt_sympy_global_laplace,True,"G(s)"))
+        self.graficos.append((self.fdt_sympy_global_laplace,True,"G_{t}(s)"))
 
         
         self.global_unitaria = "G_{0}(s) = " + self.fdt_latex_global_unitaria
@@ -201,6 +201,12 @@ class SVGView(QGraphicsSvgItem):
         self.renderer_global_unitaria = QSvgRenderer(bytess_global_unitaria)
         self.funciones.append(self.renderer_global_unitaria)      
         self.graficos.append((self.fdt_sympy_global_unitaria,True,"G_{0}(s)"))
+
+        self.realimentacion_latex_completa = "H(s) = " + self.realimentacion_latex
+        bytess_realimentacion = self.tex2svg(self.realimentacion_latex_completa)
+        self.renderer_realimentacion = QSvgRenderer(bytess_realimentacion)
+        self.funciones.append(self.renderer_realimentacion)      
+        self.graficos.append((self.realimentacion,True,"H(s)"))
 
         self.laplace_mode = 0
         if len(self.funciones) > 0:
