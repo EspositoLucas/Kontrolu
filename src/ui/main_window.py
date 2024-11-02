@@ -249,7 +249,7 @@ class MainWindow(QMainWindow):
             'tiempo_total': ('Tiempo total (s):', str(self.sesion.tiempo_total)),
             'salida_inicial': ('Variable a controlar en tiempo 0:', str(self.sesion.salida_inicial)),
             'delta_t': ('Muestreo de datos:', str(self.sesion.delta_t)),
-            'velocidad': ('Duración de simulación de cada ciclo (Milisegundos):', str(self.sesion.velocidad))
+            'velocidad': ('Duración del SCAN (Milisegundos):', str(self.sesion.velocidad))
         }
 
         inputs = {}
@@ -338,7 +338,7 @@ class MainWindow(QMainWindow):
             "Representa el punto de partida del sistema.</li>"
             "<li><b>Muestreo de datos:</b> Paso de tiempo entre cada cálculo de la simulación. Un valor "
             "más pequeño aumenta la precisión pero requiere más recursos computacionales.</li>"
-            "<li><b>Duración de simulación de cada ciclo:</b> Tiempo en milisegundos que tarda cada ciclo de "
+            "<li><b>Duración del SCAN:</b> Tiempo en milisegundos que tarda cada ciclo de "
             "simulación. Afecta la velocidad de visualización de la simulación.</li>"
             "</ul>"),
             
