@@ -143,6 +143,7 @@ class Simulacion(QObject):
     
     def confirmar_cierre(self, event):
         self.timer.stop()
+        self.timerStatus = self.timer.isActive()
         if self.cerrando:
             self.window.deteniendo_buttons()
             event.accept()
@@ -208,7 +209,8 @@ class Simulacion(QObject):
             self.graficadora.close()
         else:
             self.window.reanudando_buttons()
-            self.timer.start()
+            if self.timerStatus:
+                self.timer.start() 
             event.ignore() 
 
     def calcular_ft_global(self):
