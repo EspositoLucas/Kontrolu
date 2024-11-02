@@ -109,7 +109,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
 
         # Función de transferencia con editor LaTeX
         ft_layout = QtWidgets.QVBoxLayout()
-        ft_layout.addWidget(QtWidgets.QLabel("Función de transferencia:"))
+        ft_layout.addWidget(QtWidgets.QLabel("Respuesta de la entrada:"))
         # Pasar el valor inicial directamente en el constructor
         self.latex_editor = LatexEditor(self.entrada.funcion_transferencia or "")
         self.latex_editor.setEnabled(self.tipo_entrada == "Personalizada")
@@ -170,7 +170,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
              "<li><b>Nombre:</b> Identificador único para la entrada</li>"
              "<li><b>Tipo de entrada:</b> Selecciona el comportamiento de la señal</li>"
              "<li><b>Coeficiente:</b> Ajusta la magnitud de la señal (actúa como un multiplicador)</li>"
-             "<li><b>Función de transferencia:</b> Fórmula matemática que describe el comportamiento</li>"
+             "<li><b>Respuesta de la entrada:</b> Fórmula matemática que describe el comportamiento</li>"
              "</ul>"),
              
             ("<b>Editor LaTeX:</b>",
@@ -249,8 +249,8 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
     def accept(self):
         
         if not self.latex_editor.es_funcion_valida(self.latex_editor.get_latex()):
-            QMessageBox.warning(self, "Función de transferencia inválida", 
-                                "La función de transferencia no es válida. Por favor, corríjala antes de continuar.")
+            QMessageBox.warning(self, "Respuesta de la entrada inválida", 
+                                "La respuesta de la entrada no es válida. Por favor, corríjala antes de continuar.")
             return
     
         self.entrada.nombre = self.nombre_input.text()

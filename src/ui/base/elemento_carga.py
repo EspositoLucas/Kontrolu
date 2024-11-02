@@ -120,7 +120,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
 
         # Tipo de entrada
         tipo_entrada_layout = QtWidgets.QHBoxLayout()
-        tipo_entrada_layout.addWidget(QtWidgets.QLabel("Tipo de transferencia:"))
+        tipo_entrada_layout.addWidget(QtWidgets.QLabel("Entrada alternativa para el análisis:"))
         self.tipo_entrada_combo = QtWidgets.QComboBox()
         self.tipo_entrada_combo.addItems(["Misma que entrada","Personalizada", "Escalón", "Rampa", "Parabólica"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
