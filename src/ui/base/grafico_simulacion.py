@@ -14,7 +14,35 @@ from PyQt5 import QtGui
 import numpy as np
 import csv
 import os
+
 ESTILO = """
+    QCheckBox {
+        spacing: 5px;  /* Espaciado entre el cuadro y el texto */
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tamaño de fuente */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía */
+        font-weight: bold;  /* Texto en negrita */
+    }
+
+    QCheckBox::indicator {
+        width: 20px;  /* Ancho del cuadro de verificación */
+        height: 20px;  /* Alto del cuadro de verificación */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 5px;  /* Bordes redondeados */
+        background-color: #FAF8F6;  /* Color de fondo del cuadro */
+    }
+
+    QCheckBox::indicator:checked {
+        background-color: #808080;  /* Fondo gris oscuro cuando está marcado */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+    }
+
+    QCheckBox::indicator:unchecked {
+        background-color: #FAF8F6;  /* Fondo claro cuando no está marcado */
+    }
+
+
+
     QDialog {
         background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
         border-radius: 15px;  /* Bordes redondeados */
