@@ -179,7 +179,7 @@ class Carga(Hoja):
             raise Exception(f"La función de transferencia debe ser una cadena de caracteres")
 
         if datos["tipo_carga"] not in TipoCarga._value2member_map_:
-            raise Exception(f"El tipo de carga debe ser uno de los siguientes: {[e.value for e in TipoCarga]}")
+            raise Exception(f"El tipo de evaluación del rendimiento debe ser uno de los siguientes: {[e.value for e in TipoCarga]}")
 
         if not isinstance(datos["escalamiento_sigmoide"], (int, float)):
             raise Exception(f"El escalamiento sigmoide debe ser un número")

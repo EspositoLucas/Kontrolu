@@ -101,7 +101,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
 
         # Tipo de carga
         tipo_carga_layout = QtWidgets.QHBoxLayout()
-        tipo_carga_layout.addWidget(QtWidgets.QLabel("Tipo de carga:"))
+        tipo_carga_layout.addWidget(QtWidgets.QLabel("Tipo de evaluación del rendimiento:"))
         self.tipo_carga_combo = QtWidgets.QComboBox()
         self.tipo_carga_combo.addItems([tipo.value for tipo in TipoCarga])
         self.tipo_carga_combo.setCurrentText(self.carga.tipo_carga.value)
