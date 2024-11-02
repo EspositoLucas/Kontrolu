@@ -133,7 +133,7 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         <ul>
             <li><strong>Tiempo total:</strong> Duración completa de la simulación</li>
             <li><strong>Variable a controlar:</strong> El valor objetivo que deseas mantener</li>
-            <li><strong>Intervalo de tiempo:</strong> Tiempo entre cada paso de la simulación</li>
+            <li><strong>Muestreo de datos:</strong> Tiempo entre cada paso de la simulación</li>
             <li><strong>Duración de ciclos:</strong> Tiempo real que toma cada ciclo</li>
             <li><strong>Simulación Precisa:</strong> Activa un modo más preciso pero que requiere más recursos</li>
         </ul>
