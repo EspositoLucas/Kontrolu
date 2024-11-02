@@ -407,7 +407,10 @@ class Sesion():
         return latex_lim,sympy_lim,error
     
     def simplificar_tf(self,tf):
-        num,den = tf.as_numer_denom()
+        if hasattr(tf, 'as_numer_denom'):
+            num,den = tf.as_numer_denom()
+        else:
+            return tf
         num = simplify(num)
         den = simplify(den)
 
