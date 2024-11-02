@@ -8,7 +8,7 @@ from .detener_button import BotonDetener
 from PyQt5.QtCore import QRectF
 from ..menu.archivo import Archivo
 from .vista_json import VistaJson
-from PyQt5.QtWidgets import (QPushButton, QWidget,QMenu,QHBoxLayout)
+from PyQt5.QtWidgets import (QPushButton, QWidget,QMenu,QHBoxLayout,QDialog,QVBoxLayout,QTextEdit)
 from PyQt5.QtCore import Qt
 
 
@@ -71,6 +71,106 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
                                     self, 
                                     message="Copiar y guardar diagrama")
         self.scene.addItem(copy_button)
+        
+        x += spacing  # Actualizar x para el siguiente botón
+        copy_button = QGraphicCircleItem(x, y, RADIO_C, 
+                                    'fa5s.question-circle', 
+                                    self.mostrar_ayuda,
+                                    self, 
+                                    message="Ayuda")
+        self.scene.addItem(copy_button)
+        
+    
+    def mostrar_ayuda(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda")
+        help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        
+        help_dialog.setStyleSheet("""
+            QDialog {
+                background-color: #B0B0B0;
+                border-radius: 15px;
+                padding: 20px;
+                border: 2px solid #505050;
+            }
+            QTextEdit {
+                background-color: #D0D0D0;
+                color: #2B2D42;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 8px;
+                font-size: 14px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            QPushButton {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                border-radius: 10px;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            QPushButton:hover {
+                background-color: #606060;
+                cursor: pointer;
+            }
+        """)
+        
+        layout = QVBoxLayout()
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        help_text = QTextEdit()
+        help_text.setReadOnly(True)
+        
+        help_content = """
+        <h2>Guía de Botones del Simulador</h2>
+
+        <h3>Configurar Simulación</h3>
+        <p>Este botón te permite ajustar los parámetros básicos de la simulación:</p>
+        <ul>
+            <li><strong>Tiempo total:</strong> Duración completa de la simulación</li>
+            <li><strong>Variable a controlar:</strong> El valor objetivo que deseas mantener</li>
+            <li><strong>Intervalo de tiempo:</strong> Tiempo entre cada paso de la simulación</li>
+            <li><strong>Duración de ciclos:</strong> Tiempo real que toma cada ciclo</li>
+            <li><strong>Simulación Precisa:</strong> Activa un modo más preciso pero que requiere más recursos</li>
+        </ul>
+
+        <h3>Archivo</h3>
+        <p>Desde este menú puedes gestionar tus archivos de trabajo:</p>
+        <ul>
+            <li><strong>Nuevo Archivo:</strong> Comienza un nuevo proyecto desde cero</li>
+            <li><strong>Abrir Archivo:</strong> Carga un proyecto existente</li>
+            <li><strong>Guardar Archivo:</strong> Guarda tu trabajo actual</li>
+        </ul>
+
+        <h3>Editar JSON</h3>
+        <p>Esta herramienta te permite:</p>
+        <ul>
+            <li>Ver y modificar los datos del modelo en formato JSON</li>
+            <li>Copiar el contenido al portapapeles</li>
+            <li>Cargar datos desde archivos JSON externos</li>
+            <li>Guardar tus modificaciones</li>
+        </ul>
+
+        <h3>Copiar y Guardar Diagrama</h3>
+        <p>Con un solo clic, puedes:</p>
+        <ul>
+            <li>Capturar el diagrama actual de tu sistema</li>
+            <li>Guardarlo como imagen PNG en tu dispositivo</li>
+        </ul>
+        """
+
+        help_text.setHtml(help_content)
+        layout.addWidget(help_text)
+
+        close_button = QPushButton("Cerrar")
+        close_button.clicked.connect(help_dialog.close)
+        layout.addWidget(close_button)
+        
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
 
     
     def draw_simu_buttons(self,sene_width,scene_height):
