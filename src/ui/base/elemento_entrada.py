@@ -91,7 +91,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         tipo_entrada_layout = QtWidgets.QHBoxLayout()
         tipo_entrada_layout.addWidget(QtWidgets.QLabel("Tipo de entrada:"))
         self.tipo_entrada_combo = QtWidgets.QComboBox()
-        self.tipo_entrada_combo.addItems(["Personalizada", "Escalón", "Rampa", "Parábola"])
+        self.tipo_entrada_combo.addItems(["Personalizada", "Escalón", "Rampa", "Parabólica"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
         self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
@@ -161,7 +161,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
              "<ul>"
              "<li><b>Escalón:</b> Cambio instantáneo y constante (ejemplo: encender un interruptor)</li>"
              "<li><b>Rampa:</b> Cambio que aumenta linealmente con el tiempo (ejemplo: acelerador de un auto)</li>"
-             "<li><b>Parábola:</b> Cambio que aumenta cuadráticamente con el tiempo</li>"
+             "<li><b>Parabólica:</b> Cambio que aumenta cuadráticamente con el tiempo</li>"
              "<li><b>Personalizada:</b> Cualquier otra función definida por el usuario</li>"
              "</ul>"),
             
@@ -239,7 +239,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
             latex = f"\\frac{{{coeficiente}}}{{s}}"
         elif tipo_entrada == "Rampa":
             latex = f"\\frac{{{coeficiente}}}{{s^2}}"
-        elif tipo_entrada == "Parábola":
+        elif tipo_entrada == "Parabólica":
             latex = f"\\frac{{{coeficiente}}}{{s^3}}"
         else:
             return  # No actualizamos para entrada personalizada

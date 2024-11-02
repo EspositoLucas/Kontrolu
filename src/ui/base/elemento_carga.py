@@ -57,7 +57,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
             elif exponente == "2":
                 return "Rampa", coeficiente
             elif exponente == "3":
-                return "Parábola", coeficiente
+                return "Parabólica", coeficiente
         
         return "Personalizada", "1"
 
@@ -122,7 +122,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         tipo_entrada_layout = QtWidgets.QHBoxLayout()
         tipo_entrada_layout.addWidget(QtWidgets.QLabel("Tipo de transferencia:"))
         self.tipo_entrada_combo = QtWidgets.QComboBox()
-        self.tipo_entrada_combo.addItems(["Misma que entrada","Personalizada", "Escalón", "Rampa", "Parábola"])
+        self.tipo_entrada_combo.addItems(["Misma que entrada","Personalizada", "Escalón", "Rampa", "Parabólica"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
         self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
@@ -237,7 +237,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
             "<li><b>Misma que entrada:</b> Replica el comportamiento de la entrada</li>"
             "<li><b>Escalón:</b> Evaluación instantánea del error</li>"
             "<li><b>Rampa:</b> Evaluación con cambio lineal</li>"
-            "<li><b>Parábola:</b> Evaluación con cambio cuadrático</li>"
+            "<li><b>Parabólica:</b> Evaluación con cambio cuadrático</li>"
             "<li><b>Personalizada:</b> Función definida por el usuario</li>"
             "</ul>"),
             
@@ -352,7 +352,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
             latex = f"\\frac{{{coeficiente}}}{{s}}"
         elif tipo_entrada == "Rampa":
             latex = f"\\frac{{{coeficiente}}}{{s^2}}"
-        elif tipo_entrada == "Parábola":
+        elif tipo_entrada == "Parabólica":
             latex = f"\\frac{{{coeficiente}}}{{s^3}}"
         elif tipo_entrada == "Misma que entrada":
             latex = f"{self.carga.entrada.funcion_transferencia}"

@@ -566,7 +566,7 @@ class MainWindow(QMainWindow):
             "<ul>"
             "<li><b>Escalón:</b> Mide la precisión para alcanzar un valor constante</li>"
             "<li><b>Rampa:</b> Evalúa la capacidad de seguir una señal que aumenta linealmente</li>"
-            "<li><b>Parábola:</b> Analiza el seguimiento de señales con aceleración constante</li>"
+            "<li><b>Parabólica:</b> Analiza el seguimiento de señales con aceleración constante</li>"
             "</ul>"
             "Un error de cero (verde) indica seguimiento perfecto, mientras que un error no nulo (rojo) indica "
             "una desviación permanente del valor deseado.")
