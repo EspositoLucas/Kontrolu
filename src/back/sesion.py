@@ -167,10 +167,8 @@ class Sesion():
 
         return self.controlador.calcular_fdt(tiempo=tiempo) * self.actuador.calcular_fdt(tiempo=tiempo) * self.proceso.calcular_fdt(tiempo=tiempo)
     
-    def obtener_fdt_lazo_abierto_simpy(self):
-        ft = self.calcular_fdt_lazo_abierto()
-        ft_simplificada = self.simplificar_tf(ft)
-        return ft_simplificada
+    def obtener_fdt_lazo_abierto_simpy(self):   
+        return self.calcular_fdt_lazo_abierto()
     
     def obtener_fdt_lazo_abierto_latex(self):
 
@@ -196,9 +194,7 @@ class Sesion():
         return self.medidor.calcular_fdt(tiempo=tiempo)
     
     def obtener_fdt_realimentacion_simpy(self):
-        ft = self.calcular_fdt_realimentacion()
-        ft_simplificada = self.simplificar_tf(ft)
-        return ft_simplificada
+        return self.calcular_fdt_realimentacion()
 
     
     def obtener_fdt_realimentacion_latex(self):
@@ -225,9 +221,7 @@ class Sesion():
         return latex(self.calcular_fdt_realimentacion_tiempo())
     
     def obtener_fdt_global_simpy(self):
-        ft = self.calcular_fdt_global()
-        ft_simplificada = self.simplificar_tf(ft)
-        return ft_simplificada
+        return self.calcular_fdt_global()
     
     def obtener_fdt_global_latex(self):
 
@@ -253,9 +247,7 @@ class Sesion():
         return self.calcular_fdt_global(tiempo=tiempo) * self.entrada.calcular_fdt(tiempo=tiempo)
 
     def obtener_fdt_con_entrada_simpy(self):
-        ft = self.calcular_fdt_con_entrada()
-        ft_simplificada = self.simplificar_tf(ft)
-        return ft_simplificada    
+        return self.calcular_fdt_con_entrada(tiempo=tiempo)1
     
     def obtener_fdt_con_entrada_latex(self):
 
@@ -284,9 +276,7 @@ class Sesion():
         return self.calcular_fdt_lazo_abierto()/(1+self.calcular_fdt_lazo_abierto()*(self.calcular_fdt_realimentacion()-1))
     
     def obtener_abierta_si_unitario_simpy(self):
-        ft = self.calcular_abierta_si_unitario()
-        ft_simplificada = self.simplificar_tf(ft)
-        return ft_simplificada
+        return self.calcular_abierta_si_unitario()
     
     def obtener_abierta_si_unitario_latex(self):
 
@@ -313,9 +303,7 @@ class Sesion():
         return 1/(1+self.calcular_abierta_si_unitario())
     
     def obtener_sistema_unitario_simpy(self):
-        ft = self.calcular_sistema_unitario()
-        ft_simplificada = self.simplificar_tf(ft)
-        return ft_simplificada
+        return self.calcular_sistema_unitario()
     
     def obtener_sistema_unitario_latex(self):
 
@@ -341,9 +329,8 @@ class Sesion():
         return s*self.entrada.calcular_fdt(tiempo=tiempo)*(1/(1+self.calcular_abierta_si_unitario()))
     
     def obtener_calculo_error_en_estado_estable_simpy(self):
-        ft = self.calcular_calculo_error_en_estado_estable()
-        ft_simplificada = self.simplificar_tf(ft)
-        return ft_simplificada
+        
+        return self.calcular_calculo_error_en_estado_estable()
     
     def obtener_calculo_error_en_estado_estable_latex(self):
 
@@ -377,20 +364,20 @@ class Sesion():
 
     def obtener_fdts(self):
 
-        global_sympy = simplify(self.obtener_fdt_lazo_abierto_simpy())
+        global_sympy = self.simplificar_tf(self.obtener_fdt_lazo_abierto_simpy())
         global_latex = latex(global_sympy)
 
         realimentacion = self.obtener_fdt_realimentacion_simpy()
         realimentacion_latex = latex(realimentacion)
 
-        total_sympy = simplify(global_sympy/(1+global_sympy*realimentacion))
+        total_sympy = self.simplificar_tf(global_sympy/(1+global_sympy*realimentacion))
         total_latex = latex(total_sympy)
 
 
-        con_entrada = simplify(total_sympy * self.entrada.calcular_fdt())
+        con_entrada = self.simplificar_tf(total_sympy * self.entrada.calcular_fdt())
         con_entrada_latex = latex(con_entrada)
 
-        abierta_si_unitario = simplify(total_sympy/(1-total_sympy))
+        abierta_si_unitario = self.simplificar_tf(total_sympy/(1-total_sympy))
         abierta_si_unitario_latex = latex(abierta_si_unitario)
 
         return con_entrada,con_entrada_latex,total_sympy,total_latex,global_sympy,global_latex,abierta_si_unitario,abierta_si_unitario_latex,realimentacion,realimentacion_latex
@@ -402,8 +389,8 @@ class Sesion():
         self.proceso.calcular_indice_de_error()
 
     def calculos_de_error(self):
-
-        sympy_lim = self.obtener_calculo_error_en_estado_estable_simpy()
+        
+        sympy_lim = self.simplificar_tf(self.obtener_calculo_error_en_estado_estable_simpy())
         latex_lim = latex(sympy_lim)
         error = sympy_lim.limit(s,0).evalf()
 
