@@ -153,7 +153,7 @@ class Graficadora(QMainWindow):
         self.state_indicator.setStyleSheet("border: 1px solid black;")
         self.state_layout.addWidget(self.state_indicator)
 
-        self.state_label = QLabel("Estado: ")
+        self.state_label = QLabel("Estado de Carga: ")
         self.state_layout.addWidget(self.state_label)
 
         # Pestaña de la tabla
@@ -264,14 +264,14 @@ class Graficadora(QMainWindow):
                 self.datos[clave] = []
                 color = self.colores[len(self.lineas) % len(self.colores)]
                 self.lineas[clave], = self.ax.plot([], [], label=clave, color=color)
-                if clave != 'tiempo':
+                if clave != 'Tiempo':
                     self.checkboxes[clave] = QCheckBox(clave)
                     self.checkboxes[clave].setChecked(True)
                     self.checkboxes[clave].stateChanged.connect(self.actualizar_grafico)
                     self.controls_layout.addWidget(self.checkboxes[clave])
                 
-                # if clave == 'carga':
-                #     self.datos[clave].append(valor)  # Mantener el diccionario para 'carga'
+                # if clave == 'Carga':
+                #     self.datos[clave].append(valor)  # Mantener el diccionario para 'Carga'
                 
                 # Agregar clave a la lista de selección de columnas
                 self.column_list.addItem(clave)
@@ -281,7 +281,7 @@ class Graficadora(QMainWindow):
 
         
         self.actualizar_grafico()
-        self.actualizar_estado_carga(nuevos_datos.get('carga', None))
+        self.actualizar_estado_carga(nuevos_datos.get('Carga', None))
         self.actualizar_tabla()
 
     def actualizar_estado_carga(self, estado):
@@ -289,7 +289,7 @@ class Graficadora(QMainWindow):
             nombre_estado = estado.get('nombre', 'Desconocido').lower()
             color = self.obtener_color_estado(nombre_estado)
             self.state_indicator.setStyleSheet(f"background-color: {color.name()}; border: 1px solid black;")
-            self.state_label.setText(f"Estado: {estado.get('nombre', 'Desconocido')}")
+            self.state_label.setText(f"Estado de Carga: {estado.get('nombre', 'Desconocido')}")
 
     def obtener_color_estado(self, nombre_estado):
         colores_estado = {
@@ -307,7 +307,7 @@ class Graficadora(QMainWindow):
         if not columnas_seleccionadas:
             columnas_seleccionadas = list(self.datos.keys())  # Mostrar todas si no hay selección
 
-        self.data_table.setRowCount(len(self.datos['tiempo']))
+        self.data_table.setRowCount(len(self.datos['Tiempo']))
         self.data_table.setColumnCount(len(columnas_seleccionadas))
 
         # Establecer encabezados
@@ -339,14 +339,14 @@ class Graficadora(QMainWindow):
     def actualizar_grafico(self):
         self.ax.clear()
         for clave, linea in self.lineas.items():
-            if clave != 'tiempo':
+            if clave != 'Tiempo':
                 if self.checkboxes[clave].isChecked():
-                    self.ax.plot(self.datos['tiempo'], self.datos[clave], label=clave)
+                    self.ax.plot(self.datos['Tiempo'], self.datos[clave], label=clave)
                     # Añadir esta línea para mostrar el último valor
                     if len(self.datos[clave]) > 0:
                         ultimo_valor = self.datos[clave][-1]
                         self.ax.annotate(f'{ultimo_valor:.2f}', 
-                                        (self.datos['tiempo'][-1], ultimo_valor),
+                                        (self.datos['Tiempo'][-1], ultimo_valor),
                                         textcoords="offset points", 
                                         xytext=(0,10), 
                                         ha='center')
@@ -374,7 +374,7 @@ class ExportManager:
             with open(filename, 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(self.graficadora.datos.keys())
-                for i in range(len(self.graficadora.datos['tiempo'])):
+                for i in range(len(self.graficadora.datos['Tiempo'])):
                     row = [self.graficadora.datos[key][i] for key in self.graficadora.datos.keys()]
                     writer.writerow(row)
 
@@ -450,7 +450,7 @@ class InterpretacionDatos(QDialog):
     def interpretar_datos(self, datos):
         interpretacion = "Interpretación detallada de los datos de la simulación:\n\n"
 
-        tiempo_total = datos['tiempo'][-1] - datos['tiempo'][0]
+        tiempo_total = datos['Tiempo'][-1] - datos['Tiempo'][0]
         interpretacion += f"Tiempo total de simulación: {tiempo_total:.2f} unidades\n\n"
 
         # Análisis de estabilización
@@ -474,33 +474,33 @@ class InterpretacionDatos(QDialog):
 
         # Análisis por variable
         for key in datos:
-            if key != 'tiempo' and key != 'carga':
+            if key != 'Tiempo' and key != 'Carga':
                 interpretacion += self.analizar_variable(key, datos[key])
 
         self.text_edit.setText(interpretacion)
     def analizar_estabilizacion(self, datos):
         # Implementa lógica para determinar cuándo el sistema se estabiliza
-        salida = datos['salida']
+        salida = datos['Salida']
         for i in range(len(salida) - 1):
             if abs(salida[i] - salida[i+1]) < 0.01:  # Umbral de estabilización
-                return datos['tiempo'][i]
-        return datos['tiempo'][-1]  # Si no se estabiliza, retorna el tiempo final
+                return datos['Tiempo'][i]
+        return datos['Tiempo'][-1]  # Si no se estabiliza, retorna el tiempo final
 
     def analizar_control(self, datos):
         # Implementa lógica para determinar si hubo control efectivo
         # Por ejemplo, comparando el error inicial con el error final
  
-        error_inicial = abs(datos['error_real'][0])
-        error_final = abs(datos['error_real'][-1])
+        error_inicial = abs(datos['Error Real'][0])
+        error_final = abs(datos['Error Real'][-1])
         return error_final < error_inicial / 2  # Control efectivo si el error se reduce a la mitad
     
     def analizar_cambios_bruscos(self, datos):
         cambios_bruscos = []
-        if 'carga' not in datos or len(datos['carga']) < 2:
+        if 'Carga' not in datos or len(datos['Carga']) < 2:
             return cambios_bruscos
 
-        estados_carga = datos['carga']
-        tiempos = datos['tiempo']
+        estados_carga = datos['Carga']
+        tiempos = datos['Tiempo']
         def calificar_estado(estado):
             if estado is not None:
                 if estado== 5:
@@ -536,7 +536,7 @@ class InterpretacionDatos(QDialog):
         analisis += f"  Máximo: {maximo:.2f} (alcanzado al {tiempo_max:.1f}% del tiempo total)\n"
         analisis += f"  Mínimo: {minimo:.2f}\n"
         
-        if nombre == 'salida':
+        if nombre == 'Salida':
             tiempo_en_maximo = sum(1 for v in valores if v > 0.95 * maximo) / len(valores) * 100
             analisis += f"  Tiempo en máximo esplendor (>95% del máximo): {tiempo_en_maximo:.1f}%\n"
         

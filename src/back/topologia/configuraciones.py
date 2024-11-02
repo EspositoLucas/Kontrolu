@@ -10,7 +10,7 @@ class TipoError(Enum):
 
 class Configuracion:
     def __init__(self, nombre="Configuración", limite_inferior=-inf, limite_superior=inf, limite_por_ciclo=inf, error_maximo=inf, proporcion=0, tipo=TipoError.NINGUNO, ultimo_valor=0, probabilidad=1, unidad="V",from_json=None):
-        self.datos = {'tiempo': [], 'valor_original': [], 'error_base': [], 'error_limite': [], 'error_total': [], 'resultado': []}
+        self.datos = {'Tiempo': [], 'valor_original': [], 'error_base': [], 'error_limite': [], 'error_total': [], 'resultado': []}
         self.indice_de_error = 1
         if from_json:
             self.from_json(from_json)
@@ -150,7 +150,7 @@ class Configuracion:
         error = self.calcular_error(valor)
         nuevo = self.calcular_limite(valor + error)
         self.ultimo_valor = nuevo
-        self.datos['tiempo'].append(tiempo)
+        self.datos['Tiempo'].append(tiempo)
         self.datos['valor_original'].append(valor)
         self.datos['error_base'].append(error)
         self.datos['error_limite'].append(nuevo - valor + error)

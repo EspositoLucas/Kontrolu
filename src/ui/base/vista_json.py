@@ -38,7 +38,7 @@ class VistaJson(QDialog):
 
         pretty_json = json.dumps(json_a, indent=4)
         self.text_edit.setPlainText(pretty_json)
-        self.highlight_json()
+        #self.highlight_json()
         self.adjust_dialog_size()
         self.boton = QPushButton("Copiar")
         self.boton.clicked.connect(self.copiar)
@@ -141,7 +141,7 @@ class VistaJson(QDialog):
             with open(file_name, 'r') as file:
                 json_text = file.read()
                 self.text_edit.setPlainText(json_text)
-                self.highlight_json()
+                #self.highlight_json()
 
     def descargar_json(self):
         options = QFileDialog.Options()
@@ -189,7 +189,7 @@ class VistaJson(QDialog):
         cursor.select(QTextCursor.Document)
         cursor.setCharFormat(QTextCharFormat())
         self.text_edit.setTextCursor(cursor)
-        self.apply_syntax_highlighting()
+        #self.apply_syntax_highlighting()
 
     def apply_syntax_highlighting(self):
         json_text = self.text_edit.toPlainText()
@@ -225,71 +225,82 @@ class VistaJson(QDialog):
         document_size = document.size()
         self.resize(int(document_size.width()) + 50, int(document_size.height()) + 100)
         """
-        self.setMinimumSize(400, 400)
+        self.setMinimumSize(800, 600)
 
 
 ESTILO = """
     QDialog {
-        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
-        border-radius: 15px;  /* Bordes redondeados */
-        padding: 20px;  /* Espaciado interior */
-        border: 2px solid #505050;  /* Borde gris más oscuro */
+        background-color: #B0B0B0;  /* Gris pastel oscuro */
+        border-radius: 15px;
+        padding: 20px;
+        border: 2px solid #505050;
     }
 
     QPushButton {
-        background-color: #808080;  /* Botones en gris oscuro pastel */
-        color: white;  /* Texto en blanco */
-        border: 2px solid #505050;  /* Borde gris oscuro */
+        background-color: #808080;
+        color: white;
+        border: 2px solid #505050;
         border-radius: 10px;
-        padding: 10px 20px;  /* Tamaño de botón más grande */
-        font-size: 16px;  /* Tipografía más grande */
-        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía moderna */
+        padding: 10px 20px;
+        font-size: 16px;
+        font-family: "Segoe UI", "Arial", sans-serif;
     }
 
     QPushButton:hover {
-        background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
+        background-color: #606060;
         cursor: pointer;
     }
 
     QLineEdit {
-        background-color: #D0D0D0;  /* Fondo gris claro */
-        border: 2px solid #505050;  /* Borde gris oscuro */
+        background-color: #D0D0D0;
+        border: 2px solid #505050;
         border-radius: 10px;
         padding: 8px;
-        color: #2B2D42;  /* Texto gris oscuro */
-        font-size: 14px;  /* Tipografía más grande */
+        color: #2B2D42;
+        font-size: 14px;
         font-family: "Segoe UI", "Arial", sans-serif;
     }
+
     QTextEdit {
         background-color: #FAF8F6;  /* Fondo blanco pastel */
+        border: 2px solid #505050;
+        border-radius: 10px;
+        padding: 10px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+    
+    QTextEdit:focus {
+        background-color: #EAE8E5;  /* Fondo pastel al enfocar */
     }
 
     QLabel {
-        color: #2B2D42;  /* Texto gris oscuro */
+        color: #2B2D42;
         background-color: transparent;
-        font-size: 16px;  /* Tipografía más grande */
+        font-size: 16px;
         font-family: "Segoe UI", "Arial", sans-serif;
     }
 
     QComboBox {
-        background-color: #D0D0D0;  /* Fondo gris claro */
-        color: #2B2D42;  /* Texto gris oscuro */
-        border: 2px solid #505050;  /* Borde gris oscuro */
+        background-color: #D0D0D0;
+        color: #2B2D42;
+        border: 2px solid #505050;
         border-radius: 10px;
         padding: 5px;
-        font-size: 14px;  /* Tipografía más grande */
+        font-size: 14px;
         font-family: "Segoe UI", "Arial", sans-serif;
     }
 
     QComboBox QAbstractItemView {
-        background-color: #F1F1F1;  /* Fondo de la lista desplegable */
-        border: 2px solid #505050;  /* Borde gris oscuro */
-        selection-background-color: #808080;  /* Selección gris oscuro */
-        color: white;  /* Texto blanco en selección */
+        background-color: #F1F1F1;
+        border: 2px solid #505050;
+        selection-background-color: #808080;
+        color: white;
     }
 
     QVBoxLayout {
-        margin: 10px;  /* Márgenes en el layout */
-        spacing: 10px;  /* Espaciado entre widgets */
+        margin: 10px;
+        spacing: 10px;
     }
 """
