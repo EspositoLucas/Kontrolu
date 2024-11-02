@@ -13,7 +13,7 @@ from PyQt5 import QtWidgets
 from io import BytesIO
 import matplotlib.pyplot as plt
 import numpy as np
-from sympy import symbols, sympify, lambdify,DiracDelta
+from sympy import symbols, sympify, lambdify,DiracDelta,latex
 import os
 
 ESTILO = """
@@ -167,26 +167,16 @@ class SVGView(QGraphicsSvgItem):
         self.graficos = []
         self.renders = []
 
+
+
         self.fdt_sympy_laplace = self.macro.obtener_fdt_simpy()
-        if self.fdt_sympy_laplace != None:
-            self.laplace = "F(s) = " + self.macro.obtener_fdt_latex()
-            bytess_laplace = self.tex2svg(self.laplace)
-            self.renderer_laplace = QSvgRenderer(bytess_laplace)
-            self.renders.append(self.renderer_laplace)
-            self.graficos.append((self.fdt_sympy_laplace,True,"F(s)"))
 
+        self.laplace = "F(s) = " + latex(self.fdt_sympy_laplace)
+        bytess_laplace = self.tex2svg(self.laplace)
+        self.renderer_laplace = QSvgRenderer(bytess_laplace)
+        self.renders.append(self.renderer_laplace)
+        self.graficos.append((self.fdt_sympy_laplace,True,"F(s)"))
 
-
-
-
-        #self.fdt_sympy_tiempo = self.macro.obtener_fdt_tiempo()
-        self.fdt_sympy_tiempo = None
-        if self.fdt_sympy_tiempo != None:
-            self.tiempo = "f(t) = " + self.macro.obtener_fdt_tiempo_latex()
-            bytess_tiempo = self.tex2svg(self.tiempo)
-            self.renderer_tiempo = QSvgRenderer(bytess_tiempo)
-            self.renders.append(self.renderer_tiempo)
-            self.graficos.append((self.fdt_sympy_tiempo,False,"f(t)"))
 
 
 

@@ -391,3 +391,11 @@ class Sesion():
         self.actuador.calcular_indice_de_error()
         self.controlador.calcular_indice_de_error()
         self.proceso.calcular_indice_de_error()
+
+    def calculos_de_error(self):
+
+        sympy_lim = self.obtener_calculo_error_en_estado_estable_simpy()
+        latex_lim = latex(sympy_lim)
+        error = sympy_lim.limit(s,0).evalf()
+
+        return latex_lim,sympy_lim,error

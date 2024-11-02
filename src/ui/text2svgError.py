@@ -171,7 +171,9 @@ class SVGViewError(QGraphicsSvgItem):
         self.renders =[]
         self.graficos = []
 
-        self.error_estado_estable = self.macro.calcular_error_en_estado_estable()
+        self.calculo, self.calculo_simpy, self.error_estado_estable = self.macro.calculos_de_error()
+
+
         if self.error_estado_estable.is_real:
             #limitar cantidad de decimales
             self.error_estado_estable = N(self.error_estado_estable, 2)
@@ -181,26 +183,13 @@ class SVGViewError(QGraphicsSvgItem):
 
         self.renders.append(self.renderer_error_estado_estable)
 
-        self.calculo_simpy = self.macro.obtener_calculo_error_en_estado_estable_simpy()
-        if self.calculo_simpy != None:
-            self.calculo = self.macro.obtener_calculo_error_en_estado_estable_latex()
-            self.calculo_texto = 'lim_{s \\to 0}' + self.calculo + ' = ' + latex(self.error_estado_estable)
-            bytess_calculo = self.tex2svg(self.calculo_texto)
-            self.renderer_calculo = QSvgRenderer(bytess_calculo)
-            self.renders.append(self.renderer_calculo)
-            self.graficos.append((self.calculo_simpy,True,'lim_{s \\to 0}'))
 
-        
-        
-        #self.calculo_tiempo_simpy = self.macro.obtener_calculo_error_en_estado_estable_tiempo()
-        self.calculo_tiempo_simpy = None
-        if self.calculo_tiempo_simpy != None:
-            self.calculo_tiempo = self.macro.obtener_calculo_error_en_estado_estable_latex_tiempo()
-            self.calculo_tiempo_texto = 'lim_{t \\to \\infty}' + self.calculo_tiempo + ' = ' + latex(self.error_estado_estable)
-            bytess_calculo_tiempo = self.tex2svg(self.calculo_tiempo_texto)
-            self.renderer_calculo_tiempo = QSvgRenderer(bytess_calculo_tiempo)
-            self.renders.append(self.renderer_calculo_tiempo)
-            self.graficos.append((self.calculo_tiempo_simpy,False,'lim_{t \\to \\infty}'))
+        self.calculo_texto = 'lim_{s \\to 0}' + self.calculo + ' = ' + latex(self.error_estado_estable)
+        bytess_calculo = self.tex2svg(self.calculo_texto)
+        self.renderer_calculo = QSvgRenderer(bytess_calculo)
+        self.renders.append(self.renderer_calculo)
+        self.graficos.append((self.calculo_simpy,True,'lim_{s \\to 0}'))
+
 
 
 
