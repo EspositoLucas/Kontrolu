@@ -4,7 +4,7 @@ from .macros.macro_medidor import MacroMedidor
 from .macros.macro_proceso import MacroProceso
 from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
-from sympy import simplify, latex,inverse_laplace_transform,degree,solve, Poly
+from sympy import simplify, latex,inverse_laplace_transform,degree,solve,Poly,cancel,together,factor
 from sympy.abc import s,z,t
 import numpy as np
 
@@ -168,8 +168,9 @@ class Sesion():
         return self.controlador.calcular_fdt(tiempo=tiempo) * self.actuador.calcular_fdt(tiempo=tiempo) * self.proceso.calcular_fdt(tiempo=tiempo)
     
     def obtener_fdt_lazo_abierto_simpy(self):
-
-        return simplify(self.calcular_fdt_lazo_abierto())
+        ft = self.calcular_fdt_lazo_abierto()
+        ft_simplificada = self.simplificar_tf(ft)
+        return ft_simplificada
     
     def obtener_fdt_lazo_abierto_latex(self):
 
@@ -195,9 +196,9 @@ class Sesion():
         return self.medidor.calcular_fdt(tiempo=tiempo)
     
     def obtener_fdt_realimentacion_simpy(self):
-
-        return simplify(self.calcular_fdt_realimentacion())
-    
+        ft = self.calcular_fdt_realimentacion()
+        ft_simplificada = self.simplificar_tf(ft)
+        return ft_simplificada
 
     
     def obtener_fdt_realimentacion_latex(self):
@@ -224,8 +225,9 @@ class Sesion():
         return latex(self.calcular_fdt_realimentacion_tiempo())
     
     def obtener_fdt_global_simpy(self):
-
-        return self.calcular_fdt_global()
+        ft = self.calcular_fdt_global()
+        ft_simplificada = self.simplificar_tf(ft)
+        return ft_simplificada
     
     def obtener_fdt_global_latex(self):
 
@@ -251,8 +253,9 @@ class Sesion():
         return self.calcular_fdt_global(tiempo=tiempo) * self.entrada.calcular_fdt(tiempo=tiempo)
 
     def obtener_fdt_con_entrada_simpy(self):
-            
-        return self.calcular_fdt_con_entrada()
+        ft = self.calcular_fdt_con_entrada()
+        ft_simplificada = self.simplificar_tf(ft)
+        return ft_simplificada    
     
     def obtener_fdt_con_entrada_latex(self):
 
@@ -281,8 +284,9 @@ class Sesion():
         return self.calcular_fdt_lazo_abierto()/(1+self.calcular_fdt_lazo_abierto()*(self.calcular_fdt_realimentacion()-1))
     
     def obtener_abierta_si_unitario_simpy(self):
-
-        return simplify(self.calcular_abierta_si_unitario())
+        ft = self.calcular_abierta_si_unitario()
+        ft_simplificada = self.simplificar_tf(ft)
+        return ft_simplificada
     
     def obtener_abierta_si_unitario_latex(self):
 
@@ -309,8 +313,9 @@ class Sesion():
         return 1/(1+self.calcular_abierta_si_unitario())
     
     def obtener_sistema_unitario_simpy(self):
-
-        return simplify(self.calcular_sistema_unitario())
+        ft = self.calcular_sistema_unitario()
+        ft_simplificada = self.simplificar_tf(ft)
+        return ft_simplificada
     
     def obtener_sistema_unitario_latex(self):
 
@@ -336,8 +341,9 @@ class Sesion():
         return s*self.entrada.calcular_fdt(tiempo=tiempo)*(1/(1+self.calcular_abierta_si_unitario()))
     
     def obtener_calculo_error_en_estado_estable_simpy(self):
-
-        return simplify(self.calcular_calculo_error_en_estado_estable())
+        ft = self.calcular_calculo_error_en_estado_estable()
+        ft_simplificada = self.simplificar_tf(ft)
+        return ft_simplificada
     
     def obtener_calculo_error_en_estado_estable_latex(self):
 
@@ -402,3 +408,17 @@ class Sesion():
         error = sympy_lim.limit(s,0).evalf()
 
         return latex_lim,sympy_lim,error
+    
+    def simplificar_tf(self,tf):
+        if hasattr(tf, 'as_numer_denom'):
+            num,den = tf.as_numer_denom()
+        else:
+            return tf
+        num = simplify(num)
+        den = simplify(den)
+
+        ft_compuesta = together(num/den)
+        ft_cancelada = cancel(ft_compuesta)
+        ft_factorizada = factor(ft_cancelada)
+        ft_fact_simp = simplify(ft_factorizada)
+        return ft_fact_simp
