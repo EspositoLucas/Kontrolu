@@ -84,6 +84,7 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
     def mostrar_ayuda(self):
         help_dialog = QDialog(self)
         help_dialog.setWindowTitle("Ayuda")
+        help_dialog.setMinimumSize(800, 800)
         help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
         help_dialog.setStyleSheet("""
