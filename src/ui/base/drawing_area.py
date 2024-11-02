@@ -938,7 +938,7 @@ class DrawingArea(QGraphicsView):
         elif isinstance(nodo, TopologiaSerie):
             return f"la estructura en serie (nivel {nivel})"
         elif isinstance(nodo, TopologiaParalelo):
-            return f"la estructura en paralelo (nivel {nivel})"
+            return f"la estructura de prealimentación (nivel {nivel})"
         else:
             return "la estructura desconocida"
         
