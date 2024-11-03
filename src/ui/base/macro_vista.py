@@ -64,9 +64,7 @@ class MacroVista(QGraphicsRectItem):
         self.updateText()
     
     def update_fdt(self):
-        self.padre.update_fdt()
-        self.padre.update_error()
-        self.padre.update_estabilidad_state()
+        self.padre.update_funciones()
     
     def click(self):
         self.macro_vista_window = MacroVistaMainWindow(self, self.modelo)
@@ -78,6 +76,7 @@ class MacroVista(QGraphicsRectItem):
     def hoverMoveEvent(self, event):
         # Cambia el cursor a una mano al pasar el mouse sobre el rectángulo
         self.setCursor(Qt.PointingHandCursor)
+
 
 
 

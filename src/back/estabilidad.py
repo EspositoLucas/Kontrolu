@@ -145,8 +145,12 @@ class Estabilidad:
 
         return matriz_routh, es_estable
     
-    def calcular_routh_con_libreria(self):
-        den_poly = self.polinomio_caracteristico()
+    def calcular_routh_con_libreria(self,estabilidad=None):
+        
+        if estabilidad ==None:
+            den_poly = self.polinomio_caracteristico()
+        else:
+            den_poly = estabilidad
         coeficientes = den_poly.all_coeffs()
 
         if len(coeficientes) == 1:

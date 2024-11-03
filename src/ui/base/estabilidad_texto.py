@@ -29,7 +29,7 @@ NEGRO_ACLARADO = NEGRO.lighter(150)
 
 class EstabilidadTexto(QGraphicsTextItem):
 
-    def __init__(self, sesion, parent=None):
+    def __init__(self, sesion, estabilidad, parent=None):
 
         super().__init__(parent)
 
@@ -41,7 +41,7 @@ class EstabilidadTexto(QGraphicsTextItem):
 
         self.hoover_color = AMARILLO_ACLARADO
 
-        self.update_text()
+        self.update_text(estabilidad)
 
         font = QFont("Arial", 30, QFont.Bold)
 
@@ -60,9 +60,9 @@ class EstabilidadTexto(QGraphicsTextItem):
         super().mousePressEvent(event)
 
 
-    def update_text(self):
+    def update_text(self,estabilidad):
 
-        _ , estado =  self.estabilidad.calcular_routh_con_libreria()
+        _ , estado =  self.estabilidad.calcular_routh_con_libreria(estabilidad[0])
 
         if estado == "ESTABLE":
             self.setPlainText("Estable")

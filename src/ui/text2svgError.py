@@ -161,7 +161,7 @@ ESTILO = """
 """
 
 class SVGViewError(QGraphicsSvgItem):
-    def __init__(self, macro, padre, pos_x,pos_y, parent=None):
+    def __init__(self, macro, padre, pos_x,pos_y, errores, parent=None):
         super().__init__(parent)
         self.padre = padre
         self.macro = macro
@@ -174,7 +174,7 @@ class SVGViewError(QGraphicsSvgItem):
         self.renders =[]
         self.graficos = []
 
-        self.calculo, self.calculo_simpy, self.error_estado_estable = self.macro.calculos_de_error()
+        self.calculo, self.calculo_simpy, self.error_estado_estable = errores
 
 
         if self.error_estado_estable.is_real:

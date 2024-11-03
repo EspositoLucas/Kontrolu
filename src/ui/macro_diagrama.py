@@ -144,10 +144,9 @@ class MacroDiagrama(QGraphicsView):
         puntoSuma = PuntoSuma(x_medio=x_subida, y_medio=y_linea_1, RADIO_PERTURBACION=20, izq=2, abajo=1)
         self.scene.addItem(puntoSuma)
 
+        self.estabilidad = None
         self.draw_title()
-        self.draw_fdt()
-        self.draw_error()
-        self.draw_estabilidad()
+        self.draw_funciones()
 
         # Deshabilitar el desplazamiento
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -163,14 +162,14 @@ class MacroDiagrama(QGraphicsView):
         self.scene.removeItem(self.estabilidad)
         self.draw_estabilidad()
 
-    def update_estabilidad_state(self):
+    def update_estabilidad_state(self,estabilidad):
         
-        self.estabilidad.update_text()
+        self.estabilidad.update_text(estabilidad)
         self.estabilidad_update_pos()
     
-    def draw_estabilidad(self):
+    def draw_estabilidad(self,estabilidad):
         
-        self.estabilidad = EstabilidadTexto(self.sesion)
+        self.estabilidad = EstabilidadTexto(self.sesion,estabilidad)
         self.scene.addItem(self.estabilidad)
         self.estabilidad_update_pos()
     
@@ -182,47 +181,42 @@ class MacroDiagrama(QGraphicsView):
 
 
 
-    def update_fdt(self):
-        
-        self.scene.removeItem(self.svg)
-        self.draw_fdt()
 
-    def draw_fdt(self):
+
+    def draw_fdt(self,fdts):
     
-        self.svg = SVGView(self.sesion,self.x_bajada,self.Y_MEDIO -  DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5,self)
+        self.svg = SVGView(self.sesion,self.x_bajada,self.Y_MEDIO -  DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5,self,fdts)
 
         self.scene.addItem(self.svg)
 
-        #self.fdt_update_pos()
-
-
-
-    def fdt_update_pos(self):
-
-        text_rect = self.svg.boundingRect()
-
-        self.svg.setPos(self.x_bajada - (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
-
-    
-    def error_update_pos(self):
-        
-        text_rect = self.error_svg.boundingRect()
-
-        self.error_svg.setPos(self.x_subida -  (text_rect.width() / 2), self.Y_MEDIO - text_rect.height() - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
-
-
-    def update_error(self):
-            
+    def remove_funciones(self):
+        self.scene.removeItem(self.svg)
         self.scene.removeItem(self.error_svg)
-        self.draw_error()
+    
+    def draw_funciones(self):
+        fdts,estabilidad,errores = self.sesion.obtener_ecuaciones_inicio()
 
-    def draw_error(self):
+        self.draw_fdt(fdts)
+        self.draw_error(errores)
+        if self.estabilidad!=None:
+            self.update_estabilidad_state(estabilidad)
+        else:
+            self.draw_estabilidad(estabilidad)
+            
 
-        self.error_svg = SVGViewError(self.sesion,self,self.x_subida, self.Y_MEDIO - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
+    def update_funciones(self):
+        self.remove_funciones()
+        self.draw_funciones()
+
+ 
+
+    def draw_error(self,errores):
+
+        self.error_svg = SVGViewError(self.sesion,self,self.x_subida, self.Y_MEDIO - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5,errores)
 
         self.scene.addItem(self.error_svg)
 
-        #self.error_update_pos()
+ 
 
     def draw_title(self):
 

@@ -4,7 +4,7 @@ from .macros.macro_medidor import MacroMedidor
 from .macros.macro_proceso import MacroProceso
 from back.topologia.microbloque import MicroBloque
 from .topologia.carga import Carga
-from sympy import simplify, latex,inverse_laplace_transform,degree,solve,Poly,cancel,together,factor
+from sympy import simplify, latex,inverse_laplace_transform,degree,solve,Poly,cancel,together,factor,fraction
 from sympy.abc import s,z,t
 import numpy as np
 
@@ -409,3 +409,33 @@ class Sesion():
         ft_factorizada = factor(ft_cancelada)
         ft_fact_simp = simplify(ft_factorizada)
         return ft_fact_simp
+    
+
+    
+    def obtener_ecuaciones_inicio(self):
+        
+        global_sympy = self.simplificar_tf(self.obtener_fdt_lazo_abierto_simpy())
+        global_latex = latex(global_sympy)
+
+        realimentacion = self.obtener_fdt_realimentacion_simpy()
+        realimentacion_latex = latex(realimentacion)
+
+        total_sympy = self.simplificar_tf(global_sympy/(1+global_sympy*realimentacion))
+        total_latex = latex(total_sympy)
+
+        caracteristico = Poly(fraction(total_sympy)[1],s)
+        caracteristico_latex = latex(caracteristico)        
+
+        entrada = self.entrada.calcular_fdt()
+
+        con_entrada = self.simplificar_tf(total_sympy * entrada)
+        con_entrada_latex = latex(con_entrada)
+
+        abierta_si_unitario = self.simplificar_tf(total_sympy/(1-total_sympy))
+        abierta_si_unitario_latex = latex(abierta_si_unitario)
+
+        sympy_lim = self.simplificar_tf(s*entrada*(1/(1+abierta_si_unitario)))
+        latex_lim = latex(sympy_lim)
+        error = sympy_lim.limit(s,0).evalf()
+
+        return (con_entrada,con_entrada_latex,total_sympy,total_latex,global_sympy,global_latex,abierta_si_unitario,abierta_si_unitario_latex,realimentacion,realimentacion_latex),(caracteristico,caracteristico_latex),(latex_lim,sympy_lim,error)

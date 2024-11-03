@@ -159,7 +159,7 @@ ESTILO = """
 """
 
 class SVGView(QGraphicsSvgItem):
-    def __init__(self, macro,x,y, padre, parent=None):
+    def __init__(self, macro,x,y, padre, fdts,parent=None):
         self.padre = padre
         super().__init__(parent)
         self.pos_x = x
@@ -173,7 +173,7 @@ class SVGView(QGraphicsSvgItem):
         self.graficos = []
 
 
-        self.fdt_sympy_laplace, self.fdt_latex_laplace, self.fdt_sympy_laplace_total, self.fdt_latex_laplace_total, self.fdt_sympy_global_laplace, self.fdt_latex_global_laplace, self.fdt_sympy_global_unitaria, self.fdt_latex_global_unitaria, self.realimentacion, self.realimentacion_latex  = self.macro.obtener_fdts()
+        self.fdt_sympy_laplace, self.fdt_latex_laplace, self.fdt_sympy_laplace_total, self.fdt_latex_laplace_total, self.fdt_sympy_global_laplace, self.fdt_latex_global_laplace, self.fdt_sympy_global_unitaria, self.fdt_latex_global_unitaria, self.realimentacion, self.realimentacion_latex  = fdts
         
         
         self.laplace = "\\theta_{o}(s) = " + self.fdt_latex_laplace
