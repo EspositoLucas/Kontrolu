@@ -38,7 +38,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, carga=None, estado_seleccionado=None):
         super().__init__()
         self.padre = parent
-        self.setWindowTitle("Configuración de Carga")
+        self.setWindowTitle("Configuración de Rendimiento")
         self.carga = carga
         self.tipo_entrada, self.coeficiente = self.determinar_tipo_funcion(carga.funcion_transferencia)
         self.estado_seleccionado = estado_seleccionado
@@ -197,13 +197,13 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
     
     def mostrar_ayuda(self):
         help_dialog = QtWidgets.QDialog(self)
-        help_dialog.setWindowTitle("Ayuda - Configuración de Carga")
+        help_dialog.setWindowTitle("Ayuda - Configuración de Rendimiento")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(500)
         help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         layout = QtWidgets.QVBoxLayout()
 
-        titulo = QtWidgets.QLabel("Guía de Configuración de Carga")
+        titulo = QtWidgets.QLabel("Guía de Configuración de Rnedimiento")
         titulo.setStyleSheet("""
             QLabel {
                 font-size: 18px;

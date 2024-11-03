@@ -8,23 +8,44 @@ from PyQt5.QtGui import QBrush, QPen, QColor, QFont
 from PyQt5.QtCore import Qt
 from .floating_buttons import FloatingButtons
 
+CELESTE_SUAVE = QColor("#A8DADC")
+AZUL = QColor("#457B9D")
+ACLARADO = QColor("#F1FAEE")
+
+VERDE_FONDO = QColor("#D5E8D4")       # Fondo verde pastel suave
+VERDE_BORDE_OSCURO = QColor("#6B9D8F")  # Verde oscuro para bordes
+VERDE_HOVER = QColor("#BCE2D0")         # Verde intermedio para el efecto hover
+
 
 
 class MacroVista(QGraphicsRectItem):
-    def __init__(self, elementoBack,  pos,padre):
+    def __init__(self, elementoBack=None,  pos=100,padre=None,nombre=None):
+        self.clickeable = True
         qrect = pos
         self.padre = padre
         super().__init__(qrect)
         self.modelo = elementoBack
         self.default_brush = QBrush(QColor("#A8DADC"))  # Fondo celeste suave
         self.hover_brush = QBrush(QColor("#F1FAEE"))  # Fondo aclarado al pasar el mouse
-        self.setBrush(QBrush(QColor("#A8DADC")))  # Fondo celeste suave
-        self.setPen(QPen(QColor("#457B9D"), 4))  # Borde azul con grosor de 2px
+        self.borde = QPen(QColor("#457B9D"), 4)  # Borde azul con grosor de 2px
+        if elementoBack==None:
+            self.nombre = nombre
+            self.clickeable = False
+            self.default_brush = QBrush(VERDE_FONDO)  # Fondo verde pastel suave
+            self.hover_brush = QBrush(VERDE_HOVER)
+            self.borde = QPen(VERDE_BORDE_OSCURO, 4)
+
+
+        self.setBrush(self.default_brush)  # Fondo celeste suave
+        self.setPen(self.borde)  # Borde azul con grosor de 2px
         self.setRect(qrect)  # Establecer el tamaño del rectángulo
 
         # Agregar texto centrado
         # Texto que se mostrará en el rectángulo
-        self.text = self.modelo.nombre
+        if self.modelo == None:
+            self.text = self.nombre
+        else:
+            self.text = self.modelo.nombre
         self.font = QFont("Arial", 16, QFont.Bold)  # Estilo del texto
         self.setAcceptHoverEvents(True)  
 
@@ -57,7 +78,10 @@ class MacroVista(QGraphicsRectItem):
 
     def updateText(self):
         # Actualizar el texto del rectángulo
-        self.text = self.modelo.nombre
+        if self.modelo == None:
+            self.text = self.modelo.nombre
+        else:
+            self.text = self.nombre
         self.update()  # Actualizar el rectángulo para redibujar
 
     def update_nombre(self):
@@ -67,7 +91,8 @@ class MacroVista(QGraphicsRectItem):
         self.padre.update_funciones()
     
     def click(self):
-        self.macro_vista_window = MacroVistaMainWindow(self, self.modelo)
+        if self.clickeable:
+            self.macro_vista_window = MacroVistaMainWindow(self, self.modelo)
     
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:

@@ -4,6 +4,7 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
 from sympy import sympify, Symbol, SympifyError,Expr
 import re
+from latex2sympy2 import latex2sympy
 
 class LatexEditor(QWidget):
     latex_changed = pyqtSignal(str)
@@ -194,6 +195,36 @@ class LatexEditor(QWidget):
             self.update_preview()
             
     def es_funcion_valida(self, latex):
+        """
+        Valida si una expresión LaTeX es válida según los siguientes criterios:
+        1. Puede ser convertida a sympy usando latex2sympy
+        2. Solo contiene la variable 's' como símbolo
+        
+        Args:
+            latex (str): La expresión LaTeX a validar
+            
+        Returns:
+            bool: True si la expresión es válida, False en caso contrario
+        """
+        try:
+            # Intentamos convertir la expresión LaTeX a sympy
+            expr = latex2sympy(latex)
+            
+            # Obtenemos todos los símbolos (variables) en la expresión
+            simbolos = expr.free_symbols
+
+            print(simbolos)
+            
+            # Verificamos que solo haya un símbolo y sea 's'
+            if len(simbolos) == 0:
+                return True
+            return len(simbolos) == 1 and 's' in [str(sym) for sym in simbolos]
+            
+        except Exception as e:
+            # Si hay cualquier error en la conversión, la función no es válida
+            return False
+
+
         latex = latex.replace(' ', '').lower()
         
         if not latex or latex.count('{') != latex.count('}'):

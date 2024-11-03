@@ -6,6 +6,7 @@ from .base.elemento_proceso import ElementoProceso
 from .base.elemento_medicion import ElementoMedicion
 from .base.elemento_entrada import ElementoEntrada
 from .base.elemento_carga import ElementoCarga
+from .base.macro_vista import MacroVista
 from .base.punto_suma import PuntoSuma
 from .base.flecha import Flecha
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -109,33 +110,40 @@ class MacroDiagrama(QGraphicsView):
 
         # LINEAS:
         desde_controlador = x_controlador + ANCHO_ELEMENTO
-        line = Flecha(QtCore.QPointF(desde_controlador, y_linea_1), QtCore.QPointF(x_actuador - head, y_linea_1), ah, aw, lw, color=QColor("#A8DADC"))  # controlador a actuador
+        line = Flecha(QtCore.QPointF(desde_controlador, y_linea_1), QtCore.QPointF(x_actuador - head, y_linea_1), ah, aw, lw)  # controlador a actuador
         self.scene.addItem(line)
 
         desde_actuador = x_actuador + ANCHO_ELEMENTO
-        self.line_1 = Flecha(QtCore.QPointF(desde_actuador, y_linea_1), QtCore.QPointF(x_proceso - head, y_linea_1), ah, aw, lw, color=QColor("#A8DADC"))  # actuador a proceso
+        self.line_1 = Flecha(QtCore.QPointF(desde_actuador, y_linea_1), QtCore.QPointF(x_proceso - head, y_linea_1), ah, aw, lw)  # actuador a proceso
         self.scene.addItem(self.line_1)
 
         desde_entrada = x_entrada + ANCHO_ELEMENTO
-        self.line_8 = Flecha(QtCore.QPointF(desde_entrada, y_linea_1), QtCore.QPointF(x_controlador - head, y_linea_1), ah, aw, lw, color=QColor("#A8DADC"))  # entrada a controlador
+        self.line_8 = Flecha(QtCore.QPointF(desde_entrada, y_linea_1), QtCore.QPointF(x_controlador - head, y_linea_1), ah, aw, lw)  # entrada a controlador
         self.scene.addItem(self.line_8)
 
         x_bajada = x_carga - DISTANCIA_HORIZONTAL_EXTRA / 2
-        self.line_3 = Flecha(QtCore.QPointF(x_bajada, y_linea_1), QtCore.QPointF(x_bajada, y_linea_2), ah, aw, lw, arrow=False, color=QColor("#A8DADC"))  # proceso a medidor (lazo realimentado - vertical)
+        self.line_3 = Flecha(QtCore.QPointF(x_bajada, y_linea_1), QtCore.QPointF(x_bajada, y_linea_2), ah, aw, lw, arrow=False)  # proceso a medidor (lazo realimentado - vertical)
         self.scene.addItem(self.line_3)
 
+        x_bajada_2 = x_carga - DISTANCIA_HORIZONTAL_EXTRA / 4
+        self.line_9 = Flecha(QtCore.QPointF(x_bajada_2, y_linea_1), QtCore.QPointF(x_bajada_2, y_linea_2+15), ah, aw, lw, arrow=False, color=QColor("#6B9D8F"))  # proceso a medidor (lazo realimentado - vertical)
+        self.scene.addItem(self.line_9)
+
+        carga = MacroVista(None,QtCore.QRectF(x_bajada_2-35, y_linea_2+14, 70, 40),self,"Carga")
+        self.scene.addItem(carga)
+
         x_subida = x_controlador - DISTANCIA_HORIZONTAL_EXTRA / 2
-        self.line_6 = Flecha(QtCore.QPointF(x_subida, y_linea_2), QtCore.QPointF(x_subida, y_linea_1), ah, aw, lw, color=QColor("#A8DADC"))  # medidor a punto suma (vertical)
+        self.line_6 = Flecha(QtCore.QPointF(x_subida, y_linea_2), QtCore.QPointF(x_subida, y_linea_1), ah, aw, lw)  # medidor a punto suma (vertical)
         self.scene.addItem(self.line_6)
 
-        self.line_2 = Flecha(QtCore.QPointF(x_bajada, y_linea_2), QtCore.QPointF(desde_actuador + head, y_linea_2), ah, aw, lw, color=QColor("#A8DADC"))  # proceso a medidor (lazo realimentado - horizontal)
+        self.line_2 = Flecha(QtCore.QPointF(x_bajada, y_linea_2), QtCore.QPointF(desde_actuador + head, y_linea_2), ah, aw, lw)  # proceso a medidor (lazo realimentado - horizontal)
         self.scene.addItem(self.line_2)
 
         desde_proceso = x_proceso + ANCHO_ELEMENTO
-        self.line_4 = Flecha(QtCore.QPointF(desde_proceso, y_linea_1), QtCore.QPointF(x_carga - head, y_linea_1), ah, aw, lw, color=QColor("#A8DADC"))  # proceso a carga
+        self.line_4 = Flecha(QtCore.QPointF(desde_proceso, y_linea_1), QtCore.QPointF(x_carga - head, y_linea_1), ah, aw, lw)  # proceso a carga
         self.scene.addItem(self.line_4)
 
-        self.line_5 = Flecha(QtCore.QPointF(x_medidor, y_linea_2), QtCore.QPointF(x_subida + head, y_linea_2), ah, aw, lw, arrow=False, color=QColor("#A8DADC"))  # medidor a punto suma (horizontal)
+        self.line_5 = Flecha(QtCore.QPointF(x_medidor, y_linea_2), QtCore.QPointF(x_subida + head, y_linea_2), ah, aw, lw, arrow=False)  # medidor a punto suma (horizontal)
         self.scene.addItem(self.line_5)
 
         # PUNTO SUMA

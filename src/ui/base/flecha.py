@@ -13,10 +13,11 @@ class Flecha(QtWidgets.QGraphicsItem):
         self.arrow = arrow
         self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, False)
         self.setAcceptHoverEvents(True)
-        self.color = QColor("#457B9D")
-        self.default_color = QColor("#457B9D")  # Color negro por defecto
-        self.hover_color = QColor("#457B9D")    # Color de hover, se establecerá en las subclases en macro_diagrama.py
+        self.color = color
+        self.default_color = color  # Color negro por defecto
+        self.hover_color = color    # Color de hover, se establecerá en las subclases en macro_diagrama.py
         self.current_color = self.color
+        self.color_flecha = color
         self.setAcceptHoverEvents(True)
     
     def set_color(self, color):
@@ -44,13 +45,13 @@ class Flecha(QtWidgets.QGraphicsItem):
             arrow_polygon = self.arrowCalc(points[0], points[1])
             if arrow_polygon is not None:
                 painter.drawPolyline(QtGui.QPolygonF(points))
-                painter.setBrush(QColor("#457B9D"))
+                painter.setBrush(self.color_flecha)
                 painter.drawPolygon(arrow_polygon)
         else:
             rectangle_polygon = self.rectangleCalc(points[0], points[1])
             if rectangle_polygon is not None:
                 painter.drawPolyline(QtGui.QPolygonF(points))
-                painter.setBrush(QColor("#457B9D"))
+                painter.setBrush(self.color_flecha)
                 painter.drawPolygon(rectangle_polygon)
 
     def arrowCalc(self, start_point, end_point):

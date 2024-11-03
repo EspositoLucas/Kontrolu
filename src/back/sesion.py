@@ -246,7 +246,7 @@ class Sesion():
 
         return self.calcular_fdt_global(tiempo=tiempo) * self.entrada.calcular_fdt(tiempo=tiempo)
 
-    def obtener_fdt_con_entrada_simpy(self):
+    def obtener_fdt_con_entrada_simpy(self,tiempo=None):
         return self.calcular_fdt_con_entrada(tiempo=tiempo)
     
     def obtener_fdt_con_entrada_latex(self):

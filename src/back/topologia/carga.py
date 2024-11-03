@@ -40,7 +40,7 @@ estados = [
 ]
 
 class Carga(Hoja):
-    def __init__(self,funcion_transferencia="",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Carga",entrada=None,from_json= None):
+    def __init__(self,funcion_transferencia="",tipo_carga=TipoCarga.FINAL,estados=estados,escalamiento_sigmoide=1,desplazamiento_sigmoide=0,nombre="Rendimiento",entrada=None,from_json= None):
         super().__init__(nombre=nombre, funcion_transferencia=funcion_transferencia)
         self.datos = {'tiempo': [], 'estado': [], 'carga': []}
         if from_json:
