@@ -21,6 +21,74 @@ import sympy as sp
 from sympy.parsing.latex import parse_latex
 
 
+class InitialMenuWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('Menú Inicial - Kontrolu')
+        self.setStyleSheet(ESTILO)
+        self.resize(400, 400)
+        
+        # Widget central y layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
+        
+        # Configurar el icono de la ventana
+        path = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
+        
+        # Logo
+        image_path_2 = os.path.join(path, 'base', 'imgs', 'kontrolu_azul_oscuro.png')
+        logo_label = QLabel()
+        pixmap = QtGui.QPixmap(image_path_2)
+        scaled_pixmap = pixmap.scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        logo_label.setPixmap(scaled_pixmap)
+        logo_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(logo_label)
+        
+        # Etiqueta de bienvenida
+        welcome_label = QLabel('¡Bienvenido a Kontrolu!')
+        welcome_label.setAlignment(Qt.AlignCenter)
+        welcome_label.setStyleSheet("font-size: 30px; font-weight: bold; margin: 20px 0 5px 0;")
+        layout.addWidget(welcome_label)
+
+        # Subtítulo
+        subtitle_label = QLabel('El valor deseado de ser controlado')
+        subtitle_label.setAlignment(Qt.AlignCenter)
+        subtitle_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #2B2D42; margin: 0px 0 20px 0;")
+        layout.addWidget(subtitle_label)
+
+        # Botones
+        new_project_btn = QPushButton('Crear proyecto nuevo')
+        new_project_btn.clicked.connect(self.new_project)
+        layout.addWidget(new_project_btn)
+
+        open_project_btn = QPushButton('Abrir proyecto existente')
+        open_project_btn.clicked.connect(self.open_project)
+        layout.addWidget(open_project_btn)
+        
+        self.main_window = None
+        
+    def new_project(self):
+        if not self.main_window:
+            self.main_window = MainWindow(self.sesion)
+        self.main_window.sesion.nueva_sesion()
+        self.main_window.initUI()
+        self.main_window.showMaximized()
+        self.close()
+        
+    def open_project(self):
+        if not self.main_window:
+            self.main_window = MainWindow(self.sesion)
+        if not self.main_window.archivo.open_project():
+            return
+        self.main_window.initUI()
+        self.main_window.showMaximized()
+        self.close()
+
 class MainWindow(QMainWindow):
     
     def __init__(self, sesion):
@@ -35,81 +103,7 @@ class MainWindow(QMainWindow):
             'salida_inicial': '0',
             'delta_t': '0.1',
             'velocidad': '100'
-        }
-        self.show_initial_menu()
-
-    def show_initial_menu(self):
-        self.initial_menu = self.create_initial_menu()
-        self.initial_menu.show()
-        
-    def create_initial_menu(self):
-        initial_menu = QDialog(self)
-        initial_menu.setWindowTitle('Menú Inicial - Kontrolu')
-        initial_menu.setStyleSheet(ESTILO)
-        initial_menu.resize(400, 400)  # Aumentamos el tamaño para acomodar el logo
-        initial_menu.setWindowFlags(initial_menu.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        layout = QVBoxLayout()
-        
-        # Configurar el icono de la ventana
-        path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path,'base','imgs','logo.png')
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.setWindowIcon(QtGui.QIcon(icon))
-        
-        # Configurar el icono del menu inicial
-        path = os.path.dirname(os.path.abspath(__file__))
-        image_path_2 = os.path.join(path,'base','imgs','kontrolu_azul_oscuro.png')
-        icon_2 = QtGui.QIcon()
-        icon_2.addPixmap(QtGui.QPixmap(image_path_2), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-
-        # Agregar logo grande
-        logo_label = QLabel()
-        pixmap = QtGui.QPixmap(image_path_2)
-        scaled_pixmap = pixmap.scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        logo_label.setPixmap(scaled_pixmap)
-        logo_label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(logo_label)
-        # Etiqueta de bienvenida
-        welcome_label = QLabel('¡Bienvenido a Kontrolu!')
-        welcome_label.setAlignment(Qt.AlignCenter)
-        welcome_label.setStyleSheet("font-size: 30px; font-weight: bold; margin: 20px 0 5px 0;")  # Margen: arriba 20px, abajo 5px
-        layout.addWidget(welcome_label)
-
-        # Subtítulo
-        subtitle_label = QLabel('El valor deseado de ser controlado')
-        subtitle_label.setAlignment(Qt.AlignCenter)
-        subtitle_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #2B2D42; margin: 0px 0 20px 0;")  # Margen superior 10px
-        layout.addWidget(subtitle_label)
-
-
-        new_project_btn = QPushButton('Crear proyecto nuevo')
-        new_project_btn.clicked.connect(self.new_project_from_menu)
-        layout.addWidget(new_project_btn)
-
-        open_project_btn = QPushButton('Abrir proyecto existente')
-        open_project_btn.clicked.connect(self.open_project_from_menu)
-        layout.addWidget(open_project_btn)
-
-        initial_menu.setLayout(layout)
-        return initial_menu
-    
-    def new_project_from_menu(self):
-        self.sesion.nueva_sesion()
-        self.close_initial_menu_and_show_main()
-
-    def open_project_from_menu(self):
-        self.archivo.open_project()
-        self.close_initial_menu_and_show_main()
-
-    def close_initial_menu_and_show_main(self):
-        if self.initial_menu:
-            self.initial_menu.close()
-            self.initial_menu = None
-        self.initUI()
-        self.showNormal()
-        self.setWindowState(Qt.WindowMaximized)
-            
+        }        
     
     def initUI(self):
         self.setWindowTitle('Kontrolu')
