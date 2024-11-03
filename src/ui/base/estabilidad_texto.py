@@ -55,8 +55,6 @@ class EstabilidadTexto(QGraphicsTextItem):
 
         if event.button() == Qt.LeftButton:
             EstabilidadDialog(self.sesion,self.estabilidad).exec_()
-            self.update_text()
-
 
         # Llamar al método base para manejar otros eventos
         super().mousePressEvent(event)

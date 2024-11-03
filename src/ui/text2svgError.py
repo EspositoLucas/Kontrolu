@@ -191,7 +191,7 @@ class SVGViewError(QGraphicsSvgItem):
         bytess_calculo = self.tex2svg(self.calculo_texto)
         self.renderer_calculo = QSvgRenderer(bytess_calculo)
         self.renders.append(self.renderer_calculo)
-        self.graficos.append((self.calculo_simpy,True,'lim_{s \\to 0}'))
+        self.graficos.append((self.calculo_simpy,True,'Error'))
 
 
 
@@ -435,9 +435,9 @@ class SVGViewError(QGraphicsSvgItem):
 
         plt.figure()
         plt.plot(s_vals, F_s)
-        plt.title("Dominio de Laplace")
-        plt.xlabel("Re(s)")
-        plt.ylabel("F(s)")
+        plt.title("Error en Estado Estable")
+        plt.xlabel("s")
+        plt.ylabel("Error")
         plt.grid(True)
         return plt.gcf()
 

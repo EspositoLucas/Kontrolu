@@ -91,18 +91,18 @@ ESTILO = """
         background-color: #FAF8F6;
         padding: 10px;
     }
-
     QTabBar::tab {
         background-color: #D0D0D0;
         color: #2B2D42;
         border: 2px solid #505050;
         border-radius: 5px;
-        padding: 12px 1px;  /* Aumentar el padding para más espacio */
+        padding: 12px 20px;  /* Aumentamos el padding horizontal a 20px */
         font-size: 14px;
         font-family: "Segoe UI", "Arial", sans-serif;
-        font-weight: bold;  /* Texto en negrita */
+        font-weight: bold;
+        min-width: 80px;  /* Ancho mínimo para las tabs */
+        margin-right: 2px;  /* Pequeño espacio entre tabs */
     }
-
 
     QTabBar::tab:selected {
         background-color: #808080;  /* Fondo gris oscuro al seleccionar */
@@ -187,7 +187,7 @@ class SVGView(QGraphicsSvgItem):
         bytess_laplace_total = self.tex2svg(self.total_laplace)
         self.renderer_laplace_total = QSvgRenderer(bytess_laplace_total)
         self.funciones.append(self.renderer_laplace_total)
-        self.graficos.append((self.fdt_sympy_laplace_total,True,"Lazo Directo"))
+        self.graficos.append((self.fdt_sympy_laplace_total,True,"Directo"))
 
 
         self.global_laplace = "G_{t}(s) = " + self.fdt_latex_global_laplace
@@ -207,7 +207,7 @@ class SVGView(QGraphicsSvgItem):
         bytess_realimentacion = self.tex2svg(self.realimentacion_latex_completa)
         self.renderer_realimentacion = QSvgRenderer(bytess_realimentacion)
         self.funciones.append(self.renderer_realimentacion)      
-        self.graficos.append((self.realimentacion,True,"Lazo Realimentacion"))
+        self.graficos.append((self.realimentacion,True,"Realimentacion"))
 
         self.laplace_mode = 0
         if len(self.funciones) > 0:
