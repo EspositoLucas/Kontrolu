@@ -5,6 +5,7 @@ from back.topologia.perturbacion import Perturbacion
 from back.topologia.hoja import Hoja
 from latex2sympy2 import latex2sympy
 from tbcontrol.symbolic import routh
+from collections import Counter
 import numpy as np
 import math
 
@@ -189,13 +190,53 @@ class Estabilidad:
         G_cl = self.parse_latex_to_sympy(G_cl_latex)
         s = sp.Symbol('s')
         
+        # Separar numerador y denominador
         num, den = sp.fraction(G_cl)
         
+        # Convertir numerador y denominador a polinomios en 's'
         den_poly = sp.Poly(den, s)
-        polos = sp.roots(den_poly)
-        
         num_poly = sp.Poly(num, s)
-        ceros = sp.roots(num_poly)
+        
+        grado_num = num_poly.degree()
+        grado_den = den_poly.degree()
+        print("den_poly: ", den_poly)
+        print("num_poly: ", num_poly)
+        print(f"Grado del numerador: {grado_num}")
+        print(f"Grado del denominador: {grado_den}")
+
+        # Función para convertir raíces a formato complejo
+        def procesar_raices(raices_dict):
+            resultado = {}
+            for raiz, multiplicidad in raices_dict.items():
+                # Si es un objeto SymPy, convertirlo a complex
+                if hasattr(raiz, 'evalf'):
+                    raiz_complex = complex(raiz.evalf())
+                # Si ya es un float o complex, usarlo directamente
+                else:
+                    raiz_complex = complex(raiz)
+                resultado[raiz_complex] = multiplicidad
+            return resultado
+
+        # Calcular polos
+        if grado_den < 5:
+            polos_raw = sp.roots(den_poly)
+            polos = procesar_raices(polos_raw)
+        else:
+            polos_lista = den_poly.nroots()
+            # Convertir directamente a complex ya que nroots() devuelve valores numéricos
+            polos = {complex(polo): 1 for polo in polos_lista}
+        
+        # Calcular ceros
+        if grado_num < 5:
+            ceros_raw = sp.roots(num_poly)
+            ceros = procesar_raices(ceros_raw)
+        else:
+            ceros_lista = num_poly.nroots()
+            # Convertir directamente a complex ya que nroots() devuelve valores numéricos
+            ceros = {complex(cero): 1 for cero in ceros_lista}
+        
+        print(f"Polos: {polos}")
+        print(f"Ceros: {ceros}")
         
         return polos, ceros
 
