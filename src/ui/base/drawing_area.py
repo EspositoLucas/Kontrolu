@@ -1263,6 +1263,8 @@ class DrawingArea(QGraphicsView):
         response = vista.exec_()
         if response == QDialog.Accepted:
             self.load_microbloques()
+            self.macrobloque.update_nombre()
+            self.macrobloque.update_fdt()
 
     def agregar_perturbacion(self, microbloque, posicion):
 

@@ -90,6 +90,7 @@ class Menu(QMenuBar):
         vista.exec_()
         if vista.result():
             self.main_window.actualizar_sesion()
+            
     
     def show_archivo_menu(self):
         menu = QMenu(self)

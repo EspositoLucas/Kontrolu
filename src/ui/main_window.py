@@ -148,9 +148,7 @@ class MainWindow(QMainWindow):
     def new_project_from_main(self):
         if self.archivo.new_project(from_menu=False):
             self.actualizar_sesion()
-            self.actualizar_sesion()
-    
-            self.actualizar_sesion() 
+
         
     def init_macrobloques(self):
 
@@ -213,6 +211,7 @@ class MainWindow(QMainWindow):
         vista.exec_()
         if vista.result():
             self.actualizar_sesion()
+            
 
     # Agregar este nuevo método
     def configurar_simulacion(self):
