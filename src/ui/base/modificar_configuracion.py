@@ -11,7 +11,7 @@ class ModificarConfiguracion(QDialog):
         super().__init__(padre)
         self.configuracion:Configuracion = configuracion
         self.setWindowTitle(f"Editar Configuración de {tipo.capitalize()}")
-        self.setStyleSheet("background-color: #333; color: white;")
+        self.setStyleSheet(ESTILO)
         self.edit_configuration()
         
     
@@ -123,48 +123,8 @@ class ModificarConfiguracion(QDialog):
 
     def edit_configuration(self):
         # Definición de estilos
-        label_style = """
-            color: #2B2D42;
-            font-size: 16px;
-            font-family: "Segoe UI", "Arial", sans-serif;
-        """
         
-        line_edit_style = """
-            background-color: #D0D0D0;
-            color: #2B2D42;
-            border: 2px solid #505050;
-            border-radius: 10px;
-            padding: 8px;
-            font-size: 14px;
-            font-family: "Segoe UI", "Arial", sans-serif;
-        """
-        
-        checkbox_style = """
-            color: #2B2D42;
-            background-color:#FAF8F6;
-            font-size: 14px;
-            font-family: "Segoe UI", "Arial", sans-serif;
-        """
-        
-        combobox_style = """
-            background-color: #D0D0D0;
-            color: #2B2D42;
-            border: 2px solid #505050;
-            border-radius: 10px;
-            padding: 5px;
-            font-size: 14px;
-            font-family: "Segoe UI", "Arial", sans-serif;
-        """
-        
-        button_style = """
-            background-color: #808080;
-            color: white;
-            border: 2px solid #505050;
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-family: "Segoe UI", "Arial", sans-serif;
-        """
+
 
         self.layout = QVBoxLayout()
         self.layout.setSpacing(10)
@@ -200,17 +160,14 @@ class ModificarConfiguracion(QDialog):
         self.limite_inf_row = QHBoxLayout()
 
         self.limite_inf_nombre = QLabel("Límite inferior")
-        self.limite_inf_nombre.setStyleSheet(label_style)
 
         self.limite_inf_field = QLineEdit()
-        self.limite_inf_field.setStyleSheet(line_edit_style)
         self.limite_inf_field.setValidator(QDoubleValidator())
         self.limite_inf_field.setVisible(not self.configuracion.es_default_limite_inferior())
         self.limite_inf_field.setText("0" if self.configuracion.es_default_limite_inferior() else str(self.configuracion.limite_inferior))
 
         self.limite_inf_check = QCheckBox("Default")
         self.limite_inf_check.setChecked(self.configuracion.es_default_limite_inferior())
-        self.limite_inf_check.setStyleSheet(checkbox_style)
         self.limite_inf_check.stateChanged.connect(lambda state: self.limite_inf_field.setVisible(state == Qt.Unchecked))
         self.limite_inf_check.stateChanged.connect(lambda state: self.limite_inf_field.setText("0" if state == Qt.Unchecked else str(self.configuracion.limite_inferior)))
 
@@ -224,17 +181,14 @@ class ModificarConfiguracion(QDialog):
         self.limite_sup_row = QHBoxLayout()
 
         self.limite_sup_nombre = QLabel("Límite superior")
-        self.limite_sup_nombre.setStyleSheet(label_style)
 
         self.limite_sup_field = QLineEdit()
-        self.limite_sup_field.setStyleSheet(line_edit_style)
         self.limite_sup_field.setValidator(QDoubleValidator())
         self.limite_sup_field.setVisible(not self.configuracion.es_default_limite_superior())
         self.limite_sup_field.setText("0" if self.configuracion.es_default_limite_superior() else str(self.configuracion.limite_superior))
 
         self.limite_sup_check = QCheckBox("Default")
         self.limite_sup_check.setChecked(self.configuracion.es_default_limite_superior())
-        self.limite_sup_check.setStyleSheet(checkbox_style)
         self.limite_sup_check.stateChanged.connect(lambda state: self.limite_sup_field.setVisible(state == Qt.Unchecked))
         self.limite_sup_check.stateChanged.connect(lambda state: self.limite_sup_field.setText("0" if state == Qt.Unchecked else str(self.configuracion.limite_superior)))
 
@@ -248,17 +202,14 @@ class ModificarConfiguracion(QDialog):
         self.limite_ciclo_row = QHBoxLayout()
         
         self.limite_ciclo_nombre = QLabel("Límite por ciclo")
-        self.limite_ciclo_nombre.setStyleSheet(label_style)
 
         self.limite_ciclo_field = QLineEdit()
-        self.limite_ciclo_field.setStyleSheet(line_edit_style)
         self.limite_ciclo_field.setValidator(QDoubleValidator())
         self.limite_ciclo_field.setVisible(not self.configuracion.es_default_limite_por_ciclo())
         self.limite_ciclo_field.setText("0" if self.configuracion.es_default_limite_por_ciclo() else str(self.configuracion.limite_por_ciclo))
 
         self.limite_ciclo_check = QCheckBox("Default")
         self.limite_ciclo_check.setChecked(self.configuracion.es_default_limite_por_ciclo())
-        self.limite_ciclo_check.setStyleSheet(checkbox_style)
         self.limite_ciclo_check.stateChanged.connect(lambda state: self.limite_ciclo_field.setVisible(state == Qt.Unchecked))
         self.limite_ciclo_check.stateChanged.connect(lambda state: self.limite_ciclo_field.setText("0" if state == Qt.Unchecked else str(self.configuracion.limite_por_ciclo)))
 
@@ -272,17 +223,14 @@ class ModificarConfiguracion(QDialog):
         self.error_max_row = QHBoxLayout()
 
         self.error_max_nombre = QLabel("Error máximo")
-        self.error_max_nombre.setStyleSheet(label_style)
 
         self.error_max_field = QLineEdit()
-        self.error_max_field.setStyleSheet(line_edit_style)
         self.error_max_field.setValidator(QDoubleValidator())
         self.error_max_field.setVisible(not self.configuracion.es_default_error_maximo())
         self.error_max_field.setText("0" if self.configuracion.es_default_error_maximo() else str(self.configuracion.error_maximo))
 
         self.error_max_check = QCheckBox("Default")
         self.error_max_check.setChecked(self.configuracion.es_default_error_maximo())
-        self.error_max_check.setStyleSheet(checkbox_style)
         self.error_max_check.stateChanged.connect(lambda state: self.error_max_field.setVisible(state == Qt.Unchecked))
         self.error_max_check.stateChanged.connect(lambda state: self.error_max_field.setText("0" if state == Qt.Unchecked else str(self.configuracion.error_maximo)))
 
@@ -296,17 +244,14 @@ class ModificarConfiguracion(QDialog):
         self.proporcion_row = QHBoxLayout()
         
         self.proporcion_nombre = QLabel("Proporción")
-        self.proporcion_nombre.setStyleSheet(label_style)
 
         self.proporcion_field = QLineEdit()
-        self.proporcion_field.setStyleSheet(line_edit_style)
         self.proporcion_field.setValidator(QDoubleValidator())
         self.proporcion_field.setVisible(not self.configuracion.es_default_proporcion())
         self.proporcion_field.setText("1" if self.configuracion.es_default_proporcion() else str(self.configuracion.proporcion))
 
         self.proporcion_check = QCheckBox("Default")
         self.proporcion_check.setChecked(self.configuracion.es_default_proporcion())
-        self.proporcion_check.setStyleSheet(checkbox_style)
         self.proporcion_check.stateChanged.connect(lambda state: self.proporcion_field.setVisible(state == Qt.Unchecked))
         self.proporcion_check.stateChanged.connect(lambda state: self.proporcion_field.setText("1" if state == Qt.Unchecked else str(self.configuracion.proporcion)))
 
@@ -320,17 +265,14 @@ class ModificarConfiguracion(QDialog):
         self.ultimo_valor_row = QHBoxLayout()
 
         self.ultimo_valor_nombre = QLabel("Último valor")
-        self.ultimo_valor_nombre.setStyleSheet(label_style)
 
         self.ultimo_valor_field = QLineEdit()
-        self.ultimo_valor_field.setStyleSheet(line_edit_style)
         self.ultimo_valor_field.setValidator(QDoubleValidator())
         self.ultimo_valor_field.setVisible(not self.configuracion.es_default_ultimo_valor())
         self.ultimo_valor_field.setText("0" if self.configuracion.es_default_ultimo_valor() else str(self.configuracion.ultimo_valor))
 
         self.ultimo_valor_check = QCheckBox("Default")
         self.ultimo_valor_check.setChecked(self.configuracion.es_default_ultimo_valor())
-        self.ultimo_valor_check.setStyleSheet(checkbox_style)
         self.ultimo_valor_check.stateChanged.connect(lambda state: self.ultimo_valor_field.setVisible(state == Qt.Unchecked))
         self.ultimo_valor_check.stateChanged.connect(lambda state: self.ultimo_valor_field.setText("0" if state == Qt.Unchecked else str(self.configuracion.ultimo_valor)))
 
@@ -344,17 +286,14 @@ class ModificarConfiguracion(QDialog):
         self.probabilidad_row = QHBoxLayout()
 
         self.probabilidad_nombre = QLabel("Probabilidad")
-        self.probabilidad_nombre.setStyleSheet(label_style)
         
         self.probabilidad_field = QLineEdit()
-        self.probabilidad_field.setStyleSheet(line_edit_style)
         self.probabilidad_field.setValidator(QDoubleValidator())
         self.probabilidad_field.setVisible(not self.configuracion.es_default_probabilidad())
         self.probabilidad_field.setText("1" if self.configuracion.es_default_probabilidad() else str(self.configuracion.probabilidad))
 
         self.probabilidad_check = QCheckBox("Default")
         self.probabilidad_check.setChecked(self.configuracion.es_default_probabilidad())
-        self.probabilidad_check.setStyleSheet(checkbox_style)
         self.probabilidad_check.stateChanged.connect(lambda state: self.probabilidad_field.setVisible(state == Qt.Unchecked))
         self.probabilidad_check.stateChanged.connect(lambda state: self.probabilidad_field.setText("1" if state == Qt.Unchecked else str(self.configuracion.probabilidad)))
 
@@ -364,44 +303,27 @@ class ModificarConfiguracion(QDialog):
 
         self.layout.addLayout(self.probabilidad_row)
 
+        self.tipo_desbvio_box = QHBoxLayout()
+
         # Tipo de error
-        tipo_error_label = QLabel("Tipo de error")
-        tipo_error_label.setStyleSheet(label_style)
-        self.layout.addWidget(tipo_error_label)
+        tipo_error_label = QLabel("Tipo de Desviación: ")
+        self.tipo_desbvio_box.addWidget(tipo_error_label)
         
         self.tipo_error_combo = QComboBox()
-        self.tipo_error_combo.setStyleSheet(combobox_style)
         for error_type in TipoError:
             self.tipo_error_combo.addItem(error_type.value)
         self.tipo_error_combo.setCurrentText(self.configuracion.tipo.value)
-        self.layout.addWidget(self.tipo_error_combo)
+        self.tipo_desbvio_box.addWidget(self.tipo_error_combo)
+
+        self.layout.addLayout(self.tipo_desbvio_box)
 
         # Botón guardar
         self.save_button = QPushButton("Guardar cambios")
-        self.save_button.setStyleSheet(button_style)
         self.save_button.clicked.connect(self.save_configuration)
-        
-        # Agregar efecto hover al botón
-        self.save_button.enterEvent = lambda e: self.save_button.setStyleSheet(
-            button_style + "background-color: #606060;"
-        )
-        self.save_button.leaveEvent = lambda e: self.save_button.setStyleSheet(button_style)
+
         
         self.layout.addWidget(self.save_button)
 
-        # Estilo del diálogo principal
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #B0B0B0;
-                border-radius: 15px;
-                padding: 20px;
-                border: 2px solid #505050;
-            }
-            
-            QTextEdit {
-        background-color: #FAF8F6;  /* Fondo blanco pastel */
-    }
-        """)
 
         self.setLayout(self.layout)
         self.exec_()
@@ -473,3 +395,175 @@ class ModificarConfiguracion(QDialog):
 
         self.configuracion.tipo = TipoError(self.tipo_error_combo.currentText())
         self.accept()
+
+
+ESTILO = """
+    QCheckBox {
+        spacing: 5px;  /* Espaciado entre el cuadro y el texto */
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tamaño de fuente */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía */
+        font-weight: bold;  /* Texto en negrita */
+    }
+
+    QCheckBox::indicator {
+        width: 20px;  /* Ancho del cuadro de verificación */
+        height: 20px;  /* Alto del cuadro de verificación */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 5px;  /* Bordes redondeados */
+        background-color: #FAF8F6;  /* Color de fondo del cuadro */
+    }
+
+    QCheckBox::indicator:checked {
+        background-color: #808080;  /* Fondo gris oscuro cuando está marcado */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+    }
+
+    QCheckBox::indicator:unchecked {
+        background-color: #FAF8F6;  /* Fondo claro cuando no está marcado */
+    }
+
+
+
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #707070;  /* Un gris más oscuro para mayor contraste */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;  /* Texto en negrita */
+        font-family: "Segoe UI", "Arial", sans-serif;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);  /* Sombra de texto para resaltar */
+        cursor: pointer;
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Color un poco más claro al pasar el cursor */
+        cursor: pointer;
+    }
+
+
+    QLineEdit {
+        background-color: #FAF8F6;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+    
+    QTextEdit {
+        background-color: #FAF8F6;  /* Fondo blanco pastel */
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #D0D0D0;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: #2B2D42;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+
+    QTabWidget::pane {
+        border: 2px solid #505050;
+        border-radius: 10px;
+        background-color: #FAF8F6;
+        padding: 10px;
+    }
+
+    QTabBar::tab {
+        background-color: #D0D0D0;
+        color: #2B2D42;
+        border: 2px solid #505050;
+        border-radius: 5px;
+        padding: 12px 30px;  /* Aumentar el padding para más espacio */
+        min-width: 140px;   /* Tamaño mínimo para evitar solapamiento */
+        font-size: 14px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+        font-weight: bold;  /* Texto en negrita */
+    }
+
+
+    QTabBar::tab:selected {
+        background-color: #808080;  /* Fondo gris oscuro al seleccionar */
+        color: white;  /* Texto en blanco en la pestaña seleccionada */
+    }
+
+    QTabBar::tab:hover {
+        background-color: #606060;  /* Fondo gris más oscuro al pasar el cursor */
+        color: white;  /* Texto en blanco al pasar el cursor */
+    }
+
+
+    QTableWidget {
+        background-color: #FAF8F6;  /* Color de fondo del área sin celdas */
+        border: 2px solid #505050;
+        border-radius: 10px;
+        color: #2B2D42;
+        font-size: 14px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+        gridline-color: #505050;  /* Color de las líneas de la cuadrícula */
+    }
+
+    QTableWidget::item {
+        background-color: #D0D0D0;  /* Color de fondo de las celdas */
+        border: none;
+    }
+
+    QHeaderView::section {
+        background-color: #808080;
+        color: white;
+        padding: 5px;
+        border: 1px solid #505050;
+    }
+
+    QTableCornerButton::section {
+        background-color: #808080;  /* Color del botón de esquina */
+        border: 1px solid #505050;
+    }
+
+
+    QListWidget {
+        background-color: #D0D0D0;
+        border: 2px solid #505050;
+        border-radius: 10px;
+        color: #2B2D42;
+        font-size: 14px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QListWidget::item:selected {
+        background-color: #808080;
+        color: white;
+    }
+"""
