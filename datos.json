@@ -190,6 +190,80 @@
                         "unidad_salida": "rep"
                     }
                 }
+            },
+            "Controladores Binarios": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Proporcional Binario": {
+                        "nombre": "Proporcional Binario",
+                        "descripcion": "Un controlador proporcional binario se utiliza en sistemas inform\u00e1ticos.",
+                        "fdt": "0.8",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "BIN",
+                        "unidad_salida": "BIN"
+                    },
+                    "Integral Binario": {
+                        "nombre": "Integral Binario",
+                        "descripcion": "Un controlador integral binario se utiliza en sistemas inform\u00e1ticos.",
+                        "fdt": "\\frac{0.1}{s}",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "BIN",
+                        "unidad_salida": "BIN"
+                    },
+                    "Derivativo Binario": {
+                        "nombre": "Derivativo Binario",
+                        "descripcion": "Un controlador derivativo binario se utiliza en sistemas inform\u00e1ticos.",
+                        "fdt": "s*\\frac{5}{100}",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "BIN",
+                        "unidad_salida": "BIN"
+                    }
+                }
             }
         },
         "ELECTRONICA": {
@@ -350,7 +424,7 @@
     },
     "MACROS.ACTUADOR": {
         "SISTEMAS": {
-            "balanceador_carga": {
+            "Balanceador de Carga": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Balanceador de carga simple": {
@@ -381,38 +455,7 @@
                     }
                 }
             },
-            "escalador_instancias": {
-                "descripcion": "",
-                "micro_bloques": {
-                    "Escalador de instancias b\u00e1sico": {
-                        "nombre": "Escalador de instancias b\u00e1sico",
-                        "descripcion": "Escala instancias en la nube de manera simple",
-                        "fdt": "\\frac{0.6}{1 + 2*s}",
-                        "entrada_limite_inferior": 0,
-                        "entrada_limite_superior": 100,
-                        "entrada_tipo": "proporcional",
-                        "salida_limite_inferior": 1,
-                        "salida_limite_superior": 10,
-                        "salida_tipo": "proporcional",
-                        "unidad_entrada": "%",
-                        "unidad_salida": "ins"
-                    },
-                    "Escalador de instancias avanzado": {
-                        "nombre": "Escalador de instancias avanzado",
-                        "descripcion": "Escala instancias en la nube de manera inteligente",
-                        "fdt": "\\frac{0.15}{s} + 0.1*s",
-                        "entrada_limite_inferior": 0,
-                        "entrada_limite_superior": 100,
-                        "entrada_tipo": "proporcional",
-                        "salida_limite_inferior": 1,
-                        "salida_limite_superior": 100,
-                        "salida_tipo": "proporcional",
-                        "unidad_entrada": "%",
-                        "unidad_salida": "ins"
-                    }
-                }
-            },
-            "reinicio_servicios": {
+            "Reinicio de Servicios": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Sistema de reinicio simple": {
@@ -443,7 +486,7 @@
                     }
                 }
             },
-            "limpieza_cache": {
+            "Limpieza de Cach\u00e9": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Limpiador de cach\u00e9 simple": {
@@ -474,7 +517,7 @@
                     }
                 }
             },
-            "ajustador_parametros": {
+            "Ajustador de Par\u00e1metros": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Ajustador de par\u00e1metros simple": {
@@ -502,6 +545,80 @@
                         "salida_tipo": "proporcional",
                         "unidad_entrada": "%",
                         "unidad_salida": "con"
+                    }
+                }
+            },
+            "Escaladores": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Escalador Vertical de CPU": {
+                        "nombre": "Escalador Vertical de CPU",
+                        "descripcion": "Escalador vertical de cantidad de CPU de las instancias.",
+                        "fdt": "\\frac{1}{2*s+1}",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "BIN",
+                        "unidad_salida": "U"
+                    },
+                    "Escalador Horizontal de Instancias": {
+                        "nombre": "Escalador Horizontal de Instancias",
+                        "descripcion": "Escalador simple de cantidad de instancias del sistema.",
+                        "fdt": "\\frac{2}{2*s+1}",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "BIN",
+                        "unidad_salida": "U"
+                    },
+                    "Ponderaci\u00f3n de Recursos de Escaladores": {
+                        "nombre": "Ponderaci\u00f3n de Recursos de Escaladores",
+                        "descripcion": "Traduce las unidades escaladas de recursos para la capacidad de un load balancer.",
+                        "fdt": "\\frac{s*(s+1)*(s+2)}{(3*s+1)^2}",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "U",
+                        "unidad_salida": "RPS"
                     }
                 }
             }
@@ -1053,6 +1170,34 @@
                         "unidad_salida": "GB"
                     }
                 }
+            },
+            "Balanceadores de Carga": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "AWS Load Balancer": {
+                        "nombre": "AWS Load Balancer",
+                        "descripcion": "El balanceador de carga de AWS es el m\u00e1s utilizado del mercado.",
+                        "fdt": "\\frac{1.2}{s*(s+1)*(s+2)}",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "RPS",
+                        "unidad_salida": "LOGS"
+                    }
+                }
             }
         },
         "ELECTRONICA": {
@@ -1294,7 +1439,7 @@
     },
     "MACROS.MEDIDOR": {
         "SISTEMAS": {
-            "uso_cpu": {
+            "Uso de Cpu": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Medidor de CPU b\u00e1sico": {
@@ -1327,7 +1472,7 @@
                     }
                 }
             },
-            "uso_ram": {
+            "Uso de Ram": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Medidor de RAM simple": {
@@ -1360,7 +1505,7 @@
                     }
                 }
             },
-            "espacio_disco": {
+            "Espacio Disco": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Medidor de disco b\u00e1sico": {
@@ -1393,7 +1538,7 @@
                     }
                 }
             },
-            "trafico_red": {
+            "Tr\u00e1fico de Red": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Medidor de tr\u00e1fico de red simple": {
@@ -1426,7 +1571,7 @@
                     }
                 }
             },
-            "peticiones_servidor": {
+            "Peticiones de Servidor": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Contador de peticiones b\u00e1sico": {
@@ -1459,7 +1604,7 @@
                     }
                 }
             },
-            "tiempo_respuesta": {
+            "Tiempo de Respuesta": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Monitor de tiempo de respuesta simple": {
@@ -1491,10 +1636,61 @@
                         "unidad_salida": "ms"
                     }
                 }
+            },
+            "Latencia": {
+                "descripcion": "",
+                "micro_bloques": {
+                    "Lector de Logs de Latencia.": {
+                        "nombre": "Lector de Logs de Latencia.",
+                        "descripcion": "Un lector de logs de latencia se encarga de leer los logs del sistema y obtener los tiempos de respuesta en milisegundos.",
+                        "fdt": "2",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "LOGS",
+                        "unidad_salida": "MS"
+                    },
+                    "Medidor de latencia": {
+                        "nombre": "Medidor de latencia",
+                        "descripcion": "El medidor de latencia hace el calculo de la media de los milisegundos y genera una respuesta binaria.",
+                        "fdt": "\\frac{1}{s+2}",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "MS",
+                        "unidad_salida": "BIN"
+                    }
+                }
             }
         },
         "ELECTRONICA": {
-            "Amperimetros": {
+            "Amper\u00edmetros": {
                 "descripcion": "",
                 "micro_bloques": {
                     "amperimetro_basico": {
@@ -1568,10 +1764,10 @@
                     }
                 }
             },
-            "Voltimetros": {
+            "Volt\u00edmetros": {
                 "descripcion": "",
                 "micro_bloques": {
-                    "voltimetro_basico": {
+                    "voltmetro_basico": {
                         "nombre": "Volt\u00edmetro B\u00e1sico",
                         "descripcion": "Volt\u00edmetro de baja precisi\u00f3n para mediciones de voltaje simple.",
                         "fdt": "\\frac{1}{1 + 0.05*s}",
@@ -1646,7 +1842,7 @@
                 "descripcion": "",
                 "micro_bloques": {
                     "ohimetro_basico": {
-                        "nombre": "Oh\u00edmetro B\u00e1sico",
+                        "nombre": "Ohm\u00edmetro B\u00e1sico",
                         "descripcion": "Oh\u00edmetro b\u00e1sico para mediciones simples de resistencia.",
                         "fdt": "\\frac{1}{1 + 0.02*s}",
                         "entrada_limite_inferior": "0",
@@ -1669,7 +1865,7 @@
                         "unidad_salida": "\u03a9"
                     },
                     "ohimetro_precision": {
-                        "nombre": "Oh\u00edmetro de Precisi\u00f3n",
+                        "nombre": "Ohm\u00edmetro de Precisi\u00f3n",
                         "descripcion": "Oh\u00edmetro de precisi\u00f3n con mayor exactitud y menor error de medici\u00f3n.",
                         "fdt": "\\frac{2}{1 + 0.01*s}",
                         "entrada_limite_inferior": "0",
@@ -1692,7 +1888,7 @@
                         "unidad_salida": "\u03a9"
                     },
                     "ohimetro_avanzado": {
-                        "nombre": "Oh\u00edmetro Avanzado",
+                        "nombre": "Ohm\u00edmetro Avanzado",
                         "descripcion": "Oh\u00edmetro avanzado capaz de medir resistencias en rangos muy altos.",
                         "fdt": "\\frac{10}{1 + 0.05*s}",
                         "entrada_limite_inferior": "0",
