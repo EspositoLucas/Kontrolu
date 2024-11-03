@@ -214,10 +214,7 @@ class Graficadora(QMainWindow):
         self.graph_layout = QHBoxLayout(self.graph_widget)  # Cambiado a QHBoxLayout
         self.tabs.addTab(self.graph_widget, "Gráfico")
         
-        # Panel izquierdo para controles y checkboxes
-        self.left_panel = QWidget()
-        self.left_panel_layout = QVBoxLayout(self.left_panel)
-        self.graph_layout.addWidget(self.left_panel, 1)
+
         
         # Área de desplazamiento para checkboxes
         self.checkbox_scroll = QScrollArea()
@@ -225,7 +222,6 @@ class Graficadora(QMainWindow):
         self.checkbox_widget = QWidget()
         self.checkbox_layout = QVBoxLayout(self.checkbox_widget)
         self.checkbox_scroll.setWidget(self.checkbox_widget)
-        self.left_panel_layout.addWidget(self.checkbox_scroll)
         
         # Panel derecho para el gráfico
         self.right_panel = QWidget()
@@ -254,11 +250,30 @@ class Graficadora(QMainWindow):
         self.right_panel_layout.addLayout(self.state_layout)
         self.state_indicator = QLabel()
         self.state_indicator.setFixedSize(50, 50)
-        self.state_indicator.setStyleSheet("border: 1px solid black;")
+        self.state_indicator.setStyleSheet("border: 3px solid black; border-radius: 25px;")
         self.state_layout.addWidget(self.state_indicator)
 
-        self.state_label = QLabel("Estado de Carga: ")
+        self.state_indicator.setStyleSheet(
+                f"background-color: {QColor(200, 200, 200).name()};"
+                f"border: 3px solid {QColor(200, 200, 200).darker().name()};"
+                f"border-radius: 25px;"
+                f"color: {QColor(200, 200, 200).darker().name()};"
+                f"font-weight: bold;")
+            # Establece el texto de `state_indicator` con la prioridad en formato 'prioridad/5'
+        self.state_indicator.setText(f" 0/5")
+        
+
+
+        self.state_label = QLabel("Rendimiento del sistema desconocido.")
         self.state_layout.addWidget(self.state_label)
+
+        # Actualiza el label de estado en negrita y centrado
+        self.state_label.setStyleSheet(
+            "font-weight: bold;"
+            "text-align: center;"
+            "vertical-align: middle;"
+            "line-height: 1.5em;"  # Ajusta esta altura para centrar verticalmente
+        )
 
         # Pestaña de la tabla
         self.table_widget = QWidget()
@@ -359,18 +374,42 @@ class Graficadora(QMainWindow):
 
     def actualizar_estado_carga(self, estado):
         if estado is not None:
-            nombre_estado = estado.get('nombre', 'Desconocido').lower()
-            color = self.obtener_color_estado(nombre_estado)
-            self.state_indicator.setStyleSheet(f"background-color: {color.name()}; border: 1px solid black;")
-            self.state_label.setText(f"Estado de Carga: {estado.get('nombre', 'Desconocido')}")
+            nombre_estado = estado.get('nombre', 'desconocido').lower()
+            prioridad_estado = estado.get('prioridad', 0)
+            
+            # Obtén el color base y un color más oscuro para el borde
+            color = self.obtener_color_estado(prioridad_estado)
+            borde_color = color.darker(120)  # Un 20% más oscuro que el color base
+            
+            # Actualiza el indicador de estado con el color de fondo y el borde
+            self.state_indicator.setStyleSheet(
+                f"background-color: {color.name()};"
+                f"border: 3px solid {borde_color.name()};"
+                f"border-radius: 25px;"
+                f"color: {borde_color.name()};"
+                f"font-weight: bold;"
+            )
+            # Establece el texto de `state_indicator` con la prioridad en formato 'prioridad/5'
+            self.state_indicator.setText(f" {prioridad_estado}/5")
+            
+            # Actualiza el label de estado en negrita y centrado
+            self.state_label.setStyleSheet(
+                "font-weight: bold;"
+                "text-align: center;"
+                "vertical-align: middle;"
+                "line-height: 1.5em;"  # Ajusta esta altura para centrar verticalmente
+            )
+            self.state_label.setText(f"Rendimiento del sistema {nombre_estado}.")
+
 
     def obtener_color_estado(self, nombre_estado):
         colores_estado = {
-            'excelente': QColor(0, 255, 0),  # Verde brillante fuerte
-            'bueno': QColor(144, 238, 144),  # Verde claro apenas notorio
-            'regular': QColor(255, 255, 0),  # Amarillo
-            'malo': QColor(255, 99, 71),  # Rojo claro
-            'pésimo': QColor(255, 0, 0)  # Rojo fuerte
+            5: QColor(153, 255, 153),  # Verde pastel suave
+            4: QColor(204, 255, 204),      # Verde más claro pastel
+            3: QColor(255, 255, 153),    # Amarillo pastel
+            2: QColor(255, 178, 178),       # Rojo claro pastel
+            1: QColor(255, 153, 153),      # Rojo pastel más fuerte
+            0: QColor(200, 200, 200)      # Blanco
         }
         return colores_estado.get(nombre_estado, QColor(255, 255, 255))  # Blanco por defecto
 
