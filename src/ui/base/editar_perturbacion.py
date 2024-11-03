@@ -107,7 +107,7 @@ class EditarPerturbacion(QDialog):
         layout.addLayout(help_layout)
 
         # Función de Transferencia
-        self.ft_label = QLabel("Función de Transferencia:")
+        self.ft_label = QLabel("Respuesta de la perturbación:")
         self.ft_editor = LatexEditor(self.perturbacion_back.funcion_transferencia)
         self.ft_editor.setStyleSheet("""
             background-color: #D0D0D0;
@@ -204,7 +204,7 @@ class EditarPerturbacion(QDialog):
             "<li><b>Duración:</b> Establece por cuánto tiempo actuará la perturbación (en segundos)</li>"
             "</ul>"),
             
-            ("<b>Función de Transferencia:</b>",
+            ("<b>Respuesta de la perturbación:</b>",
             "<ul>"
             "<li>Define matemáticamente cómo la perturbación afecta al sistema</li>"
             "<li>Se escribe usando notación LaTeX para expresiones matemáticas</li>"
@@ -243,8 +243,8 @@ class EditarPerturbacion(QDialog):
     def aceptar(self):
         
         if not self.ft_editor.es_funcion_valida(self.ft_editor.get_latex()):
-            QMessageBox.warning(self, "Función de transferencia inválida", 
-                                "La función de transferencia no es válida. Por favor, corríjala antes de continuar.")
+            QMessageBox.warning(self, "Respuesta de la perturbación inválida", 
+                                "La respuesta de la perturbación no es válida. Por favor, corríjala antes de continuar.")
             return
         
         self.perturbacion_back.set_funcion_transferencia(self.ft_editor.get_latex())
