@@ -24,56 +24,7 @@ class EditarPerturbacion(QDialog):
         self.setWindowTitle("Editar Perturbación")
         
         # Establecer el estilo general del diálogo
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #B0B0B0;
-                border-radius: 15px;
-                padding: 20px;
-                border: 2px solid #505050;
-            }
-            
-            QPushButton {
-                background-color: #808080;
-                color: white;
-                border: 2px solid #505050;
-                border-radius: 10px;
-                padding: 10px 20px;
-                font-size: 16px;
-                font-family: "Segoe UI", "Arial", sans-serif;
-            }
-            
-            QPushButton:hover {
-                background-color: #606060;
-            }
-            
-            QTextEdit {
-        background-color: #FAF8F6;  /* Fondo blanco pastel */
-    }
-            
-            QLabel {
-                color: #2B2D42;
-                background-color: transparent;
-                font-size: 16px;
-                font-family: "Segoe UI", "Arial", sans-serif;
-            }
-            
-            QCheckBox {
-                color: #2B2D42;
-                font-size: 14px;
-                font-family: "Segoe UI", "Arial", sans-serif;
-                background-color: #FAF8F6;
-            }
-            
-            QSpinBox {
-                background-color: #D0D0D0;
-                color: #2B2D42;
-                border: 2px solid #505050;
-                border-radius: 10px;
-                padding: 8px;
-                font-size: 14px;
-                font-family: "Segoe UI", "Arial", sans-serif;
-            }
-        """)
+        self.setStyleSheet(ESTILO)
 
         layout = QVBoxLayout()
         layout.setSpacing(10)  # Espaciado entre widgets
@@ -121,6 +72,33 @@ class EditarPerturbacion(QDialog):
 
         # Checkbox Perturbar ahora
         self.perturbar_ahora_checkbox = QCheckBox("Perturbar ahora")
+        self.perturbar_ahora_checkbox.setStyleSheet(
+            """
+                QCheckBox {
+                    spacing: 5px;  /* Espaciado entre el cuadro y el texto */
+                    color: #2B2D42;  /* Texto gris oscuro */
+                    font-size: 14px;  /* Tamaño de fuente */
+                    font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía */
+                    font-weight: bold;  /* Texto en negrita */
+                }
+
+                QCheckBox::indicator {
+                    width: 20px;  /* Ancho del cuadro de verificación */
+                    height: 20px;  /* Alto del cuadro de verificación */
+                    border: 2px solid #505050;  /* Borde gris oscuro */
+                    border-radius: 5px;  /* Bordes redondeados */
+                    background-color: #FAF8F6;  /* Color de fondo del cuadro */
+                }
+
+                QCheckBox::indicator:checked {
+                    background-color: #808080;  /* Fondo gris oscuro cuando está marcado */
+                    border: 2px solid #505050;  /* Borde gris oscuro */
+                }
+
+                QCheckBox::indicator:unchecked {
+                    background-color: #FAF8F6;  /* Fondo claro cuando no está marcado */
+                }  
+            """)
         self.perturbar_ahora_checkbox.setChecked(self.perturbacion_back.ahora)
         layout.addWidget(self.perturbar_ahora_checkbox)
 
@@ -263,3 +241,215 @@ class EditarPerturbacion(QDialog):
         vista.exec_()
         if vista.result():
             self.actualizar_campos()
+
+ESTILO = """
+    QCheckBox {
+        spacing: 5px;  /* Espaciado entre el cuadro y el texto */
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tamaño de fuente */
+        font-family: "Segoe UI", "Arial", sans-serif;  /* Tipografía */
+        font-weight: bold;  /* Texto en negrita */
+    }
+
+    QCheckBox::indicator {
+        width: 20px;  /* Ancho del cuadro de verificación */
+        height: 20px;  /* Alto del cuadro de verificación */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 5px;  /* Bordes redondeados */
+        background-color: #FAF8F6;  /* Color de fondo del cuadro */
+    }
+
+    QCheckBox::indicator:checked {
+        background-color: #808080;  /* Fondo gris oscuro cuando está marcado */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+    }
+
+    QCheckBox::indicator:unchecked {
+        background-color: #FAF8F6;  /* Fondo claro cuando no está marcado */
+    }
+
+
+
+    QDialog {
+        background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
+        border-radius: 15px;  /* Bordes redondeados */
+        padding: 20px;  /* Espaciado interior */
+        border: 2px solid #505050;  /* Borde gris más oscuro */
+    }
+
+    QPushButton {
+        background-color: #707070;  /* Un gris más oscuro para mayor contraste */
+        color: white;  /* Texto en blanco */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;  /* Texto en negrita */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QPushButton:hover {
+        background-color: #606060;  /* Color un poco más claro al pasar el cursor */
+    }
+
+
+    QLineEdit {
+        background-color: #FAF8F6;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+    
+    QTextEdit {
+        background-color: #FAF8F6;  /* Fondo blanco pastel */
+    }
+
+    QLabel {
+        color: #2B2D42;  /* Texto gris oscuro */
+        background-color: transparent;
+        font-size: 16px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox {
+        background-color: #D0D0D0;  /* Fondo gris claro */
+        color: #2B2D42;  /* Texto gris oscuro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 5px;
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #D0D0D0;  /* Fondo de la lista desplegable */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        selection-background-color: #808080;  /* Selección gris oscuro */
+        color: #2B2D42;  /* Texto blanco en selección */
+    }
+
+    QVBoxLayout {
+        margin: 10px;  /* Márgenes en el layout */
+        spacing: 10px;  /* Espaciado entre widgets */
+    }
+
+    QTabWidget::pane {
+        border: 2px solid #505050;
+        border-radius: 10px;
+        background-color: #FAF8F6;
+        padding: 10px;
+    }
+
+    QTabBar::tab {
+        background-color: #D0D0D0;
+        color: #2B2D42;
+        border: 2px solid #505050;
+        border-radius: 5px;
+        padding: 12px 30px;  /* Aumentar el padding para más espacio */
+        min-width: 140px;   /* Tamaño mínimo para evitar solapamiento */
+        font-size: 14px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+        font-weight: bold;  /* Texto en negrita */
+    }
+
+
+    QTabBar::tab:selected {
+        background-color: #808080;  /* Fondo gris oscuro al seleccionar */
+        color: white;  /* Texto en blanco en la pestaña seleccionada */
+    }
+
+    QTabBar::tab:hover {
+        background-color: #606060;  /* Fondo gris más oscuro al pasar el cursor */
+        color: white;  /* Texto en blanco al pasar el cursor */
+    }
+
+
+    QTableWidget {
+        background-color: #FAF8F6;  /* Color de fondo del área sin celdas */
+        border: 2px solid #505050;
+        border-radius: 10px;
+        color: #2B2D42;
+        font-size: 14px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+        gridline-color: #505050;  /* Color de las líneas de la cuadrícula */
+    }
+
+    QTableWidget::item {
+        background-color: #D0D0D0;  /* Color de fondo de las celdas */
+        border: none;
+    }
+
+    QHeaderView::section {
+        background-color: #808080;
+        color: white;
+        padding: 5px;
+        border: 1px solid #505050;
+    }
+
+    QTableCornerButton::section {
+        background-color: #808080;  /* Color del botón de esquina */
+        border: 1px solid #505050;
+    }
+
+
+    QListWidget {
+        background-color: #D0D0D0;
+        border: 2px solid #505050;
+        border-radius: 10px;
+        color: #2B2D42;
+        font-size: 14px;
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QListWidget::item:selected {
+        background-color: #808080;
+        color: white;
+    }
+
+    QSpinBox {
+        background-color: #FAF8F6;  /* Fondo gris claro */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-radius: 10px;
+        padding: 8px;
+        color: #2B2D42;  /* Texto gris oscuro */
+        font-size: 14px;  /* Tipografía más grande */
+        font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    QSpinBox::up-button {
+        subcontrol-origin: border;
+        subcontrol-position: top right;
+        width: 16px;  /* Ancho del botón */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-top-right-radius: 10px;  /* Bordes redondeados */
+        background-color: #808080;  /* Fondo gris oscuro */
+    }
+
+    QSpinBox::up-button:hover {
+        background-color: #606060;  /* Fondo gris más oscuro al pasar el cursor */
+    }
+
+    QSpinBox::up-button:pressed {
+        background-color: #404040;  /* Fondo gris oscuro al presionar */
+    }
+
+    QSpinBox::down-button {
+        subcontrol-origin: border;
+        subcontrol-position: bottom right;
+        width: 16px;  /* Ancho del botón */
+        border: 2px solid #505050;  /* Borde gris oscuro */
+        border-bottom-right-radius: 10px;  /* Bordes redondeados */
+        background-color: #808080;  /* Fondo gris oscuro */
+    }
+
+    QSpinBox::down-button:hover {
+        background-color: #606060;  /* Fondo gris más oscuro al pasar el cursor */
+    }
+
+    QSpinBox::down-button:pressed {
+        background-color: #404040;  /* Fondo gris oscuro al presionar */
+    }
+"""
