@@ -437,18 +437,18 @@ class EstabilidadDialog(QDialog):
             # Obtener polos y ceros del sistema
             polos_dict, ceros_dict = self.estabilidad.calcular_polos_y_ceros()
             
-            # Convertir los diccionarios de sympy a listas de números complejos
+            # Convertir los diccionarios a listas de números complejos
             polos_complex = []
             if polos_dict:  # Si hay polos
                 for polo, multiplicidad in polos_dict.items():
-                    polo_complex = complex(polo.evalf())
-                    polos_complex.extend([polo_complex] * multiplicidad)
+                    # polo ya es un número complex
+                    polos_complex.extend([polo] * multiplicidad)
             
             ceros_complex = []
             if ceros_dict:  # Si hay ceros
                 for cero, multiplicidad in ceros_dict.items():
-                    cero_complex = complex(cero.evalf())
-                    ceros_complex.extend([cero_complex] * multiplicidad)
+                    # cero ya es un número complex
+                    ceros_complex.extend([cero] * multiplicidad)
             
             # Convertir a arrays de numpy
             polos_complex = np.array(polos_complex)
@@ -460,7 +460,6 @@ class EstabilidadDialog(QDialog):
             
             # Determinar los límites del gráfico
             if len(polos_complex) > 0 or len(ceros_complex) > 0:
-                # Si hay al menos polos o ceros, usar sus valores para los límites
                 if len(polos_complex) > 0 and len(ceros_complex) > 0:
                     all_points = np.concatenate([polos_complex, ceros_complex])
                 elif len(polos_complex) > 0:
@@ -471,7 +470,6 @@ class EstabilidadDialog(QDialog):
                 max_abs = max(abs(np.max(all_points)), abs(np.min(all_points)))
                 limit = max_abs * 1.2
             else:
-                # Si no hay ni polos ni ceros, usar límites predeterminados
                 limit = 5
             
             # Graficar polos (x)
@@ -505,7 +503,7 @@ class EstabilidadDialog(QDialog):
             
             # Determinar si el sistema es estable
             if polos_dict:
-                sistema_estable = all(complex(polo.evalf()).real < 0 for polo in polos_dict.keys())
+                sistema_estable = all(polo.real < 0 for polo in polos_dict.keys())
                 estabilidad_texto = "Sistema Estable" if sistema_estable else "Sistema Inestable"
             else:
                 estabilidad_texto = "Sistema sin polos"
