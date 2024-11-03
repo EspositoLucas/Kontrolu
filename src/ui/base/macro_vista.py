@@ -46,6 +46,7 @@ class MacroVista(QGraphicsRectItem):
             self.text = self.nombre
         else:
             self.text = self.modelo.nombre
+        
         self.font = QFont("Arial", 16, QFont.Bold)  # Estilo del texto
         self.setAcceptHoverEvents(True)  
 
@@ -79,9 +80,10 @@ class MacroVista(QGraphicsRectItem):
     def updateText(self):
         # Actualizar el texto del rectángulo
         if self.modelo == None:
-            self.text = self.modelo.nombre
-        else:
             self.text = self.nombre
+            
+        else:
+            self.text = self.modelo.nombre
         self.update()  # Actualizar el rectángulo para redibujar
 
     def update_nombre(self):

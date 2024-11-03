@@ -211,7 +211,7 @@ class MainWindow(QMainWindow):
         vista.exec_()
         if vista.result():
             self.actualizar_sesion()
-            
+
 
     # Agregar este nuevo método
     def configurar_simulacion(self):
@@ -704,7 +704,7 @@ class MainWindow(QMainWindow):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
 
-        label = QLabel('¿Está seguro de que desea salir?')
+        label = QLabel('¿Está seguro que desea salir?')
         layout.addWidget(label)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Yes | QDialogButtonBox.No)
@@ -779,7 +779,9 @@ ESTILO = """
         background-color: transparent;
         font-size: 16px;  /* Tipografía más grande */
         font-family: "Segoe UI", "Arial", sans-serif;
+        font-weight: bold;  /* Texto en negrita */
     }
+
 
     QComboBox {
         background-color: #D0D0D0;  /* Fondo gris claro */

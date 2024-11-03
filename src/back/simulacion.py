@@ -29,6 +29,13 @@ class Simulacion(QObject):
         self.carga : Carga = sesion.carga
         self.entrada = sesion.entrada
 
+        self.controlador_nombre = self.controlador.nombre
+        self.actuador_nombre = self.actuador.nombre
+        self.proceso_nombre = self.proceso.nombre
+        self.medidor_nombre = self.medidor.nombre
+        self.entrada_nombre = self.entrada.nombre
+        self.carga_nombre = self.carga.nombre
+
         self.controlador.vaciar_datos()
         self.actuador.vaciar_datos()
         self.proceso.vaciar_datos()
@@ -46,7 +53,7 @@ class Simulacion(QObject):
         self.t_total = sesion.tiempo_total
         self.ciclos = self.t_total/self.delta
         self.salida_cero = sesion.salida_inicial
-        self.datos = {'Tiempo': [], 'Entrada': [], 'Salida': [], 'Carga': [], 'Medidor': [], 'Controlador': [], 'Actuador': [], 'Proceso':[],'Error Real': [], 'Error Medido': []}
+        self.datos = {'Tiempo': [], self.entrada_nombre: [], 'Salida': [], 'Carga': [], self.medidor_nombre: [], self.controlador_nombre: [], self.actuador_nombre: [], self.proceso_nombre:[],'Error Real': [], 'Error Medido': []}
         self.graficadora = graficadora
         self.graficadora.add_simulacion(self)
         self.continuar_simulacion = True
@@ -77,14 +84,14 @@ class Simulacion(QObject):
 
         y_medidor = self.medidor.simular(tiempo, self.delta, y_actual)
         
-        self.datos['Medidor'].append(y_medidor)
+        self.datos[self.medidor_nombre].append(y_medidor)
         print(f"Medición actual: {y_medidor}")
-        print(f"Histórico de mediciones: {self.datos['Medidor']}")
+        print(f"Histórico de mediciones: {self.datos[self.medidor_nombre]}")
 
         y_entrada =  self.entrada.simular(tiempo, self.delta)
-        self.datos['Entrada'].append(y_entrada)
+        self.datos[self.entrada_nombre].append(y_entrada)
         print(f"Entrada actual: {y_entrada}")
-        print(f"Histórico de entradas: {self.datos['Entrada']}")
+        print(f"Histórico de entradas: {self.datos[self.entrada_nombre]}")
 
         error = y_entrada - y_medidor        
         self.datos['Error Real'].append(error)
@@ -92,13 +99,13 @@ class Simulacion(QObject):
         # Simula cada componente del sistema en secuencia
         # Cada componente recibe el mismo vector de tiempo
         y_controlador = self.controlador.simular(tiempo, self.delta, error)
-        self.datos['Controlador'].append(y_controlador)
+        self.datos[self.controlador_nombre].append(y_controlador)
         
         y_actuador = self.actuador.simular(tiempo, self.delta, y_controlador)
-        self.datos['Actuador'].append(y_actuador)
+        self.datos[self.actuador_nombre].append(y_actuador)
 
         y_proceso = self.proceso.simular(tiempo, self.delta, y_actuador)
-        self.datos['Proceso'].append(y_proceso)
+        self.datos[self.proceso_nombre].append(y_proceso)
 
         self.datos['Salida'].append(y_proceso)
 
@@ -109,11 +116,11 @@ class Simulacion(QObject):
 
         datos_paso = {
             'Tiempo': tiempo,
-            'Controlador': y_controlador,
-            'Actuador': y_actuador,
-            'Proceso': y_proceso,
-            'Medidor': y_medidor,
-            'Entrada': y_entrada,
+            self.controlador_nombre: y_controlador,
+            self.actuador_nombre: y_actuador,
+            self.proceso_nombre: y_proceso,
+            self.medidor_nombre: y_medidor,
+            self.entrada_nombre: y_entrada,
             'Error Real': error,
             'Salida': y_proceso,
             'Carga': estado_carga  # Añadimos el estado de la carga
@@ -162,7 +169,7 @@ class Simulacion(QObject):
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         dialog.setWindowIcon(QtGui.QIcon(icon))
         
-        # Aplicar el nuevo estilo
+                # Aplicar el nuevo estilo
         dialog.setStyleSheet("""
             QMessageBox {
                 background-color: #B0B0B0;
@@ -171,25 +178,26 @@ class Simulacion(QObject):
                 padding: 20px;
             }
             QMessageBox QLabel {
-                color: #2B2D42;
-                font-size: 16px;
+                color: #2B2B2B; /* Blanco crema para el texto */
+                font-size: 18px; /* Tamaño de letra más grande */
+                font-weight: bold; /* Texto en negrita */
                 font-family: "Segoe UI", "Arial", sans-serif;
                 background-color: transparent;
                 padding: 10px;
             }
             QMessageBox QPushButton {
-                background-color: #808080;
-                color: white;
-                border: 2px solid #505050;
+                background-color: #808080; /* Fondo gris oscuro */
+                color: white; /* Texto en blanco */
+                border: 2px solid #505050; /* Borde gris oscuro */
                 border-radius: 10px;
                 padding: 10px 20px;
-                font-size: 16px;
+                font-size: 16px; /* Tamaño de letra más grande */
                 font-family: "Segoe UI", "Arial", sans-serif;
                 min-width: 80px;
                 min-height: 30px;
             }
             QMessageBox QPushButton:hover {
-                background-color: #606060;
+                background-color: #606060; /* Color más oscuro al pasar el cursor */
                 cursor: pointer;
             }
         """)
@@ -441,26 +449,26 @@ class Simulacion(QObject):
             
             self.datos['Carga'].append(estado_carga)
             self.datos['Tiempo'].append(tiempo)
-            self.datos['Entrada'].append(u)
+            self.datos[self.entrada_nombre].append(u)
             self.datos['Salida'].append(y[0, 0])
             self.datos['Error Real'].append(u - y[0, 0])
             self.datos['Error Medido'].append(error)
-            self.datos['Medidor'].append(y_medidor[0, 0])
-            self.datos['Controlador'].append(y_controlador)
-            self.datos['Actuador'].append(y_actuador)
-            self.datos['Proceso'].append(y_proceso)
+            self.datos[self.medidor_nombre].append(y_medidor[0, 0])
+            self.datos[self.controlador_nombre].append(y_controlador)
+            self.datos[self.actuador_nombre].append(y_actuador)
+            self.datos[self.proceso_nombre].append(y_proceso)
             
             datos_paso = {
                 'Tiempo': tiempo,
-                'Entrada': u,
+                self.entrada_nombre: u,
                 'Salida': y[0, 0],
                 'Error Real': u - y[0, 0],
                 'Error Medido': error,
                 'Carga': estado_carga,
-                'Medidor': y_medidor[0, 0],
-                'Controlador': y_controlador_nuevo,
-                'Actuador': y_actuador_nuevo,
-                'Proceso': y_proceso_nuevo
+                self.medidor_nombre: y_medidor[0, 0],
+                self.controlador_nombre: y_controlador_nuevo,
+                self.actuador_nombre: y_actuador_nuevo,
+                self.proceso_nombre: y_proceso_nuevo
             }
 
             if self.graficadora:
@@ -557,7 +565,7 @@ class Simulacion(QObject):
             self.x_proceso = np.zeros((nuevo_tam_proceso, 1))
             
         if not hasattr(self, 'datos'):
-            self.datos = {'Tiempo': [], 'Entrada': [], 'Salida': [], 'Carga': [], 'Medidor': [], 'Controlador': [], 'Proceso':[], 'Actuador': [], 'Error Real': [], 'Error Medido': []}
+            self.datos = {'Tiempo': [], self.entrada_nombre: [], 'Salida': [], 'Carga': [], self.medidor_nombre: [], self.controlador_nombre: [], self.proceso_nombre:[], self.actuador_nombre: [], 'Error Real': [], 'Error Medido': []}
         
         self.paso_actual = len(self.datos['Tiempo'])  # Mantener el paso actual basado en los datos
 
@@ -574,7 +582,7 @@ class Simulacion(QObject):
     def simular_sistema_tiempo_real(self):
         self.paso_actual = 1  # Reiniciar el contador de pasos
         self.y_salida = self.salida_cero  # Reiniciar el valor de salida
-        self.datos = {'Tiempo': [], 'Controlador': [], 'Actuador': [], 'Proceso': [], 'Medidor': [], 'Entrada': [], 'Error Real': [], 'Salida': [], 'Carga': []}
+        self.datos = {'Tiempo': [], self.controlador_nombre: [], self.actuador_nombre: [], self.proceso_nombre: [], self.medidor_nombre: [], self.entrada_nombre: [], 'Error Real': [], 'Salida': [], 'Carga': []}
 
     
     def detener_simulacion(self):

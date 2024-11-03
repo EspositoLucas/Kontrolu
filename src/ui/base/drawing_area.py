@@ -1003,29 +1003,27 @@ class DrawingArea(QGraphicsView):
                 border-radius: 15px;
                 padding: 20px;
             }
-            
             QMessageBox QLabel {
-                color: #2B2D42;
-                font-size: 16px;
+                color: #2B2B2B; /* Blanco crema para el texto */
+                font-size: 18px; /* Tamaño de letra más grande */
+                font-weight: bold; /* Texto en negrita */
                 font-family: "Segoe UI", "Arial", sans-serif;
                 background-color: transparent;
                 padding: 10px;
             }
-            
             QMessageBox QPushButton {
-                background-color: #808080;
-                color: white;
-                border: 2px solid #505050;
+                background-color: #808080; /* Fondo gris oscuro */
+                color: white; /* Texto en blanco */
+                border: 2px solid #505050; /* Borde gris oscuro */
                 border-radius: 10px;
                 padding: 10px 20px;
-                font-size: 16px;
+                font-size: 16px; /* Tamaño de letra más grande */
                 font-family: "Segoe UI", "Arial", sans-serif;
                 min-width: 80px;
                 min-height: 30px;
             }
-            
             QMessageBox QPushButton:hover {
-                background-color: #606060;
+                background-color: #606060; /* Color más oscuro al pasar el cursor */
                 cursor: pointer;
             }
         """)
@@ -1102,25 +1100,26 @@ class DrawingArea(QGraphicsView):
                 padding: 20px;
             }
             QMessageBox QLabel {
-                color: #2B2D42;
-                font-size: 16px;
+                color: #2B2B2B; /* Blanco crema para el texto */
+                font-size: 18px; /* Tamaño de letra más grande */
+                font-weight: bold; /* Texto en negrita */
                 font-family: "Segoe UI", "Arial", sans-serif;
                 background-color: transparent;
                 padding: 10px;
             }
             QMessageBox QPushButton {
-                background-color: #808080;
-                color: white;
-                border: 2px solid #505050;
+                background-color: #808080; /* Fondo gris oscuro */
+                color: white; /* Texto en blanco */
+                border: 2px solid #505050; /* Borde gris oscuro */
                 border-radius: 10px;
                 padding: 10px 20px;
-                font-size: 16px;
+                font-size: 16px; /* Tamaño de letra más grande */
                 font-family: "Segoe UI", "Arial", sans-serif;
                 min-width: 80px;
                 min-height: 30px;
             }
             QMessageBox QPushButton:hover {
-                background-color: #606060;
+                background-color: #606060; /* Color más oscuro al pasar el cursor */
                 cursor: pointer;
             }
         """)
