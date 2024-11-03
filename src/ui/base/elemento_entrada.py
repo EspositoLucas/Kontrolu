@@ -9,6 +9,7 @@ from ..base.vista_json import VistaJson
 from ..base.macro_vista import MacroVista
 from PyQt5.QtCore import QRectF
 from PyQt5.QtCore import Qt
+import re
 
 
 
@@ -91,7 +92,7 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         tipo_entrada_layout = QtWidgets.QHBoxLayout()
         tipo_entrada_layout.addWidget(QtWidgets.QLabel("Tipo de entrada:"))
         self.tipo_entrada_combo = QtWidgets.QComboBox()
-        self.tipo_entrada_combo.addItems(["Personalizada", "Escalón", "Rampa", "Parabólica"])
+        self.tipo_entrada_combo.addItems(["Personalizada", "Impulso", "Escalón", "Rampa", "Parabólica"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
         self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
@@ -129,6 +130,9 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         self.setLayout(layout)
         
         # Actualizamos la interfaz según el tipo de entrada inicial
+        self.tipo_entrada, self.coeficiente = self.determinar_tipo_funcion(self.entrada.funcion_transferencia)
+        self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
+        self.coeficiente_input.setText(self.coeficiente)
         self.actualizar_interfaz()
     
     def mostrar_ayuda(self):
@@ -203,8 +207,12 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
 
     def actualizar_campos_con_microbloque(self, microbloque):
         self.nombre_input.setText(microbloque.nombre)
+
+
+        self.tipo_entrada, self.coeficiente = self.determinar_tipo_funcion(microbloque.funcion_transferencia)
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
         self.coeficiente_input.setText(self.coeficiente)
+
         self.latex_editor.set_latex(microbloque.funcion_transferencia or "")
         self.actualizar_interfaz()
 
@@ -212,11 +220,31 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         vista = VistaJson(self.entrada, self)
         vista.exec_()
         if vista.result():
-            self.actualizar_campos_con_microbloque()
-            self.padre.setText(self.entrada.nombre)
+            self.actualizar_campos_con_microbloque(self.entrada)
+            self.padre.update_fdt()
+            self.padre.updateText()
+
+    def determinar_tipo_funcion(self, latex_funcion):        
+        #chequar si no tiene s es impulso
+        if "s" not in latex_funcion:
+            return "Impulso", latex_funcion
+        match = re.match(r"\\frac\{(.+?)\}\{s(?:\^(\d+))?\}", latex_funcion)
+        if match:
+            coeficiente = match.group(1)
+            exponente = match.group(2)
+            if exponente == "1" or exponente is None:
+                return "Escalón", coeficiente
+            elif exponente == "2":
+                return "Rampa", coeficiente
+            elif exponente == "3":
+                return "Parabólica", coeficiente
+        
+        return "Personalizada", "1"
 
 
     def actualizar_interfaz(self):
+
+
         tipo_entrada = self.tipo_entrada_combo.currentText()
         es_personalizada = tipo_entrada == "Personalizada"
         
@@ -241,6 +269,8 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
             latex = f"\\frac{{{coeficiente}}}{{s^2}}"
         elif tipo_entrada == "Parabólica":
             latex = f"\\frac{{{coeficiente}}}{{s^3}}"
+        elif tipo_entrada == "Impulso":
+            latex = f"{coeficiente}"
         else:
             return  # No actualizamos para entrada personalizada
         

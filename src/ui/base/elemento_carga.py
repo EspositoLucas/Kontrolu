@@ -48,6 +48,9 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         if not latex_funcion or latex_funcion == "" or latex_funcion == " ":
             return "Misma que entrada", "1"
         
+        #chequar si no tiene s es impulso
+        if "s" not in latex_funcion:
+            return "Impulso", latex_funcion
         match = re.match(r"\\frac\{(.+?)\}\{s(?:\^(\d+))?\}", latex_funcion)
         if match:
             coeficiente = match.group(1)
@@ -122,7 +125,7 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         tipo_entrada_layout = QtWidgets.QHBoxLayout()
         tipo_entrada_layout.addWidget(QtWidgets.QLabel("Entrada alternativa para el análisis:"))
         self.tipo_entrada_combo = QtWidgets.QComboBox()
-        self.tipo_entrada_combo.addItems(["Misma que entrada","Personalizada", "Escalón", "Rampa", "Parabólica"])
+        self.tipo_entrada_combo.addItems(["Misma que entrada","Personalizada", "Impulso", "Escalón", "Rampa", "Parabólica"])
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
         self.tipo_entrada_combo.currentIndexChanged.connect(self.actualizar_interfaz)
         tipo_entrada_layout.addWidget(self.tipo_entrada_combo)
@@ -283,13 +286,13 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.tipo_entrada_combo.setCurrentText(self.tipo_entrada)
         self.coeficiente_input.setText(self.coeficiente)
         self.actualizar_interfaz()
-        self.padre.setText(self.carga.nombre)
 
     def editar_json(self):
         vista = VistaJson(self.carga, self)
         vista.exec_()
         if vista.result():
             self.actualizar_campos()
+            self.padre.updateText()
 
     def actualizar_lista_estados(self):
         self.estados_list.clear()
@@ -347,8 +350,9 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def actualizar_funcion_transferencia(self):
         tipo_entrada = self.tipo_entrada_combo.currentText()
         coeficiente = self.coeficiente_input.text()
-        
-        if tipo_entrada == "Escalón":
+        if tipo_entrada == "Impulso":
+            latex = f"{coeficiente}"
+        elif tipo_entrada == "Escalón":
             latex = f"\\frac{{{coeficiente}}}{{s}}"
         elif tipo_entrada == "Rampa":
             latex = f"\\frac{{{coeficiente}}}{{s^2}}"
