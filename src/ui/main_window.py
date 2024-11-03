@@ -17,8 +17,9 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication
 from .base.vista_json import VistaJson
 import sympy as sp
-import sys
-from latex2sympy2 import latex2sympy
+#from latex2sympy2 import latex2sympy
+from sympy.parsing.latex import parse_latex
+
 
 class MainWindow(QMainWindow):
     
@@ -115,16 +116,6 @@ class MainWindow(QMainWindow):
         
         # Debug de información de pantalla
         screen = QtGui.QGuiApplication.primaryScreen().geometry()
-        print("\n=== PANTALLA DEBUG ===")
-        print(f"Resolución de pantalla: {screen.width()}x{screen.height()}")
-        print(f"DPI de pantalla: {QtGui.QGuiApplication.primaryScreen().logicalDotsPerInch()}")
-        print(f"Factor de escalado: {QtGui.QGuiApplication.primaryScreen().devicePixelRatio()}")
-        
-        
-        # Print tamaño inicial de ventana
-        print(f"Tamaño mínimo establecido: 800x600")
-        print(f"Geometría inicial: {self.geometry().width()}x{self.geometry().height()}")
-        print("=====================\n")
         
         self.showMaximized()
         
@@ -175,16 +166,11 @@ class MainWindow(QMainWindow):
         super().resizeEvent(event)
         if self.floating_ellipses_view:
             # Prints para debugging de dimensiones
-            print("\n=== RESIZE EVENT DEBUG ===")
-            print(f"Ventana actual - Ancho: {self.size().width()}, Alto: {self.size().height()}")
-            print(f"Evento resize - Antiguo tamaño: {event.oldSize().width()}x{event.oldSize().height()}")
-            print(f"Evento resize - Nuevo tamaño: {event.size().width()}x{event.size().height()}")
+
             
             # Calcular dimensiones
-            print("resize")
             height = self.size().height()
             width = self.size().width()
-            print(height)
             
             self.floating_ellipses_view.setGeometry(0, height-200, width, 150)
 
@@ -432,7 +418,6 @@ class MainWindow(QMainWindow):
         # Save the image if a path is selected
         if save_path:
             image.save(save_path)
-            print(f"Image saved to {save_path}")
 
 
     def mostrar_analisis_estabilidad(self):
@@ -676,7 +661,7 @@ class MainWindow(QMainWindow):
 
         def calcular():
             error = self.estabilidad.calcular_error_estado_estable()
-            resultado_label.setText(f"Error en estado estable para entrada {latex2sympy(self.sesion.entrada.funcion_transferencia)}:\n{error}")
+            resultado_label.setText(f"Error en estado estable para entrada {parse_latex(self.sesion.entrada.funcion_transferencia)}:\n{error}")
             if error == 0:
                 resultado_frame.setStyleSheet("background-color: #d4edda; padding: 2px; border-radius: 2px;")
                 resultado_label.setStyleSheet("font-weight: bold; font-size: 16px; color: #155724;")
@@ -750,13 +735,10 @@ ESTILO = """
         font-size: 16px;
         font-weight: bold;  /* Texto en negrita */
         font-family: "Segoe UI", "Arial", sans-serif;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);  /* Sombra de texto para resaltar */
-        cursor: pointer;
     }
 
     QPushButton:hover {
         background-color: #606060;  /* Color un poco más claro al pasar el cursor */
-        cursor: pointer;
     }
 
 

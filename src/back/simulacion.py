@@ -13,8 +13,6 @@ from sympy import latex,inverse_laplace_transform, simplify
 from sympy.abc import s,z,t
 import control as ctrl
 import numpy as np
-import time
-from latex2sympy2 import latex2sympy
 
 class Simulacion(QObject):
 
@@ -198,7 +196,6 @@ class Simulacion(QObject):
             }
             QMessageBox QPushButton:hover {
                 background-color: #606060; /* Color más oscuro al pasar el cursor */
-                cursor: pointer;
             }
         """)
         

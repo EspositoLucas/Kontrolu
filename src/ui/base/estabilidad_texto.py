@@ -552,13 +552,10 @@ ESTILO = """
         font-size: 16px;
         font-weight: bold;  /* Texto en negrita */
         font-family: "Segoe UI", "Arial", sans-serif;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);  /* Sombra de texto para resaltar */
-        cursor: pointer;
     }
 
     QPushButton:hover {
         background-color: #606060;  /* Color un poco más claro al pasar el cursor */
-        cursor: pointer;
     }
 
 

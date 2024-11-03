@@ -3,7 +3,8 @@ from PyQt5.QtGui import QColor
 from back.topologia.configuraciones import Configuracion,TipoError
 from .hoja import Hoja
 from back.json_manager.dtos import MicroBloqueDto
-from latex2sympy2 import latex2sympy
+#from latex2sympy2 import latex2sympy
+from sympy.parsing.latex import parse_latex
 
 class MicroBloque(Hoja):
     def __init__(self, nombre: str= "Microbloque",color: QColor=QColor(255, 255, 255), funcion_transferencia: str="\\frac{1}{s}", padre=None, descripcion = "Esto es un microbloque", datos: MicroBloqueDto = None,from_json=None) -> None:
@@ -162,7 +163,7 @@ class MicroBloque(Hoja):
             raise Exception(f"La función de transferencia de {datos['nombre']} debe ser un string")
         
         try:
-            latex2sympy(datos['fdt'])
+            parse_latex(datos['fdt'])
         except Exception as e:
             raise Exception(f"Error en la función de transferencia de {datos['nombre']}")
         
@@ -181,7 +182,6 @@ class MicroBloque(Hoja):
         return True
     
     def calcular_indice_de_error(self):
-        print("DEBO CALCULAR EL INDICE DE ERROR")
         self.configuracion_entrada.calcular_indice_de_error()
         self.configuracion_salida.calcular_indice_de_error()
 
@@ -191,8 +191,7 @@ class MicroBloque(Hoja):
         if tiempo != None:
             entrada = self.configuracion_entrada.get_indice_de_error()
             salida = self.configuracion_salida.get_indice_de_error()
-            print(f"Entrada INDICE: {entrada}")	
-            print(f"Salida INDICE: {salida}")
+
             return (entrada * self.calcular_fdt(tiempo=tiempo) * salida) * input
         
         return self.calcular_fdt() * input

@@ -219,7 +219,6 @@ class DrawingArea(QGraphicsView):
             }
             QPushButton:hover {
                 background-color: #606060;
-                cursor: pointer;
             }
         """)
         
@@ -366,7 +365,6 @@ class DrawingArea(QGraphicsView):
             
             QMessageBox QPushButton:hover {
                 background-color: #606060;
-                cursor: pointer;
             }
         """)
         
@@ -1024,7 +1022,6 @@ class DrawingArea(QGraphicsView):
             }
             QMessageBox QPushButton:hover {
                 background-color: #606060; /* Color más oscuro al pasar el cursor */
-                cursor: pointer;
             }
         """)
         
@@ -1120,7 +1117,6 @@ class DrawingArea(QGraphicsView):
             }
             QMessageBox QPushButton:hover {
                 background-color: #606060; /* Color más oscuro al pasar el cursor */
-                cursor: pointer;
             }
         """)
         
@@ -1165,7 +1161,6 @@ class DrawingArea(QGraphicsView):
         # Save the image if a path is selected
         if save_path:
             image.save(save_path)
-            print(f"Image saved to {save_path}")
 
 
     def set_seleccion_multiple(self, valor):

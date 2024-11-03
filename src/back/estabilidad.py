@@ -3,7 +3,8 @@ from back.topologia.topologia_serie import TopologiaSerie, TopologiaParalelo
 from back.topologia.microbloque import MicroBloque
 from back.topologia.perturbacion import Perturbacion
 from back.topologia.hoja import Hoja
-from latex2sympy2 import latex2sympy
+#from latex2sympy2 import latex2sympy
+from sympy.parsing.latex import parse_latex
 from tbcontrol.symbolic import routh
 import numpy as np
 import math
@@ -78,7 +79,7 @@ class Estabilidad:
 
     def parse_latex_to_sympy(self, latex_str):
         try:
-            return latex2sympy(latex_str)
+            return parse_latex(latex_str)
         except Exception as e:
             print(f"Error parsing LaTeX: {e}")
             # As a fallback, try to create a simple fraction if the latex represents a basic fraction

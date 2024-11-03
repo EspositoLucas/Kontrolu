@@ -414,13 +414,13 @@ class Sesion():
     
     def obtener_ecuaciones_inicio(self):
         
-        global_sympy = self.simplificar_tf(self.obtener_fdt_lazo_abierto_simpy())
+        global_sympy = simplify(self.obtener_fdt_lazo_abierto_simpy())
         global_latex = latex(global_sympy)
 
         realimentacion = self.obtener_fdt_realimentacion_simpy()
         realimentacion_latex = latex(realimentacion)
 
-        total_sympy = self.simplificar_tf(global_sympy/(1+global_sympy*realimentacion))
+        total_sympy = simplify(global_sympy/(1+global_sympy*realimentacion))
         total_latex = latex(total_sympy)
 
         caracteristico = Poly(fraction(total_sympy)[1],s)
@@ -428,13 +428,13 @@ class Sesion():
 
         entrada = self.entrada.calcular_fdt()
 
-        con_entrada = self.simplificar_tf(total_sympy * entrada)
+        con_entrada = simplify(total_sympy * entrada)
         con_entrada_latex = latex(con_entrada)
 
-        abierta_si_unitario = self.simplificar_tf(total_sympy/(1-total_sympy))
+        abierta_si_unitario = simplify(total_sympy/(1-total_sympy))
         abierta_si_unitario_latex = latex(abierta_si_unitario)
 
-        sympy_lim = self.simplificar_tf(s*entrada*(1/(1+abierta_si_unitario)))
+        sympy_lim = simplify(s*entrada*(1/(1+abierta_si_unitario)))
         latex_lim = latex(sympy_lim)
         error = sympy_lim.limit(s,0).evalf()
 

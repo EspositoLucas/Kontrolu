@@ -114,7 +114,6 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
             }
             QPushButton:hover {
                 background-color: #606060;
-                cursor: pointer;
             }
         """)
         

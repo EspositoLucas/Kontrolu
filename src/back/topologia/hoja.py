@@ -1,9 +1,9 @@
 from __future__ import annotations
 from .interfaz_topologia import InterfazTopologia
 from sympy import  simplify,inverse_laplace_transform
-from latex2sympy2 import latex2sympy
 from sympy.abc import s,t,z
-from latex2sympy2 import latex2sympy
+#from latex2sympy2 import latex2sympy
+from sympy.parsing.latex import parse_latex
 from scipy.signal import bilinear,dlsim,dlti,dimpulse
 class Hoja(InterfazTopologia):
     
@@ -88,38 +88,30 @@ class Hoja(InterfazTopologia):
 
     def calcular_fdt(self,tiempo=None):
 
-        return latex2sympy(self.get_funcion_transferencia())
+        return parse_latex(self.get_funcion_transferencia())
     
     def simular(self, tiempo, delta, entrada=None):
 
         self.tiempos.append(tiempo)
 
         if entrada == None:
-            print("ENTRADA")
-            print(self.tiempos)
-            print(self.system)
 
 
-            y = inverse_laplace_transform(latex2sympy(self.get_funcion_transferencia()),s,t).subs(t,tiempo)
+            y = inverse_laplace_transform(parse_latex(self.get_funcion_transferencia()),s,t).subs(t,tiempo)
             return y
         
         if not self.system or self.delta_calculated != delta or self.fdt_calculated != self.get_funcion_transferencia():
             self.set_simu_fdt(delta)
         
         self.entradas.append(entrada)
-        print("BLOQUE")
-        print(self.entradas)
-        print(self.tiempos)
-        print(self.system)
+
         _,y = dlsim(self.system,u = self.entradas,t = self.tiempos)
 
-        print("SALIDA")
-        print(y[-1][0])
         return float(y[-1][0])
     
     def get_simu_fdt(self,delta):
 
-        sympy_fdt = latex2sympy(self.get_funcion_transferencia())
+        sympy_fdt = parse_latex(self.get_funcion_transferencia())
 
         expr_simplified = simplify(sympy_fdt)
 

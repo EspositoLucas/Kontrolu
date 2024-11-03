@@ -4,8 +4,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
 from sympy import sympify, Symbol, SympifyError,Expr
 import re
-from latex2sympy2 import latex2sympy
-
+#from latex2sympy2 import latex2sympy
+from sympy.parsing.latex import parse_latex
 class LatexEditor(QWidget):
     latex_changed = pyqtSignal(str)
 
@@ -206,14 +206,32 @@ class LatexEditor(QWidget):
         Returns:
             bool: True si la expresión es válida, False en caso contrario
         """
+
         try:
             # Intentamos convertir la expresión LaTeX a sympy
-            expr = latex2sympy(latex)
+            print("Prueba de latex")
+
+            print(latex)
+
+            print("tipo latex")
+
+            print(type(latex))
+
+
+            expr = parse_latex(latex)
+
+            print("Latex parsaedo")
+
+            print(expr)
             
             # Obtenemos todos los símbolos (variables) en la expresión
             simbolos = expr.free_symbols
 
+            print("Simbolos")
+
             print(simbolos)
+
+            print("Fin simbolos")
             
             # Verificamos que solo haya un símbolo y sea 's'
             if len(simbolos) == 0:
@@ -221,6 +239,8 @@ class LatexEditor(QWidget):
             return len(simbolos) == 1 and 's' in [str(sym) for sym in simbolos]
             
         except Exception as e:
+            print("Latex error")
+            print(e)
             # Si hay cualquier error en la conversión, la función no es válida
             return False
 
@@ -284,13 +304,10 @@ ESTILO = """
         font-size: 16px;
         font-weight: bold;  /* Texto en negrita */
         font-family: "Segoe UI", "Arial", sans-serif;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);  /* Sombra de texto para resaltar */
-        cursor: pointer;
     }
 
     QPushButton:hover {
         background-color: #606060;  /* Color un poco más claro al pasar el cursor */
-        cursor: pointer;
     }
 
 
@@ -328,7 +345,6 @@ ESTILO = """
 
     QToolButton:hover {
         background-color: #606060;  /* Gris aún más oscuro al pasar el cursor */
-        cursor: pointer;  /* Cambia el cursor al pasar sobre el botón */
     }
 
     QToolButton:pressed {

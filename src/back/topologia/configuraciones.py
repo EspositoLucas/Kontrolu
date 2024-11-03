@@ -236,19 +236,14 @@ class Configuracion:
         if probabilidad > self.probabilidad:
             self.indice_de_error = 1
         elif self.tipo == TipoError.NINGUNO:
-            print("No hay error")
             self.indice_de_error =  1
         elif self.tipo == TipoError.PROPORCIONAL:
-            print("Error proporcional")
             self.indice_de_error = 1 - self.proporcion
         elif self.tipo == TipoError.ALEATORIO:
-            print("Error aleatorio")
             self.indice_de_error = np.random.uniform(1 - self.proporcion,1+self.proporcion)
         elif self.tipo == TipoError.GAUSS:
-            print("Error gaussiano")
             self.indice_de_error = np.random.normal(1, self.proporcion)
         else:
-            print("Error no definido")
             self.indice_de_error = 1
         
         return self.indice_de_error
