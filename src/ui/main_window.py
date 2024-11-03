@@ -364,7 +364,8 @@ class MainWindow(QMainWindow):
 
     # Modificar el método iniciar_simulacion existente
     def iniciar_simulacion(self):
-        self.graficadora = Graficadora()
+        carga_nombre = self.sesion.carga.nombre
+        self.graficadora = Graficadora(carga_nombre)
         self.graficadora.show()
         
         self.simulacion = Simulacion(

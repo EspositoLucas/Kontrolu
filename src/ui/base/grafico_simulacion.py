@@ -184,8 +184,11 @@ ESTILO = """
 """
 
 class Graficadora(QMainWindow):
-    def __init__(self):
+    def __init__(self,carga_nombre):
         super().__init__()
+
+        self.carga_nombre = carga_nombre
+
         # Aplicar el estilo global
         self.setStyleSheet(ESTILO)
         
@@ -337,7 +340,7 @@ class Graficadora(QMainWindow):
 
 
     def mostrar_interpretacion(self):
-        interpretacion = InterpretacionDatos(self.datos)
+        interpretacion = InterpretacionDatos(self.datos,self.carga_nombre)
         interpretacion.exec_()
 
     def export_to_pdf(self):
@@ -358,8 +361,8 @@ class Graficadora(QMainWindow):
                     self.checkboxes[clave].stateChanged.connect(self.actualizar_grafico)
                     self.controls_layout.addWidget(self.checkboxes[clave])
                 
-                # if clave == 'Carga':
-                #     self.datos[clave].append(valor)  # Mantener el diccionario para 'Carga'
+                # if clave == self.carga_nombre:
+                #     self.datos[clave].append(valor)  # Mantener el diccionario para self.carga_nombre
                 
                 # Agregar clave a la lista de selección de columnas
                 self.column_list.addItem(clave)
@@ -369,7 +372,7 @@ class Graficadora(QMainWindow):
 
         
         self.actualizar_grafico()
-        self.actualizar_estado_carga(nuevos_datos.get('Carga', None))
+        self.actualizar_estado_carga(nuevos_datos.get(self.carga_nombre, None))
         self.actualizar_tabla()
 
     def actualizar_estado_carga(self, estado):
@@ -399,7 +402,7 @@ class Graficadora(QMainWindow):
                 "vertical-align: middle;"
                 "line-height: 1.5em;"  # Ajusta esta altura para centrar verticalmente
             )
-            self.state_label.setText(f"Rendimiento del sistema {nombre_estado}.")
+            self.state_label.setText(f"{self.carga_nombre} del sistema {nombre_estado}.")
 
 
     def obtener_color_estado(self, nombre_estado):
@@ -464,8 +467,8 @@ class Graficadora(QMainWindow):
                                         ha='center')
 
         self.ax.legend()
-        self.ax.set_xlabel('Tiempo')
-        self.ax.set_ylabel('Valor')
+        self.ax.set_xlabel('Segundos')
+        self.ax.set_ylabel('Salidas')
         self.canvas.draw()
 
     def closeEvent(self, event):
@@ -492,8 +495,9 @@ class ExportManager:
 
 
 class InterpretacionDatos(QDialog):
-    def __init__(self, datos):
+    def __init__(self, datos,carga_nombre):
         super().__init__()
+        self.carga_nombre = carga_nombre
         self.setStyleSheet(ESTILO)  # Aplicar el estilo
         self.setWindowTitle("Interpretación de Datos")
         self.setGeometry(200, 200, 800, 600)
@@ -586,7 +590,7 @@ class InterpretacionDatos(QDialog):
 
         # Análisis por variable
         for key in datos:
-            if key != 'Tiempo' and key != 'Carga':
+            if key != 'Tiempo' and key != self.carga_nombre:
                 interpretacion += self.analizar_variable(key, datos[key])
 
         self.text_edit.setText(interpretacion)
@@ -608,10 +612,10 @@ class InterpretacionDatos(QDialog):
     
     def analizar_cambios_bruscos(self, datos):
         cambios_bruscos = []
-        if 'Carga' not in datos or len(datos['Carga']) < 2:
+        if self.carga_nombre not in datos or len(datos[self.carga_nombre]) < 2:
             return cambios_bruscos
 
-        estados_carga = datos['Carga']
+        estados_carga = datos[self.carga_nombre]
         tiempos = datos['Tiempo']
         def calificar_estado(estado):
             if estado is not None:

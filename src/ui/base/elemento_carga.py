@@ -398,6 +398,8 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         super().accept()
         
         
+from PyQt5 import QtWidgets, QtCore
+
 class EditarEstadoDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, estado=None):
         super().__init__(parent)
@@ -408,6 +410,7 @@ class EditarEstadoDialog(QtWidgets.QDialog):
     def initUI(self):
         layout = QtWidgets.QVBoxLayout()
 
+        # Aplica el estilo
         self.setStyleSheet(ESTILO)
 
         # Nombre del estado
@@ -433,11 +436,34 @@ class EditarEstadoDialog(QtWidgets.QDialog):
 
         # Botones OK y Cancelar
         button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
-        button_box.accepted.connect(self.accept)
+        button_box.accepted.connect(self.validate_inputs)
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
 
         self.setLayout(layout)
+
+    def validate_inputs(self):
+        # Validar la prioridad como un entero entre 0 y 5
+        try:
+            prioridad = int(self.prioridad_input.text())
+            if prioridad not in range(6):
+                raise ValueError
+        except ValueError:
+            QtWidgets.QMessageBox.warning(self, "Error", "La prioridad debe ser un número entero entre 0 y 5.")
+            return
+
+        # Validar el mínimo como un float entre 0 (incluido) y 1 (excluido)
+        try:
+            minimo = float(self.minimo_input.text())
+            if not (0 <= minimo < 1):
+                raise ValueError
+        except ValueError:
+            QtWidgets.QMessageBox.warning(self, "Error", "El mínimo debe ser un número decimal entre 0 y 1, incluyendo 0 pero excluyendo 1.")
+            return
+
+        # Si ambas validaciones pasan, aceptar el diálogo
+        self.accept()
+
 
 
 ESTILO = """

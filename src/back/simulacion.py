@@ -51,7 +51,7 @@ class Simulacion(QObject):
         self.t_total = sesion.tiempo_total
         self.ciclos = self.t_total/self.delta
         self.salida_cero = sesion.salida_inicial
-        self.datos = {'Tiempo': [], self.entrada_nombre: [], 'Salida': [], 'Carga': [], self.medidor_nombre: [], self.controlador_nombre: [], self.actuador_nombre: [], self.proceso_nombre:[],'Error Real': [], 'Error Medido': []}
+        self.datos = {'Tiempo': [], self.entrada_nombre: [], 'Salida': [], self.carga_nombre: [], self.medidor_nombre: [], self.controlador_nombre: [], self.actuador_nombre: [], self.proceso_nombre:[],'Error Real': [], 'Error Medido': []}
         self.graficadora = graficadora
         self.graficadora.add_simulacion(self)
         self.continuar_simulacion = True
@@ -108,9 +108,9 @@ class Simulacion(QObject):
         self.datos['Salida'].append(y_proceso)
 
         estado_carga = self.carga.simular(tiempo, self.delta, y_proceso)
-        self.datos['Carga'].append(estado_carga)
+        self.datos[self.carga_nombre].append(estado_carga)
         print(f"Estado de carga: {estado_carga}")
-        print(f"Histórico de estados de carga: {self.datos['Carga']}")
+        print(f"Histórico de estados de carga: {self.datos[self.carga_nombre]}")
 
         datos_paso = {
             'Tiempo': tiempo,
@@ -121,7 +121,7 @@ class Simulacion(QObject):
             self.entrada_nombre: y_entrada,
             'Error Real': error,
             'Salida': y_proceso,
-            'Carga': estado_carga  # Añadimos el estado de la carga
+            self.carga_nombre: estado_carga  # Añadimos el estado de la carga
         }
 
         if self.graficadora:
@@ -444,7 +444,7 @@ class Simulacion(QObject):
 
             estado_carga = self.carga.simular(tiempo, self.delta, y[0, 0])
             
-            self.datos['Carga'].append(estado_carga)
+            self.datos[self.carga_nombre].append(estado_carga)
             self.datos['Tiempo'].append(tiempo)
             self.datos[self.entrada_nombre].append(u)
             self.datos['Salida'].append(y[0, 0])
@@ -461,7 +461,7 @@ class Simulacion(QObject):
                 'Salida': y[0, 0],
                 'Error Real': u - y[0, 0],
                 'Error Medido': error,
-                'Carga': estado_carga,
+                self.carga_nombre: estado_carga,
                 self.medidor_nombre: y_medidor[0, 0],
                 self.controlador_nombre: y_controlador_nuevo,
                 self.actuador_nombre: y_actuador_nuevo,
@@ -562,7 +562,7 @@ class Simulacion(QObject):
             self.x_proceso = np.zeros((nuevo_tam_proceso, 1))
             
         if not hasattr(self, 'datos'):
-            self.datos = {'Tiempo': [], self.entrada_nombre: [], 'Salida': [], 'Carga': [], self.medidor_nombre: [], self.controlador_nombre: [], self.proceso_nombre:[], self.actuador_nombre: [], 'Error Real': [], 'Error Medido': []}
+            self.datos = {'Tiempo': [], self.entrada_nombre: [], 'Salida': [], self.carga_nombre: [], self.medidor_nombre: [], self.controlador_nombre: [], self.proceso_nombre:[], self.actuador_nombre: [], 'Error Real': [], 'Error Medido': []}
         
         self.paso_actual = len(self.datos['Tiempo'])  # Mantener el paso actual basado en los datos
 
@@ -579,7 +579,7 @@ class Simulacion(QObject):
     def simular_sistema_tiempo_real(self):
         self.paso_actual = 1  # Reiniciar el contador de pasos
         self.y_salida = self.salida_cero  # Reiniciar el valor de salida
-        self.datos = {'Tiempo': [], self.controlador_nombre: [], self.actuador_nombre: [], self.proceso_nombre: [], self.medidor_nombre: [], self.entrada_nombre: [], 'Error Real': [], 'Salida': [], 'Carga': []}
+        self.datos = {'Tiempo': [], self.controlador_nombre: [], self.actuador_nombre: [], self.proceso_nombre: [], self.medidor_nombre: [], self.entrada_nombre: [], 'Error Real': [], 'Salida': [], self.carga_nombre: []}
 
     
     def detener_simulacion(self):
