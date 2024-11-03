@@ -33,6 +33,8 @@ class EstabilidadTexto(QGraphicsTextItem):
 
         super().__init__(parent)
 
+        self.polinomio = estabilidad
+
         self.estabilidad = Estabilidad(sesion)
 
         self.sesion = sesion
@@ -61,6 +63,8 @@ class EstabilidadTexto(QGraphicsTextItem):
 
 
     def update_text(self,estabilidad):
+
+        self.polinomio = estabilidad
 
         _ , estado =  self.estabilidad.calcular_routh_con_libreria(estabilidad[0])
 
