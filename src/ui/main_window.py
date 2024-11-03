@@ -107,23 +107,28 @@ class MainWindow(QMainWindow):
             self.initial_menu.close()
             self.initial_menu = None
         self.initUI()
-        self.show()
+        self.showNormal()
+        self.setWindowState(Qt.WindowMaximized)
             
     
     def initUI(self):
         self.setWindowTitle('Kontrolu')
         self.floating_ellipses_view = None
         
-        # Debug de información de pantalla
-        screen = QtGui.QGuiApplication.primaryScreen().geometry()
+        # Obtenemos el tamaño de la pantalla de manera correcta
+        screen = QtGui.QGuiApplication.primaryScreen().availableGeometry()
         
-        self.showMaximized()
+        # Establecemos un tamaño mínimo razonable para la ventana
+        self.setMinimumSize(800, 600)
         
+        # Configuramos el icono
         path = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path, 'base/imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(QIcon(icon))
+        
+        # Inicializamos los componentes de la ventana
         self.init_macrobloques()
 
     def changeEvent(self, event):
@@ -142,25 +147,28 @@ class MainWindow(QMainWindow):
 
         
     def init_macrobloques(self):
-
-        screen = QtGui.QGuiApplication.primaryScreen().geometry()
         self.central_widget = QWidget(self)
-        self.setGeometry(screen)
         self.setCentralWidget(self.central_widget)
 
         layout = QVBoxLayout(self.central_widget)
         self.diagrama = MacroDiagrama(self)
         layout.addWidget(self.diagrama)
-        self.diagrama.setGeometry(self.central_widget.geometry())
+        
+        # Ajustamos el diagrama al tamaño del widget central
+        self.diagrama.setGeometry(self.central_widget.rect())
 
         # Crear la segunda QGraphicsView que contendrá los elipses
-        self.floating_ellipses_view = FloatingButtonsMainView(self.central_widget,padre=self)
+        self.floating_ellipses_view = FloatingButtonsMainView(self.central_widget, padre=self)
         self.floating_ellipses_view.raise_()
 
-        # Establecer la posición de la vista de elipses flotantes en la esquina inferior izquierda
-        height = self.size().height()
-        width = self.size().width()
-        self.floating_ellipses_view.setGeometry(0, height-200, width, 150)
+        # La posición se actualizará en resizeEvent
+        self.updateFloatingEllipsesPosition()
+    
+    def updateFloatingEllipsesPosition(self):
+        if self.floating_ellipses_view:
+            height = self.size().height()
+            width = self.size().width()
+            self.floating_ellipses_view.setGeometry(0, height-200, width, 150)
             
     def resizeEvent(self, event):
         super().resizeEvent(event)
