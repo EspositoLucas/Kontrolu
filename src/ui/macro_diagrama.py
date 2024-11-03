@@ -189,11 +189,11 @@ class MacroDiagrama(QGraphicsView):
 
     def draw_fdt(self):
     
-        self.svg = SVGView(self.sesion,self)
+        self.svg = SVGView(self.sesion,self.x_bajada,self.Y_MEDIO -  DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5,self)
 
         self.scene.addItem(self.svg)
 
-        self.fdt_update_pos()
+        #self.fdt_update_pos()
 
 
 
@@ -218,11 +218,11 @@ class MacroDiagrama(QGraphicsView):
 
     def draw_error(self):
 
-        self.error_svg = SVGViewError(self.sesion,self)
+        self.error_svg = SVGViewError(self.sesion,self,self.x_subida, self.Y_MEDIO - DISTANCIA_ENTRE_ELEMENTOS_VERTICAL*5)
 
         self.scene.addItem(self.error_svg)
 
-        self.error_update_pos()
+        #self.error_update_pos()
 
     def draw_title(self):
 

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import  QApplication
 from PyQt5.QtSvg import QSvgRenderer, QGraphicsSvgItem
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap,QTransform
 from io import BytesIO
 import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import ( QApplication, 
@@ -161,10 +161,13 @@ ESTILO = """
 """
 
 class SVGViewError(QGraphicsSvgItem):
-    def __init__(self, macro, padre, parent=None):
+    def __init__(self, macro, padre, pos_x,pos_y, parent=None):
         super().__init__(parent)
         self.padre = padre
         self.macro = macro
+
+        self.pos_x = pos_x
+        self.pos_y = pos_y
 
         plt.rc('mathtext', fontset='cm')
 
@@ -197,6 +200,39 @@ class SVGViewError(QGraphicsSvgItem):
             self.setSharedRenderer(self.renders[0])
             self.elegir = 0
             self.setAcceptHoverEvents(True)
+            self.setSize()
+        
+
+    
+    def setSize(self):
+
+        max_x = 400
+        max_y = 250
+
+        render = self.renders[self.elegir]
+
+        rect = render.viewBoxF()
+
+        # Calcular la escala necesaria para ajustar el SVG al tamaño máximo
+        scale_x = max_x / rect.width()
+        scale_y = max_y / rect.height()
+        scale = min(scale_x, scale_y,1)
+        
+        # Aplicar la escala al QGraphicsSvgItem
+        self.setTransform(QTransform().scale(scale, scale))
+
+        # Calcular la nueva posición para centrar el SVG
+        # Obtener el tamaño escalado
+        scaled_width = rect.width() * scale
+        scaled_height = rect.height() * scale
+
+        pos_x = self.pos_x -(scaled_width/2)
+        pos_y = self.pos_y -(scaled_height/2)
+
+        # Establecer la nueva posición
+        self.setPos(pos_x, pos_y)
+
+
 
 
     def tex2svg(self, formula, fontsize=50, dpi=300):
@@ -223,7 +259,10 @@ class SVGViewError(QGraphicsSvgItem):
             if self.elegir >= len(self.renders):
                 self.elegir = 0
             self.setSharedRenderer(self.renders[self.elegir])
-            self.padre.error_update_pos()
+            self.setSize()
+            #self.padre.error_update_pos()
+
+
 
 
         if event.button() == Qt.LeftButton:

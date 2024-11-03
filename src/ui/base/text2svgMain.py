@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import  QApplication
 from PyQt5.QtSvg import QSvgRenderer, QGraphicsSvgItem
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QTransform
 from io import BytesIO
 import matplotlib.pyplot as plt
 from PyQt5.QtWidgets import ( QApplication, 
@@ -97,8 +97,7 @@ ESTILO = """
         color: #2B2D42;
         border: 2px solid #505050;
         border-radius: 5px;
-        padding: 12px 30px;  /* Aumentar el padding para más espacio */
-        min-width: 140px;   /* Tamaño mínimo para evitar solapamiento */
+        padding: 12px 1px;  /* Aumentar el padding para más espacio */
         font-size: 14px;
         font-family: "Segoe UI", "Arial", sans-serif;
         font-weight: bold;  /* Texto en negrita */
@@ -160,9 +159,11 @@ ESTILO = """
 """
 
 class SVGView(QGraphicsSvgItem):
-    def __init__(self, macro, padre, parent=None):
+    def __init__(self, macro,x,y, padre, parent=None):
         self.padre = padre
         super().__init__(parent)
+        self.pos_x = x
+        self.pos_y = y
         self.macro = macro
 
         plt.rc('mathtext', fontset='cm')
@@ -179,40 +180,69 @@ class SVGView(QGraphicsSvgItem):
         bytess_laplace = self.tex2svg(self.laplace)
         self.renderer_laplace = QSvgRenderer(bytess_laplace)
         self.funciones.append(self.renderer_laplace)
-        self.graficos.append((self.fdt_sympy_laplace,True,"\\theta_{o}(s)"))
+        self.graficos.append((self.fdt_sympy_laplace,True,"Salida"))
 
         
         self.total_laplace = "G_{g}(s) = " + self.fdt_latex_laplace_total
         bytess_laplace_total = self.tex2svg(self.total_laplace)
         self.renderer_laplace_total = QSvgRenderer(bytess_laplace_total)
         self.funciones.append(self.renderer_laplace_total)
-        self.graficos.append((self.fdt_sympy_laplace_total,True,"G_{g}(s)"))
+        self.graficos.append((self.fdt_sympy_laplace_total,True,"Lazo Directo"))
 
 
         self.global_laplace = "G_{t}(s) = " + self.fdt_latex_global_laplace
         bytess_global_laplace = self.tex2svg(self.global_laplace)
         self.renderer_global_laplace = QSvgRenderer(bytess_global_laplace)
         self.funciones.append(self.renderer_global_laplace)
-        self.graficos.append((self.fdt_sympy_global_laplace,True,"G_{t}(s)"))
+        self.graficos.append((self.fdt_sympy_global_laplace,True,"Total"))
 
         
         self.global_unitaria = "G_{0}(s) = " + self.fdt_latex_global_unitaria
         bytess_global_unitaria = self.tex2svg(self.global_unitaria)
         self.renderer_global_unitaria = QSvgRenderer(bytess_global_unitaria)
         self.funciones.append(self.renderer_global_unitaria)      
-        self.graficos.append((self.fdt_sympy_global_unitaria,True,"G_{0}(s)"))
+        self.graficos.append((self.fdt_sympy_global_unitaria,True,"Unitaria"))
 
         self.realimentacion_latex_completa = "H(s) = " + self.realimentacion_latex
         bytess_realimentacion = self.tex2svg(self.realimentacion_latex_completa)
         self.renderer_realimentacion = QSvgRenderer(bytess_realimentacion)
         self.funciones.append(self.renderer_realimentacion)      
-        self.graficos.append((self.realimentacion,True,"H(s)"))
+        self.graficos.append((self.realimentacion,True,"Lazo Realimentacion"))
 
         self.laplace_mode = 0
         if len(self.funciones) > 0:
             self.setSharedRenderer(self.funciones[0])
             # Permitir eventos de hover
             self.setAcceptHoverEvents(True)
+            self.setSize()
+
+    def setSize(self):
+
+        max_x = 400
+        max_y = 250
+
+        render = self.funciones[self.laplace_mode]
+
+        rect = render.viewBoxF()
+
+        # Calcular la escala necesaria para ajustar el SVG al tamaño máximo
+        scale_x = max_x / rect.width()
+        scale_y = max_y / rect.height()
+        scale = min(scale_x, scale_y,1)
+        
+        # Aplicar la escala al QGraphicsSvgItem
+        self.setTransform(QTransform().scale(scale, scale))
+
+        # Calcular la nueva posición para centrar el SVG
+        # Obtener el tamaño escalado
+        scaled_width = rect.width() * scale
+        scaled_height = rect.height() * scale
+
+        pos_x = self.pos_x -(scaled_width/2)
+        pos_y = self.pos_y -(scaled_height/2)
+
+        # Establecer la nueva posición
+        self.setPos(pos_x, pos_y)
 
     def tex2svg(self, formula, fontsize=50, dpi=300):
         """Render TeX formula to SVG."""
@@ -244,7 +274,7 @@ class SVGView(QGraphicsSvgItem):
             if self.laplace_mode >= len(self.funciones):
                 self.laplace_mode = 0
             self.setSharedRenderer(self.funciones[self.laplace_mode])
-            self.padre.fdt_update_pos()
+            self.setSize()
         # Llamar al método base para manejar otros eventos
         super().mousePressEvent(event)
 
@@ -291,9 +321,9 @@ class SVGView(QGraphicsSvgItem):
             # Crear la pestaña para el dominio de Laplace
             laplace_tab = QLabel()
             if is_laplace:
-                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt))
+                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt,title))
             else:
-                laplace_pixmap = self.get_plot_pixmap(self.plot_tiempo(fdt))
+                laplace_pixmap = self.get_plot_pixmap(self.plot_tiempo(fdt,title))
             laplace_tab.setPixmap(laplace_pixmap)
             tab_widget.addTab(laplace_tab, title)
 
@@ -399,7 +429,7 @@ class SVGView(QGraphicsSvgItem):
         buf.close()
         return pixmap
         
-    def plot_laplace(self,fdt):
+    def plot_laplace(self,fdt,title):
         """Generar y mostrar el gráfico del dominio de Laplace."""
         s = symbols('s')
         f_laplace = sympify(fdt)  # Asegúrate de que `self.fdt_sympy_laplace` esté definida
@@ -416,13 +446,13 @@ class SVGView(QGraphicsSvgItem):
 
         plt.figure()
         plt.plot(s_vals, F_s)
-        plt.title("Dominio de Laplace")
-        plt.xlabel("Re(s)")
-        plt.ylabel("F(s)")
+        plt.title(title)
+        plt.xlabel("S")
+        plt.ylabel(title)
         plt.grid(True)
         return plt.gcf()
 
-    def plot_tiempo(self,fdt):
+    def plot_tiempo(self,fdt,title):
         """Generar y mostrar el gráfico del dominio del tiempo, con manejo especial para DiracDelta."""
         t = symbols('t')
         f_tiempo = sympify(fdt)  # Supone que `self.fdt_sympy_tiempo` esté definida
@@ -446,7 +476,7 @@ class SVGView(QGraphicsSvgItem):
 
         plt.figure()
         plt.plot(t_vals, f_t_vals)
-        plt.title("Dominio de Tiempo")
+        plt.title(title)
         plt.xlabel("Tiempo (t)")
         plt.ylabel("f(t)")
         plt.grid(True)
