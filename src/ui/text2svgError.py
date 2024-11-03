@@ -188,7 +188,7 @@ class SVGViewError(QGraphicsSvgItem):
         bytess_calculo = self.tex2svg(self.calculo_texto)
         self.renderer_calculo = QSvgRenderer(bytess_calculo)
         self.renders.append(self.renderer_calculo)
-        self.graficos.append((self.calculo_simpy,True,'Error'))
+        self.graficos.append((self.calculo_simpy,True,'Error','e_{ss}'))
 
 
 
@@ -307,11 +307,11 @@ class SVGViewError(QGraphicsSvgItem):
 
         tab_widget = QTabWidget()
 
-        for fdt, is_laplace, title in self.graficos:
+        for fdt, is_laplace, title, output in self.graficos:
             # Crear la pestaña para el dominio de Laplace
             laplace_tab = QLabel()
             if is_laplace:
-                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt))
+                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt,title,output))
             else:
                 laplace_pixmap = self.get_plot_pixmap(self.plot_tiempo(fdt))
             laplace_tab.setPixmap(laplace_pixmap)
@@ -413,28 +413,43 @@ class SVGViewError(QGraphicsSvgItem):
         buf.close()
         return pixmap
         
-    def plot_laplace(self,fdt):
-        """Generar y mostrar el gráfico del dominio de Laplace."""
+    def plot_laplace(self, fdt, title, output):
+        """Generar y mostrar el gráfico del dominio de Laplace con la ecuación en LaTeX."""
         s = symbols('s')
-        f_laplace = sympify(fdt)  # Asegúrate de que `self.fdt_sympy_laplace` esté definida
+        f_laplace = sympify(fdt)
         F_laplace = lambdify(s, f_laplace, 'numpy')
 
-        s_vals = np.linspace(0, 10, 100)
+        # Crear figura
+        fig = plt.figure(figsize=(10, 6))
         
-        # Evaluar la función en s_vals
+        ax = plt.subplot2grid((1,1), (0,0))
+        
+        s_vals = np.linspace(0, 10, 100)
         F_s = F_laplace(s_vals)
         
-        # Si F_s es un valor constante, extiéndelo para que tenga la misma longitud que s_vals
-        if np.isscalar(F_s):  # Verifica si F_s es un número (escalar)
-            F_s = np.full_like(s_vals, F_s)  # Crea un array con el mismo valor y longitud que s_vals
+        # Si F_s es un valor constante, extiéndelo
+        if np.isscalar(F_s):
+            F_s = np.full_like(s_vals, F_s)
 
-        plt.figure()
+        # Graficar
         plt.plot(s_vals, F_s)
-        plt.title("Error en Estado Estable")
-        plt.xlabel("s")
-        plt.ylabel("Error")
+        plt.title(title)
+        plt.xlabel("S")
+        plt.ylabel(f"${output}$")
         plt.grid(True)
-        return plt.gcf()
+        
+        # Convertir la función a LaTeX usando el output proporcionado
+        latex_expr = f"{output} = " + 'lim_{s \\to 0}'+ f"{latex(f_laplace)}"
+        
+        # Agregar la ecuación en LaTeX debajo del gráfico con tamaño de fuente aumentado
+        fig.text(0.5, 0.08, f"${latex_expr}$", 
+                horizontalalignment='center', 
+                fontsize=30)  # Aumentado de 12 a 16
+        
+        plt.tight_layout()
+        plt.subplots_adjust(bottom=0.25)
+        
+        return fig
 
     def plot_tiempo(self,fdt):
         """Generar y mostrar el gráfico del dominio del tiempo, con manejo especial para DiracDelta."""

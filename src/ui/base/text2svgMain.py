@@ -14,7 +14,7 @@ import os
 from io import BytesIO
 import matplotlib.pyplot as plt
 import numpy as np
-from sympy import symbols, sympify, lambdify,DiracDelta
+from sympy import symbols, sympify, lambdify,DiracDelta,latex
 ESTILO = """
     QDialog {
         background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
@@ -177,34 +177,34 @@ class SVGView(QGraphicsSvgItem):
         bytess_laplace = self.tex2svg(self.laplace)
         self.renderer_laplace = QSvgRenderer(bytess_laplace)
         self.funciones.append(self.renderer_laplace)
-        self.graficos.append((self.fdt_sympy_laplace,True,"Salida"))
+        self.graficos.append((self.fdt_sympy_laplace,True,"Salida","\\theta_{o}(s)"))
 
         
         self.total_laplace = "G_{g}(s) = " + self.fdt_latex_laplace_total
         bytess_laplace_total = self.tex2svg(self.total_laplace)
         self.renderer_laplace_total = QSvgRenderer(bytess_laplace_total)
         self.funciones.append(self.renderer_laplace_total)
-        self.graficos.append((self.fdt_sympy_laplace_total,True,"Directo"))
+        self.graficos.append((self.fdt_sympy_laplace_total,True,"Directo","G_{g}(s)"))
 
 
         self.global_laplace = "G_{t}(s) = " + self.fdt_latex_global_laplace
         bytess_global_laplace = self.tex2svg(self.global_laplace)
         self.renderer_global_laplace = QSvgRenderer(bytess_global_laplace)
         self.funciones.append(self.renderer_global_laplace)
-        self.graficos.append((self.fdt_sympy_global_laplace,True,"Total"))
+        self.graficos.append((self.fdt_sympy_global_laplace,True,"Total","G_{t}(s)"))
 
         
         self.global_unitaria = "G_{0}(s) = " + self.fdt_latex_global_unitaria
         bytess_global_unitaria = self.tex2svg(self.global_unitaria)
         self.renderer_global_unitaria = QSvgRenderer(bytess_global_unitaria)
         self.funciones.append(self.renderer_global_unitaria)      
-        self.graficos.append((self.fdt_sympy_global_unitaria,True,"Unitaria"))
+        self.graficos.append((self.fdt_sympy_global_unitaria,True,"Unitaria","G_{0}(s)"))
 
         self.realimentacion_latex_completa = "H(s) = " + self.realimentacion_latex
         bytess_realimentacion = self.tex2svg(self.realimentacion_latex_completa)
         self.renderer_realimentacion = QSvgRenderer(bytess_realimentacion)
         self.funciones.append(self.renderer_realimentacion)      
-        self.graficos.append((self.realimentacion,True,"Realimentación"))
+        self.graficos.append((self.realimentacion,True,"Realimentación","H(s)"))
 
         self.laplace_mode = 0
         if len(self.funciones) > 0:
@@ -310,11 +310,11 @@ class SVGView(QGraphicsSvgItem):
 
         tab_widget = QTabWidget()
 
-        for fdt, is_laplace, title in self.graficos:
+        for fdt, is_laplace, title, output in self.graficos:
             # Crear la pestaña para el dominio de Laplace
             laplace_tab = QLabel()
             if is_laplace:
-                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt,title))
+                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt,title,output))
             else:
                 laplace_pixmap = self.get_plot_pixmap(self.plot_tiempo(fdt,title))
             laplace_tab.setPixmap(laplace_pixmap)
@@ -422,28 +422,43 @@ class SVGView(QGraphicsSvgItem):
         buf.close()
         return pixmap
         
-    def plot_laplace(self,fdt,title):
-        """Generar y mostrar el gráfico del dominio de Laplace."""
+    def plot_laplace(self, fdt, title, output):
+        """Generar y mostrar el gráfico del dominio de Laplace con la ecuación en LaTeX."""
         s = symbols('s')
-        f_laplace = sympify(fdt)  # Asegúrate de que `self.fdt_sympy_laplace` esté definida
+        f_laplace = sympify(fdt)
         F_laplace = lambdify(s, f_laplace, 'numpy')
 
-        s_vals = np.linspace(0, 10, 100)
+        # Crear figura
+        fig = plt.figure(figsize=(10, 6))
         
-        # Evaluar la función en s_vals
+        ax = plt.subplot2grid((1,1), (0,0))
+        
+        s_vals = np.linspace(0, 10, 100)
         F_s = F_laplace(s_vals)
         
-        # Si F_s es un valor constante, extiéndelo para que tenga la misma longitud que s_vals
-        if np.isscalar(F_s):  # Verifica si F_s es un número (escalar)
-            F_s = np.full_like(s_vals, F_s)  # Crea un array con el mismo valor y longitud que s_vals
+        # Si F_s es un valor constante, extiéndelo
+        if np.isscalar(F_s):
+            F_s = np.full_like(s_vals, F_s)
 
-        plt.figure()
+        # Graficar
         plt.plot(s_vals, F_s)
         plt.title(title)
         plt.xlabel("S")
-        plt.ylabel(title)
+        plt.ylabel(f"${output}$")
         plt.grid(True)
-        return plt.gcf()
+        
+        # Convertir la función a LaTeX usando el output proporcionado
+        latex_expr = f"{output} = {latex(f_laplace)}"
+        
+        # Agregar la ecuación en LaTeX debajo del gráfico con tamaño de fuente aumentado
+        fig.text(0.5, 0.08, f"${latex_expr}$", 
+                horizontalalignment='center', 
+                fontsize=30)  # Aumentado de 12 a 16
+        
+        plt.tight_layout()
+        plt.subplots_adjust(bottom=0.25)
+        
+        return fig
 
     def plot_tiempo(self,fdt,title):
         """Generar y mostrar el gráfico del dominio del tiempo, con manejo especial para DiracDelta."""
