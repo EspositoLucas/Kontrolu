@@ -195,91 +195,44 @@ class LatexEditor(QWidget):
             self.update_preview()
             
     def es_funcion_valida(self, latex):
-        """
-        Valida si una expresión LaTeX es válida según los siguientes criterios:
-        1. Puede ser convertida a sympy usando latex2sympy
-        2. Solo contiene la variable 's' como símbolo
-        
-        Args:
-            latex (str): La expresión LaTeX a validar
-            
-        Returns:
-            bool: True si la expresión es válida, False en caso contrario
-        """
-
-        try:
-            # Intentamos convertir la expresión LaTeX a sympy
-            print("Prueba de latex")
-
-            print(latex)
-
-            print("tipo latex")
-
-            print(type(latex))
-
-
-            expr = parse_latex(latex)
-
-            print("Latex parsaedo")
-
-            print(expr)
-            
-            # Obtenemos todos los símbolos (variables) en la expresión
-            simbolos = expr.free_symbols
-
-            print("Simbolos")
-
-            print(simbolos)
-
-            print("Fin simbolos")
-            
-            # Verificamos que solo haya un símbolo y sea 's'
-            if len(simbolos) == 0:
-                return True
-            return len(simbolos) == 1 and 's' in [str(sym) for sym in simbolos]
-            
-        except Exception as e:
-            print("Latex error")
-            print(e)
-            # Si hay cualquier error en la conversión, la función no es válida
-            return False
-
-
         latex = latex.replace(' ', '').lower()
         
+        # Verificar paréntesis/llaves balanceados
         if not latex or latex.count('{') != latex.count('}'):
             return False
         
-        if latex.replace('.', '').isdigit():
-            return True
-        
+        # Detectar multiplicaciones implícitas (números seguidos directamente de variables)
+        if re.search(r'(\d+\.?\d*|\.\d+)([a-z])', latex):
+            return False
+            
         # Permitir expresiones LaTeX específicas
         valid_latex_expressions = ["\\frac", "\\log", "\\ln", "e", "\\pi", "\\sqrt"]
         if any(expr in latex for expr in valid_latex_expressions):
-            pass  # Permitir estas expresiones y continuar con la validación
+            pass
         elif re.search(r'([a-z\d])\s*([a-z\d])', latex):
-            # Verificar si hay términos adyacentes sin operador, excluyendo comandos LaTeX
             return False
         
         # Tratar símbolos especiales
-        latex = re.sub(r'\\sqrt\[([^]]+)\]\{([^}]+)\}', r'(\2)**(1/(\1))', latex)  # raíz n-ésima
-        # Tratar fracciones
+        latex = re.sub(r'\\sqrt\[([^]]+)\]\{([^}]+)\}', r'(\2)**(1/(\1))', latex)
         latex = re.sub(r'\\frac\{([^}]+)\}\{([^}]+)\}', r'((\1)/(\2))', latex)
         latex = latex.replace('\\log', 'log')
         latex = latex.replace('\\ln', 'ln')
-        latex = latex.replace('e', 'E')  # 'E' es reconocido como la constante e en sympy
+        latex = latex.replace('e', 'E')
         latex = latex.replace('\\pi', 'pi')
         
         s = Symbol('s')
         try:
+            # Intentar parsear la expresión
             expr = sympify(latex, locals={'s': s})
             
+            # Verificaciones adicionales
             if isinstance(expr, (dict, list, tuple)):
                 return False
             
             if not isinstance(expr, Expr):
                 return False
             
+            # Permitir expresiones con 's' y constantes
             if 's' not in latex and not expr.is_constant():
                 return False
             
