@@ -207,7 +207,7 @@ class SVGView(QGraphicsSvgItem):
         bytess_realimentacion = self.tex2svg(self.realimentacion_latex_completa)
         self.renderer_realimentacion = QSvgRenderer(bytess_realimentacion)
         self.funciones.append(self.renderer_realimentacion)      
-        self.graficos.append((self.realimentacion,True,"Realimentacion"))
+        self.graficos.append((self.realimentacion,True,"Realimentación"))
 
         self.laplace_mode = 0
         if len(self.funciones) > 0:
