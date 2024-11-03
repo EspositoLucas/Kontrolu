@@ -424,7 +424,7 @@
     },
     "MACROS.ACTUADOR": {
         "SISTEMAS": {
-            "balanceador_carga": {
+            "Balanceador de Carga": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Balanceador de carga simple": {
@@ -455,7 +455,7 @@
                     }
                 }
             },
-            "reinicio_servicios": {
+            "Reinicio de Servicios": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Sistema de reinicio simple": {
@@ -486,7 +486,7 @@
                     }
                 }
             },
-            "limpieza_cache": {
+            "Limpieza de Cach\u00e9": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Limpiador de cach\u00e9 simple": {
@@ -517,7 +517,7 @@
                     }
                 }
             },
-            "ajustador_parametros": {
+            "Ajustador de Par\u00e1metros": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Ajustador de par\u00e1metros simple": {
@@ -1439,7 +1439,7 @@
     },
     "MACROS.MEDIDOR": {
         "SISTEMAS": {
-            "uso_cpu": {
+            "Uso de Cpu": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Medidor de CPU b\u00e1sico": {
@@ -1472,7 +1472,7 @@
                     }
                 }
             },
-            "uso_ram": {
+            "Uso de Ram": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Medidor de RAM simple": {
@@ -1505,7 +1505,7 @@
                     }
                 }
             },
-            "espacio_disco": {
+            "Espacio Disco": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Medidor de disco b\u00e1sico": {
@@ -1538,7 +1538,7 @@
                     }
                 }
             },
-            "trafico_red": {
+            "Tr\u00e1fico de Red": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Medidor de tr\u00e1fico de red simple": {
@@ -1571,7 +1571,7 @@
                     }
                 }
             },
-            "peticiones_servidor": {
+            "Peticiones de Servidor": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Contador de peticiones b\u00e1sico": {
@@ -1604,7 +1604,7 @@
                     }
                 }
             },
-            "tiempo_respuesta": {
+            "Tiempo de Respuesta": {
                 "descripcion": "",
                 "micro_bloques": {
                     "Monitor de tiempo de respuesta simple": {
@@ -1690,7 +1690,7 @@
             }
         },
         "ELECTRONICA": {
-            "Amperimetros": {
+            "Amper\u00edmetros": {
                 "descripcion": "",
                 "micro_bloques": {
                     "amperimetro_basico": {
@@ -1764,10 +1764,10 @@
                     }
                 }
             },
-            "Voltimetros": {
+            "Volt\u00edmetros": {
                 "descripcion": "",
                 "micro_bloques": {
-                    "voltimetro_basico": {
+                    "voltmetro_basico": {
                         "nombre": "Volt\u00edmetro B\u00e1sico",
                         "descripcion": "Volt\u00edmetro de baja precisi\u00f3n para mediciones de voltaje simple.",
                         "fdt": "\\frac{1}{1 + 0.05*s}",
@@ -1842,7 +1842,7 @@
                 "descripcion": "",
                 "micro_bloques": {
                     "ohimetro_basico": {
-                        "nombre": "Oh\u00edmetro B\u00e1sico",
+                        "nombre": "Ohm\u00edmetro B\u00e1sico",
                         "descripcion": "Oh\u00edmetro b\u00e1sico para mediciones simples de resistencia.",
                         "fdt": "\\frac{1}{1 + 0.02*s}",
                         "entrada_limite_inferior": "0",
@@ -1865,7 +1865,7 @@
                         "unidad_salida": "\u03a9"
                     },
                     "ohimetro_precision": {
-                        "nombre": "Oh\u00edmetro de Precisi\u00f3n",
+                        "nombre": "Ohm\u00edmetro de Precisi\u00f3n",
                         "descripcion": "Oh\u00edmetro de precisi\u00f3n con mayor exactitud y menor error de medici\u00f3n.",
                         "fdt": "\\frac{2}{1 + 0.01*s}",
                         "entrada_limite_inferior": "0",
@@ -1888,7 +1888,7 @@
                         "unidad_salida": "\u03a9"
                     },
                     "ohimetro_avanzado": {
-                        "nombre": "Oh\u00edmetro Avanzado",
+                        "nombre": "Ohm\u00edmetro Avanzado",
                         "descripcion": "Oh\u00edmetro avanzado capaz de medir resistencias en rangos muy altos.",
                         "fdt": "\\frac{10}{1 + 0.05*s}",
                         "entrada_limite_inferior": "0",
