@@ -384,8 +384,9 @@ class CrearMicroBloque(QDialog):
         vista.exec_()
         if vista.result():
             self.actualizar_campos()
-            if self.padre.__class__.__name__ == 'Microbloque':
-                self.padre.actualizar()
+            self.padre.load_microbloques()
+            self.padre.macrobloque.update_nombre()
+            self.padre.macrobloque.update_fdt()
 
 
     def select_color(self, button):

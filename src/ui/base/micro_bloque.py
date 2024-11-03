@@ -140,6 +140,8 @@ class Microbloque(QGraphicsItem):
                 pass        
                 
             self.update()
+
+
     
     def select_color(self, button):
         color = QColorDialog.getColor()
