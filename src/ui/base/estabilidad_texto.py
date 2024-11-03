@@ -54,7 +54,7 @@ class EstabilidadTexto(QGraphicsTextItem):
     def mousePressEvent(self, event):
 
         if event.button() == Qt.LeftButton:
-            EstabilidadDialog(self.sesion,self.estabilidad).exec_()
+            EstabilidadDialog(self.sesion,self.estabilidad,self.polinomio).exec_()
 
         # Llamar al método base para manejar otros eventos
         super().mousePressEvent(event)
@@ -103,15 +103,16 @@ class EstabilidadTexto(QGraphicsTextItem):
 
 class EstabilidadDialog(QDialog):
 
-    def __init__(self, sistema, estabilidad, parent=None):
+    def __init__(self, sistema, estabilidad, polinomio, parent=None):
 
         super().__init__(parent)
 
         self.estabilidad = estabilidad
 
+        self.tupla_magica = polinomio
 
-        self.matriz_routh_obtenida,self.nombre_estabilidad = self.estabilidad.calcular_routh_con_libreria()
-        self.polinomio = latex(self.estabilidad.polinomio_caracteristico())
+        self.matriz_routh_obtenida,self.nombre_estabilidad = self.estabilidad.calcular_routh_con_libreria(polinomio[0])
+        self.polinomio = latex(polinomio[0])
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
 
@@ -435,7 +436,7 @@ class EstabilidadDialog(QDialog):
         """
         try:
             # Obtener polos y ceros del sistema
-            polos_dict, ceros_dict = self.estabilidad.calcular_polos_y_ceros()
+            polos_dict, ceros_dict = self.estabilidad.calcular_polos_y_ceros(self.tupla_magica[0],self.tupla_magica[2])
             
             # Convertir los diccionarios a listas de números complejos
             polos_complex = []

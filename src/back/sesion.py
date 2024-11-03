@@ -423,8 +423,13 @@ class Sesion():
         total_sympy = simplify(global_sympy/(1+global_sympy*realimentacion))
         total_latex = latex(total_sympy)
 
-        caracteristico = Poly(fraction(total_sympy)[1],s)
-        caracteristico_latex = latex(caracteristico)        
+        fraction_poly = fraction(total_sympy)
+
+        caracteristico = Poly(fraction_poly[1],s)
+        caracteristico_latex = latex(caracteristico)
+
+        numerador_caracteristico =  Poly(fraction_poly[0],s)
+        numerador_caracteristico_latex = latex(numerador_caracteristico)
 
         entrada = self.entrada.calcular_fdt()
 
@@ -438,4 +443,4 @@ class Sesion():
         latex_lim = latex(sympy_lim)
         error = sympy_lim.limit(s,0).evalf()
 
-        return (con_entrada,con_entrada_latex,total_sympy,total_latex,global_sympy,global_latex,abierta_si_unitario,abierta_si_unitario_latex,realimentacion,realimentacion_latex),(caracteristico,caracteristico_latex),(latex_lim,sympy_lim,error)
+        return (con_entrada,con_entrada_latex,total_sympy,total_latex,global_sympy,global_latex,abierta_si_unitario,abierta_si_unitario_latex,realimentacion,realimentacion_latex),(caracteristico,caracteristico_latex,numerador_caracteristico,numerador_caracteristico_latex),(latex_lim,sympy_lim,error)

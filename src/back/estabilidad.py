@@ -149,10 +149,13 @@ class Estabilidad:
     
     def calcular_routh_con_libreria(self,estabilidad=None):
         
-        if estabilidad ==None:
+        if estabilidad == None:
             den_poly = self.polinomio_caracteristico()
         else:
             den_poly = estabilidad
+
+
+            
         coeficientes = den_poly.all_coeffs()
 
         if len(coeficientes) == 1:
@@ -186,17 +189,23 @@ class Estabilidad:
         den_poly = sp.Poly(den, s)
         return den_poly
 
-    def calcular_polos_y_ceros(self):
-        G_cl_latex = self.obtener_funcion_transferencia()
-        G_cl = self.parse_latex_to_sympy(G_cl_latex)
-        s = sp.Symbol('s')
+    def calcular_polos_y_ceros(self,den=None,num=None):
+
+        if num == None and den == None:
+            G_cl_latex = self.obtener_funcion_transferencia()
+            G_cl = self.parse_latex_to_sympy(G_cl_latex)
+            s = sp.Symbol('s')
+            
+            # Separar numerador y denominador
+            num, den = sp.fraction(G_cl)
+            
         
-        # Separar numerador y denominador
-        num, den = sp.fraction(G_cl)
-        
-        # Convertir numerador y denominador a polinomios en 's'
-        den_poly = sp.Poly(den, s)
-        num_poly = sp.Poly(num, s)
+            # Convertir numerador y denominador a polinomios en 's'
+            den_poly = sp.Poly(den, s)
+            num_poly = sp.Poly(num, s)
+        else:
+            den_poly = den
+            num_poly = num
         
         grado_num = num_poly.degree()
         grado_den = den_poly.degree()
