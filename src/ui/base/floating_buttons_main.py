@@ -8,7 +8,7 @@ from .detener_button import BotonDetener
 from PyQt5.QtCore import QRectF
 from ..menu.archivo import Archivo
 from .vista_json import VistaJson
-from PyQt5.QtWidgets import (QPushButton, QWidget,QMenu,QHBoxLayout,QDialog,QVBoxLayout,QTextEdit)
+from PyQt5.QtWidgets import (QPushButton, QWidget,QMenu,QHBoxLayout,QDialog,QVBoxLayout,QTextEdit,QTabWidget)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
@@ -86,10 +86,10 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
                                     message="Glosario")
         self.scene.addItem(copy_button)
         
-    
+        
     def mostrar_ayuda(self):
         help_dialog = QDialog(self)
-        help_dialog.setWindowTitle("Glosario de Términos")
+        help_dialog.setWindowTitle("Ayuda de Kontrolu")
         help_dialog.setMinimumSize(800, 800)
         help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
@@ -100,10 +100,32 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
                 padding: 20px;
                 border: 2px solid #505050;
             }
+            QTabWidget::pane {
+                background-color: #D0D0D0;
+                border: 2px solid #505050;
+                border-radius: 10px;
+            }
+            QTabWidget::tab-bar {
+                alignment: center;
+            }
+            QTabBar::tab {
+                background-color: #808080;
+                color: white;
+                border: 2px solid #505050;
+                min-width: 140px;   /* Tamaño mínimo para evitar solapamiento */
+                border-radius: 5px;
+                padding: 8px 20px;
+                margin: 2px;
+                font-size: 14px;
+                font-family: "Segoe UI", "Arial", sans-serif;
+            }
+            QTabBar::tab:selected {
+                background-color: #606060;
+            }
             QTextEdit {
                 background-color: #D0D0D0;
                 color: #2B2D42;
-                border: 2px solid #505050;
+                border: 2px solid transparent;
                 border-radius: 10px;
                 padding: 8px;
                 font-size: 14px;
@@ -124,14 +146,141 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         """)
         
         layout = QVBoxLayout()
-        layout.setSpacing(10)
-        layout.setContentsMargins(20, 20, 20, 20)
-
-        help_text = QTextEdit()
-        help_text.setReadOnly(True)
+        tab_widget = QTabWidget()
         
-        help_content = """
-        <h2>Glosario de Términos de Teoria de Control</h2>
+        # Tab 1: Bienvenida
+        welcome_tab = QWidget()
+        welcome_layout = QVBoxLayout()
+        welcome_text = QTextEdit()
+        welcome_text.setReadOnly(True)
+        
+        welcome_content = """
+        <h2>Bienvenido a Kontrolu</h2>
+
+        <h3>¿Qué es Kontrolu?</h3>
+        <p>Kontrolu es una herramienta educativa diseñada para el estudio de la teoría de control de forma práctica y dinámica. 
+        Permite a los estudiantes y educadores explorar los conceptos fundamentales de control a través de una interfaz intuitiva y versátil.</p>
+
+        <h3>¿Qué permite Kontrolu?</h3>
+        <p>Kontrolu ofrece tres funcionalidades principales:</p>
+        <ul>
+            <li>Diagramación de sistemas de control con capacidad de exportación</li>
+            <li>Simulación dinámica y en tiempo real de sistemas de control</li>
+            <li>Análisis detallado de sistemas mediante datos de simulación y operaciones matemáticas</li>
+        </ul>
+
+        <h3>¿Qué es la teoría de control?</h3>
+        <p>La teoría de control es una rama interdisciplinaria de la ingeniería y las matemáticas que se ocupa del comportamiento 
+        de sistemas dinámicos. Se centra en cómo las entradas de un sistema afectan sus salidas y cómo podemos manipular estas 
+        entradas para obtener el comportamiento deseado del sistema.</p>
+
+        <h3>¿Cuándo usar Kontrolu?</h3>
+        <p>Kontrolu está diseñado principalmente para fines educativos. No pretende ser un simulador de alta precisión, 
+        sino una herramienta didáctica que permite explorar y comprender los conceptos de control más allá del ámbito 
+        tradicional de la electrónica. Es ideal para estudiantes que desean visualizar y experimentar con diferentes 
+        tipos de sistemas de control de manera accesible.</p>
+
+        <h3>¿Cuáles son las ventajas que ofrece Kontrolu?</h3>
+        <ul>
+            <li>Facilidad de uso con una interfaz intuitiva</li>
+            <li>Simulación rápida y eficiente de sistemas de control</li>
+            <li>Alta capacidad de parametrización para adaptarse a diferentes necesidades</li>
+            <li>Análisis y cálculos matemáticos en tiempo real</li>
+        </ul>
+        """
+        
+        welcome_text.setHtml(welcome_content)
+        welcome_layout.addWidget(welcome_text)
+        welcome_tab.setLayout(welcome_layout)
+        
+        # Tab 2: Uso
+        usage_tab = QWidget()
+        usage_layout = QVBoxLayout()
+        usage_text = QTextEdit()
+        usage_text.setReadOnly(True)
+        
+        usage_content = """
+        <h2>Guía de Uso de la Pantalla Principal</h2>
+
+        <h3>Elementos del Diagrama</h3>
+        <p>Cada elemento en la pantalla principal es interactivo y puede ser configurado mediante un clic:</p>
+        <ul>
+            <li><strong>Entrada:</strong> Define la señal de referencia del sistema</li>
+            <li><strong>Controlador:</strong> Ajusta los parámetros de control</li>
+            <li><strong>Actuador:</strong> Configura el elemento que ejecuta la acción de control</li>
+            <li><strong>Proceso:</strong> Representa el sistema a controlar</li>
+            <li><strong>Medidor:</strong> Define cómo se mide la salida del sistema</li>
+            <li><strong>Desempeño:</strong> Define como se mide el desempeño del sistema</li>
+        </ul>
+
+        <h3>Controles Principales</h3>
+        <ul>
+            <li><strong>Botón Simular (verde):</strong> Inicia la simulación del sistema</li>
+            <li><strong>Configuración:</strong> Ajustes generales del sistema (abajo a la izquierda)</li>
+            <li><strong>Gestión de Archivos:</strong> Botones para abrir, guardar o crear nuevos archivos</li>
+            <li><strong>Editor JSON:</strong> Permite visualizar y editar el código del sistema</li>
+            <li><strong>Captura de Pantalla:</strong> Guarda la vista actual como imagen PNG</li>
+            <li><strong>Ayuda:</strong> Acceso a esta documentación</li>
+        </ul>
+
+        <h3>Navegación y Funciones Adicionales</h3>
+        <ul>
+            <li><strong>Click Derecho Superior:</strong> Navega entre funciones del sistema</li>
+            <li><strong>Click Izquierdo Superior:</strong> Accede a las funciones seleccionadas</li>
+            <li><strong>Indicador de Estabilidad:</strong> Muestra y proporciona información sobre la estabilidad del sistema</li>
+            <li><strong>Nombre del Sistema:</strong> Editable con click izquierdo</li>
+        </ul>
+        """
+        
+        usage_text.setHtml(usage_content)
+        usage_layout.addWidget(usage_text)
+        usage_tab.setLayout(usage_layout)
+        
+        # Tab 3: Glosario
+        glossary_tab = QWidget()
+        glossary_layout = QVBoxLayout()
+        glossary_text = QTextEdit()
+        glossary_text.setReadOnly(True)
+        
+        glossary_content = """
+        <h2>Glosario de Términos de Teoría de Control</h2>
+
+        <h3>Conceptos Fundamentales</h3>
+        <ul>
+            <li><strong>Error en Estado Estable:</strong> Diferencia entre el valor deseado y el valor real cuando el sistema 
+            ha alcanzado un estado estable. Es un indicador crucial de la precisión del sistema.</li>
+            
+            <li><strong>Estabilidad del Sistema:</strong> Capacidad del sistema para mantener un estado de equilibrio bajo 
+            condiciones normales de operación. Un sistema es estable si, ante una entrada acotada, produce una salida también acotada.</li>
+            
+            <li><strong>Función de Transferencia:</strong> Representación matemática que relaciona la salida con la entrada de un 
+            sistema en el dominio de Laplace. Se expresa como el cociente de polinomios en 's'.</li>
+            
+            <li><strong>Polos y Ceros:</strong> Los polos son las raíces del denominador de la función de transferencia y determinan 
+            la estabilidad del sistema. Los ceros son las raíces del numerador y afectan la respuesta transitoria.</li>
+            
+            <li><strong>Matriz de Routh-Hurwitz:</strong> Método matemático para determinar la estabilidad de un sistema lineal 
+            invariante en el tiempo, analizando los coeficientes de su ecuación característica.</li>
+        </ul>
+
+        <h3>Componentes del Sistema</h3>
+        <ul>
+            <li><strong>Entrada:</strong> Señal de referencia o valor deseado que el sistema debe alcanzar.</li>
+            
+            <li><strong>Controlador:</strong> Elemento que determina la acción de control basándose en la diferencia entre 
+            la referencia y la medición.</li>
+            
+            <li><strong>Actuador:</strong> Dispositivo que convierte la señal de control en una acción física sobre el proceso.</li>
+            
+            <li><strong>Proceso:</strong> Sistema físico o planta que se desea controlar.</li>
+            
+            <li><strong>Medidor:</strong> Elemento que mide la variable controlada y la retroalimenta al sistema.</li>
+            
+            <li><strong>Carga:</strong> Perturbación externa que afecta al comportamiento del sistema.</li>
+            
+            <li><strong>Desempeño:</strong> Medida de la calidad del control basada en diversos criterios como tiempo de 
+            respuesta, sobrepico, error en estado estable, etc.</li>
+        </ul>
 
         <h3>Variables y Señales</h3>
         <ul>
@@ -141,46 +290,42 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
 
         <h3>Funciones de Transferencia</h3>
         <ul>
-            <li><strong>G Global:</strong> Función de transferencia que engloba todo el sistema, incluyendo la vinculación entre la trayectoria directa y la inversa</li>
-            <li><strong>G Total:</strong> Función de transferencia resultante de la multiplicación de bloques en serie en la trayectoria directa</li>
-            <li><strong>G₀ (G cero):</strong> Transferencia a lazo abierto de un sistema de lazo cerrado. Es la G Global afectada por la compensación del lazo de realimentación unitaria</li>
-            <li><strong>G:</strong> Transferencia ubicada en la trayectoria directa</li>
-            <li><strong>H:</strong> Transferencia ubicada en la trayectoria inversa</li>
+            <li><strong>G Global:</strong> Función de transferencia que engloba todo el sistema</li>
+            <li><strong>G Total:</strong> Función de transferencia resultante de la multiplicación de bloques en serie</li>
+            <li><strong>G₀ (G cero):</strong> Transferencia a lazo abierto de un sistema de lazo cerrado</li>
+            <li><strong>G:</strong> Transferencia en la trayectoria directa</li>
+            <li><strong>H:</strong> Transferencia en la trayectoria inversa</li>
         </ul>
 
-        <h3>Topologías y Configuraciones</h3>
+        <h3>Dominio de Laplace vs Tiempo</h3>
+        <p>El uso del dominio de Laplace en lugar del dominio del tiempo se debe a:</p>
         <ul>
-            <li><strong>Prealimentación:</strong> Configuración donde la señal se adelanta al sistema principal (anteriormente denominada "paralelo")</li>
-            <li><strong>Realimentación:</strong> Configuración donde parte de la salida retorna a la entrada</li>
-            <li><strong>Lazo Directo:</strong> Trayectoria principal de la señal desde la entrada hasta la salida</li>
-            <li><strong>Lazo Inverso:</strong> Trayectoria de realimentación desde la salida hacia la entrada</li>
-        </ul>
-
-        <h3>Simulación y Muestreo</h3>
-        <ul>
-            <li><strong>SCAN:</strong> Una vuelta completa del ciclo de control, desde la lectura de entrada hasta la actualización de la salida</li>
-            <li><strong>Duración de SCAN:</strong> Tiempo que toma completar una vuelta completa del ciclo de control</li>
-            <li><strong>Muestreo de datos:</strong> Intervalo de tiempo entre cada captura de datos del sistema</li>
-        </ul>
-
-        <h3>Calidad y Evaluación</h3>
-        <ul>
-            <li><strong>Tipo de Desvío:</strong> Indica cómo se calcula la variación en cada microbloque (anteriormente denominado "tipo de error")</li>
-            <li><strong>Carga:</strong> Factor sobre el cual opera la respuesta del sistema, determinando la calidad de servicio</li>
-            <li><strong>Calidad de Servicio:</strong> Evaluación del desempeño del sistema basada en los requisitos de la carga</li>
+            <li>Simplifica el análisis convirtiendo ecuaciones diferenciales en algebraicas</li>
+            <li>Facilita el estudio de la estabilidad del sistema</li>
+            <li>Permite una representación más clara de la dinámica del sistema</li>
+            <li>Simplifica la representación de sistemas complejos mediante funciones de transferencia</li>
         </ul>
         """
-
-        help_text.setHtml(help_content)
-        layout.addWidget(help_text)
-
+        
+        glossary_text.setHtml(glossary_content)
+        glossary_layout.addWidget(glossary_text)
+        glossary_tab.setLayout(glossary_layout)
+        
+        # Add tabs to widget
+        tab_widget.addTab(welcome_tab, "Bienvenida")
+        tab_widget.addTab(usage_tab, "Guía de Uso")
+        tab_widget.addTab(glossary_tab, "Glosario")
+        
+        layout.addWidget(tab_widget)
+        
+        # Close button
         close_button = QPushButton("Cerrar")
         close_button.clicked.connect(help_dialog.close)
         layout.addWidget(close_button)
         
         help_dialog.setLayout(layout)
         help_dialog.exec_()
-    
+        
     def draw_simu_buttons(self,sene_width,scene_height):
 
         y = scene_height
@@ -288,7 +433,7 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         guardar_action.triggered.connect(self.guardar_archivo)
         
         return menu
-    
+        
 ESTILO = """
     QDialog {
         background-color: #B0B0B0;  /* Gris pastel oscuro para el fondo */
