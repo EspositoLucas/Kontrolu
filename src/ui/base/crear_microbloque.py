@@ -130,7 +130,13 @@ class CrearMicroBloque(QDialog):
         """
         Función para agregar los elementos del diccionario de presets a un QTreeWidget.
         """
-        # Obtener los microbloques (el método que estás usando)
+        # Desconectar señales previas si existen
+        try:
+            tree_widget.itemClicked.disconnect()
+            tree_widget.customContextMenuRequested.disconnect()
+        except:
+            pass
+        
         tree_widget.setHeaderHidden(True)
         presets = obtener_microbloques_de_una_macro(self.tipo)
 
@@ -155,17 +161,20 @@ class CrearMicroBloque(QDialog):
                         button_text += f" - {microbloque.descripcion}"
                     
                     # Crear el QTreeWidgetItem relacionado con el sub_item
-                    option_item = QTreeWidgetItem([button_text])  
+                    option_item = QTreeWidgetItem([button_text,])  
                     sub_item.addChild(option_item)
 
-                    # Conectar el evento de selección de este item a la función select_preset
-                    option_item.microbloque = microbloque  # Guardar el microbloque como atributo del item
+                    # Guardar el microbloque como atributo del item
+                    option_item.microbloque = microbloque
                     option_item.dominio = dominio
                     option_item.tipo = tipo
-                    tree_widget.itemClicked.connect(self.on_item_clicked)
 
-                    tree_widget.setContextMenuPolicy(Qt.CustomContextMenu)
-                    tree_widget.customContextMenuRequested.connect(self.show_context_menu)
+        # Conectar las señales una sola vez fuera del bucle
+        tree_widget.itemClicked.connect(self.on_item_clicked)
+        tree_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        tree_widget.customContextMenuRequested.connect(self.show_context_menu)
+        
+        tree_widget.setColumnHidden(1, True)
         self.tree_widget = tree_widget
 
     def show_context_menu(self, pos):
@@ -210,8 +219,18 @@ class CrearMicroBloque(QDialog):
         Método que se ejecuta al hacer clic en un elemento del árbol.
         """
         if hasattr(item, 'microbloque'):
-            # Llama al método select_preset pasando el microbloque del item clickeado
-            self.select_preset(item.microbloque)
+            # Preguntar al usuario si está seguro de seleccionar este preset
+            confirm = QMessageBox.question(
+                self,
+                "Confirmar selección",
+                "¿Estás seguro de que deseas seleccionar este preset?\nSe sobrescribirá el bloque anterior si está guardado.",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No  # Respuesta por defecto
+            )
+
+            if confirm == QMessageBox.Yes:
+                # Llama al método select_preset pasando el microbloque del item clickeado
+                self.select_preset(item.microbloque)
 
 
 
@@ -677,45 +696,32 @@ ESTILO = """
     }
 
 
-    QTableWidget {
-        background-color: #FAF8F6;  /* Color de fondo del área sin celdas */
-        border: 2px solid #505050;
-        border-radius: 10px;
-        color: #2B2D42;
-        font-size: 14px;
-        font-family: "Segoe UI", "Arial", sans-serif;
-        gridline-color: #505050;  /* Color de las líneas de la cuadrícula */
-    }
-
-    QTableWidget::item {
-        background-color: #D0D0D0;  /* Color de fondo de las celdas */
-        border: none;
-    }
-
-    QHeaderView::section {
-        background-color: #808080;
-        color: white;
-        padding: 5px;
-        border: 1px solid #505050;
-    }
-
-    QTableCornerButton::section {
-        background-color: #808080;  /* Color del botón de esquina */
-        border: 1px solid #505050;
-    }
-
-
-    QListWidget {
-        background-color: #D0D0D0;
-        border: 2px solid #505050;
-        border-radius: 10px;
-        color: #2B2D42;
+    QTreeWidget {
+        background-color: transparent;  /* Color de fondo del área del árbol */
+        border: 2px solid transparent;  /* Borde gris oscuro */
+        border-radius: 10px;  /* Bordes redondeados */
+        color: #2B2D42;  /* Texto gris oscuro */
         font-size: 14px;
         font-family: "Segoe UI", "Arial", sans-serif;
     }
 
-    QListWidget::item:selected {
-        background-color: #808080;
-        color: white;
+    QTreeWidget::item {
+        background-color: #D0D0D0;  /* Color de fondo de los elementos */
+        border: 2px solid #505050;  /* Borde gris oscuro para los elementos */
+        border-radius: 5px;  /* Bordes redondeados para los elementos */
+        padding: 5px;  /* Espaciado interior */
     }
+
+
+    QTreeWidget::item:selected {
+        background-color: #808080;  /* Fondo gris oscuro al seleccionar */
+        color: white;  /* Texto en blanco al seleccionar */
+    }
+
+    QTreeWidget::indicator {
+        width: 16px;  /* Ancho del indicador */
+        height: 16px;  /* Alto del indicador */
+        margin: 0;  /* Sin margen para los indicadores */
+    }
+
 """

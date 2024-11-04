@@ -524,8 +524,23 @@ class EstabilidadDialog(QDialog):
                     bbox=dict(boxstyle='round', facecolor='white', alpha=0.8),
                     color=color_texto)
             
-            # Ajustar el layout para que no se corten las etiquetas
-            self.canvas.figure.tight_layout()
+            """
+  
+            latex_expr = f"Numerador = {latex(self.tupla_magica[2].as_expr())}"
+            self.canvas.figure.text(0.5, 0.15, f"${latex_expr}$", 
+                    horizontalalignment='center', 
+                    fontsize=30)
+            
+            latex_expr = f"Denominador = {latex(self.tupla_magica[0].as_expr())}"
+            self.canvas.figure.text(0.5, 0.05, f"${latex_expr}$", 
+                    horizontalalignment='center', 
+                    fontsize=30)
+            
+            self.canvas.figure.subplots_adjust(bottom=0.32)  # Ajustar solo el margen inferior
+            """
+
+
+            self.canvas.figure.tight_layout()  # Aplicar ajustes generales
             
             # Actualizar el canvas
             self.canvas.draw()

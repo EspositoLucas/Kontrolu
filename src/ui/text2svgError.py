@@ -15,6 +15,14 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 import numpy as np
 from sympy import symbols, sympify, lambdify,DiracDelta,N,latex
+from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QPushButton, 
+                           QTabWidget, QLabel, QFileDialog)
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import Qt
+import matplotlib.pyplot as plt
+from io import BytesIO
+import pyperclip
+import os
 
 ESTILO = """
     QDialog {
@@ -184,11 +192,11 @@ class SVGViewError(QGraphicsSvgItem):
         self.renders.append(self.renderer_error_estado_estable)
 
 
-        self.calculo_texto = 'lim_{s \\to 0}' + self.calculo + ' = ' + latex(self.error_estado_estable)
+        self.calculo_texto = 'lim_{s \\to 0} ' + self.calculo + ' = ' + latex(self.error_estado_estable)
         bytess_calculo = self.tex2svg(self.calculo_texto)
         self.renderer_calculo = QSvgRenderer(bytess_calculo)
         self.renders.append(self.renderer_calculo)
-        self.graficos.append((self.calculo_simpy,True,'Error','e_{ss}'))
+        self.graficos.append((self.calculo_simpy,True,'Error','e_{ss} = lim_{s \\to 0}'))
 
 
 
@@ -267,30 +275,52 @@ class SVGViewError(QGraphicsSvgItem):
         super().mousePressEvent(event)
 
     def open_graph_window(self, cual):
-        if len(self.graficos) == 0:
-            return
+        dialog = GraphWindow()
+        for fdt, is_laplace, title, output in self.graficos:
+            dialog.add_plot(fdt, is_laplace, title, output, cual)
+        dialog.exec_()        
+
         
-        dialog = QDialog()
-        dialog.setWindowTitle("Dominio de Laplace")
-        dialog.setStyleSheet(ESTILO)
-        dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+    
+    def hoverEnterEvent(self, event):
+        # Cambiar el cursor al formato de clic
+        QApplication.setOverrideCursor(Qt.PointingHandCursor)
+        super().hoverEnterEvent(event)
+
+    def hoverLeaveEvent(self, event):
+        # Restaurar el cursor al estado predeterminado
+        QApplication.restoreOverrideCursor()
+        super().hoverLeaveEvent(event)
+
+
+
+class GraphWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__()
+        self.setWindowTitle("Dominio de Laplace")
+        self.setStyleSheet(ESTILO)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        
+        # Diccionarios para almacenar las figuras y latex por pestaña
+        self.figures = {}
+        self.latex_expressions = {}
         
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'base','imgs', 'logo.png')
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        dialog.setWindowIcon(QtGui.QIcon(icon))
+        image_path = os.path.join(path, 'imgs', 'logo.png')
+        icon = QIcon()
+        icon.addPixmap(QPixmap(image_path), QIcon.Normal, QIcon.Off)
+        self.setWindowIcon(icon)
         
+        self.init_ui()
+
+    def init_ui(self):
         layout = QVBoxLayout()
         
-        # Agregar botón de ayuda
-        help_button = QtWidgets.QPushButton("?")
+        # Botón de ayuda
+        help_button = QPushButton("?")
         help_button.setFixedSize(30, 30)
-        help_button.move(50, 50)  # Posición del botón en la ventana
-        # help_button.setMaximumWidth(30)
         help_button.clicked.connect(self.mostrar_ayuda)
-        layout.addWidget(help_button, alignment=Qt.AlignRight)
         help_button.setStyleSheet("""
             QPushButton {
                 background-color: #808080;
@@ -303,27 +333,137 @@ class SVGViewError(QGraphicsSvgItem):
                 background-color: #606060;
             }
         """)
+        layout.addWidget(help_button, alignment=Qt.AlignRight)
+
+        # TabWidget para los gráficos
+        self.tab_widget = QTabWidget()
+        layout.addWidget(self.tab_widget)
+
+        # Contenedor para los botones
+        button_layout = QHBoxLayout()
+        
+        # Botón para copiar LaTeX
+        copy_latex_btn = QPushButton("Copiar LaTeX")
+        copy_latex_btn.clicked.connect(self.copy_latex)
+        button_layout.addWidget(copy_latex_btn)
+        
+        # Botón para guardar gráfico
+        save_graph_btn = QPushButton("Guardar Gráfico")
+        save_graph_btn.clicked.connect(self.save_graph)
+        button_layout.addWidget(save_graph_btn)
+        
+        # Botón para guardar LaTeX como imagen
+        save_latex_btn = QPushButton("Guardar LaTeX")
+        save_latex_btn.clicked.connect(self.save_latex)
+        button_layout.addWidget(save_latex_btn)
+        
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+
+    def add_plot(self, fdt, is_laplace, title, output, index):
+        """Añade un nuevo plot al tab widget"""
+        plot_label = QLabel()
+        if is_laplace:
+            fig = self.plot_laplace(fdt, title, output)
+            pixmap = self.get_plot_pixmap(fig)
+            
+            # Guardar la información para esta pestaña específica
+            self.latex_expressions[title] = f"{output} {latex(sympify(fdt))}"
+            self.figures[title] = fig
+            
+        plot_label.setPixmap(pixmap)
+        self.tab_widget.addTab(plot_label, title)
+        self.tab_widget.setCurrentIndex(index)
+
+    def get_current_title(self):
+        """Obtiene el título de la pestaña actual"""
+        return self.tab_widget.tabText(self.tab_widget.currentIndex())
+
+    def copy_latex(self):
+        """Copia la expresión LaTeX al portapapeles"""
+        current_title = self.get_current_title()
+        latex_expr = self.latex_expressions.get(current_title)
+        if latex_expr:
+            pyperclip.copy(latex_expr)
+
+    def save_graph(self):
+        """Guarda el gráfico actual como imagen"""
+        current_title = self.get_current_title()
+        current_fig = self.figures.get(current_title)
+        
+        if current_fig:
+            file_name, _ = QFileDialog.getSaveFileName(
+                self, "Guardar Gráfico",
+                "", "PNG Files (*.png);;All Files (*)"
+            )
+            if file_name:
+                current_fig.savefig(file_name, bbox_inches='tight', dpi=300)
+
+    def save_latex(self):
+        """Guarda la ecuación LaTeX como imagen"""
+        current_title = self.get_current_title()
+        latex_expr = self.latex_expressions.get(current_title)
+        
+        if latex_expr:
+            file_name, _ = QFileDialog.getSaveFileName(
+                self, "Guardar LaTeX",
+                "", "PNG Files (*.png);;All Files (*)"
+            )
+            if file_name:
+                # Crear una figura solo con la ecuación
+                fig = plt.figure(figsize=(10, 1))
+                plt.axis('off')
+                plt.text(0.5, 0.5, f"${latex_expr}$",
+                        horizontalalignment='center',
+                        verticalalignment='center',
+                        fontsize=30)
+                plt.savefig(file_name, bbox_inches='tight', dpi=300,
+                          transparent=True)
+                plt.close(fig)
+
+    def plot_laplace(self, fdt, title, output):
+        """Generar y mostrar el gráfico del dominio de Laplace con la ecuación en LaTeX."""
+        s = symbols('s')
+        f_laplace = sympify(fdt)
+        F_laplace = lambdify(s, f_laplace, 'numpy')
+
+        fig = plt.figure(figsize=(10, 6))
+        ax = plt.subplot2grid((1,1), (0,0))
+        
+        s_vals = np.linspace(0, 10, 100)
+        F_s = F_laplace(s_vals)
+        
+        if np.isscalar(F_s):
+            F_s = np.full_like(s_vals, F_s)
+
+        plt.plot(s_vals, F_s)
+        plt.title(title)
+        plt.xlabel("S")
+        plt.ylabel(f"${output}$")
+        plt.grid(True)
+        
+        latex_expr = f"{output} {latex(f_laplace)}"
+        fig.text(0.5, 0.08, f"${latex_expr}$", 
+                horizontalalignment='center', 
+                fontsize=30)
+        
+        plt.tight_layout()
+        plt.subplots_adjust(bottom=0.25)
+        
+        return fig
         
 
-        tab_widget = QTabWidget()
 
-        for fdt, is_laplace, title, output in self.graficos:
-            # Crear la pestaña para el dominio de Laplace
-            laplace_tab = QLabel()
-            if is_laplace:
-                laplace_pixmap = self.get_plot_pixmap(self.plot_laplace(fdt,title,output))
-            else:
-                laplace_pixmap = self.get_plot_pixmap(self.plot_tiempo(fdt))
-            laplace_tab.setPixmap(laplace_pixmap)
-            tab_widget.addTab(laplace_tab, title)
-
-        # Seleccionar la pestaña activa dependiendo del valor de `cual`
-        tab_widget.setCurrentIndex(cual)
-
-        layout.addWidget(tab_widget)
-        dialog.setLayout(layout)
-        dialog.exec_()
-        
+    def get_plot_pixmap(self, figure):
+        """Convierte una figura de matplotlib en un QPixmap."""
+        buf = BytesIO()
+        figure.savefig(buf, format="png")
+        buf.seek(0)
+        pixmap = QPixmap()
+        pixmap.loadFromData(buf.read())
+        buf.close()
+        return pixmap
+    
     def mostrar_ayuda(self):
         help_dialog = QtWidgets.QDialog()
         help_dialog.setWindowTitle("Ayuda - Visualización del Sistema")
@@ -396,91 +536,3 @@ class SVGViewError(QGraphicsSvgItem):
         
         help_dialog.setLayout(layout)
         help_dialog.exec_()
-
-    def get_plot_pixmap(self, figure):
-        """Convierte una figura de matplotlib en un QPixmap."""
-        buf = BytesIO()
-        figure.savefig(buf, format="png")
-        buf.seek(0)
-        pixmap = QPixmap()
-        pixmap.loadFromData(buf.read())
-        buf.close()
-        return pixmap
-        
-    def plot_laplace(self, fdt, title, output):
-        """Generar y mostrar el gráfico del dominio de Laplace con la ecuación en LaTeX."""
-        s = symbols('s')
-        f_laplace = sympify(fdt)
-        F_laplace = lambdify(s, f_laplace, 'numpy')
-
-        # Crear figura
-        fig = plt.figure(figsize=(10, 6))
-        
-        ax = plt.subplot2grid((1,1), (0,0))
-        
-        s_vals = np.linspace(0, 10, 100)
-        F_s = F_laplace(s_vals)
-        
-        # Si F_s es un valor constante, extiéndelo
-        if np.isscalar(F_s):
-            F_s = np.full_like(s_vals, F_s)
-
-        # Graficar
-        plt.plot(s_vals, F_s)
-        plt.title(title)
-        plt.xlabel("S")
-        plt.ylabel(f"${output}$")
-        plt.grid(True)
-        
-        # Convertir la función a LaTeX usando el output proporcionado
-        latex_expr = f"{output} = " + 'lim_{s \\to 0}'+ f"{latex(f_laplace)}"
-        
-        # Agregar la ecuación en LaTeX debajo del gráfico con tamaño de fuente aumentado
-        fig.text(0.5, 0.08, f"${latex_expr}$", 
-                horizontalalignment='center', 
-                fontsize=30)  # Aumentado de 12 a 16
-        
-        plt.tight_layout()
-        plt.subplots_adjust(bottom=0.25)
-        
-        return fig
-
-    def plot_tiempo(self,fdt):
-        """Generar y mostrar el gráfico del dominio del tiempo, con manejo especial para DiracDelta."""
-        t = symbols('t')
-        f_tiempo = sympify(fdt)  # Supone que `self.fdt_sympy_tiempo` esté definida
-        
-        # Verificar si hay una DiracDelta en la función
-        if f_tiempo.has(DiracDelta(t)):
-            # Crear un array para simular la DiracDelta: un valor alto en t=0, y 0 en los demás puntos
-            t_vals = np.linspace(0, 10, 100)
-            f_t_vals = np.zeros_like(t_vals)
-            # Aproximamos la DiracDelta con un pico alto en el primer punto
-            f_t_vals[0] = 1e10  # Representa la intensidad del impulso en t=0
-        else:
-            # Si no hay DiracDelta, crear la función normalmente
-            f_t = lambdify(t, f_tiempo, 'numpy')
-            t_vals = np.linspace(0, 10, 100)
-            f_t_vals = f_t(t_vals)
-
-            # Si f_t_vals es un valor constante, extiéndelo para que tenga la misma longitud que t_vals
-            if np.isscalar(f_t_vals):  # Verifica si f_t_vals es un número (escalar)
-                f_t_vals = np.full_like(t_vals, f_t_vals)  # Crea un array con el mismo valor y longitud que t_vals
-
-        plt.figure()
-        plt.plot(t_vals, f_t_vals)
-        plt.title("Dominio de Tiempo")
-        plt.xlabel("Tiempo (t)")
-        plt.ylabel("f(t)")
-        plt.grid(True)
-        return plt.gcf()
-    
-    def hoverEnterEvent(self, event):
-        # Cambiar el cursor al formato de clic
-        QApplication.setOverrideCursor(Qt.PointingHandCursor)
-        super().hoverEnterEvent(event)
-
-    def hoverLeaveEvent(self, event):
-        # Restaurar el cursor al estado predeterminado
-        QApplication.restoreOverrideCursor()
-        super().hoverLeaveEvent(event)
