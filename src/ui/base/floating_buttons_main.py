@@ -270,16 +270,15 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
             <li><strong>Controlador:</strong> Elemento que determina la acción de control basándose en la diferencia entre 
             la referencia y la medición.</li>
             
-            <li><strong>Actuador:</strong> Dispositivo que convierte la señal de control en una acción física sobre el proceso.</li>
+            <li><strong>Actuador:</strong> Dispositivo que convierte la señal de control en una acción sobre el proceso.</li>
             
-            <li><strong>Proceso:</strong> Sistema físico o planta que se desea controlar.</li>
+            <li><strong>Proceso:</strong> Sistema se desea controlar.</li>
             
             <li><strong>Medidor:</strong> Elemento que mide la variable controlada y la retroalimenta al sistema.</li>
             
-            <li><strong>Carga:</strong> Perturbación externa que afecta al comportamiento del sistema.</li>
+            <li><strong>Carga:</strong> Valoración de calidad de control del sistema.</li>
             
-            <li><strong>Desempeño:</strong> Medida de la calidad del control basada en diversos criterios como tiempo de 
-            respuesta, sobrepico, error en estado estable, etc.</li>
+            <li><strong>Desempeño:</strong> Elemento que mide a través de la calidad del sistema una valoración integral. </li>
         </ul>
 
         <h3>Variables y Señales</h3>
