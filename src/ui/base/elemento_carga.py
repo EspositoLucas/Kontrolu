@@ -247,7 +247,6 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
             "<ul>"
             "<li><b>Escalamiento sigmoide:</b> Ajusta la sensibilidad de la evaluación</li>"
             "<li><b>Desplazamiento sigmoide:</b> Modifica el punto medio de evaluación</li>"
-            "<li><b>Coeficiente:</b> Factor multiplicador para la función de transferencia</li>"
             "</ul>")
         ]
 

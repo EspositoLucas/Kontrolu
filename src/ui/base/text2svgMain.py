@@ -361,10 +361,13 @@ class SVGView(QGraphicsSvgItem):
             
             ("<b>Representaciones Disponibles:</b>",
             "<ul>"
-            "<li><b>Y(s):</b> Salida del sistema en el dominio de Laplace</li>"
-            "<li><b>Y(s)/R(s):</b> Función de transferencia total del sistema en Laplace</li>"
-            "<li><b>G(s):</b> Función de transferencia global en Laplace</li>"
-            "<li><b>G_{0}(s):</b> Función de transferencia total unitaria en Laplace</li>"
+            
+            "<li><b>θo(s): Salida del sistema en el dominio de Laplace</li>"
+            "<li><b>Gg(s)=: Función de transferencia del trayecto directo</li>"
+            "<li><b>Gt(s)=: Función de transferencia total del sistema en el dominio de Laplace</li>"
+            "<li><b>Go(s): Función de transferencia unitaria del sistema en el dominio de Laplace</li>"
+            "<li><b>H(s): Función de transferencia del lazo de realimentación en el dominio de Laplace</li>"
+
             "</ul>"),
             
             ("<b>Interpretación de Gráficos:</b>",
@@ -380,12 +383,6 @@ class SVGView(QGraphicsSvgItem):
             "<br>Y(s) → Y(s)/R(s) → G(s) → G_{0}(s)"
             "<li><b>Clic Izquierdo:</b> Abre la ventana de gráficos detallados</li>"
             "<li><b>Pestañas:</b> Permiten alternar entre diferentes vistas del sistema</li>"
-            "</ul>"),
-
-            ("<b>Análisis del Sistema:</b>",
-            "<ul>"
-            "<li><b>Respuesta en Frecuencia:</b> Analizar G(s) para entender el comportamiento frecuencial</li>"
-            "<li><b>Relación E/S:</b> Y(s)/R(s) muestra cómo el sistema procesa la entrada</li>"
             "</ul>")
         ]
         

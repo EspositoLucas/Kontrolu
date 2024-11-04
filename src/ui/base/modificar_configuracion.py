@@ -48,7 +48,7 @@ class ModificarConfiguracion(QDialog):
             "<ul>"
             "<li><b>Proporción:</b> Factor de escala estático aplicado al error. Si se marca 'Default', se usa 1 como valor predeterminado.</li>"
             "<li><b>Probabilidad:</b> Factor que influye en la generación del error estocástico (para tipos Gauss y Aleatorio). Si se marca 'Default', se usa 1 como valor predeterminado.</li>"
-            "<li><b>Tipo de error:</b> Define cómo se aplica el error en la simulación:"
+            "<li><b>Tipo de desviación:</b> Define cómo se aplica el error o desvío en la simulación:"
             "<ul>"
             "<li>Ninguno: Error estático basado solo en la proporción</li>"
             "<li>Gauss: Error estocástico con distribución gaussiana</li>"

@@ -355,12 +355,6 @@ class SVGViewError(QGraphicsSvgItem):
             ("<b>Visualización del Error en Estado Estable:</b>",
          "Esta ventana permite analizar el error en estado estable del sistema de control en el dominio de Laplace."),
         
-        ("<b>Representaciones Disponibles:</b>",
-         "<ul>"
-         "<li><b>e_ss:</b> Error en estado estable en el dominio de Laplace</li>"
-         "<li><b>lim_{s->0} (G(s)):</b> Representación algebraica del error en estado estable en Laplace</li>"
-         "</ul>"),
-        
         ("<b>Interpretación de Gráficos:</b>",
          "<ul>"
          "<li><b>Dominio de Laplace:</b> Muestra el valor del error en estado estable y su cálculo algebraico</li>"

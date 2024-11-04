@@ -201,6 +201,30 @@ class Graficadora(QMainWindow):
 
         self.layout = QVBoxLayout(self.central_widget)
         
+            # Agregar botón de ayuda en la esquina superior
+        help_layout = QHBoxLayout()
+        help_layout.setAlignment(Qt.AlignRight | Qt.AlignTop)
+        
+        help_button = QPushButton("?")
+        help_button.setFixedSize(30, 30)
+        help_button.move(50, 50)  # Posición del botón en la ventana
+        help_button.clicked.connect(self.mostrar_ayuda)
+        help_button.setStyleSheet("""
+            QPushButton {
+                background-color: #808080;
+                color: white;
+                border-radius: 15px;
+                font-weight: bold;
+                font-size: 16px;
+            }
+            QPushButton:hover {
+                background-color: #606060;
+            }
+        """)
+        
+        help_layout.addWidget(help_button)
+        self.layout.addLayout(help_layout)
+        
         # Configurar el icono de la ventana
         path = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(path,'imgs', 'logo.png')
@@ -322,6 +346,88 @@ class Graficadora(QMainWindow):
         self.pause_button.clicked.connect(self.toggle_pause)
         self.pause_button.setCursor(Qt.PointingHandCursor)
         self.controls_layout.addWidget(self.pause_button)
+    
+    def mostrar_ayuda(self):
+        help_dialog = QDialog(self)
+        help_dialog.setWindowTitle("Ayuda - Gráficos y Simulación en Tiempo Real")
+        help_dialog.setStyleSheet(ESTILO)
+        help_dialog.setMinimumWidth(600)
+        layout = QVBoxLayout()
+
+        # Título principal
+        titulo = QLabel("Guía de Gráficos y Simulación en Tiempo Real")
+        titulo.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        layout.addWidget(titulo)
+
+        # Contenido organizado en secciones
+        contenido = [
+            ("<b>Pestañas principales:</b>",
+            "<ul>"
+            "<li><b>Gráfico:</b> Muestra la visualización en tiempo real de las variables del sistema</li>"
+            "<li><b>Datos:</b> Presenta los valores numéricos en formato de tabla</li>"
+            "</ul>"),
+            
+            ("<b>Panel de Control:</b>",
+            "<ul>"
+            "<li><b>Checkboxes:</b> Permiten mostrar/ocultar variables específicas en el gráfico</li>"
+            "<li><b>Exportar Datos:</b> Guarda los datos en formato CSV para análisis posterior</li>"
+            "<li><b>Interpretar Datos:</b> Genera un análisis automático del comportamiento del sistema</li>"
+            "<li><b>Pausar/Reanudar:</b> Controla la ejecución de la simulación</li>"
+            "</ul>"),
+            
+            ("<b>Indicador de Estado:</b>",
+            "<ul>"
+            "<li><b>Círculo de color:</b> Representa el estado actual del sistema</li>"
+            "<li><b>Escala:</b> Va de 1 a 5, donde 5 es excelente y 1 es pésimo</li>"
+            "<li><b>Colores:</b> Verde (óptimo), Amarillo (regular), Rojo (crítico)</li>"
+            "</ul>"),
+            
+            ("<b>Gráfico en Tiempo Real:</b>",
+            "<ul>"
+            "<li><b>Eje X:</b> Tiempo transcurrido en segundos</li>"
+            "<li><b>Eje Y:</b> Valores de las variables seleccionadas</li>"
+            "<li><b>Etiquetas:</b> Muestran el último valor de cada variable</li>"
+            "<li><b>Leyenda:</b> Identifica cada variable con su color correspondiente</li>"
+            "</ul>"),
+            
+            ("<b>Tabla de Datos:</b>",
+            "<ul>"
+            "<li><b>Selector de columnas:</b> Permite elegir qué variables mostrar</li>"
+            "<li><b>Datos numéricos:</b> Muestra todos los valores registrados</li>"
+            "<li><b>Ordenamiento:</b> Permite ordenar por cualquier columna</li>"
+            "</ul>")
+        ]
+
+        for titulo, texto in contenido:
+            seccion = QLabel()
+            seccion.setText(f"{titulo}<br>{texto}")
+            seccion.setWordWrap(True)
+            seccion.setStyleSheet("""
+                QLabel {
+                    font-size: 14px;
+                    color: #2B2D42;
+                    padding: 5px;
+                    background-color: #D0D0D0;
+                    border-radius: 5px;
+                    margin: 5px;
+                }
+            """)
+            layout.addWidget(seccion)
+
+        # Botón de cerrar
+        cerrar_btn = QPushButton("Cerrar")
+        cerrar_btn.clicked.connect(help_dialog.close)
+        layout.addWidget(cerrar_btn)
+
+        help_dialog.setLayout(layout)
+        help_dialog.exec_()
     
     def toggle_pause(self):
         if self.pause_button.text() == "Pausar Simulación":

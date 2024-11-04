@@ -77,13 +77,13 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
                                     'fa5s.question-circle', 
                                     self.mostrar_ayuda,
                                     self, 
-                                    message="Ayuda")
+                                    message="Glosario")
         self.scene.addItem(copy_button)
         
     
     def mostrar_ayuda(self):
         help_dialog = QDialog(self)
-        help_dialog.setWindowTitle("Ayuda")
+        help_dialog.setWindowTitle("Glosario de Términos")
         help_dialog.setMinimumSize(800, 800)
         help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         
@@ -125,40 +125,43 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         help_text.setReadOnly(True)
         
         help_content = """
-        <h2>Guía de Botones del Simulador</h2>
+        <h2>Glosario de Términos de Teoria de Control</h2>
 
-        <h3>Configurar Simulación</h3>
-        <p>Este botón te permite ajustar los parámetros básicos de la simulación:</p>
+        <h3>Variables y Señales</h3>
         <ul>
-            <li><strong>Tiempo total:</strong> Duración completa de la simulación</li>
-            <li><strong>Variable a controlar:</strong> El valor objetivo que deseas mantener</li>
-            <li><strong>Muestreo de datos:</strong> Tiempo entre cada paso de la simulación</li>
-            <li><strong>Duración de ciclos:</strong> Tiempo real que toma cada ciclo</li>
-            <li><strong>Simulación Precisa:</strong> Activa un modo más preciso pero que requiere más recursos</li>
+            <li><strong>θᵢ (Theta i):</strong> Valor de referencia o señal de entrada del sistema</li>
+            <li><strong>θ₀ (Theta cero):</strong> Señal de salida o respuesta del sistema</li>
         </ul>
 
-        <h3>Archivo</h3>
-        <p>Desde este menú puedes gestionar tus archivos de trabajo:</p>
+        <h3>Funciones de Transferencia</h3>
         <ul>
-            <li><strong>Nuevo Archivo:</strong> Comienza un nuevo proyecto desde cero</li>
-            <li><strong>Abrir Archivo:</strong> Carga un proyecto existente</li>
-            <li><strong>Guardar Archivo:</strong> Guarda tu trabajo actual</li>
+            <li><strong>G Global:</strong> Función de transferencia que engloba todo el sistema, incluyendo la vinculación entre la trayectoria directa y la inversa</li>
+            <li><strong>G Total:</strong> Función de transferencia resultante de la multiplicación de bloques en serie en la trayectoria directa</li>
+            <li><strong>G₀ (G cero):</strong> Transferencia a lazo abierto de un sistema de lazo cerrado. Es la G Global afectada por la compensación del lazo de realimentación unitaria</li>
+            <li><strong>G:</strong> Transferencia ubicada en la trayectoria directa</li>
+            <li><strong>H:</strong> Transferencia ubicada en la trayectoria inversa</li>
         </ul>
 
-        <h3>Editar JSON</h3>
-        <p>Esta herramienta te permite:</p>
+        <h3>Topologías y Configuraciones</h3>
         <ul>
-            <li>Ver y modificar los datos del modelo en formato JSON</li>
-            <li>Copiar el contenido al portapapeles</li>
-            <li>Cargar datos desde archivos JSON externos</li>
-            <li>Guardar tus modificaciones</li>
+            <li><strong>Prealimentación:</strong> Configuración donde la señal se adelanta al sistema principal (anteriormente denominada "paralelo")</li>
+            <li><strong>Realimentación:</strong> Configuración donde parte de la salida retorna a la entrada</li>
+            <li><strong>Lazo Directo:</strong> Trayectoria principal de la señal desde la entrada hasta la salida</li>
+            <li><strong>Lazo Inverso:</strong> Trayectoria de realimentación desde la salida hacia la entrada</li>
         </ul>
 
-        <h3>Copiar y Guardar Diagrama</h3>
-        <p>Con un solo clic, puedes:</p>
+        <h3>Simulación y Muestreo</h3>
         <ul>
-            <li>Capturar el diagrama actual de tu sistema</li>
-            <li>Guardarlo como imagen PNG en tu dispositivo</li>
+            <li><strong>SCAN:</strong> Una vuelta completa del ciclo de control, desde la lectura de entrada hasta la actualización de la salida</li>
+            <li><strong>Duración de SCAN:</strong> Tiempo que toma completar una vuelta completa del ciclo de control</li>
+            <li><strong>Muestreo de datos:</strong> Intervalo de tiempo entre cada captura de datos del sistema</li>
+        </ul>
+
+        <h3>Calidad y Evaluación</h3>
+        <ul>
+            <li><strong>Tipo de Desvío:</strong> Indica cómo se calcula la variación en cada microbloque (anteriormente denominado "tipo de error")</li>
+            <li><strong>Carga:</strong> Factor sobre el cual opera la respuesta del sistema, determinando la calidad de servicio</li>
+            <li><strong>Calidad de Servicio:</strong> Evaluación del desempeño del sistema basada en los requisitos de la carga</li>
         </ul>
         """
 
@@ -171,7 +174,6 @@ class FloatingButtonsMainView(QtWidgets.QGraphicsView):
         
         help_dialog.setLayout(layout)
         help_dialog.exec_()
-
     
     def draw_simu_buttons(self,sene_width,scene_height):
 
