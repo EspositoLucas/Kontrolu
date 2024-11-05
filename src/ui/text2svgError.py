@@ -307,7 +307,7 @@ class GraphWindow(QDialog):
         
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'imgs', 'logo.png')
+        image_path = os.path.join(path, 'base','imgs', 'logo.png')
         icon = QIcon()
         icon.addPixmap(QPixmap(image_path), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(icon)
