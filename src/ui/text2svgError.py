@@ -463,25 +463,31 @@ class GraphWindow(QDialog):
         pixmap.loadFromData(buf.read())
         buf.close()
         return pixmap
-    
+        from PyQt5 import QtWidgets, QtGui, QtCore
+
     def mostrar_ayuda(self):
         help_dialog = QtWidgets.QDialog()
         help_dialog.setWindowTitle("Ayuda - Visualización del Sistema")
         help_dialog.setStyleSheet(ESTILO)
         help_dialog.setMinimumWidth(500)
         help_dialog.setWindowFlags(help_dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        
+
         # Configurar el icono
         path = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(path, 'base','imgs', 'logo.png')
+        image_path = os.path.join(path, 'base', 'imgs', 'logo.png')
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(image_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         help_dialog.setWindowIcon(icon)
+
+        # Crear pestañas
+        tab_widget = QtWidgets.QTabWidget()
         
-        layout = QtWidgets.QVBoxLayout()
-        
-        titulo = QtWidgets.QLabel("Guía de Visualización del Sistema de Control")
-        titulo.setStyleSheet("""
+        # Pestaña 1: Explicación del error en estado estable y el teorema del valor final
+        tab1 = QtWidgets.QWidget()
+        tab1_layout = QtWidgets.QVBoxLayout()
+
+        titulo1 = QtWidgets.QLabel("Explicación del Error en Estado Estable y el Teorema del Valor Final")
+        titulo1.setStyleSheet("""
             QLabel {
                 font-size: 18px;
                 font-weight: bold;
@@ -489,50 +495,100 @@ class GraphWindow(QDialog):
                 padding: 10px;
             }
         """)
-        layout.addWidget(titulo)
-        
-        contenido = [
-            ("<b>Visualización del Error en Estado Estable:</b>",
-         "Esta ventana permite analizar el error en estado estable del sistema de control en el dominio de Laplace."),
-        
-        ("<b>Interpretación de Gráficos:</b>",
-         "<ul>"
-         "<li><b>Dominio de Laplace:</b> Muestra el valor del error en estado estable y su cálculo algebraico</li>"
-         "</ul>"),
-        
-        ("<b>Navegación e Interacción:</b>",
-         "<ul>"
-         "<li><b>Clic Derecho:</b> Alterna entre las diferentes representaciones del error en estado estable</li>"
-         "<li><b>Clic Izquierdo:</b> Abre una ventana con gráficos detallados de las representaciones</li>"
-         "<li><b>Pestañas:</b> Permiten cambiar entre las diferentes vistas de la visualización</li>"
-         "</ul>"),
-        
-        ("<b>Análisis del Error en Estado Estable:</b>",
-         "<ul>"
-         "<li><b>Valor Numérico:</b> Consultar el valor exacto del error en estado estable</li>"
-         "<li><b>Cálculo Algebraico:</b> Examinar la expresión matemática que define el error</li>"
-         "</ul>")
-        ]
-        
-        for titulo, texto in contenido:
-            seccion = QtWidgets.QLabel()
-            seccion.setText(f"{titulo}<br>{texto}")
-            seccion.setWordWrap(True)
-            seccion.setStyleSheet("""
-                QLabel {
-                    font-size: 14px;
-                    color: #2B2D42;
-                    padding: 5px;
-                    background-color: #D0D0D0;
-                    border-radius: 5px;
-                    margin: 5px;
-                }
-            """)
-            layout.addWidget(seccion)
-        
+        tab1_layout.addWidget(titulo1)
+
+        contenido1 = QtWidgets.QLabel()
+        contenido1.setText(
+            "<b>¿Qué es el error en estado estable?</b><br>"
+            "El error en estado estable es la diferencia entre la entrada y la salida del sistema cuando el tiempo tiende a infinito. "
+            "Es un parámetro clave para evaluar el desempeño de un sistema de control.<br><br>"
+            
+            "<b>Cálculo del error en estado estable mediante el Teorema del Valor Final:</b><br>"
+            "Para calcular el error en estado estable, se aplica el Teorema del Valor Final. Este teorema se usa para determinar el valor "
+            "de una función en el dominio de Laplace cuando el tiempo tiende a infinito.<br><br>"
+            
+            "<b>El Teorema del Valor Final establece que:</b><br>"
+            "Si <i>F(s)</i> es la transformada de Laplace de <i>f(t)</i>, entonces:<br>"
+            "<center>lim (t → ∞) f(t) = lim (s → 0) s * F(s)</center><br><br>"
+
+            "<b>Aplicación para el cálculo del error en estado estable:</b><br>"
+            "En un sistema de control con una función de lazo directo <i>G(s)</i> y realimentación unitaria, el error en estado estable "
+            "para una entrada escalón unitario se calcula como:<br>"
+            "<center>lim (s → 0) s * Entrada * (1 / (1 + G<sub>0</sub>))</center><br>"
+            "donde <i>G<sub>0</sub></i> es la función de transferencia del lazo directo del sistema."
+        )
+        contenido1.setWordWrap(True)
+        contenido1.setStyleSheet("""
+            QLabel {
+                font-size: 14px;
+                color: #2B2D42;
+                padding: 5px;
+                background-color: #D0D0D0;
+                border-radius: 5px;
+                margin: 5px;
+            }
+        """)
+        tab1_layout.addWidget(contenido1)
+        tab1.setLayout(tab1_layout)
+
+        # Pestaña 2: Información de visualización del error en estado estable
+        tab2 = QtWidgets.QWidget()
+        tab2_layout = QtWidgets.QVBoxLayout()
+
+        titulo2 = QtWidgets.QLabel("Guía de Visualización del Sistema de Control")
+        titulo2.setStyleSheet("""
+            QLabel {
+                font-size: 18px;
+                font-weight: bold;
+                color: #2B2D42;
+                padding: 10px;
+            }
+        """)
+        tab2_layout.addWidget(titulo2)
+
+        contenido2 = QtWidgets.QLabel()
+        contenido2.setText(
+            "<b>Visualización del Error en Estado Estable:</b><br>"
+            "Esta ventana permite analizar el error en estado estable del sistema de control en el dominio de Laplace.<br><br>"
+            
+            "<b>Interpretación de Gráficos:</b><br>"
+            "<ul>"
+            "<li><b>Dominio de Laplace:</b> Muestra el valor del error en estado estable y su cálculo algebraico.</li>"
+            "</ul><br>"
+
+            "<b>Acciones Disponibles:</b><br>"
+            "<ul>"
+            "<li><b>Copiar LaTeX:</b> Permite copiar la función en formato LaTeX.</li>"
+            "<li><b>Guardar Gráfico:</b> Guarda el gráfico en formato PNG.</li>"
+            "<li><b>Guardar LaTeX como PNG:</b> Guarda la representación LaTeX en formato PNG.</li>"
+            "</ul>"
+        )
+        contenido2.setWordWrap(True)
+        contenido2.setStyleSheet("""
+            QLabel {
+                font-size: 14px;
+                color: #2B2D42;
+                padding: 5px;
+                background-color: #D0D0D0;
+                border-radius: 5px;
+                margin: 5px;
+            }
+        """)
+        tab2_layout.addWidget(contenido2)
+        tab2.setLayout(tab2_layout)
+
+        # Agregar las pestañas al widget de pestañas
+        tab_widget.addTab(tab1, "Teoría")
+        tab_widget.addTab(tab2, "Visualización")
+
+        # Layout del diálogo de ayuda
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(tab_widget)
+
+        # Botón de cerrar
         cerrar_btn = QtWidgets.QPushButton("Cerrar")
         cerrar_btn.clicked.connect(help_dialog.close)
         layout.addWidget(cerrar_btn)
-        
+
         help_dialog.setLayout(layout)
-        help_dialog.exec_()
+        help_dialog.exec()
