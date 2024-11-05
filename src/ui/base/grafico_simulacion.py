@@ -590,7 +590,7 @@ class ExportManager:
         self.graficadora = graficadora
 
     def export_data(self):
-        filename, _ = QFileDialog.getSaveFileName(self.graficadora, "Guardar datos", "", "CSV Files (*.csv)")
+        filename, _ = QFileDialog.getSaveFileName(self.graficadora, "Guardar datos", "simulacion_datos.csv", "CSV Files (*.csv)")
         if filename:
             with open(filename, 'w', newline='') as file:
                 writer = csv.writer(file)
@@ -650,7 +650,7 @@ class InterpretacionDatos(QDialog):
 
     def descargar_archivo(self):
         options = QFileDialog.Options()
-        file_path, _ = QFileDialog.getSaveFileName(self, "Guardar Interpretación como", "", "Archivos de Texto (*.txt)", options=options)
+        file_path, _ = QFileDialog.getSaveFileName(self, "Guardar Interpretación como", "interpretacion_datos.txt", "Archivos de Texto (*.txt)", options=options)
         if file_path:
             with open(file_path, 'w') as file:
                 file.write(self.text_edit.toPlainText())

@@ -1156,7 +1156,7 @@ class DrawingArea(QGraphicsView):
         clipboard.setImage(image)
 
             # Open a file dialog to select the save location
-        save_path, _ = QFileDialog.getSaveFileName(None, "Save Image", "", "PNG Files (*.png);;All Files (*)")
+        save_path, _ = QFileDialog.getSaveFileName(None, "Save Image", self.modelo.nombre+"_diagrama.png", "PNG Files (*.png);;All Files (*)")
 
         # Save the image if a path is selected
         if save_path:

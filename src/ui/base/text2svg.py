@@ -350,7 +350,7 @@ class GraphWindow(QDialog):
         if current_fig:
             file_name, _ = QFileDialog.getSaveFileName(
                 self, "Guardar Gráfico",
-                "", "PNG Files (*.png);;All Files (*)"
+                self.get_current_title()+"_grafico.png", "PNG Files (*.png);;All Files (*)"
             )
             if file_name:
                 current_fig.savefig(file_name, bbox_inches='tight', dpi=300)
@@ -363,7 +363,7 @@ class GraphWindow(QDialog):
         if latex_expr:
             file_name, _ = QFileDialog.getSaveFileName(
                 self, "Guardar LaTeX",
-                "", "PNG Files (*.png);;All Files (*)"
+                self.get_current_title()+"_latex.png", "PNG Files (*.png);;All Files (*)"
             )
             if file_name:
                 # Crear una figura solo con la ecuación

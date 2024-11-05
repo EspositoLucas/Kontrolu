@@ -182,14 +182,14 @@ class MainWindow(QMainWindow):
 
     def open_project(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, 'Abrir Proyecto', '', 'Todos los archivos (*);;Archivos de Proyecto (*.prj)', options=options)
+        file_name, _ = QFileDialog.getOpenFileName(self, 'Abrir Proyecto', '', 'Archivos JSON (*.json)', options=options)
         if file_name:
             self.statusBar().showMessage(f'Proyecto {file_name} abierto')
             # Lógica para abrir un proyecto
     
     def save_project(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, 'Guardar Proyecto', '', 'Archivos de Proyecto (*.prj)', options=options)
+        file_name, _ = QFileDialog.getSaveFileName(self, 'Guardar Proyecto', '', 'Archivos JSON (*.json)', options=options)
         if file_name:
             self.statusBar().showMessage(f'Proyecto guardado en {file_name}')
             # Lógica para guardar un proyecto
@@ -416,7 +416,7 @@ class MainWindow(QMainWindow):
         clipboard.setImage(image)
 
             # Open a file dialog to select the save location
-        save_path, _ = QFileDialog.getSaveFileName(None, "Save Image", "", "PNG Files (*.png);;All Files (*)")
+        save_path, _ = QFileDialog.getSaveFileName(None, "Save Image", self.sesion.nombre+"_diagrama.png", "PNG Files (*.png);;All Files (*)")
 
         # Save the image if a path is selected
         if save_path:

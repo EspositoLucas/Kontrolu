@@ -144,7 +144,7 @@ class VistaJson(QDialog):
 
     def descargar_json(self):
         options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "Descargar JSON", "", "JSON Files (*.json);;All Files (*)", options=options)
+        file_name, _ = QFileDialog.getSaveFileName(self, "Descargar JSON", self.microbloque.nombre + ".json", "JSON Files (*.json);;All Files (*)", options=options)
         if file_name:
             with open(file_name, 'w') as file:
                 json_text = self.text_edit.toPlainText()
