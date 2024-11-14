@@ -1,6 +1,6 @@
 # Kontrolu | Proyecto Final | UTN FRBA | 2024
 
-## Requisitos previos
+## Requisitos Previos
 
 1. **Python 3.8+**: Asegúrate de tener Python instalado. Puedes verificar tu versión con:
    ```bash
@@ -10,7 +10,7 @@
 
 ## Instalación
 
-### 1. Clona el repositorio
+### 1. Clonar Repositorio
 
 Si tienes el archivo `.zip`, extráelo en una carpeta local. Alternativamente, si el repositorio está en un sistema de control de versiones, puedes clonarlo con:
 
@@ -30,7 +30,7 @@ source venv/bin/activate   # En Linux/macOS
 venv\Scripts\activate      # En Windows
 ```
 
-### 3. Instala las dependencias
+### 3. Instalar Dependencias
 
 Todas las dependencias necesarias están listadas en `requirements.txt`. Ejecuta el siguiente comando para instalarlas:
 
@@ -38,7 +38,7 @@ Todas las dependencias necesarias están listadas en `requirements.txt`. Ejecuta
 pip install -r requirements.txt
 ```
 
-### 4. Instala el proyecto como un paquete
+### 4. Instalar el proyecto como un paquete
 
 Para facilitar la ejecución de algunos módulos, puedes instalar el proyecto como un paquete usando el archivo `setup.py`. Esto hará que las importaciones internas funcionen correctamente y podrás ejecutar el proyecto desde cualquier ubicación. Para instalar el paquete, usa:
 
