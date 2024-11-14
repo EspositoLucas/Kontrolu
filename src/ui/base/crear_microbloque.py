@@ -219,19 +219,22 @@ class CrearMicroBloque(QDialog):
         Método que se ejecuta al hacer clic en un elemento del árbol.
         """
         if hasattr(item, 'microbloque'):
-            # Preguntar al usuario si está seguro de seleccionar este preset
-            confirm = QMessageBox.question(
-                self,
-                "Confirmar selección",
-                "¿Estás seguro de que deseas seleccionar este preset?\nSe sobrescribirá el bloque anterior si está guardado.",
-                QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.No  # Respuesta por defecto
-            )
-
-            if confirm == QMessageBox.Yes:
+            # Crear el cuadro de diálogo de confirmación
+            confirm = QMessageBox(self)
+            confirm.setIcon(QMessageBox.Question)
+            confirm.setWindowTitle("Confirmar selección")
+            confirm.setText("¿Estás seguro de que deseas seleccionar este preset?\nSe sobrescribirá el bloque anterior si está guardado.")
+            
+            # Añadir botones personalizados
+            boton_si = confirm.addButton("Sí", QMessageBox.YesRole)
+            boton_no = confirm.addButton("No", QMessageBox.NoRole)
+            
+            # Mostrar el cuadro de diálogo y verificar la respuesta
+            confirm.exec()
+            
+            if confirm.clickedButton() == boton_si:
                 # Llama al método select_preset pasando el microbloque del item clickeado
                 self.select_preset(item.microbloque)
-
 
 
     def select_preset(self, mi_preset):

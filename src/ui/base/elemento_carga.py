@@ -26,14 +26,20 @@ class ElementoCarga(MacroVista):
             self.mostrar_configuracion_carga()
 
     def mostrar_configuracion_carga(self):
+        # Guardar una copia de los estados antes de abrir el diálogo
+        estados_originales = list(self.carga.estados)
+
         dialog = ConfiguracionCargaDialog(self, self.carga, self.estado_seleccionado)
         dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         if dialog.exec_():
+            # Solo se aplica la configuración si se da a OK
             self.carga = dialog.carga
             self.tipo_entrada = dialog.tipo_entrada
             self.estado_seleccionado = dialog.estado_seleccionado
-            self.updateText()
-
+        else:
+            # Restaurar los estados originales si se cancela
+            self.carga.estados = estados_originales
+        self.updateText()
 class ConfiguracionCargaDialog(QtWidgets.QDialog):
     def __init__(self, parent=None, carga=None, estado_seleccionado=None):
         super().__init__()
@@ -175,10 +181,16 @@ class ConfiguracionCargaDialog(QtWidgets.QDialog):
         self.desplazamiento_sigmoide_input = QtWidgets.QLineEdit(str(self.carga.desplazamiento_sigmoide))
         ds_layout.addWidget(self.desplazamiento_sigmoide_input)
         layout.addLayout(ds_layout)
+        
         # Botones OK, Cancelar y Editar JSON
         button_box = QtWidgets.QDialogButtonBox()
         button_box.addButton(QtWidgets.QDialogButtonBox.Ok)
         button_box.addButton(QtWidgets.QDialogButtonBox.Cancel)
+
+        # Cambiar el texto del botón "OK" a "Guardar" y "Cancel" a "Cancelar"
+        button_box.button(QtWidgets.QDialogButtonBox.Ok).setText("Guardar")
+        button_box.button(QtWidgets.QDialogButtonBox.Cancel).setText("Cancelar")
+
         self.btn_editar_json = QtWidgets.QPushButton("Editar JSON")
         button_box.addButton(self.btn_editar_json, QtWidgets.QDialogButtonBox.ActionRole)
         
@@ -434,10 +446,18 @@ class EditarEstadoDialog(QtWidgets.QDialog):
         layout.addLayout(prioridad_layout)
 
         # Botones OK y Cancelar
-        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        button_box = QtWidgets.QDialogButtonBox()
+        button_box. addButton(QtWidgets.QDialogButtonBox.Ok)
+        button_box. addButton(QtWidgets. QDialogButtonBox. Cancel)
+        
+        # Cambiar el texto del botón "OK" a "Guardar" y "Cancel" a "Cancelar"
+        button_box.button(QtWidgets.QDialogButtonBox.Ok).setText("Guardar")
+        button_box.button(QtWidgets.QDialogButtonBox.Cancel).setText("Cancelar")
+    
         button_box.accepted.connect(self.validate_inputs)
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
+
 
         self.setLayout(layout)
 

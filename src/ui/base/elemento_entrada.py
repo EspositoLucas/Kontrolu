@@ -121,6 +121,10 @@ class ConfiguracionEntradaDialog(QtWidgets.QDialog):
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         
+        # Cambiar el texto del botón "OK" a 'Guardar" y"Cancel" a "Cancelar"
+        button_box.button(QtWidgets.QDialogButtonBox.Ok).setText("Guardar")
+        button_box.button(QtWidgets.QDialogButtonBox.Cancel).setText("Cancelar")
+        
         # Botón Editar JSON
         self.boton_editar_json = QtWidgets.QPushButton("Editar JSON")
         self.boton_editar_json.clicked.connect(self.editar_json)

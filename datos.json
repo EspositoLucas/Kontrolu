@@ -33,6 +33,29 @@
                         "salida_tipo": "proporcional",
                         "unidad_entrada": "req",
                         "unidad_salida": "con"
+                    },
+                    "Microbloque 1": {
+                        "nombre": "Microbloque 1",
+                        "descripcion": "Esto es un microbloque",
+                        "fdt": "\\frac{1}{s}",
+                        "entrada_limite_inferior": "-inf",
+                        "entrada_limite_superior": "inf",
+                        "entrada_limite_por_ciclo": "inf",
+                        "entrada_error_maximo": "inf",
+                        "entrada_proporcion": 0.0,
+                        "entrada_tipo": "ninguno",
+                        "entrada_ultimo_valor": 0.0,
+                        "entrada_propabilidad": 1.0,
+                        "salida_limite_inferior": "-inf",
+                        "salida_limite_superior": "inf",
+                        "salida_limite_por_ciclo": "inf",
+                        "salida_error_maximo": "inf",
+                        "salida_proporcion": 0.0,
+                        "salida_tipo": "ninguno",
+                        "salida_ultimo_valor": 0.0,
+                        "salida_propabilidad": 1.0,
+                        "unidad_entrada": "V",
+                        "unidad_salida": "V"
                     }
                 }
             },
