@@ -47,7 +47,7 @@ python setup.py install
 ```
 
 ### Archivos adicionales de configuración
-- **`.gitignore`**: Excluye archivos innecesarios de la versión de control.
+**`.gitignore`**: Excluye archivos innecesarios de la versión de control.
 
 ## Ejecución del Proyecto
 
