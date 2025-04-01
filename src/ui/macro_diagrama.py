@@ -1,4 +1,3 @@
-
 from PyQt5 import QtWidgets, QtCore
 from .base.elemento_control import ElementoControl
 from .base.elemento_actuador import ElementoActuador
@@ -92,8 +91,21 @@ class MacroDiagrama(QGraphicsView):
         x_medidor = x_actuador
         y_medidor = self.Y_MEDIO + ALTO_ELEMENTO + DISTANCIA_ENTRE_ELEMENTOS_VERTICAL
         pos_med = QRectF(x_medidor, y_medidor, ANCHO_ELEMENTO, ALTO_ELEMENTO)
-        medidor = ElementoMedicion(self.sesion.medidor, pos_med,self)
-        self.scene.addItem(medidor)
+        
+        # Verificar si el medidor tiene FDT = 1 para mostrar solo la línea
+        fdt_medidor = self.sesion.medidor.obtener_fdt_simpy()
+        if fdt_medidor == 1:
+            # Solo creamos las líneas sin el rectángulo del medidor visible
+            self.medidor_visible = False
+            # Crear un elemento medidor invisible que manejará los eventos de clic
+            medidor_invisible = ElementoMedicion(self.sesion.medidor, pos_med, self)
+            medidor_invisible.setOpacity(0)  # Hacerlo completamente transparente
+            self.scene.addItem(medidor_invisible)
+        else:
+            # Crear el elemento medidor normal
+            medidor = ElementoMedicion(self.sesion.medidor, pos_med, self)
+            self.scene.addItem(medidor)
+            self.medidor_visible = True
 
         # CARGA
         x_carga = x_proceso + ANCHO_ELEMENTO + DISTANCIA_HORIZONTAL_EXTRA
@@ -144,8 +156,29 @@ class MacroDiagrama(QGraphicsView):
         self.line_4 = Flecha(QtCore.QPointF(desde_proceso, y_linea_1), QtCore.QPointF(x_carga - head, y_linea_1), ah, aw, lw)  # proceso a carga
         self.scene.addItem(self.line_4)
 
-        self.line_5 = Flecha(QtCore.QPointF(x_medidor, y_linea_2), QtCore.QPointF(x_subida + head, y_linea_2), ah, aw, lw, arrow=False)  # medidor a punto suma (horizontal)
-        self.scene.addItem(self.line_5)
+        if not hasattr(self, 'medidor_visible') or self.medidor_visible:
+            # Caso normal: líneas conectando al elemento medidor
+            self.line_5 = Flecha(QtCore.QPointF(x_medidor, y_linea_2), QtCore.QPointF(x_subida + head, y_linea_2), ah, aw, lw, arrow=False)  # medidor a punto suma (horizontal)
+            self.scene.addItem(self.line_5)
+        else:
+            # Caso FDT = 1: línea directa sin medidor visible
+            self.line_5 = Flecha(QtCore.QPointF(x_bajada, y_linea_2), QtCore.QPointF(x_subida + head, y_linea_2), ah, aw, lw, arrow=False)
+            self.scene.addItem(self.line_5)
+            
+            # Añadir un área interactiva sobre la línea para capturar clics
+            area_interactiva = QtWidgets.QGraphicsRectItem(x_subida, y_linea_2 - 5, x_bajada - x_subida, 10)
+            area_interactiva.setPen(QtGui.QPen(Qt.transparent))  # Borde invisible
+            area_interactiva.setBrush(QtGui.QBrush(Qt.transparent))  # Relleno invisible
+            area_interactiva.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
+            area_interactiva.setAcceptHoverEvents(True)
+            
+            # Conectar el evento de clic con el medidor invisible
+            def handle_click(event):
+                if event.button() == Qt.LeftButton:
+                    medidor_invisible.mousePressEvent(event)
+            
+            area_interactiva.mousePressEvent = handle_click
+            self.scene.addItem(area_interactiva)
 
         # PUNTO SUMA
         self.x_subida = x_subida
@@ -214,10 +247,75 @@ class MacroDiagrama(QGraphicsView):
             
 
     def update_funciones(self):
+        # Guardar el valor anterior de medidor_visible para ver si ha cambiado
+        medidor_visible_anterior = getattr(self, 'medidor_visible', True)
+        
+        # Verificar si el estado del medidor ha cambiado
+        fdt_medidor = self.sesion.medidor.obtener_fdt_simpy()
+        medidor_visible_nuevo = fdt_medidor != 1
+        
+        # Si el estado del medidor cambió, necesitamos actualizar su visualización
+        if medidor_visible_anterior != medidor_visible_nuevo:
+            # Limpiamos solo los elementos afectados, no toda la escena
+            items_to_remove = []
+            for item in self.scene.items():
+                # Encontrar y eliminar elementos relacionados con el medidor y sus líneas
+                if isinstance(item, ElementoMedicion) or item == self.line_5:
+                    items_to_remove.append(item)
+            
+            # Eliminar los elementos identificados
+            for item in items_to_remove:
+                self.scene.removeItem(item)
+            
+            # Actualizar el flag de visibilidad
+            self.medidor_visible = medidor_visible_nuevo
+            
+            # Recrear solo el elemento medidor y su línea
+            x_medidor = self.X_MEDIO - ANCHO_ELEMENTO / 2
+            y_medidor = self.Y_MEDIO + ALTO_ELEMENTO + DISTANCIA_ENTRE_ELEMENTOS_VERTICAL
+            pos_med = QRectF(x_medidor, y_medidor, ANCHO_ELEMENTO, ALTO_ELEMENTO)
+            
+            # MEDIDOR
+            if not medidor_visible_nuevo:  # Si FDT = 1
+                # Crear un elemento medidor invisible
+                medidor_invisible = ElementoMedicion(self.sesion.medidor, pos_med, self)
+                medidor_invisible.setOpacity(0)  # Hacerlo transparente
+                self.scene.addItem(medidor_invisible)
+                
+                # Línea directa sin medidor visible
+                y_linea_2 = self.Y_MEDIO + ALTO_ELEMENTO + DISTANCIA_ENTRE_ELEMENTOS_VERTICAL + ALTO_ELEMENTO / 2
+                x_bajada = self.x_bajada
+                x_subida = self.x_subida
+                
+                self.line_5 = Flecha(QtCore.QPointF(x_bajada, y_linea_2), QtCore.QPointF(x_subida + 3, y_linea_2), 1, 1, 2, arrow=False)
+                self.scene.addItem(self.line_5)
+                
+                # Área interactiva
+                area_interactiva = QtWidgets.QGraphicsRectItem(x_subida, y_linea_2 - 5, x_bajada - x_subida, 10)
+                area_interactiva.setPen(QtGui.QPen(Qt.transparent))
+                area_interactiva.setBrush(QtGui.QBrush(Qt.transparent))
+                area_interactiva.setFlag(QtWidgets.QGraphicsItem.ItemIsSelectable, True)
+                area_interactiva.setAcceptHoverEvents(True)
+                
+                def handle_click(event):
+                    if event.button() == Qt.LeftButton:
+                        medidor_invisible.mousePressEvent(event)
+                
+                area_interactiva.mousePressEvent = handle_click
+                self.scene.addItem(area_interactiva)
+            else:
+                # Crear el elemento medidor normal
+                medidor = ElementoMedicion(self.sesion.medidor, pos_med, self)
+                self.scene.addItem(medidor)
+                
+                # Línea normal que conecta con el medidor
+                y_linea_2 = self.Y_MEDIO + ALTO_ELEMENTO + DISTANCIA_ENTRE_ELEMENTOS_VERTICAL + ALTO_ELEMENTO / 2
+                self.line_5 = Flecha(QtCore.QPointF(x_medidor, y_linea_2), QtCore.QPointF(self.x_subida + 3, y_linea_2), 1, 1, 2, arrow=False)
+                self.scene.addItem(self.line_5)
+        
+        # Continuar con la actualización normal de funciones
         self.remove_funciones()
         self.draw_funciones()
-
- 
 
     def draw_error(self,errores):
 
