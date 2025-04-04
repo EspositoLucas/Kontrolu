@@ -1,5 +1,3 @@
-Aquí tienes el README actualizado con la información sobre la necesidad de tener Git instalado:
-
 # **Kontrolu | Proyecto Final | UTN FRBA | 2024**
 ## **Requisitos Previos**
 1. **Python 3.8+**: Asegúrate de tener Python instalado. Puedes verificar tu versión con:
