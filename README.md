@@ -42,7 +42,6 @@ Este comando lanza la aplicación y comienza la simulación/visualización de lo
 - **`src/ui/`**: Contiene los elementos de la interfaz de usuario y visualización.
 - **`tests/`**: Carpeta de pruebas unitarias.
 
-```
 ## **Desactivación del entorno virtual**
 Una vez que hayas terminado, puedes salir del entorno virtual con:
 ```bash
