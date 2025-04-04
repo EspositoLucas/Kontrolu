@@ -31,9 +31,6 @@ Todas las dependencias necesarias están listadas en `requirements.txt`. Ejecuta
 ```bash
 pip install -r requirements.txt
 ```
-### **4. Archivos adicionales de configuración**
-**`.gitignore`**: Excluye archivos innecesarios de la versión de control.
-
 ## **Ejecución del Proyecto**
 Una vez instaladas las dependencias y configurado el entorno, puedes ejecutar la aplicación principal. Este repositorio tiene un archivo principal en `src/main.py`, que inicia la aplicación.
 Para ejecutar el proyecto, usa:
