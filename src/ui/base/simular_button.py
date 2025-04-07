@@ -35,7 +35,7 @@ class BotonSimular(QGraphicsRectItem):
         self.setRect(qrect)  # Establecer el tamaño del rectángulo
 
         self.text = "SIMULAR"
-        self.font = QFont("Arial", 32, QFont.Bold)  # Estilo del texto
+        self.font = QFont("Arial", 28, QFont.Bold)  # Estilo del texto
         self.setAcceptHoverEvents(True)
 
         # Crear el icono de QtAwesome como pixmap

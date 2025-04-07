@@ -47,7 +47,7 @@ class MacroVista(QGraphicsRectItem):
         else:
             self.text = self.modelo.nombre
         
-        self.font = QFont("Arial", 16, QFont.Bold)  # Estilo del texto
+        self.font = QFont("Arial", 14, QFont.Bold)  # Estilo del texto
         self.setAcceptHoverEvents(True)  
 
 
